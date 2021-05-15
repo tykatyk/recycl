@@ -1,0 +1,22 @@
+{
+  "name": "q",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "materialize-css": "^1.0.0-rc.2",
+    "morgan": "~1.9.1",
+    "node-sass-middleware": "0.11.0",
+    "react": "^17.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.2",
+    "babel-loader": "^8.2.2",
+    "webpack": "^5.37.0"
+  }
+}
