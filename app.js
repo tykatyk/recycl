@@ -1,13 +1,21 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var sassMiddleware = require('node-sass-middleware');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const sassMiddleware = require('node-sass-middleware');
+const handlebars = require('express-handlebars')
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 
-var app = express();
+const app = express();
+
+app.engine('handlebars', handlebars({
+  layoutsDir: path.join(__dirname, '/public/views/layouts')
+}))
+app.set('views', path.join(__dirname, '/public/views'))
+app.set('view engine', 'handlebars')
+app.set('view options', { layout: 'main' });
 
 app.use(logger('dev'));
 app.use(express.json());

@@ -1,9 +1,14 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const React = require('React')
+const ReactDOMServer = require('react-dom/server')
+const Home = React.createFactory(require('../components/home.jsx'))
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('home', {
+    content: ReactDOMServer.renderToString(Home())
+  });
 });
 
 module.exports = router;
