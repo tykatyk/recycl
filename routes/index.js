@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const React = require('React')
+const React = require('react')
 const ReactDOMServer = require('react-dom/server')
 const Home = React.createFactory(require('../components/home.jsx'))
 

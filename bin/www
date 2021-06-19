@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var app = require('../app.js');
+var app = require('../server/server.js');
 var debug = require('debug')('q:server');
 var http = require('http');
 
@@ -26,7 +26,7 @@ var server = http.createServer(app);
  */
 
 server.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`Recycl app listening at http://localhost:${port}`)
 });
 server.on('error', onError);
 server.on('listening', onListening);
