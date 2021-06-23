@@ -1,13 +1,15 @@
 const path = require('path')
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
+  target: 'web',
   mode: 'development',
   entry: {
-    index: './public/js/index.js'
+    index: './public/client.js'
   },
   output: {
     path: path.join(__dirname, 'build'),
-    filename: 'index.js'
+    filename: '[name].js'
   },
   module: {
     rules: [
@@ -22,5 +24,5 @@ module.exports = {
         }
       }
     ]
-  }
+  },
 }

@@ -1,13 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const React = require('react')
-const ReactDOMServer = require('react-dom/server')
-const Home = React.createFactory(require('../components/home.jsx'))
+require("@babel/register")
+const express = require('express')
+const router = express.Router()
+const {css, html} = require('../public/ssr/home.mjs')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+
   res.render('home', {
-    content: ReactDOMServer.renderToString(Home())
+    header: html,
+    css: css,
   });
 });
 

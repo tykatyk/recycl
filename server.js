@@ -10,7 +10,6 @@ const usersRouter = require('./routes/users');
 const app = express();
 
 app.set('view engine', 'hbs')
-app.set('view options', { layout: '/layouts/main' });
 
 app.use(logger('dev'));
 app.use(express.json());
