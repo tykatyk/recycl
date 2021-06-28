@@ -1,15 +1,17 @@
-const path = require('path')
-const nodeExternals = require('webpack-node-externals');
+import path from 'path';
+import webpack from 'webpack';
 
-module.exports = {
+export default {
   target: 'web',
   mode: 'development',
-  entry: {
-    index: './public/client.js'
-  },
+  entry: [
+    'webpack-hot-middleware/client?&path=/__webpack_hmr&timeout=20000',
+    './client/client.jsx'
+  ],
   output: {
-    path: path.join(__dirname, 'build'),
-    filename: '[name].js'
+    path: path.join(__dirname, 'build', 'public', 'js'),
+    publicPath: '/',
+    filename: 'client.js'
   },
   module: {
     rules: [
@@ -25,4 +27,8 @@ module.exports = {
       }
     ]
   },
-}
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoEmitOnErrorsPlugin()
+  ]
+};
