@@ -6,6 +6,7 @@ import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography'
 import Header from './Header.jsx'
+import Footer from './Footer.jsx'
 import {makeStyles} from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
@@ -53,31 +54,32 @@ export default function Home() {
   const classes = useStyles()
   return (
     <React.Fragment>
-    <Header />
-    <Container maxWidth="md" component="main" className={classes.content}>
-      <Grid container spacing={5} alignItems="flex-end">
-        {tiers.map((tier) => (
-          <Grid item key={tier.title} xs={12} md={6}>
-            <Card className={classes.card}>
-              <CardHeader
-                title={tier.title}
-                titleTypographyProps={{ align: 'center' }}
-                className={classes.cardHeader}
-              />
-              <CardContent>
-                <ul>
-                  {tier.description.map((line) => (
-                    <Typography component="li" variant="subtitle1" align="center" key={line}>
-                      {line}
-                    </Typography>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
+      <Header />
+      <Container maxWidth="md" component="main" className={classes.content}>
+        <Grid container spacing={5} alignItems="flex-end">
+          {tiers.map((tier) => (
+            <Grid item key={tier.title} xs={12} md={6}>
+              <Card className={classes.card}>
+                <CardHeader
+                  title={tier.title}
+                  titleTypographyProps={{ align: 'center' }}
+                  className={classes.cardHeader}
+                />
+                <CardContent>
+                  <ul>
+                    {tier.description.map((line) => (
+                      <Typography component="li" variant="subtitle1" align="center" key={line}>
+                        {line}
+                      </Typography>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+      <Footer />
     </React.Fragment>
 
   )
