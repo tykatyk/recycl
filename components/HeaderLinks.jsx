@@ -19,15 +19,19 @@ export default function HeaderLinks() {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
-      <Typography component='div' align="right" className={classes.links}>
-          <Link href="#" onClick={preventDefault} color="inherit">
-            Recyclers
-          </Link>
-          <Link href="#" onClick={preventDefault} color="inherit">
-            Collectors
-          </Link>
+      <Typography component='nav' align="right" className={`${classes.links} ${classes.root}`}>
+        <Link href="#" onClick={preventDefault} color="inherit">
+          Заявки на сортировку
+        </Link>
+        <Link href="#" onClick={preventDefault} color="inherit">
+          Заявки на вывоз
+        </Link>
+        <Link href="#" onClick={preventDefault} color="inherit">
+          Переработчики
+        </Link>
+        <Link href="#" onClick={preventDefault} color="inherit">
+          Сборщики
+        </Link>
       </Typography>
-    </div>
   )
 }

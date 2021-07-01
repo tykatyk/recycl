@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
-import Header from '../components/Header.jsx';
+import Home from '../components/Home.jsx';
 import theme from '../components/theme';
 
 function Main() {
@@ -17,7 +17,7 @@ function Main() {
     <React.Fragment>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <Header />
+        <Home />
       </ThemeProvider>
     </React.Fragment>
   );
