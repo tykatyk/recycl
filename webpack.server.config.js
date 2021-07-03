@@ -1,16 +1,14 @@
 const path = require('path')
-const nodeExternals = require('webpack-node-externals');
+const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
   target: 'node',
   node: {
-  __dirname: false,
-  __filename: false
-},
+    __dirname: false,
+    __filename: false
+  },
   mode: 'development',
-  entry: [
-    './server.js'
-  ],
+  entry: ['./server.js'],
   output: {
     path: path.join(__dirname, 'build'),
     publicPath: '/',
@@ -24,11 +22,11 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"]
+            presets: ['@babel/preset-env', '@babel/preset-react']
           }
         }
       }
     ]
   },
   externals: [nodeExternals()]
-};
+}
