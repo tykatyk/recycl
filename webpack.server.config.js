@@ -8,6 +8,7 @@ module.exports = {
     __filename: false
   },
   mode: 'development',
+  devtool: 'source-map',
   entry: ['./server.js'],
   output: {
     path: path.join(__dirname, 'build'),

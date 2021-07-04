@@ -1,9 +1,10 @@
-import path from 'path';
-import webpack from 'webpack';
+import path from 'path'
+import webpack from 'webpack'
 
 export default {
   target: 'web',
   mode: 'development',
+  devtool: 'source-map',
   entry: [
     'webpack-hot-middleware/client?&path=/__webpack_hmr&timeout=20000',
     './client/client.jsx'
@@ -21,7 +22,7 @@ export default {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"]
+            presets: ['@babel/preset-env', '@babel/preset-react']
           }
         }
       }
@@ -31,4 +32,4 @@ export default {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
   ]
-};
+}
