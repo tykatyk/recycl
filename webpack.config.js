@@ -41,6 +41,19 @@ export default {
             }
           }
         ]
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: './build/public/img',
+              include: path.join(__dirname, 'build/public/img')
+            }
+          }
+        ]
       }
     ]
   },

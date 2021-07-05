@@ -12,15 +12,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 'auto',
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
-    [theme.breakpoints.up('sm')]: {
-      paddingTop: theme.spacing(6),
-      paddingBottom: theme.spacing(6)
-    },
+
     backgroundColor: '#20232a',
-    color: '#fff',
-    '& > :first-child': {
-      marginBottom: theme.spacing(2)
-    }
+    color: '#fff'
   }
 }))
 
@@ -30,9 +24,7 @@ export default function Footer() {
   return (
     <footer className={classes.footer}>
       <Typography variant="body2" align="center">
-        <Link color="inherit" href="https://material-ui.com/">
-          Recycl
-        </Link>
+        Copyright
         {' © '}
         {new Date().getFullYear()}
       </Typography>

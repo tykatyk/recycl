@@ -134,7 +134,7 @@ export default function Header() {
   )
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" id="mainHeader">
       <Toolbar className={classes.header}>
         {mobileView ? displayMobile() : displayDesktop()}
         <IconButton
