@@ -12,8 +12,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 'auto',
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
-
-    backgroundColor: '#20232a',
+    backgroundColor: '#223c4a',
     color: '#fff'
   }
 }))
@@ -26,7 +25,7 @@ export default function Footer() {
       <Typography variant="body2" align="center">
         Copyright
         {' © '}
-        {new Date().getFullYear()}
+        {new Date().getFullYear()} | Связаться с нами
       </Typography>
     </footer>
   )

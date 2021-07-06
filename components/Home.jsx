@@ -15,22 +15,45 @@ const useStyles = makeStyles((theme) => ({
     ul: {
       margin: 0,
       padding: 0,
+      listStylePosition: 'inside',
       listStyle: 'none'
+    },
+    li: {
+      position: 'relative',
+      paddingLeft: theme.spacing(3),
+      paddingBottom: theme.spacing(3),
+      '&::lastChild': {
+        paddingBottom: 0
+      },
+      '&:before': {
+        content: '"»"',
+        color: '#f8bc45',
+        fontSize: '2em',
+        fontWeight: 'bold',
+        display: 'inline-block',
+        marginRight: theme.spacing(1),
+        position: 'absolute',
+        top: '-0.5em',
+        left: '0'
+      }
     }
   },
-  cardHeader: {
-    backgroundColor:
-      theme.palette.type === 'light'
-        ? theme.palette.grey[200]
-        : theme.palette.grey[700]
-  },
   card: {
-    height: '25em',
-    textAlign: 'left'
+    minHeight: '25em',
+    background: '#417347',
+    color: '#fff'
   },
+  cardHeader: {
+    backgroundColor: '#223c4a',
+    borderBottom: '6px solid #fff'
+  },
+  cardContent: {
+    paddingTop: theme.spacing(3)
+  },
+
   content: {
-    margin: 'auto'
-    // padding: theme.spacing(8, 0, 6)
+    padding: theme.spacing(8, 0, 8),
+    backgroundColor: '#1a2b34'
   },
   wrapper: {
     display: 'flex',
@@ -45,31 +68,38 @@ const useStyles = makeStyles((theme) => ({
     letterSpacing: '1.2',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: 'center'
   },
   mainHeader: {
-    marginTop: '-1em'
+    fontWeight: 'bold',
+    paddingTop: '1.5em'
+  },
+  subHeader: {
+    fontWeight: 'bold'
   }
 }))
 
 const tiers = [
   {
-    title: 'Для сборщиков и переработчиков',
+    title: 'Для переработчиков',
     description: [
-      'Находите новых поставщиков/клиентов',
-      'Находите отходы, мониторя заявки на вывоз',
-      'Расширяйте номенклатуру поставок продавая продукцию/сырье заинтересованным партнерам',
-      'Экономьте на логистике'
+      'Находите новых партнеров.',
+      'Находите сырье для переработки.',
+      'Работойте с новыми видами сырья, которые нужны рынку.'
     ]
   },
   {
-    title: 'Для бизнеса и общественности',
+    title: 'Для бизнеса',
     description: [
-      'Находите места приема отходов',
-      'Подавайте заявки на вывоз и участие в сортировке',
-      'Привлекайте новых клиентов, устанавливая места для раздельного сбора и гарантированно избавляйтесь от отходов',
-      'Экономьте на утилизации, сдавая отходы тем, кому они нужны'
+      'Привлекайте новых клиентов, устанавливая места для раздельного сбора и гарантированно избавляйтесь от отходов.',
+      'Экономьте на утилизации, сдавая отходы тем, кому они нужны.'
+    ]
+  },
+  {
+    title: 'Для общественности',
+    description: [
+      'Находите места приема отходов.',
+      'Подавайте заявки на вывоз и участие в сортировке.'
     ]
   }
 ]
@@ -80,11 +110,6 @@ export default function Home() {
   })
 
   useEffect(() => {
-    console.log(`splash minheight ${state.splashMinHeight}`)
-    console.log(`window innerHeight ${window.innerHeight}`)
-    console.log(
-      `header height ${document.getElementById('mainHeader').offsetHeight}`
-    )
     const calculeteSplashMinHeight = () => {
       const headerHeight = document.getElementById('mainHeader').offsetHeight
       const windowHeight = window.innerHeight
@@ -126,20 +151,20 @@ export default function Home() {
           <Container component="main">
             <Grid container spacing={5} alignItems="flex-end">
               {tiers.map((tier) => (
-                <Grid item key={tier.title} xs={12} md={6}>
+                <Grid item key={tier.title} xs={12} sm={6} md={4}>
                   <Card className={classes.card}>
                     <CardHeader
                       title={tier.title}
                       titleTypographyProps={{ align: 'center' }}
                       className={classes.cardHeader}
                     />
-                    <CardContent>
+                    <CardContent className={classes.cardContent}>
                       <ul>
                         {tier.description.map((line) => (
                           <Typography
                             component="li"
                             variant="subtitle1"
-                            align="center"
+                            align="left"
                             key={line}
                           >
                             {line}
