@@ -17,8 +17,29 @@ const useStyles = makeStyles((theme) => ({
       padding: 0,
       listStylePosition: 'inside',
       listStyle: 'none'
-    },
-    li: {
+    }
+  },
+  wrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh'
+  },
+  splash: {
+    paddingTop: theme.spacing(14),
+    backgroundImage: `url(${background})`,
+    color: '#fff',
+    textAlign: 'center'
+  },
+  splashMainHeader: {
+    fontWeight: 'bold'
+  },
+  splashSubHeader: {
+    fontWeight: 'bold'
+  },
+  cardContainer: {
+    padding: theme.spacing(8, 0, 8),
+    backgroundColor: '#1a2b34',
+    '& li': {
       position: 'relative',
       paddingLeft: theme.spacing(3),
       paddingBottom: theme.spacing(3),
@@ -49,33 +70,6 @@ const useStyles = makeStyles((theme) => ({
   },
   cardContent: {
     paddingTop: theme.spacing(3)
-  },
-
-  content: {
-    padding: theme.spacing(8, 0, 8),
-    backgroundColor: '#1a2b34'
-  },
-  wrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh'
-  },
-  splash: {
-    backgroundImage: `url(${background})`,
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    letterSpacing: '1.2',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-  mainHeader: {
-    fontWeight: 'bold',
-    paddingTop: '1.5em'
-  },
-  subHeader: {
-    fontWeight: 'bold'
   }
 }))
 
@@ -85,7 +79,7 @@ const tiers = [
     description: [
       'Находите новых партнеров.',
       'Находите сырье для переработки.',
-      'Работойте с новыми видами сырья, которые нужны рынку.'
+      'Работaйте с новыми видами сырья, которые нужны рынку.'
     ]
   },
   {
@@ -137,19 +131,24 @@ export default function Home() {
           style={{ minHeight: `${state.splashMinHeight}px` }}
         >
           <Typography
-            component="h2"
+            component="h1"
             variant="h1"
-            className={classes.mainHeader}
+            paragraph
+            className={classes.splashMainHeader}
           >
             Recycl
           </Typography>
-          <Typography component="h2" variant="h3" className={classes.subHeader}>
+          <Typography
+            component="h2"
+            variant="h3"
+            className={classes.splashSubHeader}
+          >
             Помогаем собирать и перерабатывать отходы
           </Typography>
         </div>
-        <div className={classes.content}>
+        <div className={classes.cardContainer}>
           <Container component="main">
-            <Grid container spacing={5} alignItems="flex-end">
+            <Grid container spacing={5}>
               {tiers.map((tier) => (
                 <Grid item key={tier.title} xs={12} sm={6} md={4}>
                   <Card className={classes.card}>
@@ -178,8 +177,10 @@ export default function Home() {
             </Grid>
           </Container>
         </div>
+        {/* end of cardContainer */}
         <Footer />
       </div>
+      {/* end of wrapper */}
     </>
   )
 }
