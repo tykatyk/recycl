@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Container from '@material-ui/core/Container'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Typography from '@material-ui/core/Typography'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 import Header from './Header.jsx'
 import Footer from './Footer.jsx'
 import background from '../build/public/images/22.jpg'
+import isMobile from '../helpers/detectMobile'
 
 const useStyles = makeStyles((theme) => ({
   '@global': {
@@ -25,10 +26,18 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '100vh'
   },
   splash: {
-    paddingTop: theme.spacing(14),
+    // paddingTop: theme.spacing(14),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1a2b34',
     backgroundImage: `url(${background})`,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
     color: '#fff',
-    textAlign: 'center'
+    textAlign: 'center',
+    boxSizing: 'border-box'
   },
   splashMainHeader: {
     fontWeight: 'bold'
@@ -99,28 +108,61 @@ const tiers = [
 ]
 
 export default function Home() {
+  const ref = useRef()
+
   const [state, setState] = useState({
-    splashMinHeight: 0
+    splashMinHeight: 0,
+    inPortraitMode: window.innerHeight > window.innerWidth,
+    mobilePortraitHeight: window.innerHeight,
+    mobileLandscapeHeight: window.innerWidth
   })
 
   useEffect(() => {
-    const calculeteSplashMinHeight = () => {
-      const headerHeight = document.getElementById('mainHeader').offsetHeight
-      const windowHeight = window.innerHeight
-      return setState((prevState) => ({
-        ...prevState,
-        splashMinHeight: windowHeight - headerHeight
-      }))
+    if (typeof window !== 'undefined') {
+      ref.current = {
+        splashMinHeight: state.splashMinHeight,
+        inPortraitMode: state.inPortraitMode
+      }
+
+      let isLoaded = true
+
+      const calculeteSplashMinHeight = () => {
+        const headerHeight = document.getElementById('mainHeader').offsetHeight
+        const windowHeight = window.innerHeight
+        const windowWidth = window.innerWidth
+        let splashMinHeight = windowHeight - headerHeight
+
+        if (!isLoaded) return
+        if (isMobile()) {
+          const portraitMode = window.innerHeight > window.innerWidth
+          if (
+            ref.current.splashMinHeight === 0 ||
+            ref.current.inPortraitMode != portraitMode
+          ) {
+            splashMinHeight = portraitMode
+              ? state.mobilePortraitHeight - headerHeight
+              : state.mobileLandscapeHeight - headerHeight
+
+            ref.current.splashMinHeight = splashMinHeight
+            ref.current.inPortraitMode = portraitMode
+
+            setState(() => ({ splashMinHeight }))
+          }
+        } else {
+          setState(() => ({ splashMinHeight }))
+        }
+      }
+      calculeteSplashMinHeight()
+
+      window.addEventListener('resize', () => calculeteSplashMinHeight())
+
+      return () => {
+        isLoaded = false
+        window.removeEventListener('resize', () => calculeteSplashMinHeight())
+      }
     }
+  }, [])
 
-    calculeteSplashMinHeight()
-
-    window.addEventListener('resize', () => calculeteSplashMinHeight())
-
-    return () => {
-      window.removeEventListener('resize', () => calculeteSplashMinHeight())
-    }
-  }, [state.splashMinHeight])
   const classes = useStyles()
   return (
     <>
@@ -141,6 +183,7 @@ export default function Home() {
           <Typography
             component="h2"
             variant="h3"
+            paragraph
             className={classes.splashSubHeader}
           >
             Помогаем собирать и перерабатывать отходы

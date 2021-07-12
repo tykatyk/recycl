@@ -49,16 +49,23 @@ export default function Header() {
   })
 
   useEffect(() => {
-    const setResponsiveness = () =>
-      window.innerWidth < theme.breakpoints.values.md
-        ? setState((prevState) => ({ ...prevState, mobileView: true }))
-        : setState((prevState) => ({ ...prevState, mobileView: false }))
+    if (typeof window !== 'undefined') {
+      let isMounted = true
 
-    setResponsiveness()
-    window.addEventListener('resize', () => setResponsiveness())
-
-    return () => {
-      window.removeEventListener('resize', () => setResponsiveness())
+      const setResponsiveness = () => {
+        if (isMounted) {
+          window.innerWidth < theme.breakpoints.values.md
+            ? setState((prevState) => ({ ...prevState, mobileView: true }))
+            : setState((prevState) => ({ ...prevState, mobileView: false }))
+        }
+      }
+      setResponsiveness()
+      window.addEventListener('resize', () => setResponsiveness())
+      //
+      return () => {
+        isMounted = false
+        window.removeEventListener('resize', () => setResponsiveness())
+      }
     }
   }, [])
 
