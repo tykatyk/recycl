@@ -109,27 +109,35 @@ const tiers = [
 
 export default function Home() {
   const ref = useRef()
-
+  let mobileLandscapeHeight = 0
+  let mobilePortraitHeight = 0
+  let inPortraitMode = false
+  //
+  if (typeof window !== 'undefined' && isMobile()) {
+    inPortraitMode = window.innerHeight > window.innerWidth
+    ;(mobilePortraitHeight = inPortraitMode
+      ? window.innerHeight
+      : window.innerWidth),
+      (mobileLandscapeHeight = inPortraitMode
+        ? window.innerWidth
+        : window.innerHeight)
+  }
   const [state, setState] = useState({
     splashMinHeight: 0,
-    inPortraitMode: window.innerHeight > window.innerWidth,
-    mobilePortraitHeight: window.innerHeight,
-    mobileLandscapeHeight: window.innerWidth
+    portraitMode: inPortraitMode,
+    landscapeHeight: mobileLandscapeHeight,
+    portraitHeight: mobilePortraitHeight
   })
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      ref.current = {
-        splashMinHeight: state.splashMinHeight,
-        inPortraitMode: state.inPortraitMode
-      }
+      ref.current = { ...state }
 
       let isLoaded = true
 
       const calculeteSplashMinHeight = () => {
         const headerHeight = document.getElementById('mainHeader').offsetHeight
         const windowHeight = window.innerHeight
-        const windowWidth = window.innerWidth
         let splashMinHeight = windowHeight - headerHeight
 
         if (!isLoaded) return
@@ -137,14 +145,15 @@ export default function Home() {
           const portraitMode = window.innerHeight > window.innerWidth
           if (
             ref.current.splashMinHeight === 0 ||
-            ref.current.inPortraitMode != portraitMode
+            ref.current.portraitMode != portraitMode
           ) {
+            console.log(portraitMode)
             splashMinHeight = portraitMode
-              ? state.mobilePortraitHeight - headerHeight
-              : state.mobileLandscapeHeight - headerHeight
+              ? ref.current.portraitHeight - headerHeight
+              : ref.current.landscapeHeight - headerHeight
 
             ref.current.splashMinHeight = splashMinHeight
-            ref.current.inPortraitMode = portraitMode
+            ref.current.portraitMode = portraitMode
 
             setState(() => ({ splashMinHeight }))
           }
