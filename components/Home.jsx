@@ -10,6 +10,7 @@ import Header from './Header.jsx'
 import Footer from './Footer.jsx'
 import isMobile from '../helpers/detectMobile'
 import images from './data/backgroundImages'
+import cardsContent from './data/cardsContent'
 
 const useStyles = makeStyles((theme) => ({
   '@global': {
@@ -92,30 +93,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const cardsContent = [
-  {
-    title: 'Для переработчиков',
-    description: [
-      'Находите новых партнеров.',
-      'Находите сырье для переработки.',
-      'Работaйте с новыми видами сырья, которые нужны рынку.'
-    ]
-  },
-  {
-    title: 'Для бизнеса',
-    description: [
-      'Привлекайте новых клиентов, устанавливая места для раздельного сбора и гарантированно избавляйтесь от отходов.',
-      'Экономьте на утилизации, сдавая отходы тем, кому они нужны.'
-    ]
-  },
-  {
-    title: 'Для общественности',
-    description: [
-      'Находите места приема отходов.',
-      'Подавайте заявки на вывоз и участие в сортировке.'
-    ]
-  }
-]
 export default function Home() {
   const ref = useRef()
   let landscapeHeight = 0
@@ -180,13 +157,23 @@ export default function Home() {
           setState(() => ({ splashMinHeight }))
         }
       }
+
+      let timeout
+      const handleResize = () => {
+        // throttling resize event
+        clearTimeout(timeout)
+        timeout = setTimeout(() => {
+          calculeteSplashMinHeight()
+        }, 400)
+      }
+
       calculeteSplashMinHeight()
 
-      window.addEventListener('resize', () => calculeteSplashMinHeight())
+      window.addEventListener('resize', () => handleResize())
 
       return () => {
         isLoaded = false
-        window.removeEventListener('resize', () => calculeteSplashMinHeight())
+        window.removeEventListener('resize', () => handleResize())
       }
     }
   }, [])
