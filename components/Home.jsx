@@ -5,11 +5,11 @@ import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Typography from '@material-ui/core/Typography'
-import { makeStyles, useTheme } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import Header from './Header.jsx'
 import Footer from './Footer.jsx'
-import background from '../build/public/images/22.jpg'
 import isMobile from '../helpers/detectMobile'
+import images from './data/backgroundImages'
 
 const useStyles = makeStyles((theme) => ({
   '@global': {
@@ -20,34 +20,44 @@ const useStyles = makeStyles((theme) => ({
       listStyle: 'none'
     }
   },
-  wrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh'
-  },
+
   splash: {
-    // paddingTop: theme.spacing(14),
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1a2b34',
-    backgroundImage: `url(${background})`,
-    backgroundPosition: 'center',
+    backgroundImage: `url(${images.small})`, // 600px
+    [`${theme.breakpoints.up('xs')} and (min-resolution: 2dppx)`]: {
+      backgroundImage: `url(${images.smallRetina})` // 1200px
+    },
+    [theme.breakpoints.up('sm')]: {
+      backgroundImage: `url(${images.medium})` // 960px
+    },
+    [`${theme.breakpoints.up('sm')} and (min-resolution: 2dppx)`]: {
+      backgroundImage: `url(${images.mediumRetina})` // 1920px
+    },
+    [theme.breakpoints.up('md')]: {
+      backgroundImage: `url(${images.large})` // 1280px
+    },
+    [`${theme.breakpoints.up(
+      'md'
+    )} and (min-resolution: 2dppx), ${theme.breakpoints.up('large')}`]: {
+      backgroundImage: `url(${images.xLarge})` // should be 2560px but it's 2246px
+    },
     backgroundRepeat: 'no-repeat',
     color: '#fff',
-    textAlign: 'center',
-    boxSizing: 'border-box'
+    textAlign: 'center'
   },
+
   splashMainHeader: {
     fontWeight: 'bold'
   },
   splashSubHeader: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    wordWrap: 'break-word',
+    padding: '0 10px'
   },
   cardContainer: {
-    padding: theme.spacing(8, 0, 8),
-    backgroundColor: '#1a2b34',
+    padding: theme.spacing(4, 0, 4),
     '& li': {
       position: 'relative',
       paddingLeft: theme.spacing(3),
@@ -74,7 +84,7 @@ const useStyles = makeStyles((theme) => ({
     color: '#fff'
   },
   cardHeader: {
-    backgroundColor: '#223c4a',
+    backgroundColor: theme.palette.primary.main,
     borderBottom: '6px solid #fff'
   },
   cardContent: {
@@ -82,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const tiers = [
+const cardsContent = [
   {
     title: 'Для переработчиков',
     description: [
@@ -106,29 +116,39 @@ const tiers = [
     ]
   }
 ]
-
 export default function Home() {
   const ref = useRef()
-  let mobileLandscapeHeight = 0
-  let mobilePortraitHeight = 0
+  let landscapeHeight = 0
+  let portraitHeight = 0
   let inPortraitMode = false
-  //
+
+  // Defining viewport's height in order to set background image of the home page
+  // to be 100% of screen height.
+  // When rendered on server, window object is undefined,
+  // as well as navigator object in isMobile function.
+  // We need custom login for mobile devices
+  // in order to prevent content from irritating "jumping"
+  // when address bar dissappears in mobile browsers
+
   if (typeof window !== 'undefined' && isMobile()) {
     inPortraitMode = window.innerHeight > window.innerWidth
-    ;(mobilePortraitHeight = inPortraitMode
-      ? window.innerHeight
-      : window.innerWidth),
-      (mobileLandscapeHeight = inPortraitMode
+
+    // Viewport's height is set depending on the screen orientation of user's device.
+    ;(portraitHeight = inPortraitMode ? window.innerHeight : window.innerWidth),
+      (landscapeHeight = inPortraitMode
         ? window.innerWidth
         : window.innerHeight)
   }
+
   const [state, setState] = useState({
     splashMinHeight: 0,
     portraitMode: inPortraitMode,
-    landscapeHeight: mobileLandscapeHeight,
-    portraitHeight: mobilePortraitHeight
+    landscapeHeight,
+    portraitHeight
   })
 
+  // this hook is for setting min-height of the container
+  // of the background image to be 100% of available viewport height
   useEffect(() => {
     if (typeof window !== 'undefined') {
       ref.current = { ...state }
@@ -147,7 +167,6 @@ export default function Home() {
             ref.current.splashMinHeight === 0 ||
             ref.current.portraitMode != portraitMode
           ) {
-            console.log(portraitMode)
             splashMinHeight = portraitMode
               ? ref.current.portraitHeight - headerHeight
               : ref.current.landscapeHeight - headerHeight
@@ -175,8 +194,8 @@ export default function Home() {
   const classes = useStyles()
   return (
     <>
-      <div className={classes.wrapper}>
-        <Header />
+      <Header />
+      <Container component="div">
         <div
           className={classes.splash}
           style={{ minHeight: `${state.splashMinHeight}px` }}
@@ -191,7 +210,7 @@ export default function Home() {
           </Typography>
           <Typography
             component="h2"
-            variant="h3"
+            variant="h4"
             paragraph
             className={classes.splashSubHeader}
           >
@@ -199,40 +218,38 @@ export default function Home() {
           </Typography>
         </div>
         <div className={classes.cardContainer}>
-          <Container component="main">
-            <Grid container spacing={5}>
-              {tiers.map((tier) => (
-                <Grid item key={tier.title} xs={12} sm={6} md={4}>
-                  <Card className={classes.card}>
-                    <CardHeader
-                      title={tier.title}
-                      titleTypographyProps={{ align: 'center' }}
-                      className={classes.cardHeader}
-                    />
-                    <CardContent className={classes.cardContent}>
-                      <ul>
-                        {tier.description.map((line) => (
-                          <Typography
-                            component="li"
-                            variant="subtitle1"
-                            align="left"
-                            key={line}
-                          >
-                            {line}
-                          </Typography>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Container>
+          <Grid container spacing={5}>
+            {cardsContent.map((card) => (
+              <Grid item key={card.title} xs={12} sm={6} md={4}>
+                <Card className={classes.card}>
+                  <CardHeader
+                    title={card.title}
+                    titleTypographyProps={{ align: 'center' }}
+                    className={classes.cardHeader}
+                  />
+                  <CardContent className={classes.cardContent}>
+                    <ul>
+                      {card.description.map((line) => (
+                        <Typography
+                          component="li"
+                          variant="subtitle1"
+                          align="left"
+                          key={line}
+                        >
+                          {line}
+                        </Typography>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
         </div>
         {/* end of cardContainer */}
-        <Footer />
-      </div>
-      {/* end of wrapper */}
+      </Container>
+
+      <Footer />
     </>
   )
 }

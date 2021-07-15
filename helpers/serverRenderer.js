@@ -1,9 +1,9 @@
 import React from 'react'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import { ThemeProvider , ServerStyleSheets } from '@material-ui/core/styles'
+import { ThemeProvider, ServerStyleSheets } from '@material-ui/core/styles'
 
 import ReactDOMServer from 'react-dom/server'
-import theme from '../components/theme'
+import theme from '../components/data/theme'
 
 const sheets = new ServerStyleSheets()
 

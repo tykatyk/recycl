@@ -10,15 +10,10 @@ import Link from '@material-ui/core/Link'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import Menu from '@material-ui/core/Menu'
 import Drawer from '@material-ui/core/Drawer'
-import Box from '@material-ui/core/Box'
-
+import Container from '@material-ui/core/Container'
+//
 const useStyles = makeStyles((theme) => ({
-  header: {
-    '@media (max-width: 900px)': {
-      paddingTop: 0,
-      paddingBottom: 0
-    }
-  },
+  header: { padding: 0 },
   links: {
     flexGrow: 1,
     '& > * + *': {
@@ -61,7 +56,7 @@ export default function Header() {
       }
       setResponsiveness()
       window.addEventListener('resize', () => setResponsiveness())
-      //
+
       return () => {
         isMounted = false
         window.removeEventListener('resize', () => setResponsiveness())
@@ -142,38 +137,40 @@ export default function Header() {
 
   return (
     <AppBar position="static" id="mainHeader">
-      <Toolbar className={classes.header}>
-        {mobileView ? displayMobile() : displayDesktop()}
-        <IconButton
-          aria-label="account of current user"
-          aria-controls="menu-appbar"
-          aria-haspopup="true"
-          onClick={handleMenu}
-          color="inherit"
-          className={classes.accountBtn}
-        >
-          <AccountCircle />
-        </IconButton>
-        <Menu
-          id="menu-appbar"
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          open={open}
-          onClose={handleClose}
-        >
-          <MenuItem onClick={handleClose}>Мои заявки</MenuItem>
-          <MenuItem onClick={handleClose}>Настройки</MenuItem>
-          <MenuItem onClick={handleClose}>Выйти</MenuItem>
-        </Menu>
-      </Toolbar>
+      <Container component="div">
+        <Toolbar className={classes.header}>
+          {mobileView ? displayMobile() : displayDesktop()}
+          <IconButton
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+            color="inherit"
+            className={classes.accountBtn}
+          >
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            open={open}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleClose}>Мои заявки</MenuItem>
+            <MenuItem onClick={handleClose}>Настройки</MenuItem>
+            <MenuItem onClick={handleClose}>Выйти</MenuItem>
+          </Menu>
+        </Toolbar>
+      </Container>
     </AppBar>
   )
 }

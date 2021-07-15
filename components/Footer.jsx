@@ -4,7 +4,6 @@ import Typography from '@material-ui/core/Typography'
 import Link from '@material-ui/core/Link'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
-import Box from '@material-ui/core/Box'
 
 const useStyles = makeStyles((theme) => ({
   footer: {
@@ -12,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 'auto',
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
-    backgroundColor: '#223c4a',
+    backgroundColor: theme.palette.primary.main,
     color: '#fff'
   }
 }))
@@ -22,11 +21,13 @@ export default function Footer() {
 
   return (
     <footer className={classes.footer}>
-      <Typography variant="body2" align="center">
-        Copyright
-        {' © '}
-        {new Date().getFullYear()} | Связаться с нами
-      </Typography>
+      <Container component="div">
+        <Typography variant="body2" align="center">
+          Copyright
+          {' © '}
+          {new Date().getFullYear()} | Связаться с нами
+        </Typography>
+      </Container>
     </footer>
   )
 }
