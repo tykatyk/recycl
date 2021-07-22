@@ -7,7 +7,7 @@ export default {
   devtool: 'source-map',
   entry: [
     'webpack-hot-middleware/client?&path=/__webpack_hmr&timeout=20000',
-    './client/client.jsx'
+    './components/App.jsx'
   ],
   output: {
     path: path.join(__dirname, 'build', 'public', 'js'),

@@ -1,15 +1,29 @@
 import express from 'express'
-const router = express.Router()
 import serverRenderer from '../helpers/serverRenderer'
 import Home from '../components/Home.jsx'
-const {html, css} = serverRenderer(Home)
+import RemovalClaims from '../components/RemovalClaims.jsx'
+
+const router = express.Router()
+
+/* GET page to show claims for waste removal */
+router.get('/removal', (req, res, next) => {
+  const { html, css } = serverRenderer(RemovalClaims, req)
+
+  res.render('home', {
+    title: 'Waste Removal',
+    content: html,
+    css
+  })
+})
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', (req, res, next) => {
+  const { html, css } = serverRenderer(Home, req)
+
   res.render('home', {
-    title: "Home",
+    title: 'Home',
     content: html,
-    css: css
+    css
   })
 })
 

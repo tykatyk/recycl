@@ -7,11 +7,12 @@ import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import Link from '@material-ui/core/Link'
+import { Link as RouterLink } from 'react-router-dom'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import Menu from '@material-ui/core/Menu'
 import Drawer from '@material-ui/core/Drawer'
 import Container from '@material-ui/core/Container'
-//
+
 const useStyles = makeStyles((theme) => ({
   header: { padding: 0 },
   links: {
@@ -27,10 +28,22 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Header() {
   const links = [
-    'Заявки на сортировку',
-    'Заявки на вывоз',
-    'Переработчики',
-    'Сортировщики'
+    {
+      text: 'Заявки на сортировку',
+      href: '#'
+    },
+    {
+      text: 'Заявки на вывоз',
+      href: '/removal'
+    },
+    {
+      text: 'Переработчики',
+      href: '#'
+    },
+    {
+      text: 'Сортировщики',
+      href: '#'
+    }
   ]
 
   const classes = useStyles()
@@ -82,6 +95,26 @@ export default function Header() {
 
   const preventDefault = () => false
 
+  const navLinks = () => (
+      <Typography
+        component="nav"
+        align="right"
+        className={mobileView ? '' : classes.links}
+      >
+        {links.map((link, index) => (
+          <Link
+            to={link.href}
+            onClick={preventDefault}
+            color="inherit"
+            key={index}
+            component={RouterLink}
+          >
+            {link.text}
+          </Link>
+        ))}
+      </Typography>
+    )
+
   const displayMobile = () => {
     const handleDrawerOpen = () =>
       setState((prevState) => ({ ...prevState, drawerOpen: true }))
@@ -108,32 +141,13 @@ export default function Header() {
             onClose: handleDrawerClose
           }}
         >
-          <Typography component="nav" align="right">
-            {links.map((link) => (
-              <Link
-                href="#"
-                onClick={preventDefault}
-                color="inherit"
-                key={link}
-              >
-                <MenuItem>{link}</MenuItem>
-              </Link>
-            ))}
-          </Typography>
+          {navLinks()}
         </Drawer>
       </>
     )
   }
 
-  const displayDesktop = () => (
-    <Typography component="nav" align="right" className={classes.links}>
-      {links.map((link) => (
-        <Link href="#" onClick={preventDefault} color="inherit" key={link}>
-          {link}
-        </Link>
-      ))}
-    </Typography>
-  )
+  const displayDesktop = () => navLinks()
 
   return (
     <AppBar position="static" id="mainHeader">

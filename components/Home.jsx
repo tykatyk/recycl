@@ -6,8 +6,6 @@ import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
-import Header from './Header.jsx'
-import Footer from './Footer.jsx'
 import isMobile from '../helpers/detectMobile'
 import images from './data/backgroundImages'
 import cardsContent from './data/cardsContent'
@@ -181,7 +179,6 @@ export default function Home() {
   const classes = useStyles()
   return (
     <>
-      <Header />
       <Container component="div">
         <div
           className={classes.splash}
@@ -235,8 +232,6 @@ export default function Home() {
         </div>
         {/* end of cardContainer */}
       </Container>
-
-      <Footer />
     </>
   )
 }
