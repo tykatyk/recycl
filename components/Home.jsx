@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
 import Grid from '@material-ui/core/Grid'
-import Container from '@material-ui/core/Container'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
@@ -179,59 +178,56 @@ export default function Home() {
   const classes = useStyles()
   return (
     <>
-      <Container component="div">
-        <div
-          className={classes.splash}
-          style={{ minHeight: `${state.splashMinHeight}px` }}
+      <div
+        className={classes.splash}
+        style={{ minHeight: `${state.splashMinHeight}px` }}
+      >
+        <Typography
+          component="h1"
+          variant="h1"
+          paragraph
+          className={classes.splashMainHeader}
         >
-          <Typography
-            component="h1"
-            variant="h1"
-            paragraph
-            className={classes.splashMainHeader}
-          >
-            Recycl
-          </Typography>
-          <Typography
-            component="h2"
-            variant="h4"
-            paragraph
-            className={classes.splashSubHeader}
-          >
-            Помогаем собирать и перерабатывать отходы
-          </Typography>
-        </div>
-        <div className={classes.cardContainer}>
-          <Grid container spacing={5}>
-            {cardsContent.map((card) => (
-              <Grid item key={card.title} xs={12} sm={6} md={4}>
-                <Card className={classes.card}>
-                  <CardHeader
-                    title={card.title}
-                    titleTypographyProps={{ align: 'center' }}
-                    className={classes.cardHeader}
-                  />
-                  <CardContent className={classes.cardContent}>
-                    <ul>
-                      {card.description.map((line) => (
-                        <Typography
-                          component="li"
-                          variant="subtitle1"
-                          align="left"
-                          key={line}
-                        >
-                          {line}
-                        </Typography>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </div>
-        {/* end of cardContainer */}
-      </Container>
+          Recycl
+        </Typography>
+        <Typography
+          component="h2"
+          variant="h4"
+          paragraph
+          className={classes.splashSubHeader}
+        >
+          Помогаем собирать и перерабатывать отходы
+        </Typography>
+      </div>
+      <div className={classes.cardContainer}>
+        <Grid container spacing={5}>
+          {cardsContent.map((card) => (
+            <Grid item key={card.title} xs={12} sm={6} md={4}>
+              <Card className={classes.card}>
+                <CardHeader
+                  title={card.title}
+                  titleTypographyProps={{ align: 'center' }}
+                  className={classes.cardHeader}
+                />
+                <CardContent className={classes.cardContent}>
+                  <ul>
+                    {card.description.map((line) => (
+                      <Typography
+                        component="li"
+                        variant="subtitle1"
+                        align="left"
+                        key={line}
+                      >
+                        {line}
+                      </Typography>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </div>
     </>
   )
 }
