@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "watchServ": "webpack --watch --config webpack.server.config.js",
-    "watchClient": "node ./build/server.js"
+    "start": "nodemon ./build/server.js"
   },
   "dependencies": {
     "express": "~4.16.1"
@@ -40,6 +40,7 @@
     "mini-css-extract-plugin": "^1.6.0",
     "morgan": "~1.9.1",
     "node-sass-middleware": "0.11.0",
+    "nodemon": "^2.0.12",
     "prettier": "2.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

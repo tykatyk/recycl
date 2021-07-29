@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, forwardRef } from 'react'
 import Divider from '@material-ui/core/Divider'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 
@@ -9,30 +9,33 @@ import googleLogoOnNonWhiteHDPI from '../build/public/images/powered_by_google_o
 
 const useStyles = makeStyles((theme) => ({
   googleLogo: {
+    maxWidth: '100%',
     overflow: 'hidden',
     padding: theme.spacing(2),
     textAlign: 'right'
   }
 }))
-
-export default function Listbox(props) {
+let Listbox = null
+export default Listbox = forwardRef((props, ref) => {
   const theme = useTheme()
 
   const classes = useStyles()
-  const initialSources =
-    theme.palette.type == 'light'
+
+  const getSources = () => {
+    theme.palette.type === 'light'
       ? `${googleLogoOnWhite} 144w, ${googleLogoOnWhiteHDPI} 288w`
       : `${googleLogoOnNonWhite} 144w, ${googleLogoOnNonWhiteHDPI} 288w`
+  }
+
+  const initialSources = getSources()
 
   const [imageSources, setImageSources] = useState(initialSources)
 
   useEffect(() => {
-    const sources =
-      theme.palette.type == 'light'
-        ? `${googleLogoOnWhite} 144w, ${googleLogoOnWhiteHDPI} 288w`
-        : `${googleLogoOnNonWhite} 144w, ${googleLogoOnNonWhiteHDPI} 288w`
+    const sources = getSources()
+
     setImageSources(sources)
-  }, [])
+  }, [theme.palette.type])
 
   return (
     <>
@@ -49,10 +52,14 @@ export default function Listbox(props) {
         <img
           srcSet={imageSources}
           sizes="(min-resolution: 2dppx) 288px, 144px"
-          src={`"${googleLogoOnWhite}"`}
+          src={
+            theme.palette.type === 'light'
+              ? `${googleLogoOnWhite}`
+              : `${googleLogoOnNonWhite}`
+          }
           alt="Google logo"
         />
       </div>
     </>
   )
-}
+})

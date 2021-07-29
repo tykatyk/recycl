@@ -1,6 +1,4 @@
-import { createMuiTheme } from '@material-ui/core/styles'
-
-export default createMuiTheme({
+export default {
   palette: {
     primary: {
       main: '#1a2b34'
@@ -9,4 +7,4 @@ export default createMuiTheme({
       main: '#f8bc45'
     }
   }
-})
+}

@@ -8,7 +8,6 @@ const router = express.Router()
 /* GET page to show claims for waste removal */
 router.get('/removal', (req, res, next) => {
   const { html, css } = serverRenderer(RemovalClaims, req)
-
   res.render('home', {
     title: 'Waste Removal',
     content: html,
