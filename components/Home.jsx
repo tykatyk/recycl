@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
       },
       '&:before': {
         content: '"»"',
-        color: '#f8bc45',
+        color: `${theme.palette.secondary.main}`,
         fontSize: '2em',
         fontWeight: 'bold',
         display: 'inline-block',
@@ -78,11 +78,15 @@ const useStyles = makeStyles((theme) => ({
   },
   card: {
     minHeight: '25em',
-    background: '#417347',
+    background: `${theme.palette.background.paper}`,
     color: '#fff'
   },
   cardHeader: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: `${
+      theme.palette.type == 'dark'
+        ? theme.palette.background.paper
+        : theme.palette.primary.main
+    }`,
     borderBottom: '6px solid #fff'
   },
   cardContent: {

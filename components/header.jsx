@@ -14,7 +14,9 @@ import Drawer from '@material-ui/core/Drawer'
 import Container from '@material-ui/core/Container'
 
 const useStyles = makeStyles((theme) => ({
-  header: { padding: 0 },
+  header: {
+    padding: 0
+  },
   links: {
     flexGrow: 1,
     '& > * + *': {
@@ -22,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   accountBtn: {
+    paddingRight: '0',
     marginLeft: 'auto'
   }
 }))
@@ -96,24 +99,24 @@ export default function Header() {
   const preventDefault = () => false
 
   const navLinks = () => (
-      <Typography
-        component="nav"
-        align="right"
-        className={mobileView ? '' : classes.links}
-      >
-        {links.map((link, index) => (
-          <Link
-            to={link.href}
-            onClick={preventDefault}
-            color="inherit"
-            key={index}
-            component={RouterLink}
-          >
-            {link.text}
-          </Link>
-        ))}
-      </Typography>
-    )
+    <Typography
+      component="nav"
+      align="right"
+      className={mobileView ? '' : classes.links}
+    >
+      {links.map((link, index) => (
+        <Link
+          to={link.href}
+          onClick={preventDefault}
+          color="inherit"
+          key={index}
+          component={RouterLink}
+        >
+          {link.text}
+        </Link>
+      ))}
+    </Typography>
+  )
 
   const displayMobile = () => {
     const handleDrawerOpen = () =>
@@ -126,7 +129,7 @@ export default function Header() {
       <>
         <IconButton
           {...{
-            color: 'inherit',
+            style: { paddingLeft: 0 },
             'aria-label': 'menu',
             'aria-haspopup': 'true',
             onClick: handleDrawerOpen
@@ -150,7 +153,18 @@ export default function Header() {
   const displayDesktop = () => navLinks()
 
   return (
-    <AppBar position="static" id="mainHeader">
+    <AppBar
+      position="static"
+      id="mainHeader"
+      style={{
+        backgroundColor: `${
+          theme.palette.type == 'dark'
+            ? theme.palette.background.default
+            : theme.palette.primary.main
+        }`,
+        color: `${theme.palette.text.primary}`
+      }}
+    >
       <Container component="div">
         <Toolbar className={classes.header}>
           {mobileView ? displayMobile() : displayDesktop()}

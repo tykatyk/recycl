@@ -11,8 +11,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 'auto',
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
-    backgroundColor: theme.palette.primary.main,
-    color: '#fff'
+    backgroundColor: `${
+      theme.palette.type == 'dark'
+        ? theme.palette.background.default
+        : theme.palette.primary.main
+    }`,
+    color: `${theme.palette.text.primary}`
   }
 }))
 

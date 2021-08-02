@@ -8,14 +8,14 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
-import themeStub from './data/theme'
+import getThemeStub from './data/theme'
 
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
   const theme = React.useMemo(() => {
     const type = prefersDarkMode ? 'dark' : 'light'
-    themeStub.palette.type = type
+    const themeStub = getThemeStub(type)
     return createMuiTheme(themeStub)
   }, [prefersDarkMode])
 
