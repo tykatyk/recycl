@@ -11,13 +11,18 @@ export default function getThemeStub(mode) {
         main: '#f8bc45' // not changed in light and dark modes
       },
       background: {
-        paper: mode == 'dark' ? '#424242' : '#417347',
+        paper: '#424242',
         default: mode == 'dark' ? '#303030' : '#223c4a'
       },
       text: {
         primary: '#fff', // not changed in light and dark modes
         secondary: 'rgba(255, 255, 255, 0.7)',
         disabled: 'rgba(255, 255, 255, 0.5)'
+      },
+      ation: {
+        active: '#f8bc45',
+        selected: '#f8bc45',
+        focus: '#f8bc45'
       }
     }
   }
