@@ -2,26 +2,29 @@ import React, { useState, useEffect } from 'react'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
+import Menu from '@material-ui/core/Menu'
 import MenuIcon from '@material-ui/icons/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
-import Link from '@material-ui/core/Link'
-import { Link as RouterLink } from 'react-router-dom'
 import AccountCircle from '@material-ui/icons/AccountCircle'
-import Menu from '@material-ui/core/Menu'
 import Drawer from '@material-ui/core/Drawer'
 import Container from '@material-ui/core/Container'
+import NavLinks from './NavLinks.jsx'
 
 const useStyles = makeStyles((theme) => ({
+  appBar: {
+    backgroundColor: `${
+      theme.palette.type == 'dark'
+        ? theme.palette.background.default
+        : theme.palette.primary.main
+    }`,
+    color: `${theme.palette.text.primary}`
+  },
   header: {
     padding: 0
   },
-  links: {
-    flexGrow: 1,
-    '& > * + *': {
-      marginLeft: theme.spacing(2)
-    }
+  menuBtn: {
+    paddingLeft: 0
   },
   accountBtn: {
     paddingRight: '0',
@@ -30,25 +33,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function Header() {
-  const links = [
-    {
-      text: 'Заявки на сортировку',
-      href: '#'
-    },
-    {
-      text: 'Заявки на вывоз',
-      href: '/removal'
-    },
-    {
-      text: 'Переработчики',
-      href: '#'
-    },
-    {
-      text: 'Сортировщики',
-      href: '#'
-    }
-  ]
-
   const classes = useStyles()
   const theme = useTheme()
 
@@ -96,28 +80,6 @@ export default function Header() {
     setAnchorEl(null)
   }
 
-  const preventDefault = () => false
-
-  const navLinks = () => (
-    <Typography
-      component="nav"
-      align="right"
-      className={mobileView ? '' : classes.links}
-    >
-      {links.map((link, index) => (
-        <Link
-          to={link.href}
-          onClick={preventDefault}
-          color="inherit"
-          key={index}
-          component={RouterLink}
-        >
-          {link.text}
-        </Link>
-      ))}
-    </Typography>
-  )
-
   const displayMobile = () => {
     const handleDrawerOpen = () =>
       setState((prevState) => ({ ...prevState, drawerOpen: true }))
@@ -129,10 +91,11 @@ export default function Header() {
       <>
         <IconButton
           {...{
-            style: { paddingLeft: 0 },
+            className: classes.menuBtn,
             'aria-label': 'menu',
             'aria-haspopup': 'true',
-            onClick: handleDrawerOpen
+            onClick: handleDrawerOpen,
+            color: 'inherit'
           }}
         >
           <MenuIcon />
@@ -144,27 +107,16 @@ export default function Header() {
             onClose: handleDrawerClose
           }}
         >
-          {navLinks()}
+          <NavLinks isDesktop={false} />
         </Drawer>
       </>
     )
   }
 
-  const displayDesktop = () => navLinks()
+  const displayDesktop = () => <NavLinks isDesktop />
 
   return (
-    <AppBar
-      position="static"
-      id="mainHeader"
-      style={{
-        backgroundColor: `${
-          theme.palette.type == 'dark'
-            ? theme.palette.background.default
-            : theme.palette.primary.main
-        }`,
-        color: `${theme.palette.text.primary}`
-      }}
-    >
+    <AppBar position="static" id="mainHeader" className={classes.appBar}>
       <Container component="div">
         <Toolbar className={classes.header}>
           {mobileView ? displayMobile() : displayDesktop()}

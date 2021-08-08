@@ -6,7 +6,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100vh',
-    // backgroundColor: '#223c4a'
     backgroundColor: `${theme.palette.background.default}`
   }
 }))

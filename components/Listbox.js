@@ -2,10 +2,10 @@ import React, { useState, useEffect, forwardRef } from 'react'
 import Divider from '@material-ui/core/Divider'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 
-import googleLogoOnWhite from '../build/public/images/powered_by_google_on_white.png'
-import googleLogoOnWhiteHDPI from '../build/public/images/powered_by_google_on_white_hdpi.png'
-import googleLogoOnNonWhite from '../build/public/images/powered_by_google_on_non_white.png'
-import googleLogoOnNonWhiteHDPI from '../build/public/images/powered_by_google_on_non_white_hdpi.png'
+import googleLogoOnWhite from '../build/public/images/poweredByGoogle/powered_by_google_on_white.png'
+import googleLogoOnWhiteHDPI from '../build/public/images/poweredByGoogle/powered_by_google_on_white_hdpi.png'
+import googleLogoOnNonWhite from '../build/public/images/poweredByGoogle/powered_by_google_on_non_white.png'
+import googleLogoOnNonWhiteHDPI from '../build/public/images/poweredByGoogle/powered_by_google_on_non_white_hdpi.png'
 
 const useStyles = makeStyles((theme) => ({
   googleLogo: {

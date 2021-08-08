@@ -1,10 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Card from '@material-ui/core/Card'
+import Container from '@material-ui/core/Container'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Typography from '@material-ui/core/Typography'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
+import LayoutHome from './layouts/LayoutHome.jsx'
 import isMobile from '../helpers/detectMobile'
 import images from './data/backgroundImages'
 import cardsContent from './data/cardsContent'
@@ -23,25 +25,55 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    backgroundImage: `url(${images.small})`, // 600px
-    [`${theme.breakpoints.up('xs')} and (min-resolution: 2dppx)`]: {
-      backgroundImage: `url(${images.smallRetina})` // 1200px
+    margin: '0 auto',
+    minWidth: '100%',
+    maxWidth: '1920px',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+
+    // background image for landscape orientation
+    [`@media screen`]: {
+      backgroundImage:
+        theme.palette.type == 'dark' ? 'none' : `url(${images.mediumLandscape})`
     },
+
     [theme.breakpoints.up('sm')]: {
-      backgroundImage: `url(${images.medium})` // 960px
+      backgroundImage:
+        theme.palette.type == 'dark' ? 'none' : `url(${images.xLargeLandscape})`
     },
-    [`${theme.breakpoints.up('sm')} and (min-resolution: 2dppx)`]: {
-      backgroundImage: `url(${images.mediumRetina})` // 1920px
+
+    // background image for portrait orientation
+    [`@media screen and (orientation: portrait)`]: {
+      backgroundImage:
+        theme.palette.type == 'dark' ? 'none' : `url(${images.smallPortrait})` // 600
     },
-    [theme.breakpoints.up('md')]: {
-      backgroundImage: `url(${images.large})` // 1280px
+    [`${theme.breakpoints.up('sm')} and (orientation: portrait)`]: {
+      backgroundImage:
+        theme.palette.type == 'dark' ? 'none' : `url(${images.mediumPortrait})` // 960px
+    },
+    [`${theme.breakpoints.up('md')} and (orientation: portrait)`]: {
+      backgroundImage:
+        theme.palette.type == 'dark' ? 'none' : `url(${images.largePortrait})` // 1280px
     },
     [`${theme.breakpoints.up(
-      'md'
-    )} and (min-resolution: 2dppx), ${theme.breakpoints.up('large')}`]: {
-      backgroundImage: `url(${images.xLarge})` // should be 2560px but it's 2246px
+      'xs'
+    )} and (min-resolution: 2dppx) and (orientation: portrait)`]: {
+      backgroundImage:
+        theme.palette.type == 'dark'
+          ? 'none'
+          : `url(${images.smallRetinaPortrait})` // 1200px
     },
-    backgroundRepeat: 'no-repeat',
+    [`${theme.breakpoints.up(
+      'sm'
+    )} and (min-resolution: 2dppx) and (orientation: portrait), ${theme.breakpoints
+      .up('lg')
+      .replace('@media ', '')} and (orientation: portrait)`]: {
+      backgroundImage:
+        theme.palette.type == 'dark'
+          ? 'none'
+          : `url(${images.mediumRetinaPortrait})` // 1920px
+    },
+
     color: '#fff',
     textAlign: 'center'
   },
@@ -55,7 +87,28 @@ const useStyles = makeStyles((theme) => ({
     padding: '0 10px'
   },
   cardContainer: {
-    padding: theme.spacing(4, 0, 4),
+    maxWidth: `${theme.breakpoints.values.lg}px`,
+    padding: '20px',
+    margin: '0 auto'
+  },
+  card: {
+    minHeight: '25em',
+    backgroundColor:
+      theme.palette.type == 'dark'
+        ? `${theme.palette.background.paper}`
+        : '#417347',
+    color: '#fff'
+  },
+  cardHeader: {
+    backgroundColor: `${
+      theme.palette.type == 'dark'
+        ? theme.palette.background.paper
+        : theme.palette.primary.main
+    }`,
+    borderBottom: '6px solid #fff'
+  },
+  cardContent: {
+    paddingTop: theme.spacing(3),
     '& li': {
       position: 'relative',
       paddingLeft: theme.spacing(3),
@@ -75,29 +128,11 @@ const useStyles = makeStyles((theme) => ({
         left: '0'
       }
     }
-  },
-  card: {
-    minHeight: '25em',
-    backgroundColor:
-      theme.palette.type == 'dark'
-        ? `${theme.palette.background.paper}`
-        : '#417347',
-    color: '#fff'
-  },
-  cardHeader: {
-    backgroundColor: `${
-      theme.palette.type == 'dark'
-        ? theme.palette.background.paper
-        : theme.palette.primary.main
-    }`,
-    borderBottom: '6px solid #fff'
-  },
-  cardContent: {
-    paddingTop: theme.spacing(3)
   }
 }))
 
 export default function Home() {
+  const theme = useTheme()
   const ref = useRef()
   let landscapeHeight = 0
   let portraitHeight = 0
@@ -183,9 +218,9 @@ export default function Home() {
   }, [])
 
   const classes = useStyles()
-
+  //
   return (
-    <>
+    <LayoutHome>
       <div
         className={classes.splash}
         style={{ minHeight: `${state.splashMinHeight}px` }}
@@ -236,6 +271,6 @@ export default function Home() {
           ))}
         </Grid>
       </div>
-    </>
+    </LayoutHome>
   )
 }
