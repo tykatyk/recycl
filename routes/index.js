@@ -1,14 +1,14 @@
 import express from 'express'
 import serverRenderer from '../helpers/serverRenderer'
 import Home from '../components/Home.jsx'
-import RemovalClaims from '../components/RemovalClaims.jsx'
+import HandOverClaim from '../components/HandOverClaim.jsx'
 
 const router = express.Router()
 
 /* GET page to show claims for waste removal */
 router.get('/removal', (req, res, next) => {
   console.log('ok')
-  const { html, css } = serverRenderer(RemovalClaims, req)
+  const { html, css } = serverRenderer(HandOverClaim, req)
   res.render('home', {
     title: 'Waste Removal',
     content: html,

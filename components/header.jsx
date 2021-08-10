@@ -9,6 +9,8 @@ import MenuItem from '@material-ui/core/MenuItem'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import Drawer from '@material-ui/core/Drawer'
 import Container from '@material-ui/core/Container'
+import Link from '@material-ui/core/Link'
+import { Link as RouterLink } from 'react-router-dom'
 import NavLinks from './NavLinks.jsx'
 
 const useStyles = makeStyles((theme) => ({
@@ -33,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function Header() {
+  const preventDefault = () => false
   const classes = useStyles()
   const theme = useTheme()
 
@@ -145,9 +148,36 @@ export default function Header() {
             open={open}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}>Мои заявки</MenuItem>
-            <MenuItem onClick={handleClose}>Настройки</MenuItem>
-            <MenuItem onClick={handleClose}>Выйти</MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link
+                to="#"
+                onClick={preventDefault}
+                color="inherit"
+                component={RouterLink}
+              >
+                Мои заявки
+              </Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link
+                to="#"
+                onClick={preventDefault}
+                color="inherit"
+                component={RouterLink}
+              >
+                Настройки
+              </Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link
+                to="#"
+                onClick={preventDefault}
+                color="inherit"
+                component={RouterLink}
+              >
+                Выйти
+              </Link>
+            </MenuItem>
           </Menu>
         </Toolbar>
       </Container>

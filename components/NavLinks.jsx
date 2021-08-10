@@ -24,7 +24,7 @@ export default function NavLinks(props) {
       href: '#'
     },
     {
-      text: 'Заявки на вывоз',
+      text: 'Заявки на сдачу',
       href: '/removal'
     },
     {
@@ -41,7 +41,6 @@ export default function NavLinks(props) {
   if (props.isDesktop) {
     ;(styles.display = 'inline-block'), (styles.width = 'auto')
   }
-  console.log(props.isDesktop)
   return (
     <Typography component="nav" align="right" className={classes.navLinks}>
       <List>

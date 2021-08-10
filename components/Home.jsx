@@ -6,7 +6,7 @@ import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
-import LayoutHome from './layouts/LayoutHome.jsx'
+import Layout from './layouts/Layout.jsx'
 import isMobile from '../helpers/detectMobile'
 import images from './data/backgroundImages'
 import cardsContent from './data/cardsContent'
@@ -220,7 +220,7 @@ export default function Home() {
   const classes = useStyles()
   //
   return (
-    <LayoutHome>
+    <Layout>
       <div
         className={classes.splash}
         style={{ minHeight: `${state.splashMinHeight}px` }}
@@ -271,6 +271,6 @@ export default function Home() {
           ))}
         </Grid>
       </div>
-    </LayoutHome>
+    </Layout>
   )
 }

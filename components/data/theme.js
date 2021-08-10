@@ -5,14 +5,14 @@ export default function getThemeStub(mode) {
     palette: {
       type: mode,
       primary: {
-        main: '#1a2b34' // not changed in light and dark modes
+        main: '#1a2b34' // dark blue-green
       },
       secondary: {
-        main: '#f8bc45' // not changed in light and dark modes
+        main: '#f8bc45' // yellow
       },
       background: {
         paper: '#424242',
-        default: mode == 'dark' ? '#303030' : '#223c4a'
+        default: mode == 'dark' ? '#303030' : '#223c4a' // dark grey in dark mode, blue-green in light mode
       },
       text: {
         primary: '#fff', // not changed in light and dark modes

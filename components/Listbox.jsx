@@ -38,12 +38,12 @@ export default Listbox = forwardRef((props, ref) => {
   }, [theme.palette.type])
 
   return (
-    <>
+    <div ref={ref}>
       <ul
-        className="MuiAutocomplete-listbox"
-        id="google-map-demo-popup"
-        aria-labelledby="google-map-demo-label"
-        role="listbox"
+        className={props.className}
+        id={props.id}
+        aria-labelledby={props['aria-labelledby']}
+        role={props.role}
       >
         {props.children}
       </ul>
@@ -60,6 +60,6 @@ export default Listbox = forwardRef((props, ref) => {
           alt="Google logo"
         />
       </div>
-    </>
+    </div>
   )
 })
