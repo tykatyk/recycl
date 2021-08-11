@@ -29,12 +29,15 @@ const useStyles = makeStyles((theme) => ({
 export default function HandOverClaim() {
   const classes = useStyles()
   const theme = useTheme()
-
+  const [anchorEl, setAnchorEl] = React.useState(null)
   const [wasteType, setWasteType] = React.useState('')
 
   const handleChange = (event) => {
-    console.log('here')
     setWasteType(event.target.value)
+  }
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget)
   }
   //
   return (
@@ -62,9 +65,14 @@ export default function HandOverClaim() {
             <PlacesAutocomplete />
           </Grid>
           <Grid container item direction="row" xs={12}>
-            <Grid item>
+            <Grid item xs={12} sm={9}>
               <Typography gutterBottom>Тип</Typography>
-              <FormControl variant="outlined" className={classes.formControl}>
+              <FormControl
+                variant="outlined"
+                className={classes.formControl}
+                fullWidth
+                style={{ paddingRight: '20px' }}
+              >
                 <TextField
                   variant="outlined"
                   select
@@ -72,19 +80,36 @@ export default function HandOverClaim() {
                   defaultValue="0"
                   onChange={handleChange}
                   color="secondary"
+                  onClick={handleMenu}
+                  SelectProps={{
+                    MenuProps: {
+                      anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'left'
+                      },
+                      transformOrigin: {
+                        vertical: 'top',
+                        horizontal: 'left'
+                      },
+                      autoWidth: true,
+                      getContentAnchorEl: null
+                    }
+                  }}
                 >
                   <MenuItem value={0}>Не выбрано</MenuItem>
                   <MenuItem value={1}>Шины</MenuItem>
                   <MenuItem value={2}>Батарейки</MenuItem>
-                  <MenuItem value={3}>ПЕТ бутылка</MenuItem>
+                  <MenuItem value={3} style={{ maxWidth: '100%' }}>
+                    ПЕТ бутылка
+                  </MenuItem>
                 </TextField>
               </FormControl>
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={3}>
               <Typography gutterBottom>Количество</Typography>
-              <FormControl className={classes.formControl}>
+              <FormControl className={classes.formControl} fullWidth>
                 <TextField
-                  inputProps={{ size: 6 }}
+                  inputProps={{ max: 10 }}
                   color="secondary"
                   id="weight"
                   type="number"
@@ -115,7 +140,7 @@ export default function HandOverClaim() {
           <Grid item xs={12}>
             <FormControlLabel
               control={<Checkbox name="document" />}
-              label="Нужен документ о передаче"
+              label="Нужен документ о передаче отходов на переработку"
             />
           </Grid>
         </Grid>

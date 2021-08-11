@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 let Listbox = null
 export default Listbox = forwardRef((props, ref) => {
+  const { children, ...other } = props
   const theme = useTheme()
 
   const classes = useStyles()
@@ -39,14 +40,7 @@ export default Listbox = forwardRef((props, ref) => {
 
   return (
     <div ref={ref}>
-      <ul
-        className={props.className}
-        id={props.id}
-        aria-labelledby={props['aria-labelledby']}
-        role={props.role}
-      >
-        {props.children}
-      </ul>
+      <ul {...other}>{children}</ul>
       <Divider />
       <div className={classes.googleLogo}>
         <img

@@ -50,6 +50,7 @@ export default function PlacesAutocomplete(props) {
   const classes = useStyles()
   const [value, setValue] = React.useState(null)
   const [inputValue, setInputValue] = React.useState('')
+  const [open, setOpen] = React.useState(false)
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
@@ -126,7 +127,8 @@ export default function PlacesAutocomplete(props) {
         popupIndicator: classes.popupIndicator,
         clearIndicator: classes.clearIndicator
       }}
-      noOptionsText="Населенный пункт"
+      noOptionsText="Нет вариантов"
+      loadingText="Загрузка"
       id="wasteLocation"
       getOptionLabel={(option) =>
         typeof option === 'string' ? option : option.description
@@ -134,7 +136,11 @@ export default function PlacesAutocomplete(props) {
       filterOptions={(x) => x}
       ListboxComponent={Listbox}
       options={options}
-      debug
+      open={open}
+      onOpen={() => {
+        if (inputValue.length > 0) setOpen(true)
+      }}
+      onClose={() => setOpen(false)}
       autoComplete
       includeInputInList
       filterSelectedOptions
@@ -146,9 +152,15 @@ export default function PlacesAutocomplete(props) {
       }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue)
+        inputValue.length > 0 ? setOpen(true) : setOpen(false)
       }}
       renderInput={(params) => (
-        <TextField {...params} variant="outlined" fullWidth />
+        <TextField
+          {...params}
+          placeholder="Населенный пункт"
+          variant="outlined"
+          fullWidth
+        />
       )}
       renderOption={(option) => {
         const matches =

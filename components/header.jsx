@@ -11,6 +11,11 @@ import Drawer from '@material-ui/core/Drawer'
 import Container from '@material-ui/core/Container'
 import Link from '@material-ui/core/Link'
 import { Link as RouterLink } from 'react-router-dom'
+import ClickAwayListener from '@material-ui/core/ClickAwayListener'
+import Grow from '@material-ui/core/Grow'
+import Paper from '@material-ui/core/Paper'
+import Popper from '@material-ui/core/Popper'
+import MenuList from '@material-ui/core/MenuList'
 import NavLinks from './NavLinks.jsx'
 
 const useStyles = makeStyles((theme) => ({
@@ -25,11 +30,7 @@ const useStyles = makeStyles((theme) => ({
   header: {
     padding: 0
   },
-  menuBtn: {
-    paddingLeft: 0
-  },
   accountBtn: {
-    paddingRight: '0',
     marginLeft: 'auto'
   }
 }))
@@ -38,9 +39,7 @@ export default function Header() {
   const preventDefault = () => false
   const classes = useStyles()
   const theme = useTheme()
-
   const [anchorEl, setAnchorEl] = React.useState(null)
-
   const [state, setState] = useState({
     mobileView: false,
     drawerOpen: false
@@ -83,6 +82,13 @@ export default function Header() {
     setAnchorEl(null)
   }
 
+  function handleListKeyDown(event) {
+    if (event.key === 'Tab') {
+      event.preventDefault()
+      setAnchorEl(null)
+    }
+  }
+
   const displayMobile = () => {
     const handleDrawerOpen = () =>
       setState((prevState) => ({ ...prevState, drawerOpen: true }))
@@ -94,7 +100,6 @@ export default function Header() {
       <>
         <IconButton
           {...{
-            className: classes.menuBtn,
             'aria-label': 'menu',
             'aria-haspopup': 'true',
             onClick: handleDrawerOpen,
@@ -133,52 +138,64 @@ export default function Header() {
           >
             <AccountCircle />
           </IconButton>
-          <Menu
-            id="menu-appbar"
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right'
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right'
-            }}
+          <Popper
             open={open}
-            onClose={handleClose}
+            anchorEl={anchorEl}
+            role={undefined}
+            transition
+            disablePortal
           >
-            <MenuItem onClick={handleClose}>
-              <Link
-                to="#"
-                onClick={preventDefault}
-                color="inherit"
-                component={RouterLink}
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                style={{
+                  transformOrigin:
+                    placement === 'bottom' ? 'center top' : 'center bottom'
+                }}
               >
-                Мои заявки
-              </Link>
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <Link
-                to="#"
-                onClick={preventDefault}
-                color="inherit"
-                component={RouterLink}
-              >
-                Настройки
-              </Link>
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <Link
-                to="#"
-                onClick={preventDefault}
-                color="inherit"
-                component={RouterLink}
-              >
-                Выйти
-              </Link>
-            </MenuItem>
-          </Menu>
+                <Paper>
+                  <ClickAwayListener onClickAway={handleClose}>
+                    <MenuList
+                      autoFocusItem={open}
+                      id="menu-list-grow"
+                      onKeyDown={handleListKeyDown}
+                    >
+                      <MenuItem onClick={handleClose}>
+                        <Link
+                          to="#"
+                          onClick={preventDefault}
+                          color="inherit"
+                          component={RouterLink}
+                        >
+                          Мои заявки
+                        </Link>
+                      </MenuItem>
+                      <MenuItem onClick={handleClose}>
+                        <Link
+                          to="#"
+                          onClick={preventDefault}
+                          color="inherit"
+                          component={RouterLink}
+                        >
+                          Настройки
+                        </Link>
+                      </MenuItem>
+                      <MenuItem onClick={handleClose}>
+                        <Link
+                          to="#"
+                          onClick={preventDefault}
+                          color="inherit"
+                          component={RouterLink}
+                        >
+                          Выйти
+                        </Link>
+                      </MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
         </Toolbar>
       </Container>
     </AppBar>
