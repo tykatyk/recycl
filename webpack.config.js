@@ -1,16 +1,18 @@
-import path from 'path'
-import webpack from 'webpack'
+// import path from 'path'
+// import webpack from 'webpack'
+const path = require('path')
 
-export default {
+// export default {
+module.exports = {
   target: 'web',
   mode: 'development',
   devtool: 'source-map',
   entry: [
-    'webpack-hot-middleware/client?&path=/__webpack_hmr&timeout=20000',
-    './components/App.jsx'
+    // 'webpack-hot-middleware/client?&path=/__webpack_hmr&timeout=20000',
+    './src/components/App.jsx'
   ],
   output: {
-    path: path.join(__dirname, 'build', 'public', 'js'),
+    path: path.join(__dirname, 'build/client'),
     publicPath: '/',
     filename: 'client.js'
   },
@@ -37,7 +39,8 @@ export default {
             loader: 'file-loader',
             options: {
               name: '[name].[ext]',
-              outputPath: './build/public/fonts'
+              outputPath: 'fonts',
+              emitFile: false
             }
           }
         ]
@@ -46,19 +49,47 @@ export default {
         test: /\.(png|jpg|jpeg|gif)$/,
         use: [
           {
-            loader: 'url-loader',
+            loader: 'file-loader',
             options: {
               name: '[name].[ext]',
-              outputPath: './build/public/img',
-              include: path.join(__dirname, 'build/public/img')
+              outputPath: 'images',
+              include: path.join(__dirname, 'src/images')
             }
           }
         ]
       }
     ]
-  },
-  plugins: [
+  }
+  /* watchOptions: {
+    aggregateTimeout: 1000,
+    poll: 500,
+    ignored: /node_modules/
+  } */
+  /* plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
-  ]
+  ], */
+  /* optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /node_modules/,
+          chunks: 'initial',
+          name: 'vendor',
+          enforce: true
+        }
+      }
+    }
+  }, */
+  /* stats: {
+    excludeModules: false,
+    maxModules: Infinity,
+    exclude: undefined,
+    modules: true
+  },
+  devServer: {
+    contentBase: path.join(__dirname, '/build/client'),
+    compress: true,
+    port: 8000
+  } */
 }

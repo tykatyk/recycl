@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "watchClient": "webpack --watch --config webpack.config.js",
     "watchServ": "webpack --watch --config webpack.server.config.js",
-    "startDev": "node ./build/server.js"
+    "startDev": "browser-refresh ./build/server/server.js"
   },
   "dependencies": {
     "express": "~4.16.1"
@@ -41,7 +42,6 @@
     "mongoose": "^5.13.5",
     "morgan": "~1.9.1",
     "node-sass-middleware": "0.11.0",
-    "nodemon": "^2.0.12",
     "prettier": "2.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
