@@ -2,18 +2,22 @@ import React, { useState, useEffect, forwardRef } from 'react'
 import Divider from '@material-ui/core/Divider'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 
-import googleLogoOnWhite from '../images/poweredByGoogle/powered_by_google_on_white.png'
-import googleLogoOnWhiteHDPI from '../images/poweredByGoogle/powered_by_google_on_white_hdpi.png'
-import googleLogoOnNonWhite from '../images/poweredByGoogle/powered_by_google_on_non_white.png'
-import googleLogoOnNonWhiteHDPI from '../images/poweredByGoogle/powered_by_google_on_non_white_hdpi.png'
+const googleLogoOnWhite =
+  'images/poweredByGoogle/powered_by_google_on_white.png'
+const googleLogoOnWhiteHDPI =
+  'images/poweredByGoogle/powered_by_google_on_white_hdpi.png'
+const googleLogoOnNonWhite =
+  'images/poweredByGoogle/powered_by_google_on_non_white.png'
+const googleLogoOnNonWhiteHDPI =
+  'images/poweredByGoogle/powered_by_google_on_non_white_hdpi.png'
 
 const useStyles = makeStyles((theme) => ({
   googleLogo: {
     maxWidth: '100%',
     overflow: 'hidden',
     padding: theme.spacing(2),
-    textAlign: 'right'
-  }
+    textAlign: 'right',
+  },
 }))
 let Listbox = null
 export default Listbox = forwardRef((props, ref) => {

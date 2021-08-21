@@ -12,21 +12,20 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import Divider from '@material-ui/core/Divider'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
-import PlacesAutocomplete from './PlacesAutocomplete.jsx'
-import Layout from '../layouts/Layout.jsx'
-import CustomMenuItem from './CustomMenuItem.jsx'
+import PlacesAutocomplete from '../src/components/PlacesAutocomplete.jsx'
+import Layout from '../src/components/Layout.jsx'
 
 const useStyles = makeStyles((theme) => ({
   icon: {
     color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2)
+    marginRight: theme.spacing(2),
   },
   formControl: {
     maxWidth: '100%',
     overflow: 'hidden',
     '& fieldset': { borderColor: `${theme.palette.text.secondary}` },
-    '& svg': { color: `${theme.palette.text.secondary}` }
-  }
+    '& svg': { color: `${theme.palette.text.secondary}` },
+  },
 }))
 
 export default function HandOverClaim() {
@@ -43,7 +42,7 @@ export default function HandOverClaim() {
     setAnchorEl(event.currentTarget)
   }
   const ref = React.createRef()
-  //
+
   return (
     <Layout>
       <Grid
@@ -55,7 +54,7 @@ export default function HandOverClaim() {
           maxWidth: '700px',
           margin: '24px auto',
           padding: '0 24px',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
         }}
       >
         <Grid item container spacing={2} style={{ padding: '0 0 56px 0' }}>
@@ -91,26 +90,21 @@ export default function HandOverClaim() {
                     MenuProps: {
                       anchorOrigin: {
                         vertical: 'bottom',
-                        horizontal: 'left'
+                        horizontal: 'left',
                       },
                       transformOrigin: {
                         vertical: 'top',
-                        horizontal: 'left'
+                        horizontal: 'left',
                       },
 
-                      getContentAnchorEl: null
-                    }
+                      getContentAnchorEl: null,
+                    },
                   }}
                 >
                   <MenuItem value={0}>Не выбрано</MenuItem>
                   <MenuItem value={1}>Шины</MenuItem>
                   <MenuItem value={2}>Батарейки</MenuItem>
-
-                  <CustomMenuItem value={3} refs={ref}>
-                    ПЕТ бутылка ПЕТ бутылка ПЕТ бутылка ПЕТ бутылка ПЕТ бутылка
-                    ПЕТ бутылка ПЕТ бутылка ПЕТ бутылка ПЕТ бутылка ПЕТ бутылка
-                    ПЕТ бутылка
-                  </CustomMenuItem>
+                  <MenuItem value={3}>ПЕТ бутылка</MenuItem>
                 </TextField>
               </FormControl>
             </Grid>
@@ -126,10 +120,10 @@ export default function HandOverClaim() {
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">Кг</InputAdornment>
-                    )
+                    ),
                   }}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
                   }}
                 />
               </FormControl>
@@ -168,10 +162,12 @@ export default function HandOverClaim() {
               type="number"
               variant="outlined"
               InputProps={{
-                endAdornment: <InputAdornment position="end">Км</InputAdornment>
+                endAdornment: (
+                  <InputAdornment position="end">Км</InputAdornment>
+                ),
               }}
               InputLabelProps={{
-                shrink: true
+                shrink: true,
               }}
             />
           </Grid>

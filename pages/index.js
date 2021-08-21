@@ -6,10 +6,10 @@ import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
-import Layout from '../layouts/Layout.jsx'
-import isMobile from '../js/detectMobile'
-import images from '../data/backgroundImages'
-import cardsContent from '../data/cardsContent'
+import Layout from '../src/components/Layout.jsx'
+import isMobile from '../src/detectMobile'
+import images from '../src/components/helperData/backgroundImages'
+import cardsContent from '../src/components/helperData/cardsContent'
 
 const useStyles = makeStyles((theme) => ({
   '@global': {
@@ -17,8 +17,8 @@ const useStyles = makeStyles((theme) => ({
       margin: 0,
       padding: 0,
       listStylePosition: 'inside',
-      listStyle: 'none'
-    }
+      listStyle: 'none',
+    },
   },
 
   splash: {
@@ -34,26 +34,30 @@ const useStyles = makeStyles((theme) => ({
     // background image for landscape orientation
     [`@media screen`]: {
       backgroundImage:
-        theme.palette.type == 'dark' ? 'none' : `url(${images.mediumLandscape})`
+        theme.palette.type == 'dark'
+          ? 'none'
+          : `url(${images.mediumLandscape})`,
     },
 
     [theme.breakpoints.up('sm')]: {
       backgroundImage:
-        theme.palette.type == 'dark' ? 'none' : `url(${images.xLargeLandscape})`
+        theme.palette.type == 'dark'
+          ? 'none'
+          : `url(${images.xLargeLandscape})`,
     },
 
     // background image for portrait orientation
     [`@media screen and (orientation: portrait)`]: {
       backgroundImage:
-        theme.palette.type == 'dark' ? 'none' : `url(${images.smallPortrait})` // 600
+        theme.palette.type == 'dark' ? 'none' : `url(${images.smallPortrait})`, // 600px
     },
     [`${theme.breakpoints.up('sm')} and (orientation: portrait)`]: {
       backgroundImage:
-        theme.palette.type == 'dark' ? 'none' : `url(${images.mediumPortrait})` // 960px
+        theme.palette.type == 'dark' ? 'none' : `url(${images.mediumPortrait})`, // 960px
     },
     [`${theme.breakpoints.up('md')} and (orientation: portrait)`]: {
       backgroundImage:
-        theme.palette.type == 'dark' ? 'none' : `url(${images.largePortrait})` // 1280px
+        theme.palette.type == 'dark' ? 'none' : `url(${images.largePortrait})`, // 1280px
     },
     [`${theme.breakpoints.up(
       'xs'
@@ -61,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
       backgroundImage:
         theme.palette.type == 'dark'
           ? 'none'
-          : `url(${images.smallRetinaPortrait})` // 1200px
+          : `url(${images.smallRetinaPortrait})`, // 1200px
     },
     [`${theme.breakpoints.up(
       'sm'
@@ -71,25 +75,25 @@ const useStyles = makeStyles((theme) => ({
       backgroundImage:
         theme.palette.type == 'dark'
           ? 'none'
-          : `url(${images.mediumRetinaPortrait})` // 1920px
+          : `url(${images.mediumRetinaPortrait})`, // 1920px
     },
 
     color: '#fff',
-    textAlign: 'center'
+    textAlign: 'center',
   },
 
   splashMainHeader: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   splashSubHeader: {
     fontWeight: 'bold',
     wordWrap: 'break-word',
-    padding: '0 10px'
+    padding: '0 10px',
   },
   cardContainer: {
     maxWidth: `${theme.breakpoints.values.lg}px`,
     padding: '20px',
-    margin: '0 auto'
+    margin: '0 auto',
   },
   card: {
     minHeight: '25em',
@@ -97,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
       theme.palette.type == 'dark'
         ? `${theme.palette.background.paper}`
         : '#417347',
-    color: '#fff'
+    color: '#fff',
   },
   cardHeader: {
     backgroundColor: `${
@@ -105,7 +109,7 @@ const useStyles = makeStyles((theme) => ({
         ? theme.palette.background.paper
         : theme.palette.primary.main
     }`,
-    borderBottom: '6px solid #fff'
+    borderBottom: '6px solid #fff',
   },
   cardContent: {
     paddingTop: theme.spacing(3),
@@ -114,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
       paddingLeft: theme.spacing(3),
       paddingBottom: theme.spacing(3),
       '&::lastChild': {
-        paddingBottom: 0
+        paddingBottom: 0,
       },
       '&:before': {
         content: '"»"',
@@ -125,10 +129,10 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(1),
         position: 'absolute',
         top: '-0.5em',
-        left: '0'
-      }
-    }
-  }
+        left: '0',
+      },
+    },
+  },
 }))
 
 export default function Home() {
@@ -160,7 +164,7 @@ export default function Home() {
     splashMinHeight: 0,
     portraitMode: inPortraitMode,
     landscapeHeight,
-    portraitHeight
+    portraitHeight,
   })
 
   // this hook is for setting min-height of the container

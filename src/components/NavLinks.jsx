@@ -3,14 +3,13 @@ import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Typography from '@material-ui/core/Typography'
-import Link from '@material-ui/core/Link'
-import { Link as RouterLink } from 'react-router-dom'
+import Link from './Link'
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
   navLinks: {
-    flexGrow: 1
-  }
+    flexGrow: 1,
+  },
 }))
 
 export default function NavLinks(props) {
@@ -21,20 +20,20 @@ export default function NavLinks(props) {
   const links = [
     {
       text: 'Заявки на сортировку',
-      href: '#'
+      href: '#',
     },
     {
       text: 'Заявки на сдачу',
-      href: '/removal'
+      href: '/removal',
     },
     {
       text: 'Переработчики',
-      href: '#'
+      href: '#',
     },
     {
       text: 'Сортировщики',
-      href: '#'
-    }
+      href: '#',
+    },
   ]
 
   const styles = {}
@@ -47,12 +46,7 @@ export default function NavLinks(props) {
         {links.map((link, index) => (
           <ListItem key={index} style={styles}>
             <ListItemText>
-              <Link
-                to={link.href}
-                onClick={preventDefault}
-                color="inherit"
-                component={RouterLink}
-              >
+              <Link href={link.href} onClick={preventDefault} color="inherit">
                 {link.text}
               </Link>
             </ListItemText>
@@ -64,5 +58,5 @@ export default function NavLinks(props) {
 }
 
 NavLinks.defaultProps = {
-  isDesktop: true
+  isDesktop: true,
 }

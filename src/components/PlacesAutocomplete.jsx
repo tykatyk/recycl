@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox.jsx'
-import envSettings from '../../server/envSettings'
+import envSettings from '../envSettings'
 
 function loadScript(src, position, id) {
   if (!position) {
@@ -27,23 +27,23 @@ const autocompleteService = { current: null }
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    '& fieldset': { borderColor: `${theme.palette.text.secondary}` }
+    '& fieldset': { borderColor: `${theme.palette.text.secondary}` },
   },
 
   focused: {
     '& fieldset': {
-      borderColor: `${theme.palette.secondary.main} !important`
-    }
+      borderColor: `${theme.palette.secondary.main} !important`,
+    },
   },
   clearIndicator: {
-    color: 'inherit'
+    color: 'inherit',
   },
   popupIndicator: {
-    color: 'inherit'
+    color: 'inherit',
   },
   locationIcon: {
-    marginRight: theme.spacing(2)
-  }
+    marginRight: theme.spacing(2),
+  },
 }))
 
 export default function PlacesAutocomplete(props) {
@@ -55,7 +55,7 @@ export default function PlacesAutocomplete(props) {
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
   const {
-    keys: { googleAutocomplete }
+    keys: { googleAutocomplete },
   } = envSettings
 
   if (typeof window !== 'undefined' && !loaded.current) {
@@ -125,7 +125,7 @@ export default function PlacesAutocomplete(props) {
         root: classes.root,
         focused: classes.focused,
         popupIndicator: classes.popupIndicator,
-        clearIndicator: classes.clearIndicator
+        clearIndicator: classes.clearIndicator,
       }}
       noOptionsText="Нет вариантов"
       loadingText="Загрузка"

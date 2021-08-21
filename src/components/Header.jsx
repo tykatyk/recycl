@@ -9,8 +9,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import Drawer from '@material-ui/core/Drawer'
 import Container from '@material-ui/core/Container'
-import Link from '@material-ui/core/Link'
-import { Link as RouterLink } from 'react-router-dom'
+import Link from './Link'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import Grow from '@material-ui/core/Grow'
 import Paper from '@material-ui/core/Paper'
@@ -25,14 +24,14 @@ const useStyles = makeStyles((theme) => ({
         ? theme.palette.background.default
         : theme.palette.primary.main
     }`,
-    color: `${theme.palette.text.primary}`
+    color: `${theme.palette.text.primary}`,
   },
   header: {
-    padding: 0
+    padding: 0,
   },
   accountBtn: {
-    marginLeft: 'auto'
-  }
+    marginLeft: 'auto',
+  },
 }))
 
 export default function Header() {
@@ -42,7 +41,7 @@ export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [state, setState] = useState({
     mobileView: false,
-    drawerOpen: false
+    drawerOpen: false,
   })
 
   useEffect(() => {
@@ -103,7 +102,7 @@ export default function Header() {
             'aria-label': 'menu',
             'aria-haspopup': 'true',
             onClick: handleDrawerOpen,
-            color: 'inherit'
+            color: 'inherit',
           }}
         >
           <MenuIcon />
@@ -112,7 +111,7 @@ export default function Header() {
           {...{
             anchor: 'left',
             open: drawerOpen,
-            onClose: handleDrawerClose
+            onClose: handleDrawerClose,
           }}
         >
           <NavLinks isDesktop={false} />
@@ -150,7 +149,7 @@ export default function Header() {
                 {...TransitionProps}
                 style={{
                   transformOrigin:
-                    placement === 'bottom' ? 'center top' : 'center bottom'
+                    placement === 'bottom' ? 'center top' : 'center bottom',
                 }}
               >
                 <Paper>
@@ -161,32 +160,17 @@ export default function Header() {
                       onKeyDown={handleListKeyDown}
                     >
                       <MenuItem onClick={handleClose}>
-                        <Link
-                          to="#"
-                          onClick={preventDefault}
-                          color="inherit"
-                          component={RouterLink}
-                        >
+                        <Link href="#" onClick={preventDefault} color="inherit">
                           Мои заявки
                         </Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}>
-                        <Link
-                          to="#"
-                          onClick={preventDefault}
-                          color="inherit"
-                          component={RouterLink}
-                        >
+                        <Link href="#" onClick={preventDefault} color="inherit">
                           Настройки
                         </Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}>
-                        <Link
-                          to="#"
-                          onClick={preventDefault}
-                          color="inherit"
-                          component={RouterLink}
-                        >
+                        <Link href="#" onClick={preventDefault} color="inherit">
                           Выйти
                         </Link>
                       </MenuItem>
