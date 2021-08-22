@@ -9,7 +9,6 @@ import { makeStyles } from '@material-ui/core/styles'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox.jsx'
-import envSettings from '../envSettings'
 
 function loadScript(src, position, id) {
   if (!position) {
@@ -54,14 +53,11 @@ export default function PlacesAutocomplete(props) {
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
-  const {
-    keys: { googleAutocomplete },
-  } = envSettings
 
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
       loadScript(
-        `https://maps.googleapis.com/maps/api/js?key=${googleAutocomplete}&libraries=places`,
+        `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_AUTOCOMPLETE}&libraries=places`,
         document.querySelector('head'),
         'google-maps'
       )

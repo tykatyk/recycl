@@ -16,15 +16,28 @@ import PlacesAutocomplete from '../src/components/PlacesAutocomplete.jsx'
 import Layout from '../src/components/Layout.jsx'
 
 const useStyles = makeStyles((theme) => ({
-  icon: {
-    color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2),
+  formRoot: {
+    '& > fieldset': {
+      margin: 0,
+      marginBottom: theme.spacing(5),
+      padding: 0,
+      border: 'none',
+    },
   },
   formControl: {
-    maxWidth: '100%',
-    overflow: 'hidden',
     '& fieldset': { borderColor: `${theme.palette.text.secondary}` },
     '& svg': { color: `${theme.palette.text.secondary}` },
+  },
+  gridContainer: {
+    '& > div': {
+      paddingBottom: theme.spacing(2),
+    },
+    '& > div:last-child': {
+      paddingBottom: 0,
+    },
+  },
+  sectionTitle: {
+    '& h4': { marginBottom: 0 },
   },
 }))
 
@@ -48,33 +61,36 @@ export default function HandOverClaim() {
       <Grid
         container
         direction="column"
-        spacing={2}
         style={{
-          width: '100%',
           maxWidth: '700px',
-          margin: '24px auto',
-          padding: '0 24px',
-          boxSizing: 'border-box',
+          margin: '0 auto',
+          padding: '16px',
         }}
       >
-        <Grid item container spacing={2} style={{ padding: '0 0 56px 0' }}>
-          <Typography gutterBottom variant="h4" color="secondary">
-            Параметры заявки
-          </Typography>
-          <Grid item xs={12}>
-            <Typography variant="subtitle1" gutterBottom>
-              Местонахождение отходов
-            </Typography>
-            <PlacesAutocomplete />
-          </Grid>
-          <Grid container item direction="row" xs={12}>
-            <Grid item xs={12} sm={9}>
+        <form className={classes.formRoot}>
+          <Grid
+            item
+            container
+            component="fieldset"
+            className={classes.gridContainer}
+          >
+            <Grid item xs={12} className={classes.sectionTitle}>
+              <Typography gutterBottom variant="h4" color="secondary">
+                Параметры заявки
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" gutterBottom>
+                Местонахождение отходов
+              </Typography>
+              <PlacesAutocomplete />
+            </Grid>
+            <Grid item xs={12} className={classes.gridContainer}>
               <Typography gutterBottom>Тип</Typography>
               <FormControl
                 variant="outlined"
                 className={classes.formControl}
                 fullWidth
-                style={{ paddingRight: '20px' }}
               >
                 <TextField
                   ref={ref}
@@ -108,7 +124,7 @@ export default function HandOverClaim() {
                 </TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={12}>
               <Typography gutterBottom>Количество</Typography>
               <FormControl className={classes.formControl} fullWidth>
                 <TextField
@@ -128,61 +144,69 @@ export default function HandOverClaim() {
                 />
               </FormControl>
             </Grid>
+            <Grid item xs={12}>
+              <Typography gutterBottom>Примечание</Typography>
+              <TextField
+                className={classes.formControl}
+                id="note"
+                multiline
+                rows={3}
+                variant="outlined"
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={<Checkbox name="document" />}
+                label="Нужен документ о передаче отходов на переработку"
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Typography gutterBottom>Примечание</Typography>
-            <TextField
-              className={classes.formControl}
-              id="note"
-              multiline
-              rows={3}
-              variant="outlined"
-              fullWidth
-            />
+          <Grid
+            item
+            container
+            component="fieldset"
+            className={classes.gridContainer}
+          >
+            <Grid item xs={12} className={classes.sectionTitle}>
+              <Typography gutterBottom variant="h4" color="secondary">
+                Параметры уведомлений
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={<Checkbox name="radius" />}
+                label="Получать уведомления о приеме отходов в радиусе:"
+              />
+              <TextField
+                className={classes.formControl}
+                id="radius"
+                type="number"
+                variant="outlined"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">Км</InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={<Checkbox name="cities" />}
+                label="Получать уведомления независимо от радиуса для следующих населенных пунктов"
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={<Checkbox name="document" />}
-              label="Нужен документ о передаче отходов на переработку"
-            />
+          <Grid item xs={12} component="fieldset">
+            <Button variant="contained" color="secondary">
+              Сохранить
+            </Button>
           </Grid>
-        </Grid>
-        <Grid item container spacing={2} style={{ paddingBottom: '56px' }}>
-          <Typography gutterBottom variant="h4" color="secondary">
-            Параметры уведомлений
-          </Typography>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={<Checkbox name="radius" />}
-              label="Получать уведомления о приеме отходов в радиусе"
-            />
-            <TextField
-              className={classes.formControl}
-              id="radius"
-              type="number"
-              variant="outlined"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">Км</InputAdornment>
-                ),
-              }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={<Checkbox name="cities" />}
-              label="Получать уведомления независимо от радиуса для следующих населенных пунктов"
-            />
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Button variant="contained" color="secondary">
-            Сохранить
-          </Button>
-        </Grid>
+        </form>
       </Grid>
     </Layout>
   )
