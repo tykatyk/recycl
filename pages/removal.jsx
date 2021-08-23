@@ -199,6 +199,7 @@ export default function HandOverClaim() {
                 control={<Checkbox name="cities" />}
                 label="Получать уведомления независимо от радиуса для следующих населенных пунктов"
               />
+              <PlacesAutocomplete multiple />
             </Grid>
           </Grid>
           <Grid item xs={12} component="fieldset">

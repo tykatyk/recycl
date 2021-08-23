@@ -4,7 +4,7 @@ import LocationOnIcon from '@material-ui/icons/LocationOn'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
-
+import Chip from '@material-ui/core/Chip'
 import { makeStyles } from '@material-ui/core/styles'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PlacesAutocomplete(props) {
   const classes = useStyles()
-  const [value, setValue] = React.useState(null)
+  const [value, setValue] = React.useState(props.multiple ? [] : null)
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
   const [options, setOptions] = React.useState([])
@@ -87,7 +87,7 @@ export default function PlacesAutocomplete(props) {
     }
 
     if (inputValue === '') {
-      setOptions(value ? [value] : [])
+      setOptions(value ? [...value] : [])
       return undefined
     }
 
@@ -98,7 +98,7 @@ export default function PlacesAutocomplete(props) {
           let newOptions = []
 
           if (value) {
-            newOptions = [value]
+            newOptions = props.multiple ? [...value] : [value]
           }
 
           if (results) {
@@ -117,6 +117,7 @@ export default function PlacesAutocomplete(props) {
 
   return (
     <Autocomplete
+      multiple={props.multiple}
       classes={{
         root: classes.root,
         focused: classes.focused,
@@ -141,15 +142,25 @@ export default function PlacesAutocomplete(props) {
       includeInputInList
       filterSelectedOptions
       value={value}
+      defaultValue=""
       onChange={(event, newValue) => {
         setOptions(newValue ? [newValue, ...options] : options)
-        setValue(newValue)
+        setValue(props.multiple ? [...newValue] : newValue)
         setSessionToken(new google.maps.places.AutocompleteSessionToken())
       }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue)
         inputValue.length > 0 ? setOpen(true) : setOpen(false)
       }}
+      renderTags={(value, getTagProps) =>
+        value.map((option, index) => (
+          <Chip
+            variant="outlined"
+            label={option.description}
+            {...getTagProps({ index })}
+          />
+        ))
+      }
       renderInput={(params) => (
         <TextField
           {...params}
@@ -191,4 +202,8 @@ export default function PlacesAutocomplete(props) {
       }}
     />
   )
+}
+
+PlacesAutocomplete.defaultProps = {
+  multiple: false,
 }
