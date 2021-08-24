@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "formik": "^2.2.9",
+    "formik-material-ui": "^4.0.0-alpha.1",
+    "formik-material-ui-lab": "^1.0.0-alpha.1",
     "yup": "^0.32.9"
   }
 }

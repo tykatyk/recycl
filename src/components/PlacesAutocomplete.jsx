@@ -47,13 +47,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PlacesAutocomplete(props) {
   const classes = useStyles()
-  const [value, setValue] = React.useState(props.multiple ? [] : null)
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
-
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
       loadScript(
@@ -65,7 +63,6 @@ export default function PlacesAutocomplete(props) {
 
     loaded.current = true
   }
-
   const fetch = React.useMemo(
     () =>
       throttle((request, callback) => {
@@ -73,6 +70,7 @@ export default function PlacesAutocomplete(props) {
       }, 200),
     []
   )
+  // console.log(props)
 
   React.useEffect(() => {
     let active = true
@@ -87,7 +85,7 @@ export default function PlacesAutocomplete(props) {
     }
 
     if (inputValue === '') {
-      setOptions(value ? [...value] : [])
+      setOptions(props.field.value ? [...props.field.value] : [])
       return undefined
     }
 
@@ -97,8 +95,10 @@ export default function PlacesAutocomplete(props) {
         if (active) {
           let newOptions = []
 
-          if (value) {
-            newOptions = props.multiple ? [...value] : [value]
+          if (props.field.value) {
+            newOptions = props.multiple
+              ? [...props.field.value]
+              : [props.field.value]
           }
 
           if (results) {
@@ -113,11 +113,19 @@ export default function PlacesAutocomplete(props) {
     return () => {
       active = false
     }
-  }, [value, inputValue, fetch])
+  }, [props.field.value, inputValue, fetch])
 
+  React.useEffect(() => {
+    if (!autocompleteService.current && window.google) {
+      autocompleteService.current =
+        new window.google.maps.places.AutocompleteService()
+      setSessionToken(new google.maps.places.AutocompleteSessionToken())
+    }
+  }, [props.field.value])
+  //
   return (
     <Autocomplete
-      multiple={props.multiple}
+      {...props}
       classes={{
         root: classes.root,
         focused: classes.focused,
@@ -126,7 +134,6 @@ export default function PlacesAutocomplete(props) {
       }}
       noOptionsText="Нет вариантов"
       loadingText="Загрузка"
-      id="wasteLocation"
       getOptionLabel={(option) =>
         typeof option === 'string' ? option : option.description
       }
@@ -141,13 +148,6 @@ export default function PlacesAutocomplete(props) {
       autoComplete
       includeInputInList
       filterSelectedOptions
-      value={value}
-      defaultValue=""
-      onChange={(event, newValue) => {
-        setOptions(newValue ? [newValue, ...options] : options)
-        setValue(props.multiple ? [...newValue] : newValue)
-        setSessionToken(new google.maps.places.AutocompleteSessionToken())
-      }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue)
         inputValue.length > 0 ? setOpen(true) : setOpen(false)
@@ -161,14 +161,17 @@ export default function PlacesAutocomplete(props) {
           />
         ))
       }
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          placeholder="Населенный пункт"
-          variant="outlined"
-          fullWidth
-        />
-      )}
+      renderInput={(params) => {
+        return (
+          <TextField
+            {...params}
+            placeholder="Населенный пункт"
+            variant="outlined"
+            fullWidth
+            name={props.name}
+          />
+        )
+      }}
       renderOption={(option) => {
         const matches =
           option.structured_formatting.main_text_matched_substrings
@@ -203,7 +206,6 @@ export default function PlacesAutocomplete(props) {
     />
   )
 }
-
 PlacesAutocomplete.defaultProps = {
   multiple: false,
 }
