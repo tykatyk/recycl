@@ -1,9 +1,7 @@
 import React from 'react'
 import Document, { Html, Head, Main, NextScript } from 'next/document'
 import { ServerStyleSheets, createMuiTheme } from '@material-ui/core/styles'
-import getThemeStub from '../src/components/helperData/themeStub'
-const themeStub = getThemeStub('light')
-const theme = createMuiTheme(themeStub)
+import { theme } from '../src/components/helperData/themeStub'
 
 export default class MyDocument extends Document {
   render() {

@@ -6,6 +6,8 @@ import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Chip from '@material-ui/core/Chip'
 import { makeStyles } from '@material-ui/core/styles'
+import { fieldToTextField } from 'formik-material-ui'
+import { Field } from 'formik'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox.jsx'
@@ -28,17 +30,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     '& fieldset': { borderColor: `${theme.palette.text.secondary}` },
   },
-
   focused: {
     '& fieldset': {
       borderColor: `${theme.palette.secondary.main} !important`,
     },
   },
-  clearIndicator: {
-    color: 'inherit',
-  },
-  popupIndicator: {
-    color: 'inherit',
+  inputLabelFocused: {
+    color: `${theme.palette.secondary.main} !important`,
   },
   locationIcon: {
     marginRight: theme.spacing(2),
@@ -46,12 +44,31 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function PlacesAutocomplete(props) {
+  const {
+    form: { setFieldValue, handleBlur, initialValues },
+    field: { name },
+    maps,
+  } = props
+
+  const {
+    type,
+    label,
+    variant,
+    value,
+    onChange,
+    onBlur,
+    error,
+    helperText,
+    disabled,
+  } = fieldToTextField(props)
+
   const classes = useStyles()
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
+
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
       loadScript(
@@ -63,6 +80,7 @@ export default function PlacesAutocomplete(props) {
 
     loaded.current = true
   }
+
   const fetch = React.useMemo(
     () =>
       throttle((request, callback) => {
@@ -70,7 +88,6 @@ export default function PlacesAutocomplete(props) {
       }, 200),
     []
   )
-  // console.log(props)
 
   React.useEffect(() => {
     let active = true
@@ -85,7 +102,7 @@ export default function PlacesAutocomplete(props) {
     }
 
     if (inputValue === '') {
-      setOptions(props.field.value ? [...props.field.value] : [])
+      setOptions(value ? (props.multiple ? [...value] : [value]) : [])
       return undefined
     }
 
@@ -95,10 +112,8 @@ export default function PlacesAutocomplete(props) {
         if (active) {
           let newOptions = []
 
-          if (props.field.value) {
-            newOptions = props.multiple
-              ? [...props.field.value]
-              : [props.field.value]
+          if (value) {
+            newOptions = props.multiple ? [...value] : [value]
           }
 
           if (results) {
@@ -113,16 +128,7 @@ export default function PlacesAutocomplete(props) {
     return () => {
       active = false
     }
-  }, [props.field.value, inputValue, fetch])
-
-  React.useEffect(() => {
-    if (!autocompleteService.current && window.google) {
-      autocompleteService.current =
-        new window.google.maps.places.AutocompleteService()
-      setSessionToken(new google.maps.places.AutocompleteSessionToken())
-    }
-  }, [props.field.value])
-  //
+  }, [inputValue, fetch])
   return (
     <Autocomplete
       {...props}
@@ -140,18 +146,25 @@ export default function PlacesAutocomplete(props) {
       filterOptions={(x) => x}
       ListboxComponent={Listbox}
       options={options}
+      multiple={props.multiple || false}
       open={open}
       onOpen={() => {
-        if (inputValue.length > 0) setOpen(true)
+        if (inputValue) setOpen(true)
       }}
       onClose={() => setOpen(false)}
+      onInputChange={(event, newInputValue) => {
+        setInputValue(newInputValue)
+        inputValue ? setOpen(true) : setOpen(false)
+      }}
+      onChange={(event, newValue) => {
+        setOptions(newValue ? [newValue, ...options] : options)
+        setFieldValue(name, newValue || '')
+        setSessionToken(new google.maps.places.AutocompleteSessionToken())
+      }}
+      onBlur={handleBlur}
       autoComplete
       includeInputInList
       filterSelectedOptions
-      onInputChange={(event, newInputValue) => {
-        setInputValue(newInputValue)
-        inputValue.length > 0 ? setOpen(true) : setOpen(false)
-      }}
       renderTags={(value, getTagProps) =>
         value.map((option, index) => (
           <Chip
@@ -165,10 +178,16 @@ export default function PlacesAutocomplete(props) {
         return (
           <TextField
             {...params}
-            placeholder="Населенный пункт"
-            variant="outlined"
             fullWidth
-            name={props.name}
+            variant={variant}
+            name={name}
+            InputLabelProps={{
+              classes: {
+                focused: classes.inputLabelFocused,
+              },
+            }}
+            helperText="*Обязательное поле"
+            label={label}
           />
         )
       }}
@@ -205,7 +224,4 @@ export default function PlacesAutocomplete(props) {
       }}
     />
   )
-}
-PlacesAutocomplete.defaultProps = {
-  multiple: false,
 }
