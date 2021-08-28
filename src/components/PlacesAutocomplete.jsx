@@ -68,7 +68,6 @@ export default function PlacesAutocomplete(props) {
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
-
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
       loadScript(
@@ -80,7 +79,6 @@ export default function PlacesAutocomplete(props) {
 
     loaded.current = true
   }
-
   const fetch = React.useMemo(
     () =>
       throttle((request, callback) => {
@@ -131,7 +129,6 @@ export default function PlacesAutocomplete(props) {
   }, [inputValue, fetch])
   return (
     <Autocomplete
-      {...props}
       classes={{
         root: classes.root,
         focused: classes.focused,
@@ -186,8 +183,9 @@ export default function PlacesAutocomplete(props) {
                 focused: classes.inputLabelFocused,
               },
             }}
-            helperText="*Обязательное поле"
+            helperText={helperText}
             label={label}
+            disabled={disabled}
           />
         )
       }}
