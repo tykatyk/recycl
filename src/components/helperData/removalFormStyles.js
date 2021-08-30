@@ -24,10 +24,4 @@ export default makeStyles((theme) => ({
   sectionTitle: {
     '& h4': { marginBottom: 0 },
   },
-  popover: {
-    pointerEvents: 'none',
-  },
-  paper: {
-    padding: theme.spacing(1),
-  },
 }))

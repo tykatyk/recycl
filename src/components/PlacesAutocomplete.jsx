@@ -61,7 +61,7 @@ export default function PlacesAutocomplete(props) {
     helperText,
     disabled,
   } = fieldToTextField(props)
-
+  console.log(disabled)
   const classes = useStyles()
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
@@ -144,6 +144,7 @@ export default function PlacesAutocomplete(props) {
       ListboxComponent={Listbox}
       options={options}
       multiple={props.multiple || false}
+      disabled={disabled}
       open={open}
       onOpen={() => {
         if (inputValue) setOpen(true)
@@ -185,7 +186,6 @@ export default function PlacesAutocomplete(props) {
             }}
             helperText={helperText}
             label={label}
-            disabled={disabled}
           />
         )
       }}
