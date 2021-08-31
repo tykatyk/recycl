@@ -13,11 +13,15 @@ export const initialValues = {
 }
 
 export const validationSchema = yup.object().shape({
-  wasteLocation: yup.object().required(),
-  wasteType: yup.number().oneOf([1, 2, 3]),
+  wasteLocation: yup.object().required('*Обязательное поле'),
+  wasteType: yup
+    .number()
+    .oneOf([0, 1, 2], 'Выберите одно из значений в списке'),
   quantity: yup
-    .number('Поле должно содержать число больше 0')
-    .positive('Поле должно содержать число больше 0'),
+    .number()
+    .typeError('Поле должно содержать число больше 0')
+    .positive('Поле должно содержать число больше 0')
+    .required('*Обязательне поле'),
   passDocumet: yup.boolean(),
   notificationRadiusCheckbox: yup.boolean(),
   notificationCitiesCheckbox: yup.boolean(),

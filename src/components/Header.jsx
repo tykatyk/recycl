@@ -18,14 +18,6 @@ import MenuList from '@material-ui/core/MenuList'
 import NavLinks from './NavLinks.jsx'
 
 const useStyles = makeStyles((theme) => ({
-  appBar: {
-    backgroundColor: `${
-      theme.palette.type == 'dark'
-        ? theme.palette.background.default
-        : theme.palette.primary.main
-    }`,
-    color: `${theme.palette.text.primary}`,
-  },
   header: {
     padding: 0,
   },

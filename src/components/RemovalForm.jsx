@@ -62,7 +62,6 @@ export default function RemovalForm(props) {
               </Grid>
               <Grid item xs={12} className={classes.gridContainer}>
                 <Field
-                  helperText="*Обязательное поле"
                   component={TextFieldFormic}
                   fullWidth
                   select
@@ -72,6 +71,7 @@ export default function RemovalForm(props) {
                   color="secondary"
                   variant="outlined"
                   label="Тип отходов"
+                  helperText="*Обязательное поле"
                   SelectProps={{
                     MenuProps: {
                       anchorOrigin: {
@@ -96,14 +96,12 @@ export default function RemovalForm(props) {
                 </Field>
               </Grid>
               <Grid item xs={12}>
-                <Typography gutterBottom>Количество</Typography>
                 <Field
                   component={TextFieldFormic}
-                  inputProps={{ max: 10 }}
+                  label="Количество"
                   color="secondary"
                   fullWidth
                   name="quantity"
-                  type="number"
                   variant="outlined"
                   InputProps={{
                     endAdornment: (

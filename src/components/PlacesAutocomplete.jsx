@@ -27,17 +27,6 @@ function loadScript(src, position, id) {
 const autocompleteService = { current: null }
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    '& fieldset': { borderColor: `${theme.palette.text.secondary}` },
-  },
-  focused: {
-    '& fieldset': {
-      borderColor: `${theme.palette.secondary.main} !important`,
-    },
-  },
-  inputLabelFocused: {
-    color: `${theme.palette.secondary.main} !important`,
-  },
   locationIcon: {
     marginRight: theme.spacing(2),
   },
@@ -61,7 +50,7 @@ export default function PlacesAutocomplete(props) {
     helperText,
     disabled,
   } = fieldToTextField(props)
-  console.log(disabled)
+
   const classes = useStyles()
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
@@ -86,7 +75,7 @@ export default function PlacesAutocomplete(props) {
       }, 200),
     []
   )
-
+  console.log(helperText)
   React.useEffect(() => {
     let active = true
 
@@ -186,6 +175,7 @@ export default function PlacesAutocomplete(props) {
             }}
             helperText={helperText}
             label={label}
+            error={error}
           />
         )
       }}
