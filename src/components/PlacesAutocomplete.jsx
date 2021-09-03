@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PlacesAutocomplete(props) {
   const {
-    form: { setFieldValue, handleBlur, initialValues },
+    form: { setFieldValue, handleBlur, touched, setFieldTouched, values },
     field: { name },
     maps,
   } = props
@@ -57,6 +57,7 @@ export default function PlacesAutocomplete(props) {
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
+
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
       loadScript(
@@ -75,7 +76,7 @@ export default function PlacesAutocomplete(props) {
       }, 200),
     []
   )
-  console.log(helperText)
+
   React.useEffect(() => {
     let active = true
 
@@ -89,7 +90,7 @@ export default function PlacesAutocomplete(props) {
     }
 
     if (inputValue === '') {
-      setOptions(value ? (props.multiple ? [...value] : [value]) : [])
+      setOptions(value ? (props.multiple ? value : [value]) : [])
       return undefined
     }
 
@@ -100,7 +101,7 @@ export default function PlacesAutocomplete(props) {
           let newOptions = []
 
           if (value) {
-            newOptions = props.multiple ? [...value] : [value]
+            newOptions = props.multiple ? value : [value]
           }
 
           if (results) {
@@ -116,8 +117,29 @@ export default function PlacesAutocomplete(props) {
       active = false
     }
   }, [inputValue, fetch])
+
+  const masterField = props['data-master']
+
+  const [key, setKey] = React.useState(new Date().getTime())
+  console.log(name)
+  React.useEffect(() => {
+    if (masterField && !values[masterField]) {
+      setOptions([])
+
+      if (props.multiple) {
+        setFieldValue(name, [], false)
+      } else {
+        setFieldValue(name, '', false)
+      }
+
+      setFieldTouched(name, false, false)
+      setKey(new Date().getTime())
+    }
+  }, [values[masterField]])
+
   return (
     <Autocomplete
+      key={key}
       classes={{
         root: classes.root,
         focused: classes.focused,
@@ -144,7 +166,11 @@ export default function PlacesAutocomplete(props) {
         inputValue ? setOpen(true) : setOpen(false)
       }}
       onChange={(event, newValue) => {
-        setOptions(newValue ? [newValue, ...options] : options)
+        if (props.multiple) {
+          setOptions(newValue ? [...newValue, ...options] : options)
+        } else {
+          setOptions(newValue ? [newValue, ...options] : options)
+        }
         setFieldValue(name, newValue || '')
         setSessionToken(new google.maps.places.AutocompleteSessionToken())
       }}
@@ -152,15 +178,15 @@ export default function PlacesAutocomplete(props) {
       autoComplete
       includeInputInList
       filterSelectedOptions
-      renderTags={(value, getTagProps) =>
-        value.map((option, index) => (
+      renderTags={(value, getTagProps) => {
+        return value.map((option, index) => (
           <Chip
             variant="outlined"
             label={option.description}
             {...getTagProps({ index })}
           />
         ))
-      }
+      }}
       renderInput={(params) => {
         return (
           <TextField

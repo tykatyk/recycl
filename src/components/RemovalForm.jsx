@@ -8,6 +8,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles'
 import PlacesAutocomplete from './PlacesAutocomplete.jsx'
 import InputLabel from '@material-ui/core/InputLabel'
 import TextFieldFormic from './TextFieldFormic.jsx'
+import TextFieldDependantFormic from './TextFieldDependantFormic.jsx'
 import Button from '@material-ui/core/Button'
 import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './helperData/removalFormStyles'
@@ -66,7 +67,6 @@ export default function RemovalForm(props) {
                   fullWidth
                   select
                   type="text"
-                  id="wasteType"
                   name="wasteType"
                   color="secondary"
                   variant="outlined"
@@ -107,9 +107,6 @@ export default function RemovalForm(props) {
                     endAdornment: (
                       <InputAdornment position="end">Кг</InputAdornment>
                     ),
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
                   }}
                   helperText="*Обязательное поле"
                 />
@@ -166,11 +163,11 @@ export default function RemovalForm(props) {
                 <Grid container>
                   <Grid item xs={11}>
                     <Field
-                      component={TextFieldFormic}
+                      component={TextFieldDependantFormic}
+                      data-master="notificationRadiusCheckbox"
                       disabled={!values.notificationRadiusCheckbox}
                       className={classes.formControl}
                       name="notificationRadius"
-                      type="number"
                       variant="outlined"
                       InputProps={{
                         endAdornment: (
@@ -217,6 +214,7 @@ export default function RemovalForm(props) {
                   <Grid item xs={11}>
                     <Field
                       name="notificationCities"
+                      data-master="notificationCitiesCheckbox"
                       variant="outlined"
                       multiple
                       component={PlacesAutocomplete}

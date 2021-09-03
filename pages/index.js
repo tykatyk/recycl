@@ -33,49 +33,34 @@ const useStyles = makeStyles((theme) => ({
 
     // background image for landscape orientation
     [`@media screen`]: {
-      backgroundImage:
-        theme.palette.type == 'dark'
-          ? 'none'
-          : `url(${images.mediumLandscape})`,
+      backgroundImage: `url(${images.mediumLandscape})`,
     },
 
     [theme.breakpoints.up('sm')]: {
-      backgroundImage:
-        theme.palette.type == 'dark'
-          ? 'none'
-          : `url(${images.xLargeLandscape})`,
+      backgroundImage: `url(${images.xLargeLandscape})`,
     },
 
     // background image for portrait orientation
     [`@media screen and (orientation: portrait)`]: {
-      backgroundImage:
-        theme.palette.type == 'dark' ? 'none' : `url(${images.smallPortrait})`, // 600px
+      backgroundImage: `url(${images.smallPortrait})`, // 600px
     },
     [`${theme.breakpoints.up('sm')} and (orientation: portrait)`]: {
-      backgroundImage:
-        theme.palette.type == 'dark' ? 'none' : `url(${images.mediumPortrait})`, // 960px
+      backgroundImage: `url(${images.mediumPortrait})`, // 960px
     },
     [`${theme.breakpoints.up('md')} and (orientation: portrait)`]: {
-      backgroundImage:
-        theme.palette.type == 'dark' ? 'none' : `url(${images.largePortrait})`, // 1280px
+      backgroundImage: `url(${images.largePortrait})`, // 1280px
     },
     [`${theme.breakpoints.up(
       'xs'
     )} and (min-resolution: 2dppx) and (orientation: portrait)`]: {
-      backgroundImage:
-        theme.palette.type == 'dark'
-          ? 'none'
-          : `url(${images.smallRetinaPortrait})`, // 1200px
+      backgroundImage: `url(${images.smallRetinaPortrait})`, // 1200px
     },
     [`${theme.breakpoints.up(
       'sm'
     )} and (min-resolution: 2dppx) and (orientation: portrait), ${theme.breakpoints
       .up('lg')
       .replace('@media ', '')} and (orientation: portrait)`]: {
-      backgroundImage:
-        theme.palette.type == 'dark'
-          ? 'none'
-          : `url(${images.mediumRetinaPortrait})`, // 1920px
+      backgroundImage: `url(${images.mediumRetinaPortrait})`, // 1920px
     },
 
     color: '#fff',
@@ -97,18 +82,11 @@ const useStyles = makeStyles((theme) => ({
   },
   card: {
     minHeight: '25em',
-    backgroundColor:
-      theme.palette.type == 'dark'
-        ? `${theme.palette.background.paper}`
-        : '#417347',
+    backgroundColor: `${theme.palette.primary.main}`,
     color: '#fff',
   },
   cardHeader: {
-    backgroundColor: `${
-      theme.palette.type == 'dark'
-        ? theme.palette.background.paper
-        : theme.palette.primary.main
-    }`,
+    backgroundColor: '#455a64',
     borderBottom: '6px solid #fff',
   },
   cardContent: {
