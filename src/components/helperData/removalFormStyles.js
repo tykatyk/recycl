@@ -23,10 +23,6 @@ export default makeStyles((theme) => ({
       border: 'none',
     },
   },
-  formControl: {
-    '& fieldset': { borderColor: `${theme.palette.text.secondary}` },
-    '& svg': { color: `${theme.palette.text.secondary}` },
-  },
   gridContainer: {
     '& > div': {
       paddingBottom: theme.spacing(2),

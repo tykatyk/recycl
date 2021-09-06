@@ -8,8 +8,8 @@ import removalPopoverStyles from './helperData/removalPopoverStyles'
 const useStyles = removalPopoverStyles
 
 export default function RemovalPopover(props) {
+  const theme = useTheme()
   const classes = useStyles()
-
   const [anchor, setAnchor] = React.useState(null)
 
   const handlePopoverOpen = (event) => {

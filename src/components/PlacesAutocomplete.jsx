@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PlacesAutocomplete(props) {
   const {
-    form: { setFieldValue, handleBlur, touched, setFieldTouched, values },
+    form: { setFieldValue, handleBlur, setFieldTouched, values },
     field: { name },
     maps,
   } = props
@@ -121,7 +121,7 @@ export default function PlacesAutocomplete(props) {
   const masterField = props['data-master']
 
   const [key, setKey] = React.useState(new Date().getTime())
-  console.log(name)
+
   React.useEffect(() => {
     if (masterField && !values[masterField]) {
       setOptions([])

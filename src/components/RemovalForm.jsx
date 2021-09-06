@@ -13,16 +13,23 @@ import Button from '@material-ui/core/Button'
 import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './helperData/removalFormStyles'
 import RemovalPopover from './RemovalPopover.jsx'
+import { useRouter } from 'next/router'
 import {
   initialValues,
   validationSchema,
 } from './helperData/removalFormConfig.js'
+import dataService from '../dataService'
 
 const useStyles = removalFormStyles
 
 export default function RemovalForm(props) {
   const classes = useStyles()
   const theme = useTheme()
+  const router = useRouter()
+  const { id } = router.query
+  if (id) {
+  }
+  console.log(id)
 
   return (
     <Formik
@@ -30,10 +37,7 @@ export default function RemovalForm(props) {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
-        setTimeout(() => {
-          setSubmitting(false)
-          alert(JSON.stringify(values, null, 2))
-        }, 500)
+        window.location.replace('/')
       }}
     >
       {({ submitForm, isSubmitting, errors, touched, values }) => {
@@ -46,7 +50,7 @@ export default function RemovalForm(props) {
               className={classes.gridContainer}
             >
               <Grid item xs={12} className={classes.sectionTitle}>
-                <Typography gutterBottom variant="h4" color="secondary">
+                <Typography gutterBottom variant="h4">
                   Параметры заявки
                 </Typography>
               </Grid>
@@ -82,7 +86,6 @@ export default function RemovalForm(props) {
                         vertical: 'top',
                         horizontal: 'left',
                       },
-
                       getContentAnchorEl: null,
                     },
                   }}
@@ -114,7 +117,6 @@ export default function RemovalForm(props) {
               <Grid item xs={12}>
                 <Field
                   component={TextFieldFormic}
-                  className={classes.formControl}
                   multiline
                   rows={3}
                   variant="outlined"
@@ -142,7 +144,7 @@ export default function RemovalForm(props) {
               className={classes.gridContainer}
             >
               <Grid item xs={12} className={classes.sectionTitle}>
-                <Typography gutterBottom variant="h4" color="secondary">
+                <Typography gutterBottom variant="h4">
                   Параметры уведомлений
                 </Typography>
               </Grid>
@@ -166,7 +168,6 @@ export default function RemovalForm(props) {
                       component={TextFieldDependantFormic}
                       data-master="notificationRadiusCheckbox"
                       disabled={!values.notificationRadiusCheckbox}
-                      className={classes.formControl}
                       name="notificationRadius"
                       variant="outlined"
                       InputProps={{

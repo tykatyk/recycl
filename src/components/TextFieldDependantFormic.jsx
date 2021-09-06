@@ -8,7 +8,7 @@ export default function TextFieldDependantFormic(props) {
     form: { values, setFieldValue, touched, setFieldTouched },
     field: { name },
   } = props
-  //
+
   React.useEffect(() => {
     if (!values[masterField] && touched[masterField]) {
       setFieldValue(name, '', false)

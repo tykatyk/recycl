@@ -82,11 +82,11 @@ const useStyles = makeStyles((theme) => ({
   },
   card: {
     minHeight: '25em',
-    backgroundColor: `${theme.palette.primary.main}`,
+    backgroundColor: `${theme.palette.background.paper}`,
     color: '#fff',
   },
   cardHeader: {
-    backgroundColor: '#455a64',
+    backgroundColor: `${theme.palette.primary.main}`,
     borderBottom: '6px solid #fff',
   },
   cardContent: {

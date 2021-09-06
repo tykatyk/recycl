@@ -12,30 +12,26 @@ export const initialValues = {
   notificationRadiusCheckbox: false,
 }
 
+const required = '*Обязательное поле'
+const type = 'Поле имеет неверный тип данных'
+const positive = 'Поле должно содержать число больше 0'
+
 export const validationSchema = yup.object().shape({
-  wasteLocation: yup.object().nullable().required('*Обязательное поле'),
-  wasteType: yup.number().required('*Обязатльное поле'),
-  quantity: yup
-    .number()
-    .typeError('Поле должно содержать число больше 0')
-    .positive('Поле должно содержать число больше 0')
-    .required('*Обязательне поле'),
+  wasteLocation: yup.object().nullable().required(required),
+  wasteType: yup.number().required(required),
+  quantity: yup.number().typeError(type).positive(positive).required(required),
   notificationRadiusCheckbox: yup.boolean(),
   notificationRadius: yup.number().when('notificationRadiusCheckbox', {
     is: true,
     then: yup
       .number()
-      .typeError('Поле должно содержать число больше 0')
-      .positive('Поле должно содержать число больше 0')
-      .required('Поле должно содержать число больше 0'),
+      .typeError(type)
+      .positive(positive)
+      .required('Заполните это поле'),
   }),
   notificationCitiesCheckbox: yup.boolean(),
-  notificationCities: yup.number().when('notificationCitiesCheckbox', {
+  notificationCities: yup.array().when('notificationCitiesCheckbox', {
     is: true,
-    then: yup
-      .number()
-      .typeError('Поле должно содержать число больше 0')
-      .positive('Поле должно содержать число больше 0')
-      .required('Поле должно содержать число больше 0'),
+    then: yup.array().typeError(type).min(1, 'Заполните это поле'),
   }),
 })

@@ -1,10 +1,10 @@
 import React from 'react'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
-import Layout from '../src/components/Layout.jsx'
-import RemovalForm from '../src/components/RemovalForm.jsx'
+import Layout from './Layout.jsx'
+import RemovalForm from './RemovalForm.jsx'
 
-export default function HandOverClaim() {
+export default function RemovalApplication() {
   return (
     <Layout>
       <Grid
