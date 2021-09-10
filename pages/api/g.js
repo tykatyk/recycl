@@ -1,26 +1,41 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
-import mongodbQueries from '../../src/mongodbQueries'
+import mongodbQueries from '../../src/dbQueries'
 
 const typeDefs = gql`
   type Query {
     hello: String
   }
+
+  type LocationOutput {
+    description: String
+    place_id: String
+  }
+
   type RemovalApplicationOutput {
     _id: String
+    wasteLocation: LocationOutput
     wasteType: Int
     quantity: Int
     passDocumet: Boolean
     description: String
     notificationCitiesCheckbox: Boolean
+    notificationCities: [LocationOutput]
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
   }
+  input Location {
+    description: String
+    place_id: String
+  }
+
   input RemovalApplication {
+    wasteLocation: Location
     wasteType: Int
     quantity: Int
     passDocumet: Boolean
     description: String
     notificationCitiesCheckbox: Boolean
+    notificationCities: [Location]
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
   }
@@ -47,7 +62,6 @@ const apolloServer = new ApolloServer({ typeDefs, resolvers })
 const startServer = apolloServer.start()
 
 export default async function handler(req, res) {
-  console.log('Im handler', req)
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
   res.setHeader(
@@ -61,7 +75,7 @@ export default async function handler(req, res) {
 
   await startServer
   await apolloServer.createHandler({
-    path: '/api/g',
+    path: process.env.GRAPHQL_URL,
   })(req, res)
 }
 

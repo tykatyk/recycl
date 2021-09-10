@@ -1,4 +1,4 @@
-import { RemovalApplicationModel } from './dbModels'
+import RemovalApplicationModel from './dbModels'
 
 class RemovalApplicationDataService {
   async create(data) {

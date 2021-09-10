@@ -31,13 +31,21 @@ export default function RemovalForm(props) {
   const [executeMutation, { data, loading, error }] = useMutation(
     CREATE_REMOVAL_APPLICATION
   )
-  console.log(data)
   return (
     <Formik
       enableReinitialize
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
+        const normalizedValues = {}
+        Object.assign(normalizedValues, values)
+
+        const wasteLocation = {
+          description: values.wasteLocation.description,
+          place_id: values.wasteLocation.place_id,
+        }
+        normalizedValues.wasteLocation = wasteLocation
+
         const val = {
           wasteType: values.wasteType,
           quantity: values.quantity,
