@@ -1,5 +1,4 @@
-import http from './httpCommon'
-import RemovalApplicationModel from './dbSchema'
+import { RemovalApplicationModel } from './dbModels'
 
 class RemovalApplicationDataService {
   async create(data) {

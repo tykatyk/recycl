@@ -14,11 +14,12 @@ import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './helperData/removalFormStyles'
 import RemovalPopover from './RemovalPopover.jsx'
 import { useRouter } from 'next/router'
+import { useMutation } from '@apollo/client'
+import { CREATE_REMOVAL_APPLICATION } from '../graphqlQueries'
 import {
   initialValues,
   validationSchema,
 } from './helperData/removalFormConfig.js'
-import dataService from '../dataService'
 
 const useStyles = removalFormStyles
 
@@ -27,17 +28,26 @@ export default function RemovalForm(props) {
   const theme = useTheme()
   const router = useRouter()
   const { id } = router.query
-  if (id) {
-  }
-  console.log(id)
-
+  const [executeMutation, { data, loading, error }] = useMutation(
+    CREATE_REMOVAL_APPLICATION
+  )
+  console.log(data)
   return (
     <Formik
       enableReinitialize
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
-        window.location.replace('/')
+        const val = {
+          wasteType: values.wasteType,
+          quantity: values.quantity,
+          passDocumet: values.passDocumet,
+          description: values.description,
+          notificationCitiesCheckbox: values.notificationCitiesCheckbox,
+          notificationRadius: values.notificationRadius,
+          notificationRadiusCheckbox: values.notificationRadiusCheckbox,
+        }
+        executeMutation({ variables: { application: val } })
       }}
     >
       {({ submitForm, isSubmitting, errors, touched, values }) => {
@@ -103,6 +113,7 @@ export default function RemovalForm(props) {
                   component={TextFieldFormic}
                   label="Количество"
                   color="secondary"
+                  type="number"
                   fullWidth
                   name="quantity"
                   variant="outlined"

@@ -9,6 +9,13 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+
+const client = new ApolloClient({
+  uri: '/api/g',
+  cache: new InMemoryCache(),
+  connectToDevTools: true,
+})
 
 export default function MyApp(props) {
   const { Component, pageProps } = props
@@ -32,7 +39,9 @@ export default function MyApp(props) {
       </Head>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Component {...pageProps} />
+        <ApolloProvider client={client}>
+          <Component {...pageProps} />
+        </ApolloProvider>
       </ThemeProvider>
     </React.Fragment>
   )

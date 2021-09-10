@@ -1,42 +1,43 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
-import dataService from '../../src/dataService'
+import mongodbQueries from '../../src/mongodbQueries'
 
 const typeDefs = gql`
   type Query {
-    getRemovalApplication($id: Int): RemovalApplication!
+    hello: String
   }
-  type RemovalApplication {
+  type RemovalApplicationOutput {
     _id: String
-    wasteLocation: Location
-    wasteType: Number
-    quantity: Number
+    wasteType: Int
+    quantity: Int
     passDocumet: Boolean
     description: String
-    notificationCities: [Location]
     notificationCitiesCheckbox: Boolean
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
   }
-  type Location {
+  input RemovalApplication {
+    wasteType: Int
+    quantity: Int
+    passDocumet: Boolean
     description: String
-    place_id: String
+    notificationCitiesCheckbox: Boolean
+    notificationRadius: String
+    notificationRadiusCheckbox: Boolean
   }
   type Mutation {
-    updateRemovalApplication($id:Int) : RemovalApplication
-    createRemovalApplication(RemovalApplication) : RemovalApplication
-    deleteRemovalApplication($id: Int) : RemovalApplication
-}
+    createRemovalApp(application: RemovalApplication): RemovalApplicationOutput
+  }
 `
 
 const resolvers = {
   Query: {
-    removalApplication(parent, args, context) {
-      return dataService.find(args.id)
+    hello(parent, args, context) {
+      return 'Word'
     },
   },
   Mutation: {
-    createRemovalApplication(parent, args, context) {
-      return dataService.create(args.data)
+    createRemovalApp(parent, args, context) {
+      return mongodbQueries.create(args.application)
     },
   },
 }
@@ -46,6 +47,7 @@ const apolloServer = new ApolloServer({ typeDefs, resolvers })
 const startServer = apolloServer.start()
 
 export default async function handler(req, res) {
+  console.log('Im handler', req)
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
   res.setHeader(

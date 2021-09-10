@@ -1,11 +1,9 @@
 import mongoose from 'mongoose'
-
+console.log(mongoose)
 async function main() {
   await mongoose.connect(`${process.env.NEXT_PUBLIC_DB}`)
 }
-
-main().catch((err) => console.log('Error while connecting to the database'))
-
+main()
 const removalRequestSchema = new mongoose.Schema({
   wasteLocation: { description: String, place_id: String },
   wasteType: Number,
@@ -18,7 +16,11 @@ const removalRequestSchema = new mongoose.Schema({
   notificationRadiusCheckbox: Boolean,
 })
 
-export const RemovalApplicationModel = mongoose.model(
-  'RemovalApplication',
-  removalApplicationSchema
+console.log(
+  mongoose.models.RemovalApplication ||
+    mongoose.model('RemovalApplication', removalRequestSchema)
 )
+
+export const RemovalApplicationModel =
+  mongoose.models.RemovalApplication ||
+  mongoose.model('RemovalApplication', removalRequestSchema)

@@ -3,7 +3,7 @@ import * as yup from 'yup'
 export const initialValues = {
   wasteLocation: '',
   wasteType: '',
-  quantity: '',
+  quantity: 0,
   passDocumet: false,
   description: '',
   notificationCities: [],
