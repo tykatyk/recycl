@@ -7,7 +7,15 @@ class RemovalApplicationDataService {
   }
 
   async find(id) {
-    return await findById(id).exec()
+    return await RemovalApplicationModel.findById(id).exec()
+  }
+  async update(id, newValue) {
+    return await RemovalApplicationModel.findByIdAndUpdate(id, newValue, {
+      new: true,
+    }).exec()
+  }
+  async delete(id) {
+    return await RemovalApplicationModel.findByIdAndRemove(id).exec()
   }
 }
 

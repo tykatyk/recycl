@@ -1,9 +1,10 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
-import mongodbQueries from '../../src/dbQueries'
+import dbConnect from '../../src/dbConnect'
+import dbQueries from '../../src/dbQueries'
 
 const typeDefs = gql`
   type Query {
-    hello: String
+    getRemovalApplication(id: String!): RemovalApplicationOutput
   }
 
   type LocationOutput {
@@ -52,7 +53,7 @@ const resolvers = {
   },
   Mutation: {
     createRemovalApp(parent, args, context) {
-      return mongodbQueries.create(args.application)
+      return dbQueries.create(args.application)
     },
   },
 }
@@ -61,7 +62,7 @@ const apolloServer = new ApolloServer({ typeDefs, resolvers })
 
 const startServer = apolloServer.start()
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
   res.setHeader(
@@ -78,7 +79,7 @@ export default async function handler(req, res) {
     path: process.env.GRAPHQL_URL,
   })(req, res)
 }
-
+export default dbConnect(handler)
 export const config = {
   api: {
     bodyParser: false,

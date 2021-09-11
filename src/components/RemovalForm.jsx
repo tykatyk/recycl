@@ -14,10 +14,14 @@ import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './helperData/removalFormStyles'
 import RemovalPopover from './RemovalPopover.jsx'
 import { useRouter } from 'next/router'
-import { useMutation } from '@apollo/client'
-import { CREATE_REMOVAL_APPLICATION } from '../graphqlQueries'
+import { useMutation, useLazyQuery } from '@apollo/client'
 import {
-  initialValues,
+  CREATE_REMOVAL_APPLICATION,
+  GET_REMOVAL_APPLICATION,
+  UPDATE_REMOVAL_APPLICATION,
+} from '../graphqlQueries'
+import {
+  getInitialValues,
   validationSchema,
 } from './helperData/removalFormConfig.js'
 
@@ -28,9 +32,14 @@ export default function RemovalForm(props) {
   const theme = useTheme()
   const router = useRouter()
   const { id } = router.query
-  const [executeMutation, { data, loading, error }] = useMutation(
-    CREATE_REMOVAL_APPLICATION
-  )
+  const [executeMutation, { data: creatingData, loading: creating, error }] =
+    useMutation(CREATE_REMOVAL_APPLICATION)
+  const [getRemovalApplication, { loading: getting, data: gettingData }] =
+    useLazyQuery(GET_REMOVAL_APPLICATION)
+  if (id) {
+    getRemovalApplication()
+  }
+  const initialValues = gettingData || getInitialValues()
   return (
     <Formik
       enableReinitialize
@@ -46,16 +55,7 @@ export default function RemovalForm(props) {
         }
         normalizedValues.wasteLocation = wasteLocation
 
-        const val = {
-          wasteType: values.wasteType,
-          quantity: values.quantity,
-          passDocumet: values.passDocumet,
-          description: values.description,
-          notificationCitiesCheckbox: values.notificationCitiesCheckbox,
-          notificationRadius: values.notificationRadius,
-          notificationRadiusCheckbox: values.notificationRadiusCheckbox,
-        }
-        executeMutation({ variables: { application: val } })
+        executeMutation({ variables: { application: normalizedValues } })
       }}
     >
       {({ submitForm, isSubmitting, errors, touched, values }) => {

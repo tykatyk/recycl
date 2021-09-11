@@ -1,6 +1,6 @@
 import * as yup from 'yup'
 
-export const initialValues = {
+export const getInitialValues = () => ({
   wasteLocation: '',
   wasteType: '',
   quantity: 0,
@@ -10,7 +10,7 @@ export const initialValues = {
   notificationCitiesCheckbox: false,
   notificationRadius: '',
   notificationRadiusCheckbox: false,
-}
+})
 
 const required = '*Обязательное поле'
 const type = 'Поле имеет неверный тип данных'
