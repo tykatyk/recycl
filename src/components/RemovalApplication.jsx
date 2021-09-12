@@ -11,7 +11,7 @@ export default function RemovalApplication() {
         container
         direction="column"
         style={{
-          maxWidth: '700px',
+          maxWidth: '750px',
           margin: '0 auto',
           padding: '16px',
         }}

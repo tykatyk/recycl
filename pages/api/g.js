@@ -4,7 +4,9 @@ import dbQueries from '../../src/dbQueries'
 
 const typeDefs = gql`
   type Query {
+    hello: String
     getRemovalApplication(id: String!): RemovalApplicationOutput
+    getAllRemovalApplications: [RemovalApplicationOutput]
   }
 
   type LocationOutput {
@@ -17,8 +19,8 @@ const typeDefs = gql`
     wasteLocation: LocationOutput
     wasteType: Int
     quantity: Int
+    comment: String
     passDocumet: Boolean
-    description: String
     notificationCitiesCheckbox: Boolean
     notificationCities: [LocationOutput]
     notificationRadius: String
@@ -33,8 +35,8 @@ const typeDefs = gql`
     wasteLocation: Location
     wasteType: Int
     quantity: Int
+    comment: String
     passDocumet: Boolean
-    description: String
     notificationCitiesCheckbox: Boolean
     notificationCities: [Location]
     notificationRadius: String
@@ -49,6 +51,9 @@ const resolvers = {
   Query: {
     hello(parent, args, context) {
       return 'Word'
+    },
+    getAllRemovalApplications(parent, args, context) {
+      return dbQueries.getAll()
     },
   },
   Mutation: {

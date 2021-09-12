@@ -15,6 +15,7 @@ import removalFormStyles from './helperData/removalFormStyles'
 import RemovalPopover from './RemovalPopover.jsx'
 import { useRouter } from 'next/router'
 import { useMutation, useLazyQuery } from '@apollo/client'
+import TextField from '@material-ui/core/TextField'
 import {
   CREATE_REMOVAL_APPLICATION,
   GET_REMOVAL_APPLICATION,
@@ -46,6 +47,7 @@ export default function RemovalForm(props) {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
+        console.log(typeof values.quantity)
         const normalizedValues = {}
         Object.assign(normalizedValues, values)
 
@@ -55,6 +57,13 @@ export default function RemovalForm(props) {
         }
         normalizedValues.wasteLocation = wasteLocation
 
+        const notificationCities = values.notificationCities.map((item) => {
+          const normalizedItem = {}
+          normalizedItem.description = item.description
+          normalizedItem.place_id = item.place_id
+          return normalizedItem
+        })
+        normalizedValues.notificationCities = notificationCities
         executeMutation({ variables: { application: normalizedValues } })
       }}
     >

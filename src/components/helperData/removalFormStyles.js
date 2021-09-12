@@ -2,6 +2,18 @@ import { makeStyles } from '@material-ui/core/styles'
 
 export default makeStyles((theme) => ({
   '@global': {
+    'input[type=number].MuiInputBase-input ': {
+      '-moz-appearance': 'textfield',
+    },
+    'input[type=number].MuiInputBase-input::-webkit-outer-spin-button': {
+      '-webkit-appearance': 'none ',
+      margin: 0,
+    },
+    'input[type=number].MuiInputBase-input::-webkit-inner-spin-button': {
+      '-webkit-appearance': 'none',
+      margin: 0,
+    },
+
     '.Mui-focused fieldset': {
       borderColor: `${theme.palette.secondary.main} !important`,
     },

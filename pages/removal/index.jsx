@@ -1,6 +1,6 @@
-import React from 'react'
-import RemovalApplication from '../../src/components/RemovalApplication.jsx'
+import * as React from 'react'
+import RemovalApplicationList from '../../src/components/RemovalApplicationList.jsx'
 
-export default function removalRequests() {
-  return <RemovalApplication />
+export default function RemovalRequests() {
+  return <RemovalApplicationList />
 }

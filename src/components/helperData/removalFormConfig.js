@@ -3,9 +3,9 @@ import * as yup from 'yup'
 export const getInitialValues = () => ({
   wasteLocation: '',
   wasteType: '',
-  quantity: 0,
+  quantity: '',
+  comment: '',
   passDocumet: false,
-  description: '',
   notificationCities: [],
   notificationCitiesCheckbox: false,
   notificationRadius: '',
@@ -20,6 +20,7 @@ export const validationSchema = yup.object().shape({
   wasteLocation: yup.object().nullable().required(required),
   wasteType: yup.number().required(required),
   quantity: yup.number().typeError(type).positive(positive).required(required),
+  comment: yup.string(),
   notificationRadiusCheckbox: yup.boolean(),
   notificationRadius: yup.number().when('notificationRadiusCheckbox', {
     is: true,

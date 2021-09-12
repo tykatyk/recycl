@@ -5,7 +5,7 @@ const removalApplicationSchema = new mongoose.Schema({
   wasteType: Number,
   quantity: Number,
   passDocumet: Boolean,
-  description: String,
+  comment: String,
   notificationCities: [{ description: String, place_id: String }],
   notificationCitiesCheckbox: Boolean,
   notificationRadius: String,
