@@ -65,11 +65,12 @@ export default function RemovalForm(props) {
   ] = useLazyQuery(GET_REMOVAL_APPLICATION)
 
   const {
-    loading: loadingWasteTypes,
-    data: wasteTypes,
+    loading: wasteTypesLoading,
+    data: wasteTypesData,
     error: wasteTypesError,
   } = useQuery(GET_WASTE_TYPES)
-  console.log(wasteTypes)
+  // const wasteTypes = []
+  // if (wasteTypesData) wasteTypes = wasteTypesData
   const initialValues = getterData || getInitialValues()
   return (
     <Formik
@@ -130,12 +131,29 @@ export default function RemovalForm(props) {
                     },
                   }}
                 >
-                  <MenuItem value="">
-                    <em>Не выбрано</em>
-                  </MenuItem>
-                  <MenuItem value={0}>Шины</MenuItem>
-                  <MenuItem value={1}>Батарейки</MenuItem>
-                  <MenuItem value={2}>ПЕТ бутылка</MenuItem>
+                  {wasteTypesError && (
+                    <MenuItem value="">
+                      <em>Произошла ошибка при загрузке списка элементов</em>
+                    </MenuItem>
+                  )}
+                  {wasteTypesLoading && (
+                    <MenuItem value="">
+                      <em>Загрузка списка элементов...</em>
+                    </MenuItem>
+                  )}
+                  {wasteTypesData && (
+                    <MenuItem value="">
+                      <em>Не выбрано</em>
+                    </MenuItem>
+                  )}
+                  {wasteTypesData &&
+                    wasteTypesData.getWasteTypes.map((item) => {
+                      return (
+                        <MenuItem key={item['_id']} value={item['_id']}>
+                          {item.name}
+                        </MenuItem>
+                      )
+                    })}
                 </Field>
               </Grid>
               <Grid item xs={12}>
