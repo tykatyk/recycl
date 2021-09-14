@@ -18,20 +18,15 @@ const columns = [
   },
 ]
 
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-]
-
 export default function removalRequests() {
   const { loading, error, data } = useQuery(GET_ALL_REMOVAL_APPLICATIONS)
-  console.log(data.getAllRemovalApplications)
+  console.log(data)
+  const rows = data.getAllRemovalApplications.map((item) => {
+    const newItem = {}
+    newItem.id = item['_id']
+    newItem.wasteType = item.wasteType
+    return newItem
+  })
   return (
     <Layout>
       <Grid
@@ -49,7 +44,7 @@ export default function removalRequests() {
         <div style={{ width: '100%' }}>
           <DataGrid
             autoHeight
-            rows={data.getAllRemovalApplications}
+            rows={rows}
             columns={columns}
             autoPageSize
             checkboxSelection

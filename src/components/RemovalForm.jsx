@@ -14,12 +14,13 @@ import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './helperData/removalFormStyles'
 import RemovalPopover from './RemovalPopover.jsx'
 import { useRouter } from 'next/router'
-import { useMutation, useLazyQuery } from '@apollo/client'
+import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
 import TextField from '@material-ui/core/TextField'
 import {
   CREATE_REMOVAL_APPLICATION,
   GET_REMOVAL_APPLICATION,
   UPDATE_REMOVAL_APPLICATION,
+  GET_WASTE_TYPES,
 } from '../graphqlQueries'
 import {
   getInitialValues,
@@ -28,43 +29,55 @@ import {
 
 const useStyles = removalFormStyles
 
+const submitHandler = (values, callback) => {
+  const normalizedValues = {}
+  Object.assign(normalizedValues, values)
+
+  const wasteLocation = {
+    description: values.wasteLocation.description,
+    place_id: values.wasteLocation.place_id,
+  }
+  normalizedValues.wasteLocation = wasteLocation
+
+  const notificationCities = values.notificationCities.map((item) => {
+    const normalizedItem = {}
+    normalizedItem.description = item.description
+    normalizedItem.place_id = item.place_id
+    return normalizedItem
+  })
+  normalizedValues.notificationCities = notificationCities
+  callback({ variables: { application: normalizedValues } })
+}
+
 export default function RemovalForm(props) {
   const classes = useStyles()
   const theme = useTheme()
   const router = useRouter()
-  const { id } = router.query
-  const [executeMutation, { data: creatingData, loading: creating, error }] =
-    useMutation(CREATE_REMOVAL_APPLICATION)
-  const [getRemovalApplication, { loading: getting, data: gettingData }] =
-    useLazyQuery(GET_REMOVAL_APPLICATION)
-  if (id) {
-    getRemovalApplication()
-  }
-  const initialValues = gettingData || getInitialValues()
+  // const { id } = router.query
+  const [
+    executeMutation,
+    { data: creatorData, loading: loadingCreatorData, error },
+  ] = useMutation(CREATE_REMOVAL_APPLICATION)
+
+  const [
+    getRemovalApplication,
+    { data: getterData, loading: loadingGetterData },
+  ] = useLazyQuery(GET_REMOVAL_APPLICATION)
+
+  const {
+    loading: loadingWasteTypes,
+    data: wasteTypes,
+    error: wasteTypesError,
+  } = useQuery(GET_WASTE_TYPES)
+  console.log(wasteTypes)
+  const initialValues = getterData || getInitialValues()
   return (
     <Formik
       enableReinitialize
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
-        console.log(typeof values.quantity)
-        const normalizedValues = {}
-        Object.assign(normalizedValues, values)
-
-        const wasteLocation = {
-          description: values.wasteLocation.description,
-          place_id: values.wasteLocation.place_id,
-        }
-        normalizedValues.wasteLocation = wasteLocation
-
-        const notificationCities = values.notificationCities.map((item) => {
-          const normalizedItem = {}
-          normalizedItem.description = item.description
-          normalizedItem.place_id = item.place_id
-          return normalizedItem
-        })
-        normalizedValues.notificationCities = notificationCities
-        executeMutation({ variables: { application: normalizedValues } })
+        submitHandler(values, executeMutation)
       }}
     >
       {({ submitForm, isSubmitting, errors, touched, values }) => {

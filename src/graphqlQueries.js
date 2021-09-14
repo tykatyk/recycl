@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const CREATE_REMOVAL_APPLICATION = gql`
-  mutation SomeMutation($application: RemovalApplication) {
-    createRemovalApp(application: $application) {
+  mutation CreateRemovalApplication($application: RemovalApplication) {
+    createRemovalApplication(application: $application) {
       _id
       wasteLocation {
         description
@@ -23,9 +23,9 @@ export const CREATE_REMOVAL_APPLICATION = gql`
   }
 `
 
-export const GET_ALL_REMOVAL_APPLICATIONS = gql`
-  query GetAllRemovalApplications {
-    getAllRemovalApplications {
+export const GET_REMOVAL_APPLICATIONS = gql`
+  query GetRemovalApplications {
+    getRemovalApplications {
       _id
       wasteLocation {
         description
@@ -42,6 +42,15 @@ export const GET_ALL_REMOVAL_APPLICATIONS = gql`
       }
       notificationRadius
       notificationRadiusCheckbox
+    }
+  }
+`
+
+export const GET_WASTE_TYPES = gql`
+  query GetWasteTypes {
+    getWasteTypes {
+      _id
+      name
     }
   }
 `

@@ -1,63 +1,22 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
 import dbConnect from '../../src/dbConnect'
 import dbQueries from '../../src/dbQueries'
-
-const typeDefs = gql`
-  type Query {
-    hello: String
-    getRemovalApplication(id: String!): RemovalApplicationOutput
-    getAllRemovalApplications: [RemovalApplicationOutput]
-  }
-
-  type LocationOutput {
-    description: String
-    place_id: String
-  }
-
-  type RemovalApplicationOutput {
-    _id: String
-    wasteLocation: LocationOutput
-    wasteType: Int
-    quantity: Int
-    comment: String
-    passDocumet: Boolean
-    notificationCitiesCheckbox: Boolean
-    notificationCities: [LocationOutput]
-    notificationRadius: String
-    notificationRadiusCheckbox: Boolean
-  }
-  input Location {
-    description: String
-    place_id: String
-  }
-
-  input RemovalApplication {
-    wasteLocation: Location
-    wasteType: Int
-    quantity: Int
-    comment: String
-    passDocumet: Boolean
-    notificationCitiesCheckbox: Boolean
-    notificationCities: [Location]
-    notificationRadius: String
-    notificationRadiusCheckbox: Boolean
-  }
-  type Mutation {
-    createRemovalApp(application: RemovalApplication): RemovalApplicationOutput
-  }
-`
+import typeDefs from '../../src/graphQlTypes'
 
 const resolvers = {
   Query: {
     hello(parent, args, context) {
       return 'Word'
     },
-    getAllRemovalApplications(parent, args, context) {
-      return dbQueries.getAll()
+    getRemovalApplications(parent, args, context) {
+      return new dbQueries('RemovalApplication').getAll()
+    },
+    getWasteTypes(parent, args, context) {
+      return new dbQueries('WasteType').getAll()
     },
   },
   Mutation: {
-    createRemovalApp(parent, args, context) {
+    createRemovalApplication(parent, args, context) {
       return dbQueries.create(args.application)
     },
   },

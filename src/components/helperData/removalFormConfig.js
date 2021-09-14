@@ -18,7 +18,7 @@ const positive = 'Поле должно содержать число больш
 
 export const validationSchema = yup.object().shape({
   wasteLocation: yup.object().nullable().required(required),
-  wasteType: yup.number().required(required),
+  wasteType: yup.string().required(required),
   quantity: yup.number().typeError(type).positive(positive).required(required),
   comment: yup.string(),
   notificationRadiusCheckbox: yup.boolean(),
