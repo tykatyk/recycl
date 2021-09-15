@@ -6,34 +6,56 @@ class DbQueries {
       RemovalApplication,
       WasteType,
     }
-    if (!this.models[modelName]) throw `${modelName} is unknow model name`
+    if (!this.models[modelName]) {
+      console.log(new Error(`${modelName} is unknow model name`))
+      return undefined
+    }
     this.model = this.models[modelName]
   }
 
   async create(data) {
-    const modelInstance = new this.model(data)
-    return await modelInstance.save()
+    try {
+      const modelInstance = new this.model(data)
+      return await modelInstance.save()
+    } catch (err) {
+      console.log(`Cannot create ${modelInstance.constructor.modelName}`)
+    }
   }
 
   async getOne(id) {
-    return await this.model.findById(id).exec()
+    try {
+      return await this.model.findById(id).exec()
+    } catch (err) {
+      console.log(`Cannot get ${this.model.collection.collectionName}`)
+    }
   }
 
   async getAll() {
-    console.log(await WasteType.find({}))
-    return await WasteType.find({})
+    try {
+      return await this.model.find({})
+    } catch (err) {
+      console.log(`Cannot get ${this.model.collection.collectionName}`)
+    }
   }
 
   async update(id, newValue, modelName) {
-    return await this.model
-      .findByIdAndUpdate(id, newValue, {
-        new: true,
-      })
-      .exec()
+    try {
+      return await this.model
+        .findByIdAndUpdate(id, newValue, {
+          new: true,
+        })
+        .exec()
+    } catch (err) {
+      console.log(`Cannot update ${this.model.collection.collectionName}`)
+    }
   }
 
   async delete(id) {
-    return await this.model.findByIdAndRemove(id).exec()
+    try {
+      return await this.model.findByIdAndRemove(id).exec()
+    } catch (err) {
+      console.log(`Cannot delete ${this.model.collection.collectionName}`)
+    }
   }
 }
 
