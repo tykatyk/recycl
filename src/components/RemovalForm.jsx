@@ -15,13 +15,15 @@ import removalFormStyles from './helperData/removalFormStyles'
 import RemovalPopover from './RemovalPopover.jsx'
 import { useRouter } from 'next/router'
 import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
-import TextField from '@material-ui/core/TextField'
+import SelectFormik from './SelectFormik.jsx'
+
 import {
   CREATE_REMOVAL_APPLICATION,
   GET_REMOVAL_APPLICATION,
   UPDATE_REMOVAL_APPLICATION,
   GET_WASTE_TYPES,
 } from '../server/graphqlQueries'
+
 import {
   getInitialValues,
   validationSchema,
@@ -88,54 +90,14 @@ export default function RemovalForm(props) {
                 />
               </Grid>
               <Grid item xs={12} className={classes.gridContainer}>
-                <Field
-                  component={TextFieldFormic}
-                  fullWidth
-                  select
-                  type="text"
-                  name="wasteType"
-                  color="secondary"
-                  variant="outlined"
-                  label="Тип отходов"
-                  helperText="*Обязательное поле"
-                  SelectProps={{
-                    MenuProps: {
-                      anchorOrigin: {
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                      },
-                      transformOrigin: {
-                        vertical: 'top',
-                        horizontal: 'left',
-                      },
-                      getContentAnchorEl: null,
-                    },
-                  }}
-                >
-                  {wasteTypesError && (
-                    <MenuItem value="">
-                      <em>Произошла ошибка при загрузке списка элементов</em>
-                    </MenuItem>
-                  )}
-                  {wasteTypesLoading && (
-                    <MenuItem value="">
-                      <em>Загрузка списка элементов...</em>
-                    </MenuItem>
-                  )}
-                  {wasteTypesData && (
-                    <MenuItem value="">
-                      <em>Не выбрано</em>
-                    </MenuItem>
-                  )}
-                  {wasteTypesData &&
-                    wasteTypesData.getWasteTypes.map((item) => {
-                      return (
-                        <MenuItem key={item['_id']} value={item['_id']}>
-                          {item.name}
-                        </MenuItem>
-                      )
-                    })}
-                </Field>
+                <SelectFormik
+                  error={wasteTypesError}
+                  loading={wasteTypesLoading}
+                  data={wasteTypesData}
+                  name={'wasteType'}
+                  label={'Тип отходов'}
+                  helperText={'*Обязательное поле'}
+                />
               </Grid>
               <Grid item xs={12}>
                 <Field
