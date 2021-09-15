@@ -1,7 +1,7 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
-import dbConnect from '../../src/dbConnect'
-import dbQueries from '../../src/dbQueries'
-import typeDefs from '../../src/graphQlTypes'
+import dbConnect from '../../src/server/dbConnect'
+import dbQueries from '../../src/server/dbQueries'
+import typeDefs from '../../src/server/graphQlTypes'
 
 const resolvers = {
   Query: {
