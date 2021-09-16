@@ -7,7 +7,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import Typography from '@material-ui/core/Typography'
 import Link from './Link'
 import { useQuery } from '@apollo/client'
-import { GET_ALL_REMOVAL_APPLICATIONS } from '../graphqlQueries'
+import { GET_ALL_REMOVAL_APPLICATIONS } from '../server/graphqlQueries'
 
 const columns = [
   {

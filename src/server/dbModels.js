@@ -14,7 +14,20 @@ export const WasteType =
 //RemovalApplication
 const removalApplicationSchema = Schema(
   {
-    wasteLocation: { description: String, place_id: String },
+    wasteLocation: {
+      description: String,
+      place_id: String,
+      structured_formatting: {
+        main_text: String,
+        main_text_matched_substrings: [
+          {
+            length: Number,
+            offset: Number,
+          },
+        ],
+        secondary_text: String,
+      },
+    },
     wasteType: {
       type: Schema.Types.ObjectId,
       ref: 'WasteType',

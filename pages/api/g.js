@@ -8,6 +8,9 @@ const resolvers = {
     hello(parent, args, context) {
       return 'Word'
     },
+    getRemovalApplication(parent, args, context) {
+      return new dbQueries('RemovalApplication').getOne(args.id)
+    },
     getRemovalApplications(parent, args, context) {
       return new dbQueries('RemovalApplication').getAll()
     },
@@ -17,7 +20,7 @@ const resolvers = {
   },
   Mutation: {
     createRemovalApplication(parent, args, context) {
-      return dbQueries.create(args.application)
+      return new dbQueries('RemovalApplication').create(args.application)
     },
   },
 }

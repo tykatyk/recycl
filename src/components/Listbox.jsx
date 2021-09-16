@@ -3,13 +3,13 @@ import Divider from '@material-ui/core/Divider'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 
 const googleLogoOnWhite =
-  'images/poweredByGoogle/powered_by_google_on_white.png'
+  '/images/poweredByGoogle/powered_by_google_on_white.png'
 const googleLogoOnWhiteHDPI =
-  'images/poweredByGoogle/powered_by_google_on_white_hdpi.png'
+  '/images/poweredByGoogle/powered_by_google_on_white_hdpi.png'
 const googleLogoOnNonWhite =
-  'images/poweredByGoogle/powered_by_google_on_non_white.png'
+  '/images/poweredByGoogle/powered_by_google_on_non_white.png'
 const googleLogoOnNonWhiteHDPI =
-  'images/poweredByGoogle/powered_by_google_on_non_white_hdpi.png'
+  '/images/poweredByGoogle/powered_by_google_on_non_white_hdpi.png'
 
 const useStyles = makeStyles((theme) => ({
   googleLogo: {

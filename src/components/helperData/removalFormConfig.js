@@ -44,13 +44,16 @@ export const submitHandler = (values, callback) => {
   const wasteLocation = {
     description: values.wasteLocation.description,
     place_id: values.wasteLocation.place_id,
+    structured_formatting: values.wasteLocation.structured_formatting,
   }
+
   normalizedValues.wasteLocation = wasteLocation
 
   const notificationCities = values.notificationCities.map((item) => {
     const normalizedItem = {}
     normalizedItem.description = item.description
     normalizedItem.place_id = item.place_id
+    normalizedItem.structured_formatting = item.structured_formatting
     return normalizedItem
   })
   normalizedValues.notificationCities = notificationCities

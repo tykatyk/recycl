@@ -7,6 +7,14 @@ export const CREATE_REMOVAL_APPLICATION = gql`
       wasteLocation {
         description
         place_id
+        structured_formatting {
+          main_text
+          main_text_matched_substrings {
+            length
+            offset
+          }
+          secondary_text
+        }
       }
       wasteType
       quantity
@@ -16,6 +24,53 @@ export const CREATE_REMOVAL_APPLICATION = gql`
       notificationCities {
         description
         place_id
+        structured_formatting {
+          main_text
+          main_text_matched_substrings {
+            length
+            offset
+          }
+          secondary_text
+        }
+      }
+      notificationRadius
+      notificationRadiusCheckbox
+    }
+  }
+`
+
+export const GET_REMOVAL_APPLICATION = gql`
+  query GetRemovalApplication($id: String!) {
+    getRemovalApplication(id: $id) {
+      _id
+      wasteLocation {
+        description
+        place_id
+        structured_formatting {
+          main_text
+          main_text_matched_substrings {
+            length
+            offset
+          }
+          secondary_text
+        }
+      }
+      wasteType
+      quantity
+      comment
+      passDocumet
+      notificationCitiesCheckbox
+      notificationCities {
+        description
+        place_id
+        structured_formatting {
+          main_text
+          main_text_matched_substrings {
+            length
+            offset
+          }
+          secondary_text
+        }
       }
       notificationRadius
       notificationRadiusCheckbox
@@ -30,6 +85,14 @@ export const GET_REMOVAL_APPLICATIONS = gql`
       wasteLocation {
         description
         place_id
+        structured_formatting {
+          main_text
+          main_text_matched_substrings {
+            length
+            offset
+          }
+          secondary_text
+        }
       }
       wasteType
       quantity
@@ -39,6 +102,14 @@ export const GET_REMOVAL_APPLICATIONS = gql`
       notificationCities {
         description
         place_id
+        structured_formatting {
+          main_text
+          main_text_matched_substrings {
+            length
+            offset
+          }
+          secondary_text
+        }
       }
       notificationRadius
       notificationRadiusCheckbox

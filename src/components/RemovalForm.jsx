@@ -35,26 +35,34 @@ const useStyles = removalFormStyles
 export default function RemovalForm(props) {
   const classes = useStyles()
   const theme = useTheme()
-  // const router = useRouter()
-  // const { id } = router.query
+  const router = useRouter()
+  const { id } = router.query
   const [
     executeMutation,
-    { data: creatorData, loading: loadingCreatorData, error },
+    { data: creatorData, loading: loadingCreatorData, cratorError },
   ] = useMutation(CREATE_REMOVAL_APPLICATION)
 
   const [
     getRemovalApplication,
-    { data: getterData, loading: loadingGetterData },
+    {
+      called,
+      data: getterData,
+      loading: loadingGetterData,
+      error: getterError,
+    },
   ] = useLazyQuery(GET_REMOVAL_APPLICATION)
+
+  if (id && !called) getRemovalApplication({ variables: { id } })
 
   const {
     loading: wasteTypesLoading,
     data: wasteTypesData,
     error: wasteTypesError,
   } = useQuery(GET_WASTE_TYPES)
-  // const wasteTypes = []
-  // if (wasteTypesData) wasteTypes = wasteTypesData
-  const initialValues = getterData || getInitialValues()
+
+  const initialValues = getterData
+    ? getterData.getRemovalApplication
+    : getInitialValues()
   return (
     <Formik
       enableReinitialize

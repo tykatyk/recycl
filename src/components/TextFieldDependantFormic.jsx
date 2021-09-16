@@ -13,7 +13,6 @@ export default function TextFieldDependantFormic(props) {
     if (!values[masterField] && touched[masterField]) {
       setFieldValue(name, '', false)
       setFieldTouched(name, false, false)
-      console.log(name)
     }
   }, [values[masterField], setFieldValue, name, touched[masterField]])
 

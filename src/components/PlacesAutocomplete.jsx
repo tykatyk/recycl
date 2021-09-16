@@ -11,11 +11,10 @@ import { Field } from 'formik'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox.jsx'
+import { useRouter } from 'next/router'
 
 function loadScript(src, position, id) {
-  if (!position) {
-    return
-  }
+  if (!position) return
 
   const script = document.createElement('script')
   script.setAttribute('async', '')
@@ -50,10 +49,12 @@ export default function PlacesAutocomplete(props) {
     helperText,
     disabled,
   } = fieldToTextField(props)
-
   const classes = useStyles()
+  const router = useRouter()
+  const { id } = router.query
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
+  const [shouldOpen, setShouldOpen] = React.useState(false)
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
@@ -79,15 +80,15 @@ export default function PlacesAutocomplete(props) {
 
   React.useEffect(() => {
     let active = true
-
+    if (!shouldOpen) {
+      setInputValue(value.description)
+    }
     if (!autocompleteService.current && window.google) {
       autocompleteService.current =
         new window.google.maps.places.AutocompleteService()
       setSessionToken(new google.maps.places.AutocompleteSessionToken())
     }
-    if (!autocompleteService.current) {
-      return undefined
-    }
+    if (!autocompleteService.current) return undefined
 
     if (inputValue === '') {
       setOptions(value ? (props.multiple ? value : [value]) : [])
@@ -116,7 +117,7 @@ export default function PlacesAutocomplete(props) {
     return () => {
       active = false
     }
-  }, [inputValue, fetch])
+  }, [value, inputValue, fetch])
 
   const masterField = props['data-master']
 
@@ -139,6 +140,7 @@ export default function PlacesAutocomplete(props) {
 
   return (
     <Autocomplete
+      value={value}
       key={key}
       classes={{
         root: classes.root,
@@ -158,12 +160,16 @@ export default function PlacesAutocomplete(props) {
       disabled={disabled}
       open={open}
       onOpen={() => {
-        if (inputValue) setOpen(true)
+        if (shouldOpen && inputValue) setOpen(true)
       }}
       onClose={() => setOpen(false)}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue)
-        inputValue ? setOpen(true) : setOpen(false)
+        if (shouldOpen && inputValue) {
+          setOpen(true)
+        } else {
+          setOpen(false)
+        }
       }}
       onChange={(event, newValue) => {
         if (props.multiple) {
@@ -202,6 +208,9 @@ export default function PlacesAutocomplete(props) {
             helperText={helperText}
             label={label}
             error={error}
+            onFocus={() => {
+              if (!shouldOpen) setShouldOpen(true)
+            }}
           />
         )
       }}
