@@ -1,20 +1,27 @@
 import { gql } from '@apollo/client'
 
+const STRUCTURED_FORMATTING_FRAGMENT = gql`
+  fragment StructuredFormattingFragment on LocationOutput {
+    structured_formatting {
+      main_text
+      main_text_matched_substrings {
+        length
+        offset
+      }
+      secondary_text
+    }
+  }
+`
+
 export const CREATE_REMOVAL_APPLICATION = gql`
+  ${STRUCTURED_FORMATTING_FRAGMENT}
   mutation CreateRemovalApplication($application: RemovalApplication) {
     createRemovalApplication(application: $application) {
       _id
       wasteLocation {
         description
         place_id
-        structured_formatting {
-          main_text
-          main_text_matched_substrings {
-            length
-            offset
-          }
-          secondary_text
-        }
+        ...StructuredFormattingFragment
       }
       wasteType
       quantity
@@ -24,14 +31,7 @@ export const CREATE_REMOVAL_APPLICATION = gql`
       notificationCities {
         description
         place_id
-        structured_formatting {
-          main_text
-          main_text_matched_substrings {
-            length
-            offset
-          }
-          secondary_text
-        }
+        ...StructuredFormattingFragment
       }
       notificationRadius
       notificationRadiusCheckbox
@@ -40,20 +40,14 @@ export const CREATE_REMOVAL_APPLICATION = gql`
 `
 
 export const GET_REMOVAL_APPLICATION = gql`
+  ${STRUCTURED_FORMATTING_FRAGMENT}
   query GetRemovalApplication($id: String!) {
     getRemovalApplication(id: $id) {
       _id
       wasteLocation {
         description
         place_id
-        structured_formatting {
-          main_text
-          main_text_matched_substrings {
-            length
-            offset
-          }
-          secondary_text
-        }
+        ...StructuredFormattingFragment
       }
       wasteType
       quantity
@@ -63,14 +57,7 @@ export const GET_REMOVAL_APPLICATION = gql`
       notificationCities {
         description
         place_id
-        structured_formatting {
-          main_text
-          main_text_matched_substrings {
-            length
-            offset
-          }
-          secondary_text
-        }
+        ...StructuredFormattingFragment
       }
       notificationRadius
       notificationRadiusCheckbox
@@ -79,20 +66,14 @@ export const GET_REMOVAL_APPLICATION = gql`
 `
 
 export const GET_REMOVAL_APPLICATIONS = gql`
+  ${STRUCTURED_FORMATTING_FRAGMENT}
   query GetRemovalApplications {
     getRemovalApplications {
       _id
       wasteLocation {
         description
         place_id
-        structured_formatting {
-          main_text
-          main_text_matched_substrings {
-            length
-            offset
-          }
-          secondary_text
-        }
+        ...StructuredFormattingFragment
       }
       wasteType
       quantity
@@ -102,14 +83,7 @@ export const GET_REMOVAL_APPLICATIONS = gql`
       notificationCities {
         description
         place_id
-        structured_formatting {
-          main_text
-          main_text_matched_substrings {
-            length
-            offset
-          }
-          secondary_text
-        }
+        ...StructuredFormattingFragment
       }
       notificationRadius
       notificationRadiusCheckbox
