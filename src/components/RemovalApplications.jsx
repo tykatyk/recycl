@@ -1,11 +1,12 @@
 import React from 'react'
-import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
+import { Grid, Button } from '@material-ui/core'
+
+import Link from './Link.jsx'
 import Layout from './Layout.jsx'
-import RemovalForm from './RemovalForm.jsx'
+import RemovalForm from './removalApplicationForm/RemovalForm.jsx'
+
 import { DataGrid } from '@mui/x-data-grid'
 import Typography from '@material-ui/core/Typography'
-import Link from './Link'
 import { useQuery } from '@apollo/client'
 import { GET_ALL_REMOVAL_APPLICATIONS } from '../server/graphqlQueries'
 
@@ -18,7 +19,7 @@ const columns = [
   },
 ]
 
-export default function removalRequests() {
+export default function removalApplications() {
   const { loading, error, data } = useQuery(GET_ALL_REMOVAL_APPLICATIONS)
   console.log(data)
   const rows = data.getAllRemovalApplications.map((item) => {

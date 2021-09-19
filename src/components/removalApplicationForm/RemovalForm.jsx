@@ -1,34 +1,39 @@
 import React from 'react'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import MenuItem from '@material-ui/core/MenuItem'
-import { CheckboxWithLabel } from 'formik-material-ui'
-import InputAdornment from '@material-ui/core/InputAdornment'
-import { makeStyles, useTheme } from '@material-ui/core/styles'
-import PlacesAutocomplete from './PlacesAutocomplete.jsx'
-import InputLabel from '@material-ui/core/InputLabel'
-import TextFieldFormic from './TextFieldFormic.jsx'
-import TextFieldDependantFormic from './TextFieldDependantFormic.jsx'
-import Button from '@material-ui/core/Button'
-import { Formik, Form, Field } from 'formik'
-import removalFormStyles from './helperData/removalFormStyles'
+import {
+  Grid,
+  Typography,
+  MenuItem,
+  InputAdornment,
+  InputLabel,
+  Button,
+  makeStyles,
+  useTheme,
+} from '@material-ui/core'
+
+import PlacesAutocomplete from '../PlacesAutocomplete.jsx'
+import TextFieldFormic from '../TextFieldFormic.jsx'
+import TextFieldDependantFormic from '../TextFieldDependantFormic.jsx'
 import RemovalPopover from './RemovalPopover.jsx'
+import SelectFormik from '../SelectFormik.jsx'
+
+import { CheckboxWithLabel } from 'formik-material-ui'
+import { Formik, Form, Field } from 'formik'
+import removalFormStyles from './removalFormStyles'
 import { useRouter } from 'next/router'
 import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
-import SelectFormik from './SelectFormik.jsx'
 
 import {
   CREATE_REMOVAL_APPLICATION,
   GET_REMOVAL_APPLICATION,
   UPDATE_REMOVAL_APPLICATION,
   GET_WASTE_TYPES,
-} from '../server/graphqlQueries'
+} from '../../server/graphqlQueries'
 
 import {
   getInitialValues,
   validationSchema,
   submitHandler,
-} from './helperData/removalFormConfig.js'
+} from './removalFormConfig.js'
 
 const useStyles = removalFormStyles
 
@@ -63,6 +68,7 @@ export default function RemovalForm(props) {
   const initialValues = getterData
     ? getterData.getRemovalApplication
     : getInitialValues()
+
   return (
     <Formik
       enableReinitialize

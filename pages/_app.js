@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Head from 'next/head'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import { theme } from '../src/components/helperData/themeStub'
+import { theme } from '../src/components/helpers/themeStub'
 
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'

@@ -1,29 +1,6 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
 import dbConnect from '../../src/server/dbConnect'
-import dbQueries from '../../src/server/dbQueries'
-import typeDefs from '../../src/server/graphQlTypes'
-
-const resolvers = {
-  Query: {
-    hello(parent, args, context) {
-      return 'Word'
-    },
-    getRemovalApplication(parent, args, context) {
-      return new dbQueries('RemovalApplication').getOne(args.id)
-    },
-    getRemovalApplications(parent, args, context) {
-      return new dbQueries('RemovalApplication').getAll()
-    },
-    getWasteTypes(parent, args, context) {
-      return new dbQueries('WasteType').getAll()
-    },
-  },
-  Mutation: {
-    createRemovalApplication(parent, args, context) {
-      return new dbQueries('RemovalApplication').create(args.application)
-    },
-  },
-}
+import { typeDefs, resolvers } from '../../src/server/graphQlTypes'
 
 const apolloServer = new ApolloServer({ typeDefs, resolvers })
 

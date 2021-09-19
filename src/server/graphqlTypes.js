@@ -1,17 +1,17 @@
 import { gql } from 'apollo-server-micro'
+import dbQueries from '../../src/server/dbQueries'
 
-export default gql`
+export const typeDefs = gql`
   type Query {
-    hello: String
     getRemovalApplication(id: String!): RemovalApplicationOutput
     getRemovalApplications: [RemovalApplicationOutput]
     getWasteTypes: [WasteTypeOutput]
   }
 
-  type LocationOutput {
-    description: String
-    place_id: String
-    structured_formatting: StructuredFormattingOutput
+  type Mutation {
+    createRemovalApplication(
+      application: RemovalApplication
+    ): RemovalApplicationOutput
   }
 
   type RemovalApplicationOutput {
@@ -27,9 +27,21 @@ export default gql`
     notificationRadiusCheckbox: Boolean
   }
 
+  type LocationOutput {
+    description: String
+    place_id: String
+    structured_formatting: StructuredFormattingOutput
+  }
+
   type WasteTypeOutput {
     _id: String
     name: String
+  }
+
+  type StructuredFormattingOutput {
+    main_text: String
+    main_text_matched_substrings: [FormattingObjectOutput]
+    secondary_text: String
   }
 
   type FormattingObjectOutput {
@@ -45,12 +57,6 @@ export default gql`
   input StructuredFormatting {
     main_text: String
     main_text_matched_substrings: [FormattingObject]
-    secondary_text: String
-  }
-
-  type StructuredFormattingOutput {
-    main_text: String
-    main_text_matched_substrings: [FormattingObjectOutput]
     secondary_text: String
   }
 
@@ -71,10 +77,23 @@ export default gql`
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
   }
-
-  type Mutation {
-    createRemovalApplication(
-      application: RemovalApplication
-    ): RemovalApplicationOutput
-  }
 `
+
+export const resolvers = {
+  Query: {
+    getRemovalApplication(parent, args, context) {
+      return new dbQueries('RemovalApplication').getOne(args.id)
+    },
+    getRemovalApplications(parent, args, context) {
+      return new dbQueries('RemovalApplication').getAll()
+    },
+    getWasteTypes(parent, args, context) {
+      return new dbQueries('WasteType').getAll()
+    },
+  },
+  Mutation: {
+    createRemovalApplication(parent, args, context) {
+      return new dbQueries('RemovalApplication').create(args.application)
+    },
+  },
+}

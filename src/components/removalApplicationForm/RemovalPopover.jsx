@@ -1,9 +1,7 @@
 import React from 'react'
-import Popover from '@material-ui/core/Popover'
+import { Popover, makeStyles, useTheme } from '@material-ui/core'
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined'
-
-import { makeStyles, useTheme } from '@material-ui/core/styles'
-import removalPopoverStyles from './helperData/removalPopoverStyles'
+import removalPopoverStyles from './removalPopoverStyles'
 
 const useStyles = removalPopoverStyles
 
