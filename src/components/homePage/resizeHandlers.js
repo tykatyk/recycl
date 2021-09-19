@@ -1,4 +1,4 @@
-import isMobile from '../../detectMobile'
+import isMobile from '../helpers/detectMobile'
 
 export const setSplashMinHeight = (isLoaded, stateHandler) => {
   const headerHeight = document.getElementById('mainHeader').offsetHeight
