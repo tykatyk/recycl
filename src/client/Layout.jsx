@@ -1,8 +1,8 @@
 import React from 'react'
 import Container from '@material-ui/core/Container'
-import Wrapper from '../components/Wrapper.jsx'
-import Header from '../components/Header.jsx'
-import Footer from '../components/Footer.jsx'
+import Wrapper from './Wrapper.jsx'
+import Header from './Header.jsx'
+import Footer from './Footer.jsx'
 
 export default function Layout(props) {
   return (

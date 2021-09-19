@@ -1,6 +1,6 @@
 import React from 'react'
-import RecyclApp from '../src/components/App.jsx'
+import App from '../src/client/App.jsx'
 
-export default function App(props) {
-  return <RecyclApp {...props} />
+export default function RecyclApp(props) {
+  return <App {...props} />
 }

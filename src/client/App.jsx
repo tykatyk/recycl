@@ -17,7 +17,7 @@ const client = new ApolloClient({
   connectToDevTools: true,
 })
 
-export default function RecyclApp(props) {
+export default function App(props) {
   const { Component, pageProps } = props
 
   React.useEffect(() => {
@@ -47,7 +47,7 @@ export default function RecyclApp(props) {
   )
 }
 
-RecyclApp.propTypes = {
+App.propTypes = {
   Component: PropTypes.elementType.isRequired,
   pageProps: PropTypes.object.isRequired,
 }
