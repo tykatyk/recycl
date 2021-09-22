@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button'
 import Layout from './Layout.jsx'
 import RemovalForm from './removalApplicationForm/RemovalForm.jsx'
 
-export default function RemovalApplication() {
+export default function RemovalApplication(props) {
   return (
     <Layout>
       <Grid
@@ -16,7 +16,7 @@ export default function RemovalApplication() {
           padding: '16px',
         }}
       >
-        <RemovalForm />
+        <RemovalForm {...props} />
       </Grid>
     </Layout>
   )

@@ -7,6 +7,7 @@ import {
   InputLabel,
   Button,
   makeStyles,
+  useTheme,
 } from '@material-ui/core'
 
 import PlacesAutocomplete from '../PlacesAutocomplete.jsx'
@@ -18,16 +19,48 @@ import SelectFormik from '../SelectFormik.jsx'
 import { CheckboxWithLabel } from 'formik-material-ui'
 import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './removalFormStyles'
-import { validationSchema } from './removalFormConfig.js'
+import { useRouter } from 'next/router'
+import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
 
-import { useQuery } from '@apollo/client'
-import { GET_WASTE_TYPES } from '../../server/graphqlQueries'
+import {
+  CREATE_REMOVAL_APPLICATION,
+  GET_REMOVAL_APPLICATION,
+  UPDATE_REMOVAL_APPLICATION,
+  GET_WASTE_TYPES,
+} from '../../server/graphqlQueries'
+
+import {
+  getInitialValues,
+  validationSchema,
+  submitHandler,
+} from './removalFormConfig.js'
 
 const useStyles = removalFormStyles
 
 export default function RemovalForm(props) {
   const classes = useStyles()
-  const { initialValues, submitHandler } = props
+  const theme = useTheme()
+  const router = useRouter()
+  const { id } = router.query
+  const [
+    executeMutation,
+    { data: creatorData, loading: loadingCreatorData, cratorError },
+  ] = useMutation(CREATE_REMOVAL_APPLICATION)
+
+  const [
+    getRemovalApplication,
+    {
+      called,
+      data: getterData,
+      loading: loadingGetterData,
+      error: getterError,
+    },
+  ] = useLazyQuery(GET_REMOVAL_APPLICATION)
+
+  if (id && !called) getRemovalApplication({ variables: { id } })
+  if (loadingGetterData) return <Typography>Идет загрузка данных</Typography>
+  if (getterError)
+    return <Typography>Возникла ошибка при загрузке данных</Typography>
 
   const {
     loading: wasteTypesLoading,
@@ -35,13 +68,21 @@ export default function RemovalForm(props) {
     error: wasteTypesError,
   } = useQuery(GET_WASTE_TYPES)
 
+  const initialValues = getterData
+    ? getterData.getRemovalApplication
+    : getInitialValues()
+
+  if (loadingCreatorData) return <Typography>Идет сохранение данных</Typography>
+  if (cratorError)
+    return <Typography>Возникла ошибка при сохранении данных</Typography>
+
   return (
     <Formik
       enableReinitialize
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
-        submitHandler(values)
+        submitHandler(values, executeMutation)
       }}
     >
       {({ submitForm, isSubmitting, errors, touched, values }) => {

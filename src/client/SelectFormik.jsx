@@ -1,6 +1,6 @@
 import React from 'react'
 import MenuItem from '@material-ui/core/MenuItem'
-import TextFieldFormic from './TextFieldFormic.jsx'
+import TextFieldFormik from './TextFieldFormik.jsx'
 import Button from '@material-ui/core/Button'
 import { Field } from 'formik'
 
@@ -8,7 +8,7 @@ export default function SelectFormik(props) {
   const { error, loading, data, name, label, helperText } = props
   return (
     <Field
-      component={TextFieldFormic}
+      component={TextFieldFormik}
       fullWidth
       select
       type="text"

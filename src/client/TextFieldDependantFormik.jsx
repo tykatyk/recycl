@@ -1,8 +1,8 @@
 import React from 'react'
-import TextField from '@material-ui/core/TextField'
+import { TextField } from '@material-ui/core'
 import { fieldToTextField } from 'formik-material-ui'
 
-export default function TextFieldDependantFormic(props) {
+export default function TextFieldDependantFormik(props) {
   const masterField = props['data-master']
   const {
     form: { values, setFieldValue, touched, setFieldTouched },
