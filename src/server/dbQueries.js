@@ -38,7 +38,7 @@ class DbQueries {
     }
   }
 
-  async update(id, newValue, modelName) {
+  async update(id, newValue) {
     try {
       return await this.model
         .findByIdAndUpdate(id, newValue, {

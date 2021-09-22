@@ -12,6 +12,10 @@ export const typeDefs = gql`
     createRemovalApplication(
       application: RemovalApplication
     ): RemovalApplicationOutput
+    updateRemovalApplication(
+      id: String
+      newValue: RemovalApplication
+    ): RemovalApplicationOutput
   }
 
   type RemovalApplicationOutput {
@@ -94,6 +98,9 @@ export const resolvers = {
   Mutation: {
     createRemovalApplication(parent, args, context) {
       return new dbQueries('RemovalApplication').create(args.application)
+    },
+    updateRemovalApplication(parent, args, context) {
+      return new dbQueries('RemovalApplication').update(args.id, args.newValue)
     },
   },
 }

@@ -2,27 +2,29 @@ import React from 'react'
 import { Grid } from '@material-ui/core'
 import Layout from './Layout.jsx'
 import RemovalForm from './removalApplicationForm/RemovalForm.jsx'
-import { useMutation } from '@apollo/client'
-import { CREATE_REMOVAL_APPLICATION } from '../server/graphqlQueries'
-
-const initialValues = {
-  wasteLocation: '',
-  wasteType: '',
-  quantity: '',
-  comment: '',
-  passDocumet: false,
-  notificationCities: [],
-  notificationCitiesCheckbox: false,
-  notificationRadius: '',
-  notificationRadiusCheckbox: false,
-}
+import { useLazyQuery, useMutation } from '@apollo/client'
+import {
+  GET_REMOVAL_APPLICATION,
+  UPDATE_REMOVAL_APPLICATION,
+} from '../server/graphqlQueries'
+import { useRouter } from 'next/router'
 
 export default function RemovalApplication(props) {
-  const [executeMutation, { data, loading, error }] = useMutation(
-    CREATE_REMOVAL_APPLICATION
-  )
+  const router = useRouter()
+  const { id } = router.query
+  const [getRemovalApplication, { called, data, loading, error }] =
+    useLazyQuery(GET_REMOVAL_APPLICATION)
+
+  if (id && !called) getRemovalApplication({ variables: { id } })
   //if error
   //if loading
+  const [
+    executeMutation,
+    { data: updateData, loading: loadingUpdateData, updateError },
+  ] = useMutation(CREATE_REMOVAL_APPLICATION)
+  //if error
+  //if loading
+
   const submitHandler = (values) => {
     const normalizedValues = {}
     Object.assign(normalizedValues, values)
@@ -43,7 +45,7 @@ export default function RemovalApplication(props) {
       return normalizedItem
     })
     normalizedValues.notificationCities = notificationCities
-    executeMutation({ variables: { application: normalizedValues } })
+    executeMutation({ variables: { id: id, newValue: normalizedValues } })
   }
 
   return (
