@@ -1,6 +1,6 @@
 import React from 'react'
-import RemovalApplication from '../../src/client/RemovalApplication.jsx'
+import UpdateRemovalApplication from '../../src/client/UpdateRemovalApplication.jsx'
 
-export default function getOneRemovalApplication() {
-  return <RemovalApplication />
+export default function update() {
+  return <UpdateRemovalApplication />
 }

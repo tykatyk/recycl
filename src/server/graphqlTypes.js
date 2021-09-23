@@ -14,7 +14,7 @@ export const typeDefs = gql`
     ): RemovalApplicationOutput
     updateRemovalApplication(
       id: String
-      newValue: RemovalApplication
+      newValues: RemovalApplication
     ): RemovalApplicationOutput
   }
 
