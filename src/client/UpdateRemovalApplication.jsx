@@ -21,10 +21,6 @@ export default function UpdateRemovalApplication(props) {
 
   if (id && !called) getRemovalApplication({ variables: { id } })
 
-  // if (error)
-  //   return <Typography>Возникла ошибка при получении данных</Typography>
-  // if (called && loading) return <Typography>Идет загрузка данных</Typography>
-
   const initialValues = data ? data.getRemovalApplication : getInitialValues()
 
   const [
@@ -32,14 +28,19 @@ export default function UpdateRemovalApplication(props) {
     { data: updateData, loading: loadingUpdateData, error: updateError },
   ] = useMutation(UPDATE_REMOVAL_APPLICATION)
 
-  // if (updateError)
-  //   return <Typography>Возникла ошибка при сохранении данных</Typography>
-  // if (loadingUpdateData) return <Typography>Идет сохранение данных</Typography>
-
   const submitHandler = (values) => {
     const normalizedValues = getNormalizedValues(values)
+    console.log(normalizedValues)
     executeMutation({ variables: { id: id, newValues: normalizedValues } })
   }
+
+  if (error)
+    return <Typography>Возникла ошибка при получении данных</Typography>
+  if (called && loading) return <Typography>Идет загрузка данных</Typography>
+
+  if (updateError)
+    return <Typography>Возникла ошибка при сохранении данных</Typography>
+  if (loadingUpdateData) return <Typography>Идет сохранение данных</Typography>
 
   return (
     <Layout>

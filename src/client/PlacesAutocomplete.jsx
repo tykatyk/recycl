@@ -1,11 +1,13 @@
 import React from 'react'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import LocationOnIcon from '@material-ui/icons/LocationOn'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import TextField from '@material-ui/core/TextField'
-import Chip from '@material-ui/core/Chip'
-import { makeStyles } from '@material-ui/core/styles'
+import {
+  Grid,
+  Typography,
+  TextField,
+  Chip,
+  makeStyles,
+} from '@material-ui/core'
 import { fieldToTextField } from 'formik-material-ui'
 import { Field } from 'formik'
 import throttle from 'lodash/throttle'
@@ -15,7 +17,6 @@ import { useRouter } from 'next/router'
 
 function loadScript(src, position, id) {
   if (!position) return
-
   const script = document.createElement('script')
   script.setAttribute('async', '')
   script.setAttribute('id', id)
@@ -81,11 +82,11 @@ export default function PlacesAutocomplete(props) {
   React.useEffect(() => {
     let active = true
     if (!shouldOpen) {
-      setInputValue(value.description)
+      setInputValue(value ? value.description : '')
     }
+
     if (!autocompleteService.current && window.google) {
-      autocompleteService.current =
-        new window.google.maps.places.AutocompleteService()
+      autocompleteService.current = new google.maps.places.AutocompleteService()
       setSessionToken(new google.maps.places.AutocompleteSessionToken())
     }
     if (!autocompleteService.current) return undefined
@@ -173,11 +174,11 @@ export default function PlacesAutocomplete(props) {
       }}
       onChange={(event, newValue) => {
         if (props.multiple) {
-          setOptions(newValue ? [...newValue, ...options] : options)
+          setOptions(newValue.length > 0 ? [...newValue, ...options] : options)
         } else {
           setOptions(newValue ? [newValue, ...options] : options)
         }
-        setFieldValue(name, newValue || '')
+        setFieldValue(name, newValue)
         setSessionToken(new google.maps.places.AutocompleteSessionToken())
       }}
       onBlur={handleBlur}

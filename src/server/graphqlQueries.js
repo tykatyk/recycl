@@ -43,7 +43,6 @@ export const GET_REMOVAL_APPLICATION = gql`
   ${STRUCTURED_FORMATTING_FRAGMENT}
   query GetRemovalApplication($id: String!) {
     getRemovalApplication(id: $id) {
-      _id
       wasteLocation {
         description
         place_id

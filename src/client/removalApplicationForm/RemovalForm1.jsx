@@ -58,7 +58,8 @@ export default function RemovalForm(props) {
   ] = useLazyQuery(GET_REMOVAL_APPLICATION)
 
   if (id && !called) getRemovalApplication({ variables: { id } })
-  if (loadingGetterData) return <Typography>Идет загрузка данных</Typography>
+  if (loadingGetterData && called)
+    return <Typography>Идет загрузка данных</Typography>
   if (getterError)
     return <Typography>Возникла ошибка при загрузке данных</Typography>
 

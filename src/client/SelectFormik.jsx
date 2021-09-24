@@ -13,6 +13,7 @@ export default function SelectFormik(props) {
       select
       type="text"
       name={name}
+      defaultValue=""
       color="secondary"
       variant="outlined"
       label={label}

@@ -100,7 +100,7 @@ export const resolvers = {
       return new dbQueries('RemovalApplication').create(args.application)
     },
     updateRemovalApplication(parent, args, context) {
-      return new dbQueries('RemovalApplication').update(args.id, args.newValue)
+      return new dbQueries('RemovalApplication').update(args.id, args.newValues)
     },
   },
 }
