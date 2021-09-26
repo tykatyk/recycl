@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Typography } from '@material-ui/core'
+import { Grid, Typography, Modal, CircularProgress } from '@material-ui/core'
 import Layout from './Layout.jsx'
 import RemovalForm from './removalApplicationForm/RemovalForm.jsx'
 import { useLazyQuery, useMutation } from '@apollo/client'
@@ -14,6 +14,10 @@ import {
 } from './removalApplicationForm/removalFormConfig'
 
 export default function UpdateRemovalApplication(props) {
+  const [open, setOpen] = React.useState(false)
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
+
   const router = useRouter()
   const { id } = router.query
   const [getRemovalApplication, { called, data, loading, error }] =
@@ -35,7 +39,6 @@ export default function UpdateRemovalApplication(props) {
 
   if (error)
     return <Typography>Возникла ошибка при получении данных</Typography>
-  if (called && loading) return <Typography>Идет загрузка данных</Typography>
 
   if (updateError)
     return <Typography>Возникла ошибка при сохранении данных</Typography>
@@ -52,10 +55,31 @@ export default function UpdateRemovalApplication(props) {
           padding: '16px',
         }}
       >
-        <RemovalForm
-          initialValues={initialValues}
-          submitHandler={submitHandler}
-        />
+        {!data && !error && (
+          <Modal
+            open={!data}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <div
+              style={{
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <CircularProgress color="secondary" />
+            </div>
+          </Modal>
+        )}
+        {data && (
+          <RemovalForm
+            initialValues={initialValues}
+            submitHandler={submitHandler}
+          />
+        )}
       </Grid>
     </Layout>
   )
