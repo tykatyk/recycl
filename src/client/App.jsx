@@ -9,13 +9,36 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import {
+  ApolloClient,
+  ApolloLink,
+  InMemoryCache,
+  ApolloProvider,
+  HttpLink,
+  from,
+} from '@apollo/client'
+
+const httpLink = new HttpLink({ uri: '/api/g' })
+
+const clearTypeNameLink = new ApolloLink((operation, forward) => {
+  if (operation.variables) {
+    const omitTypename = (key, value) =>
+      key === '__typename' ? undefined : value
+    operation.variables = JSON.parse(
+      JSON.stringify(operation.variables),
+      omitTypename
+    )
+  }
+  return forward(operation).map((data) => {
+    return data
+  })
+})
+
+const additiveLink = from([clearTypeNameLink, httpLink])
 
 const client = new ApolloClient({
-  uri: '/api/g',
-  cache: new InMemoryCache({
-    addTypename: false,
-  }),
+  link: additiveLink,
+  cache: new InMemoryCache(),
   connectToDevTools: true,
 })
 

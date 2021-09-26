@@ -30,7 +30,6 @@ export default function UpdateRemovalApplication(props) {
 
   const submitHandler = (values) => {
     const normalizedValues = getNormalizedValues(values)
-    console.log(normalizedValues)
     executeMutation({ variables: { id: id, newValues: normalizedValues } })
   }
 

@@ -179,7 +179,9 @@ export default function PlacesAutocomplete(props) {
           setOptions(newValue ? [newValue, ...options] : options)
         }
         setFieldValue(name, newValue)
-        setSessionToken(new google.maps.places.AutocompleteSessionToken())
+        if (autocompleteService.current && window.google) {
+          setSessionToken(new google.maps.places.AutocompleteSessionToken())
+        }
       }}
       onBlur={handleBlur}
       autoComplete
