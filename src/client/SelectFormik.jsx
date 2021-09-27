@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button'
 import { Field } from 'formik'
 
 export default function SelectFormik(props) {
-  const { error, loading, data, name, label, helperText } = props
+  const { error, loading, data, name, label, helperText, disabled } = props
 
   return (
     <Field
@@ -18,6 +18,7 @@ export default function SelectFormik(props) {
       variant="outlined"
       label={label}
       helperText={helperText}
+      disabled={disabled}
       SelectProps={{
         MenuProps: {
           anchorOrigin: {

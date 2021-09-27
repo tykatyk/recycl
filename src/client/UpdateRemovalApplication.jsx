@@ -42,7 +42,6 @@ export default function UpdateRemovalApplication(props) {
 
   if (updateError)
     return <Typography>Возникла ошибка при сохранении данных</Typography>
-  if (loadingUpdateData) return <Typography>Идет сохранение данных</Typography>
 
   return (
     <Layout>
@@ -67,9 +66,11 @@ export default function UpdateRemovalApplication(props) {
             <CircularProgress color="secondary" />
           </div>
         )}
+
         <RemovalForm
           initialValues={initialValues}
           submitHandler={submitHandler}
+          loadingUpdateData={loadingUpdateData}
         />
       </Grid>
     </Layout>
