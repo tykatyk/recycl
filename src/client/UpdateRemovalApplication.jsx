@@ -56,30 +56,21 @@ export default function UpdateRemovalApplication(props) {
         }}
       >
         {!data && !error && (
-          <Modal
-            open={!data}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
+          <div
+            style={{
+              position: 'fixed',
+              top: ' 50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
           >
-            <div
-              style={{
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <CircularProgress color="secondary" />
-            </div>
-          </Modal>
+            <CircularProgress color="secondary" />
+          </div>
         )}
-        {data && (
-          <RemovalForm
-            initialValues={initialValues}
-            submitHandler={submitHandler}
-          />
-        )}
+        <RemovalForm
+          initialValues={initialValues}
+          submitHandler={submitHandler}
+        />
       </Grid>
     </Layout>
   )

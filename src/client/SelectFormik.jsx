@@ -6,6 +6,7 @@ import { Field } from 'formik'
 
 export default function SelectFormik(props) {
   const { error, loading, data, name, label, helperText } = props
+
   return (
     <Field
       component={TextFieldFormik}
@@ -13,7 +14,6 @@ export default function SelectFormik(props) {
       select
       type="text"
       name={name}
-      defaultValue=""
       color="secondary"
       variant="outlined"
       label={label}
