@@ -3,7 +3,7 @@ import { Grid, Button, Typography } from '@material-ui/core'
 
 import Link from './Link.jsx'
 import Layout from './Layout.jsx'
-import RemovalForm from './removalApplicationForm/RemovalForm.jsx'
+import RemovalForm from './removalApplication/RemovalForm.jsx'
 
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery } from '@apollo/client'

@@ -2,7 +2,7 @@ import React from 'react'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import Layout from './Layout.jsx'
-import RemovalForm from './removalApplicationForm/RemovalForm.jsx'
+import RemovalForm from './removalApplication/RemovalForm.jsx'
 
 export default function RemovalApplication(props) {
   return (

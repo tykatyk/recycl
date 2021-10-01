@@ -1,6 +1,6 @@
 import React from 'react'
-import AddRemovalApplication from '../../src/client/AddRemovalApplication.jsx'
+import RemovalForm from '../../src/client/removalApplication/RemovalForm.jsx'
 
 export default function add() {
-  return <AddRemovalApplication />
+  return <RemovalForm />
 }
