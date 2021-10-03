@@ -56,6 +56,16 @@ export const GET_REMOVAL_APPLICATION = gql`
     }
   }
 `
+
+export const GET_REMOVAL_APPLICATIONS = gql`
+  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
+  query GetRemovalApplications {
+    getRemovalApplications {
+      ...RemovalApplicationOutputFragment
+    }
+  }
+`
+
 export const UPDATE_REMOVAL_APPLICATION = gql`
   ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
   mutation UpdateRemovalApplication(
@@ -75,12 +85,13 @@ export const DELETE_REMOVAL_APPLICATION = gql`
     }
   }
 `
-
-export const GET_REMOVAL_APPLICATIONS = gql`
+export const DELETE_REMOVAL_APPLICATIONS = gql`
   ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
-  query GetRemovalApplications {
-    getRemovalApplications {
-      ...RemovalApplicationOutputFragment
+  mutation DeleteRemovalApplication($ids: [String]!) {
+    deleteRemovalApplication(ids: [$ids]) {
+      n
+      ok
+      deletedCount
     }
   }
 `

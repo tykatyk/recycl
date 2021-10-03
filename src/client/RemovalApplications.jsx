@@ -1,14 +1,24 @@
 import React, { useState } from 'react'
-import { Grid, Button, Typography, Badge, makeStyles } from '@material-ui/core'
+import {
+  Grid,
+  Button,
+  Typography,
+  Badge,
+  TablePagination,
+  makeStyles,
+} from '@material-ui/core'
 import MailIcon from '@material-ui/icons/Mail'
 
 import Link from './Link.jsx'
 import Layout from './Layout.jsx'
 import RemovalForm from './removalApplication/RemovalForm.jsx'
 
-import { DataGrid } from '@mui/x-data-grid'
-import { useQuery } from '@apollo/client'
-import { GET_REMOVAL_APPLICATIONS } from '../server/graphqlQueries'
+import { DataGrid, useGridSlotComponentProps } from '@mui/x-data-grid'
+import { useQuery, useMutation } from '@apollo/client'
+import {
+  GET_REMOVAL_APPLICATIONS,
+  DELETE_REMOVAL_APPLICATIONS,
+} from '../server/graphqlQueries'
 
 import Router from 'next/router'
 
@@ -65,6 +75,11 @@ export default function removalApplications() {
   const classes = useStyles()
   const [selected, setSelected] = useState([])
   const { loading, error, data } = useQuery(GET_REMOVAL_APPLICATIONS)
+  const [
+    deleteMutation,
+    { loading: deleting, error: deleteError, data: deleteData },
+  ] = useMutation(DELETE_REMOVAL_APPLICATIONS)
+
   if (loading) return <Typography>Идет загрузка данных</Typography>
   if (error) {
     return <Typography>Возникла ошибка при загрузке данных</Typography>
@@ -81,6 +96,44 @@ export default function removalApplications() {
     newItem.messages = ''
     return newItem
   })
+
+  const DataGridFooter = function (props) {
+    const { selectedCount } = props
+    const [page, setPage] = React.useState(0)
+    const [rowsPerPage, setRowsPerPage] = React.useState(10)
+    const { state } = useGridSlotComponentProps()
+    console.log(state)
+    const handleChangePage = (event, newPage) => {
+      setPage(newPage)
+    }
+
+    const handleChangeRowsPerPage = (event) => {
+      setRowsPerPage(parseInt(event.target.value, 10))
+      setPage(0)
+    }
+
+    const handleClick = (event) => {}
+
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          padding: '0.5em',
+        }}
+      >
+        <Button color="secondary">Удалить отмеченные</Button>
+        <TablePagination
+          component="div"
+          count={100}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </div>
+    )
+  }
 
   return (
     <Layout>
@@ -115,6 +168,10 @@ export default function removalApplications() {
             }}
             onSelectionModelChange={(params) => {
               console.log(params)
+            }}
+            components={{
+              Footer: DataGridFooter,
+              Pagination: TablePagination,
             }}
           />
         </div>

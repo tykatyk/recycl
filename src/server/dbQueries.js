@@ -57,6 +57,13 @@ class DbQueries {
       console.log(`Cannot delete ${this.model.collection.collectionName}`)
     }
   }
+  async deleteMany(ids) {
+    try {
+      return await this.model.deleteMany({ _id: { $in: ids } }).exec()
+    } catch (err) {
+      console.log(`Cannot delete ${this.model.collection.collectionName}`)
+    }
+  }
 }
 
 export default DbQueries

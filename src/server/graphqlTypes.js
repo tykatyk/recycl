@@ -4,7 +4,6 @@ import dbQueries from '../../src/server/dbQueries'
 export const typeDefs = gql`
   type Query {
     getRemovalApplication(id: String!): RemovalApplicationOutput
-    deleteRemovalApplication(id: String!): RemovalApplicationOutput
     getRemovalApplications: [RemovalApplicationOutput]
     getWasteTypes: [WasteTypeOutput]
   }
@@ -17,6 +16,8 @@ export const typeDefs = gql`
       id: String
       newValues: RemovalApplication
     ): RemovalApplicationOutput
+    deleteRemovalApplication(id: String!): RemovalApplicationOutput
+    deleteRemovalApplications(id: String!): DeletionResultOutput
   }
 
   type RemovalApplicationOutput {
@@ -54,6 +55,12 @@ export const typeDefs = gql`
     offset: Int
   }
 
+  type DeletionResultOutput {
+    n: Int
+    ok: Int
+    deletedCount: Int
+  }
+
   input FormattingObject {
     length: Int
     offset: Int
@@ -89,9 +96,6 @@ export const resolvers = {
     getRemovalApplication(parent, args, context) {
       return new dbQueries('RemovalApplication').getOne(args.id)
     },
-    deleteRemovalApplication(parent, args, context) {
-      return new dbQueries('RemovalApplication').deleteOne(args.id)
-    },
     getRemovalApplications(parent, args, context) {
       return new dbQueries('RemovalApplication').getAll()
     },
@@ -105,6 +109,12 @@ export const resolvers = {
     },
     updateRemovalApplication(parent, args, context) {
       return new dbQueries('RemovalApplication').update(args.id, args.newValues)
+    },
+    deleteRemovalApplication(parent, args, context) {
+      return new dbQueries('RemovalApplication').deleteOne(args.id)
+    },
+    deleteRemovalApplications(parent, args, context) {
+      return new dbQueries('RemovalApplication').deleteMany(args.ids)
     },
   },
 }
