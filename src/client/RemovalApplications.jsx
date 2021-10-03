@@ -12,8 +12,9 @@ import MailIcon from '@material-ui/icons/Mail'
 import Link from './Link.jsx'
 import Layout from './Layout.jsx'
 import RemovalForm from './removalApplication/RemovalForm.jsx'
+import DataGridFooter from './DataGridFooter.jsx'
 
-import { DataGrid, useGridSlotComponentProps } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid'
 import { useQuery, useMutation } from '@apollo/client'
 import {
   GET_REMOVAL_APPLICATIONS,
@@ -85,8 +86,6 @@ export default function removalApplications() {
     return <Typography>Возникла ошибка при загрузке данных</Typography>
   }
 
-  const handleRemove = () => {}
-
   const rows = data.getRemovalApplications.map((item) => {
     const newItem = {}
     newItem.id = item['_id']
@@ -96,44 +95,6 @@ export default function removalApplications() {
     newItem.messages = ''
     return newItem
   })
-
-  const DataGridFooter = function (props) {
-    const { selectedCount } = props
-    const [page, setPage] = React.useState(0)
-    const [rowsPerPage, setRowsPerPage] = React.useState(10)
-    const { state } = useGridSlotComponentProps()
-    console.log(state)
-    const handleChangePage = (event, newPage) => {
-      setPage(newPage)
-    }
-
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10))
-      setPage(0)
-    }
-
-    const handleClick = (event) => {}
-
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          padding: '0.5em',
-        }}
-      >
-        <Button color="secondary">Удалить отмеченные</Button>
-        <TablePagination
-          component="div"
-          count={100}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </div>
-    )
-  }
 
   return (
     <Layout>
@@ -173,6 +134,7 @@ export default function removalApplications() {
               Footer: DataGridFooter,
               Pagination: TablePagination,
             }}
+            componentsProps={{ footer: { deleting, deleteMutation } }}
           />
         </div>
       </Grid>

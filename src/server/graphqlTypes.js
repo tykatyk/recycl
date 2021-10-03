@@ -17,7 +17,7 @@ export const typeDefs = gql`
       newValues: RemovalApplication
     ): RemovalApplicationOutput
     deleteRemovalApplication(id: String!): RemovalApplicationOutput
-    deleteRemovalApplications(id: String!): DeletionResultOutput
+    deleteRemovalApplications(ids: [String]!): DeleteManyOutput
   }
 
   type RemovalApplicationOutput {
@@ -55,7 +55,7 @@ export const typeDefs = gql`
     offset: Int
   }
 
-  type DeletionResultOutput {
+  type DeleteManyOutput {
     n: Int
     ok: Int
     deletedCount: Int

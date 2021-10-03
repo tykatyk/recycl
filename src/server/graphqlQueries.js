@@ -86,9 +86,8 @@ export const DELETE_REMOVAL_APPLICATION = gql`
   }
 `
 export const DELETE_REMOVAL_APPLICATIONS = gql`
-  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
-  mutation DeleteRemovalApplication($ids: [String]!) {
-    deleteRemovalApplication(ids: [$ids]) {
+  mutation DeleteRemovalApplications($ids: [String]!) {
+    deleteRemovalApplications(ids: $ids) {
       n
       ok
       deletedCount
