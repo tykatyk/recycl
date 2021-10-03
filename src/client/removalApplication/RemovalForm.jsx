@@ -7,7 +7,6 @@ import {
   InputLabel,
   Button,
   CircularProgress,
-  makeStyles,
   useTheme,
 } from '@material-ui/core'
 
@@ -110,7 +109,9 @@ export default function RemovalForm(props) {
             fields.forEach((field) =>
               setFieldValue(
                 field,
-                applicationData.getRemovalApplication[field],
+                field === 'wasteType'
+                  ? applicationData.getRemovalApplication[field]['_id']
+                  : applicationData.getRemovalApplication[field],
                 false
               )
             )

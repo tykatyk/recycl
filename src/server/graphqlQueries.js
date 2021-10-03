@@ -23,7 +23,9 @@ export const CREATE_REMOVAL_APPLICATION = gql`
         place_id
         ...StructuredFormattingFragment
       }
-      wasteType
+      wasteType {
+        _id
+      }
       quantity
       comment
       passDocumet
@@ -48,7 +50,9 @@ export const GET_REMOVAL_APPLICATION = gql`
         place_id
         ...StructuredFormattingFragment
       }
-      wasteType
+      wasteType {
+        _id
+      }
       quantity
       comment
       passDocumet
@@ -76,7 +80,9 @@ export const UPDATE_REMOVAL_APPLICATION = gql`
         place_id
         ...StructuredFormattingFragment
       }
-      wasteType
+      wasteType {
+        _id
+      }
       quantity
       comment
       passDocumet
@@ -102,7 +108,9 @@ export const GET_REMOVAL_APPLICATIONS = gql`
         place_id
         ...StructuredFormattingFragment
       }
-      wasteType
+      wasteType {
+        name
+      }
       quantity
       comment
       passDocumet

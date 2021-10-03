@@ -32,7 +32,7 @@ class DbQueries {
 
   async getAll() {
     try {
-      return await this.model.find({})
+      return await this.model.find().populate('wasteType')
     } catch (err) {
       console.log(`Cannot get ${this.model.collection.collectionName}`)
     }

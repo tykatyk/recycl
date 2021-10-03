@@ -1,6 +1,6 @@
 import React from 'react'
-import RemovalForm from '../../src/client/removalApplication/RemovalForm.jsx'
+import RemovalApplication from '../../src/client/RemovalApplication.jsx'
 
 export default function update() {
-  return <RemovalForm />
+  return <RemovalApplication />
 }

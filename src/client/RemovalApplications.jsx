@@ -1,5 +1,6 @@
-import React from 'react'
-import { Grid, Button, Typography } from '@material-ui/core'
+import { React, useState } from 'react'
+import { Grid, Button, Typography, Badge, makeStyles } from '@material-ui/core'
+import MailIcon from '@material-ui/icons/Mail'
 
 import Link from './Link.jsx'
 import Layout from './Layout.jsx'
@@ -9,24 +10,75 @@ import { DataGrid } from '@mui/x-data-grid'
 import { useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATIONS } from '../server/graphqlQueries'
 
+import Router from 'next/router'
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-columnSeparator': {
+      visibility: 'hidden',
+    },
+  },
+  row: {
+    '&:hover': {
+      cursor: 'pointer',
+    },
+  },
+}))
+
 const columns = [
   {
     field: 'wasteType',
     headerName: 'Тип отходов',
     width: 150,
-    renderCell: (params) => <Link href="#">{params.value}</Link>,
+  },
+  {
+    field: 'wasteLocation',
+    headerName: 'Местоположение',
+    width: 332,
+  },
+  {
+    field: 'quantity',
+    headerName: 'Количество',
+    width: 150,
+    headerAlign: 'center',
+    align: 'center',
+  },
+  {
+    field: 'messages',
+    width: 50,
+    headerAlign: 'center',
+    align: 'center',
+    renderCell: (params) => {
+      return (
+        <Badge badgeContent={4} color="secondary">
+          <MailIcon />
+        </Badge>
+      )
+    },
   },
 ]
 
 export default function removalApplications() {
+  const classes = useStyles()
   const { loading, error, data } = useQuery(GET_REMOVAL_APPLICATIONS)
   if (loading) return <Typography>Идет загрузка данных</Typography>
-  if (error) return <Typography>Возникла ошибка при загрузке данных</Typography>
+  if (error) {
+    return <Typography>Возникла ошибка при загрузке данных</Typography>
+  }
+
+  const [selected, setSelected] = useState([])
+  const handleRemove = () => {}
 
   const rows = data.getRemovalApplications.map((item) => {
     const newItem = {}
     newItem.id = item['_id']
-    newItem.wasteType = item.wasteType
+    newItem.wasteType = item.wasteType.name
+    newItem.wasteLocation = item.wasteLocation.description
+    newItem.quantity = item.quantity
+    newItem.messages = ''
     return newItem
   })
 
@@ -46,12 +98,24 @@ export default function removalApplications() {
         </Typography>
         <div style={{ width: '100%' }}>
           <DataGrid
+            classes={{ root: classes.root, row: classes.row }}
             autoHeight
             rows={rows}
             columns={columns}
             autoPageSize
             checkboxSelection
             disableSelectionOnClick
+            onCellClick={(params, event) => {
+              if (params.field === 'messages') {
+                Router.push(`/messages`)
+                return
+              }
+              if (params.field !== '__check__')
+                Router.push(`/removal/${params.id}`)
+            }}
+            onSelectionModelChange={(params) => {
+              console.log(params)
+            }}
           />
         </div>
       </Grid>

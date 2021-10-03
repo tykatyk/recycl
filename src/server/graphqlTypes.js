@@ -21,7 +21,7 @@ export const typeDefs = gql`
   type RemovalApplicationOutput {
     _id: String
     wasteLocation: LocationOutput
-    wasteType: String
+    wasteType: WasteTypeOutput
     quantity: Int
     comment: String
     passDocumet: Boolean
