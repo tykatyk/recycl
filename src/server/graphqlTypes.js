@@ -4,6 +4,7 @@ import dbQueries from '../../src/server/dbQueries'
 export const typeDefs = gql`
   type Query {
     getRemovalApplication(id: String!): RemovalApplicationOutput
+    deleteRemovalApplication(id: String!): RemovalApplicationOutput
     getRemovalApplications: [RemovalApplicationOutput]
     getWasteTypes: [WasteTypeOutput]
   }
@@ -87,6 +88,9 @@ export const resolvers = {
   Query: {
     getRemovalApplication(parent, args, context) {
       return new dbQueries('RemovalApplication').getOne(args.id)
+    },
+    deleteRemovalApplication(parent, args, context) {
+      return new dbQueries('RemovalApplication').deleteOne(args.id)
     },
     getRemovalApplications(parent, args, context) {
       return new dbQueries('RemovalApplication').getAll()

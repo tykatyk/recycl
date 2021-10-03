@@ -50,7 +50,7 @@ class DbQueries {
     }
   }
 
-  async delete(id) {
+  async deleteOne(id) {
     try {
       return await this.model.findByIdAndRemove(id).exec()
     } catch (err) {

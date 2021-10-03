@@ -97,6 +97,33 @@ export const UPDATE_REMOVAL_APPLICATION = gql`
     }
   }
 `
+export const DELETE_REMOVAL_APPLICATION = gql`
+  ${STRUCTURED_FORMATTING_FRAGMENT}
+  mutation DeleteRemovalApplication($id: String!) {
+    deleteRemovalApplication(id: $id) {
+      _id
+      wasteLocation {
+        description
+        place_id
+        ...StructuredFormattingFragment
+      }
+      wasteType {
+        _id
+      }
+      quantity
+      comment
+      passDocumet
+      notificationCitiesCheckbox
+      notificationCities {
+        description
+        place_id
+        ...StructuredFormattingFragment
+      }
+      notificationRadius
+      notificationRadiusCheckbox
+    }
+  }
+`
 
 export const GET_REMOVAL_APPLICATIONS = gql`
   ${STRUCTURED_FORMATTING_FRAGMENT}
