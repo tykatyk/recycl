@@ -12,143 +12,75 @@ const STRUCTURED_FORMATTING_FRAGMENT = gql`
     }
   }
 `
+const REMOVAL_APPLICATION_OUTPUT_FRAGMENT = gql`
+  ${STRUCTURED_FORMATTING_FRAGMENT}
+  fragment RemovalApplicationOutputFragment on RemovalApplicationOutput {
+    _id
+    wasteLocation {
+      description
+      place_id
+      ...StructuredFormattingFragment
+    }
+    wasteType {
+      _id
+      name
+    }
+    quantity
+    comment
+    passDocumet
+    notificationCitiesCheckbox
+    notificationCities {
+      description
+      place_id
+      ...StructuredFormattingFragment
+    }
+    notificationRadius
+    notificationRadiusCheckbox
+  }
+`
 
 export const CREATE_REMOVAL_APPLICATION = gql`
-  ${STRUCTURED_FORMATTING_FRAGMENT}
+  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
   mutation CreateRemovalApplication($application: RemovalApplication) {
     createRemovalApplication(application: $application) {
-      _id
-      wasteLocation {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      wasteType {
-        _id
-      }
-      quantity
-      comment
-      passDocumet
-      notificationCitiesCheckbox
-      notificationCities {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      notificationRadius
-      notificationRadiusCheckbox
+      ...RemovalApplicationOutputFragment
     }
   }
 `
 
 export const GET_REMOVAL_APPLICATION = gql`
-  ${STRUCTURED_FORMATTING_FRAGMENT}
+  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
   query GetRemovalApplication($id: String!) {
     getRemovalApplication(id: $id) {
-      wasteLocation {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      wasteType {
-        _id
-      }
-      quantity
-      comment
-      passDocumet
-      notificationCitiesCheckbox
-      notificationCities {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      notificationRadius
-      notificationRadiusCheckbox
+      ...RemovalApplicationOutputFragment
     }
   }
 `
 export const UPDATE_REMOVAL_APPLICATION = gql`
-  ${STRUCTURED_FORMATTING_FRAGMENT}
+  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
   mutation UpdateRemovalApplication(
     $id: String!
     $newValues: RemovalApplication!
   ) {
     updateRemovalApplication(id: $id, newValues: $newValues) {
-      _id
-      wasteLocation {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      wasteType {
-        _id
-      }
-      quantity
-      comment
-      passDocumet
-      notificationCitiesCheckbox
-      notificationCities {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      notificationRadius
-      notificationRadiusCheckbox
+      ...RemovalApplicationOutputFragment
     }
   }
 `
 export const DELETE_REMOVAL_APPLICATION = gql`
-  ${STRUCTURED_FORMATTING_FRAGMENT}
+  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
   mutation DeleteRemovalApplication($id: String!) {
     deleteRemovalApplication(id: $id) {
-      _id
-      wasteLocation {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      wasteType {
-        _id
-      }
-      quantity
-      comment
-      passDocumet
-      notificationCitiesCheckbox
-      notificationCities {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      notificationRadius
-      notificationRadiusCheckbox
+      ...RemovalApplicationOutputFragment
     }
   }
 `
 
 export const GET_REMOVAL_APPLICATIONS = gql`
-  ${STRUCTURED_FORMATTING_FRAGMENT}
+  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
   query GetRemovalApplications {
     getRemovalApplications {
-      _id
-      wasteLocation {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      wasteType {
-        name
-      }
-      quantity
-      comment
-      passDocumet
-      notificationCitiesCheckbox
-      notificationCities {
-        description
-        place_id
-        ...StructuredFormattingFragment
-      }
-      notificationRadius
-      notificationRadiusCheckbox
+      ...RemovalApplicationOutputFragment
     }
   }
 `

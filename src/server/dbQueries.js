@@ -24,7 +24,7 @@ class DbQueries {
 
   async getOne(id) {
     try {
-      return await this.model.findById(id).exec()
+      return await this.model.findById(id).populate('wasteType').exec()
     } catch (err) {
       console.log(`Cannot get ${this.model.collection.collectionName}`)
     }

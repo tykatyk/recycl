@@ -50,7 +50,7 @@ export default function SelectFormik(props) {
         data.getWasteTypes.map((item) => {
           return (
             <MenuItem key={item['_id']} value={item['_id']}>
-              {item.name}
+              {item['name']}
             </MenuItem>
           )
         })}

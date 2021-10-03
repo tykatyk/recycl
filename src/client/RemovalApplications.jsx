@@ -1,4 +1,4 @@
-import { React, useState } from 'react'
+import React, { useState } from 'react'
 import { Grid, Button, Typography, Badge, makeStyles } from '@material-ui/core'
 import MailIcon from '@material-ui/icons/Mail'
 
@@ -63,13 +63,13 @@ const columns = [
 
 export default function removalApplications() {
   const classes = useStyles()
+  const [selected, setSelected] = useState([])
   const { loading, error, data } = useQuery(GET_REMOVAL_APPLICATIONS)
   if (loading) return <Typography>Идет загрузка данных</Typography>
   if (error) {
     return <Typography>Возникла ошибка при загрузке данных</Typography>
   }
 
-  const [selected, setSelected] = useState([])
   const handleRemove = () => {}
 
   const rows = data.getRemovalApplications.map((item) => {
