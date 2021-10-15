@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Button, TablePagination, makeStyles } from '@material-ui/core'
 
-import { useGridSlotComponentProps } from '@mui/x-data-grid'
 const handleChangePage = (event, newPage) => {
   setPage(newPage)
 }
@@ -12,17 +11,9 @@ const handleChangeRowsPerPage = (event) => {
 }
 
 export default function DataGridFooter(props) {
-  const { deleting, deleteMutation } = props
+  const { deleting, selected, clickHandler } = props
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(10)
-  const {
-    state: { selection },
-  } = useGridSlotComponentProps()
-
-  const handleRemove = () => {}
-  const handleClick = (event) => {
-    deleteMutation({ variables: { ids: selection } })
-  }
 
   return (
     <div
@@ -34,9 +25,9 @@ export default function DataGridFooter(props) {
     >
       <Button
         color="secondary"
-        disabled={deleting}
+        disabled={deleting || selected.length < 1}
         onClick={(event) => {
-          handleClick(event)
+          clickHandler(event)
         }}
       >
         Удалить отмеченные

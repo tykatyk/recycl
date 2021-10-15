@@ -81,7 +81,17 @@ export default function removalApplications() {
     { loading: deleting, error: deleteError, data: deleteData },
   ] = useMutation(DELETE_REMOVAL_APPLICATIONS)
 
+  const clickHandler = function (event) {
+    console.log(selected)
+    if (selected.length < 1) return
+    deleteMutation({
+      variables: { ids: selected },
+      refetchQueries: [{ query: GET_REMOVAL_APPLICATIONS }],
+    })
+  }
+
   if (loading) return <Typography>Идет загрузка данных</Typography>
+
   if (error) {
     return <Typography>Возникла ошибка при загрузке данных</Typography>
   }
@@ -128,13 +138,13 @@ export default function removalApplications() {
                 Router.push(`/removal/${params.id}`)
             }}
             onSelectionModelChange={(params) => {
-              console.log(params)
+              setSelected(params)
             }}
             components={{
               Footer: DataGridFooter,
               Pagination: TablePagination,
             }}
-            componentsProps={{ footer: { deleting, deleteMutation } }}
+            componentsProps={{ footer: { clickHandler, deleting, selected } }}
           />
         </div>
       </Grid>
