@@ -5,6 +5,7 @@ import { Field } from 'formik'
 
 export default function SelectFormik(props) {
   const { error, loading, data, name, label, helperText, disabled } = props
+
   return (
     <Field
       component={TextFieldFormik}
@@ -47,7 +48,7 @@ export default function SelectFormik(props) {
         </MenuItem>
       )}
       {data &&
-        data.getWasteTypes.map((item) => {
+        data.map((item) => {
           return (
             <MenuItem key={item['_id']} value={item['_id']}>
               {item['name']}

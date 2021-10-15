@@ -51,11 +51,15 @@ export default function RemovalForm(props) {
   const [updateMutation, { data: updateData, loading: updating, updateError }] =
     useMutation(UPDATE_REMOVAL_APPLICATION)
 
-  const createHandler = (values) => {
+  const createHandler = (values, setSubmitting) => {
     const normalizedValues = getNormalizedValues(values)
-    createMutation({ variables: { application: normalizedValues } })
+    createMutation({
+      variables: { application: normalizedValues },
+      fetchPolicy: 'no-cache',
+    })
       .then((data) => {
         setSubmitting(false)
+        router.push('/removal')
       })
       .catch((err) => {
         console.log(err)
@@ -82,7 +86,7 @@ export default function RemovalForm(props) {
         if (id) {
           updateHandler(values, setSubmitting)
         } else {
-          createHandler(values)
+          createHandler(values, setSubmitting)
         }
       }}
     >
@@ -105,7 +109,7 @@ export default function RemovalForm(props) {
 
         useEffect(() => {
           if (id && !called) getRemovalApplication({ variables: { id } })
-          if (applicationData && wasteTypesData)
+          if (applicationData && wasteTypesData) {
             fields.forEach((field) =>
               setFieldValue(
                 field,
@@ -115,8 +119,9 @@ export default function RemovalForm(props) {
                 false
               )
             )
+          }
         }, [applicationData, wasteTypesData])
-
+        // console.log(wasteTypesData)
         const initialValues = getInitialValues()
         const shouldDisable =
           gettingApplication || gettingWasteTypes || isSubmitting
@@ -126,7 +131,7 @@ export default function RemovalForm(props) {
 
         if (crateError)
           return <Typography>Возникла ошибка при сохранении данных</Typography>
-
+        console.log(createData)
         return (
           <Form className={classes.formRoot}>
             {(gettingApplication || gettingWasteTypes) && (
@@ -168,7 +173,9 @@ export default function RemovalForm(props) {
                 <SelectFormik
                   error={wasteTypesError}
                   loading={gettingWasteTypes}
-                  data={wasteTypesData}
+                  data={
+                    wasteTypesData ? wasteTypesData.getWasteTypes : undefined
+                  }
                   name={'wasteType'}
                   label={'Тип отходов'}
                   helperText={'*Обязательное поле'}

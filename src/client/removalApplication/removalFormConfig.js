@@ -27,7 +27,7 @@ export const validationSchema = yup.object().shape({
 
 export function getInitialValues() {
   return {
-    wasteLocation: '',
+    wasteLocation: null,
     wasteType: '',
     quantity: '',
     comment: '',
