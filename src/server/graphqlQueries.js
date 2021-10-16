@@ -48,6 +48,14 @@ export const CREATE_REMOVAL_APPLICATION = gql`
   }
 `
 
+export const SEND_MESSAGE = gql`
+  mutation SendMessage($message: String) {
+    sendMessage(message: $message) {
+      _id
+    }
+  }
+`
+
 export const GET_REMOVAL_APPLICATION = gql`
   ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
   query GetRemovalApplication($id: String!) {

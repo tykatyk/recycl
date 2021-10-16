@@ -39,17 +39,8 @@ export default function PlacesAutocomplete(props) {
     maps,
   } = props
 
-  const {
-    type,
-    label,
-    variant,
-    value,
-    onChange,
-    onBlur,
-    error,
-    helperText,
-    disabled,
-  } = fieldToTextField(props)
+  const { type, label, variant, value, onBlur, error, helperText, disabled } =
+    fieldToTextField(props)
   const classes = useStyles()
   const router = useRouter()
   const { id } = router.query
