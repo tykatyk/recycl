@@ -11,6 +11,7 @@ import {
 import * as yup from 'yup'
 
 import TextFieldFormik from './TextFieldFormik.jsx'
+import Snackbars from './Snackbars.jsx'
 
 import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './removalApplication/removalFormStyles'
@@ -42,6 +43,13 @@ export default function SendMessage() {
 
   return (
     <Box p={3} style={{ background: theme.palette.primary.main }}>
+      {data && (
+        <Snackbars
+          open={true}
+          message="Сообщение отправлено"
+          severity="success"
+        />
+      )}
       <Typography variant="h6" gutterBottom>
         Написать сообщение
       </Typography>
