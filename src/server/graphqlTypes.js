@@ -118,7 +118,7 @@ export const resolvers = {
       return new dbQueries('RemovalApplication').deleteMany(args.ids)
     },
     sendMessage(parent, args, context) {
-      return new dbQueries('Message').create(args.message)
+      return new dbQueries('Message').create(args.message, args.aplId)
     },
   },
 }

@@ -48,6 +48,12 @@ export const RemovalApplication =
   mongoose.model('RemovalApplication', removalApplicationSchema)
 
 //Message
-const messageSchema = Schema({ message: String }, { timestamps: true })
+const messageSchema = Schema(
+  {
+    message: String,
+    aplId: { type: Schema.Types.ObjectId, ref: 'RemovalApplication' },
+  },
+  { timestamps: true }
+)
 export const Message =
   mongoose.models.Message || mongoose.model('Message', messageSchema)
