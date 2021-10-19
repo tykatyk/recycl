@@ -4,7 +4,7 @@ import dbQueries from '../../src/server/dbQueries'
 export const typeDefs = gql`
   type Query {
     getRemovalApplication(id: String!): RemovalApplicationOutput
-    getRemovalApplications: [RemovalApplicationOutput]
+    getRemovalApplications: [RemovalApplicationsOutput]
     getWasteTypes: [WasteTypeOutput]
   }
 
@@ -32,6 +32,20 @@ export const typeDefs = gql`
     notificationCities: [LocationOutput]
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
+  }
+
+  type RemovalApplicationsOutput {
+    _id: String
+    wasteLocation: LocationOutput
+    wasteType: WasteTypeOutput
+    quantity: Int
+    comment: String
+    passDocumet: Boolean
+    notificationCitiesCheckbox: Boolean
+    notificationCities: [LocationOutput]
+    notificationRadius: String
+    notificationRadiusCheckbox: Boolean
+    messageCount: Int
   }
 
   type LocationOutput {
@@ -98,7 +112,7 @@ export const resolvers = {
       return new dbQueries('RemovalApplication').getOne(args.id)
     },
     getRemovalApplications(parent, args, context) {
-      return new dbQueries('RemovalApplication').getAll()
+      return new dbQueries('RemovalApplication').getRemovalApplications()
     },
     getWasteTypes(parent, args, context) {
       return new dbQueries('WasteType').getAll()

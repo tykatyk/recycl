@@ -58,16 +58,20 @@ const columns = [
     align: 'center',
   },
   {
-    field: 'messages',
+    field: 'messageCount',
     width: 50,
     headerAlign: 'center',
     align: 'center',
     renderCell: (params) => {
-      return (
-        <Badge badgeContent={4} color="secondary">
-          <MailIcon />
-        </Badge>
-      )
+      console.log(params)
+      if (params.row.messageCount > 0) {
+        return (
+          <Badge badgeContent={params.row.messageCount} color="secondary">
+            <MailIcon />
+          </Badge>
+        )
+      }
+      return ''
     },
   },
 ]
@@ -76,13 +80,13 @@ export default function removalApplications() {
   const classes = useStyles()
   const [selected, setSelected] = useState([])
   const { loading, error, data } = useQuery(GET_REMOVAL_APPLICATIONS)
+
   const [
     deleteMutation,
     { loading: deleting, error: deleteError, data: deleteData },
   ] = useMutation(DELETE_REMOVAL_APPLICATIONS)
 
   const clickHandler = function (event) {
-    console.log(selected)
     if (selected.length < 1) return
     deleteMutation({
       variables: { ids: selected },
@@ -102,7 +106,7 @@ export default function removalApplications() {
     newItem.wasteType = item.wasteType.name
     newItem.wasteLocation = item.wasteLocation.description
     newItem.quantity = item.quantity
-    newItem.messages = ''
+    newItem.messageCount = item.messageCount
     return newItem
   })
 

@@ -47,6 +47,24 @@ class DbQueries {
       console.log(`Cannot get ${this.model.collection.collectionName}`)
     }
   }
+  async getRemovalApplications() {
+    try {
+      const RemovalApplModel = new RemovalApplication()
+      return await this.model.aggregate([
+        {
+          $lookup: {
+            from: 'messages',
+            let: { id: '$_id' },
+            pipeline: [{ $match: { $expr: { $eq: ['$$id', '$aplId'] } } }],
+            as: 'messageCount',
+          },
+        },
+        { $addFields: { messageCount: { $size: '$messageCount' } } },
+      ])
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   async update(id, newValue) {
     try {

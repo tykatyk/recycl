@@ -38,6 +38,33 @@ const REMOVAL_APPLICATION_OUTPUT_FRAGMENT = gql`
     notificationRadiusCheckbox
   }
 `
+const REMOVAL_APPLICATIONS_OUTPUT_FRAGMENT = gql`
+  ${STRUCTURED_FORMATTING_FRAGMENT}
+  fragment RemovalApplicationsOutputFragment on RemovalApplicationsOutput {
+    _id
+    wasteLocation {
+      description
+      place_id
+      ...StructuredFormattingFragment
+    }
+    wasteType {
+      _id
+      name
+    }
+    quantity
+    comment
+    passDocumet
+    notificationCitiesCheckbox
+    notificationCities {
+      description
+      place_id
+      ...StructuredFormattingFragment
+    }
+    notificationRadius
+    notificationRadiusCheckbox
+    messageCount
+  }
+`
 
 export const CREATE_REMOVAL_APPLICATION = gql`
   ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
@@ -53,21 +80,22 @@ export const SEND_MESSAGE = gql`
     sendMessage(message: $message, aplId: $aplId)
   }
 `
-
-export const GET_REMOVAL_APPLICATION = gql`
+//old
+/*export const GET_REMOVAL_APPLICATION = gql`
   ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
   query GetRemovalApplication($id: String!) {
     getRemovalApplication(id: $id) {
       ...RemovalApplicationOutputFragment
     }
   }
-`
+`*/
 
+//new
 export const GET_REMOVAL_APPLICATIONS = gql`
-  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
+  ${REMOVAL_APPLICATIONS_OUTPUT_FRAGMENT}
   query GetRemovalApplications {
     getRemovalApplications {
-      ...RemovalApplicationOutputFragment
+      ...RemovalApplicationsOutputFragment
     }
   }
 `
