@@ -31,13 +31,14 @@ export default function SendMessage() {
   const [createMessageMutation, { data, loading, error }] =
     useMutation(SEND_MESSAGE)
 
-  const submitHandler = (values, setSubmitting) => {
+  const submitHandler = (values, setSubmitting, resetForm) => {
     createMessageMutation({
       variables: { message: values.message, aplId: id },
       fetchPolicy: 'no-cache',
     })
       .then((data) => {
         setSubmitting(false)
+        resetForm({ values: '' })
       })
       .catch((err) => {
         //ToDo
@@ -65,8 +66,8 @@ export default function SendMessage() {
         validationSchema={yup.object().shape({
           message: yup.string(),
         })}
-        onSubmit={(values, { setSubmitting }) => {
-          submitHandler(values, setSubmitting)
+        onSubmit={(values, { setSubmitting, resetForm }) => {
+          submitHandler(values, setSubmitting, resetForm)
         }}
       >
         {({ isSubmitting, values }) => {
@@ -90,7 +91,7 @@ export default function SendMessage() {
                   type="submit"
                   disabled={
                     values.message.replace(/^\s+/, '').replace(/\s+$/, '') ===
-                    ''
+                      '' || loading
                   }
                 >
                   Отправить
