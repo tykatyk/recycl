@@ -1,11 +1,13 @@
-import { RemovalApplication, WasteType } from './dbModels'
+import { RemovalApplication, WasteType, Message } from './dbModels'
 
 class DbQueries {
   constructor(modelName) {
     this.models = {
       RemovalApplication,
       WasteType,
+      Message,
     }
+
     if (!this.models[modelName]) {
       console.log(new Error(`${modelName} is unknow model name`))
       return undefined
@@ -17,6 +19,14 @@ class DbQueries {
     try {
       const modelInstance = new this.model(data)
       return await modelInstance.save()
+    } catch (err) {
+      console.log(`Cannot create ${modelInstance.constructor.modelName}`)
+    }
+  }
+  async createMessage(data) {
+    try {
+      const modelInstance = new this.model(data)
+      return await modelInstance.save()['_id']
     } catch (err) {
       console.log(`Cannot create ${modelInstance.constructor.modelName}`)
     }

@@ -18,7 +18,7 @@ export const typeDefs = gql`
     ): RemovalApplicationOutput
     deleteRemovalApplication(id: String!): RemovalApplicationOutput
     deleteRemovalApplications(ids: [String]!): DeleteManyOutput
-    sendMessage: String
+    sendMessage(message: String, aplId: String): String
   }
 
   type RemovalApplicationOutput {
@@ -118,7 +118,10 @@ export const resolvers = {
       return new dbQueries('RemovalApplication').deleteMany(args.ids)
     },
     sendMessage(parent, args, context) {
-      return new dbQueries('Message').create(args.message, args.aplId)
+      return new dbQueries('Message').createMessage({
+        message: args.message,
+        aplId: args.aplId,
+      })
     },
   },
 }

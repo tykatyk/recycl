@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function Snackbars() {
+export default function Snackbars(props) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(props.open || false)
   const { message, severity } = props

@@ -50,9 +50,7 @@ export const CREATE_REMOVAL_APPLICATION = gql`
 
 export const SEND_MESSAGE = gql`
   mutation SendMessage($message: String, $aplId: String) {
-    sendMessage(message: $message, aplId: $aplId) {
-      _id
-    }
+    sendMessage(message: $message, aplId: $aplId)
   }
 `
 

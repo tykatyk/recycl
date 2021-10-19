@@ -18,19 +18,22 @@ import removalFormStyles from './removalApplication/removalFormStyles'
 
 import { useMutation } from '@apollo/client'
 import { SEND_MESSAGE } from '../server/graphqlQueries'
+import { useRouter } from 'next/router'
 
 const useStyles = removalFormStyles
 
 export default function SendMessage() {
   const classes = useStyles()
   const theme = useTheme()
+  const router = useRouter()
+  const { id } = router.query
 
   const [createMessageMutation, { data, loading, error }] =
     useMutation(SEND_MESSAGE)
 
   const submitHandler = (values, setSubmitting) => {
     createMessageMutation({
-      variables: { message: values },
+      variables: { message: values.message, aplId: id },
       fetchPolicy: 'no-cache',
     })
       .then((data) => {
@@ -40,7 +43,8 @@ export default function SendMessage() {
         //ToDo
       })
   }
-
+  console.log(error)
+  console.log(data)
   return (
     <Box p={3} style={{ background: theme.palette.primary.main }}>
       {data && (
