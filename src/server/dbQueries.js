@@ -60,6 +60,9 @@ class DbQueries {
           },
         },
         { $addFields: { messageCount: { $size: '$messageCount' } } },
+        {
+          $sort: { createdAt: -1 },
+        },
       ])
     } catch (err) {
       console.log(err)

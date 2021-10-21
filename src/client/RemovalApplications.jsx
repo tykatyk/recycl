@@ -63,7 +63,6 @@ const columns = [
     headerAlign: 'center',
     align: 'center',
     renderCell: (params) => {
-      console.log(params)
       if (params.row.messageCount > 0) {
         return (
           <Badge badgeContent={params.row.messageCount} color="secondary">
