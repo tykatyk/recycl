@@ -4,6 +4,8 @@ import Head from 'next/head'
 import { ThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core'
 import { theme } from './helpers/themeStub'
 
+import GlobalCss from './GlobalCss.jsx'
+
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
@@ -64,6 +66,7 @@ export default function App(props) {
       </Head>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <GlobalCss />
         <ApolloProvider client={client}>
           <Component {...pageProps} />
         </ApolloProvider>
