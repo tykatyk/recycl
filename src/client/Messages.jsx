@@ -45,7 +45,7 @@ const columns = [
     width: 332,
   },
   {
-    field: 'isUnread',
+    field: 'isRead',
     headerName: '',
     width: 150,
     headerAlign: 'center',
@@ -91,7 +91,7 @@ export default function Messages() {
       wasteType: item.wasteType.name,
       text: item.text,
     }
-    newItem.isUnread = item.isUnread
+    newItem.isRead = item.isRead
     return newItem
   })
 

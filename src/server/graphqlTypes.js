@@ -76,6 +76,16 @@ export const typeDefs = gql`
     deletedCount: Int
   }
 
+  type MessageOutput {
+    _id: ID!
+    message: String!
+    applId: ID!
+    initiatorId: ID!
+    senderId: ID!
+    receiverId: ID!
+    isRead: Boolean
+  }
+
   input FormattingObject {
     length: Int
     offset: Int
@@ -103,6 +113,14 @@ export const typeDefs = gql`
     notificationCities: [Location]
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
+  }
+
+  input Message {
+    message: String!
+    applId: ID!
+    initiatorId: ID!
+    senderId: ID!
+    receiverId: ID!
   }
 `
 
