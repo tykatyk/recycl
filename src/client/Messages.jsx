@@ -15,7 +15,7 @@ import DataGridFooter from './DataGridFooter.jsx'
 
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery, useMutation } from '@apollo/client'
-import { GET_MESSAGES, DELETE_MESSAGES } from '../server/graphqlQueries'
+import { GET_MESSAGES_BY_APPLICATION } from '../server/graphqlQueries'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -62,18 +62,18 @@ const columns = [
 export default function Messages() {
   const classes = useStyles()
   const [selected, setSelected] = useState([])
-  const { loading, error, data } = useQuery(GET_MESSAGES)
+  const { loading, error, data } = useQuery(GET_MESSAGES_BY_APPLICATION)
 
-  const [
+  /*const [
     deleteMutation,
     { loading: deleting, error: deleteError, data: deleteData },
-  ] = useMutation(DELETE_MESSAGES)
+  ] = useMutation(DELETE_MESSAGES)*/
 
   const clickHandler = function (event) {
     if (selected.length < 1) return
     deleteMutation({
       variables: { ids: selected },
-      refetchQueries: [{ query: GET_MESSAGES }],
+      refetchQueries: [{ query: GET_MESSAGES_BY_APPLICATION }],
     })
   }
 

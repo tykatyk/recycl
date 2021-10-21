@@ -137,3 +137,13 @@ export const GET_WASTE_TYPES = gql`
     }
   }
 `
+export const GET_MESSAGES_BY_APPLICATION = gql`
+  query GetMessagesByApplication($aplId: ID!) {
+    getMessagesByApplication(aplId: $aplId) {
+      lastMessage
+      isRead
+      wasteLocation
+      wasteType
+    }
+  }
+`

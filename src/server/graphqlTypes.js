@@ -6,6 +6,7 @@ export const typeDefs = gql`
     getRemovalApplication(id: String!): RemovalApplicationOutput
     getRemovalApplications: [RemovalApplicationsOutput]
     getWasteTypes: [WasteTypeOutput]
+    getMessagesByApplication(id: String!): [MessagesByApplicationOutput]
   }
 
   type Mutation {
@@ -86,6 +87,13 @@ export const typeDefs = gql`
     isRead: Boolean
   }
 
+  type LastMessageByApplicationAndUserOutput {
+    lastMessage: String!
+    isRead: Boolean
+    wasteLocation: String
+    wasteType: String
+  }
+
   input FormattingObject {
     length: Int
     offset: Int
@@ -134,6 +142,9 @@ export const resolvers = {
     },
     getWasteTypes(parent, args, context) {
       return new dbQueries('WasteType').getAll()
+    },
+    getMessagesByApplicationAndUser(parent, args, context) {
+      return new dbQueries('Message').getAplMessages()
     },
   },
   Mutation: {

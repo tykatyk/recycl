@@ -47,6 +47,7 @@ class DbQueries {
       console.log(`Cannot get ${this.model.collection.collectionName}`)
     }
   }
+
   async getRemovalApplications() {
     try {
       const RemovalApplModel = new RemovalApplication()
@@ -66,6 +67,43 @@ class DbQueries {
       ])
     } catch (err) {
       console.log(err)
+    }
+  }
+
+  async getMessagesByApplicationAndUser(aplId) {
+    try {
+      const MessageModel = new Message()
+      return await this.model.aggregate([
+        {
+          $match: {
+            aplId: aplId,
+          },
+          $sort: {
+            createdAt: 'desc',
+          },
+          $group: {
+            id: initiatorId,
+            lastMessage: {
+              $last: 'message',
+            },
+            isRead: {
+              $last: 'isRead',
+            },
+          },
+          $lookkup: {
+            from: 'removalapplications',
+            let: { aplId: '$aplId' },
+            pipeline: [{ $match: { $expr: { $eq: ['$$aplId', '$_id'] } } }],
+            as: 'removalApplication',
+          },
+          $addFields: {
+            wasteLocation: '$wasteLocation.description',
+            wasteType: '$wasteType',
+          },
+        },
+      ])
+    } catch (err) {
+      return err.message
     }
   }
 
