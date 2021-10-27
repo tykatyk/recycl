@@ -57,3 +57,45 @@ const messageSchema = Schema(
 )
 export const Message =
   mongoose.models.Message || mongoose.model('Message', messageSchema)
+
+//User
+const userSchema = Schema(
+  {
+    login: {
+      type: String,
+      required: true,
+      minLength: 3,
+      maxLength: 20,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: (v) => {
+          const re =
+            /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+          return re.test(String(v).toLowerCase())
+        },
+        message: (props) =>
+          `${props.value} не действительный адрес электронной почты!`,
+      },
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minLength: 6,
+      maxLength: 255,
+    },
+    isActive: Boolean,
+    roles: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role',
+      },
+    ],
+  },
+  { timestamps: true }
+)
+export const User = mongoose.models.User || mongoose.model('User', userSchema)
