@@ -1,4 +1,4 @@
-import dbQueries from '../db/queries'
+import dbQueries from '../../db/queries'
 
 export default {
   Query: {
