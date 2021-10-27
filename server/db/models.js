@@ -78,7 +78,7 @@ const userSchema = Schema(
           return re.test(String(v).toLowerCase())
         },
         message: (props) =>
-          `${props.value} не действительный адрес электронной почты!`,
+          `${props.value} недействительный адрес электронной почты!`,
       },
       lowercase: true,
     },
@@ -88,7 +88,10 @@ const userSchema = Schema(
       minLength: 6,
       maxLength: 255,
     },
-    isActive: Boolean,
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     roles: [
       {
         type: mongoose.Schema.Types.ObjectId,
