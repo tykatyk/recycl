@@ -1,6 +1,8 @@
 import { gql } from 'apollo-server-micro'
 
 export const typeDefs = gql`
+  scalar Date
+
   type Query {
     getRemovalApplication(id: String!): RemovalApplicationOutput
     getRemovalApplications: [RemovalApplicationOutput]
@@ -19,6 +21,7 @@ export const typeDefs = gql`
     deleteRemovalApplication(id: String!): RemovalApplicationOutput
     deleteRemovalApplications(ids: [String]!): DeleteManyOutput
     createMessage(message: String, aplId: String): String
+    createUser(user: UserInput): UserOutput
   }
 
   type RemovalApplicationOutput {
@@ -77,6 +80,16 @@ export const typeDefs = gql`
     isRead: Boolean
   }
 
+  type UserOutput {
+    _id: ID!
+    login: String!
+    email: String!
+    roles: [String!]!
+    isActive: Boolean
+    createdAt: Date!
+    updatedAd: Date!
+  }
+
   type LastMessageByApplicationAndUserOutput {
     lastMessage: String!
     isRead: Boolean
@@ -119,5 +132,12 @@ export const typeDefs = gql`
     initiatorId: ID!
     senderId: ID!
     receiverId: ID!
+  }
+
+  input UserInput {
+    login: String!
+    email: String!
+    roles: [String!]!
+    isActive: Boolean
   }
 `
