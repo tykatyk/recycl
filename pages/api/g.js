@@ -3,8 +3,8 @@ import dbConnect from '../../server/db/connection'
 import { typeDefs } from '../../server/graphql/types'
 import resolvers from '../../server/graphql/resolvers'
 
-const apolloServer = new ApolloServer({ typeDefs, resolvers })
-const startServer = apolloServer.start()
+// const apolloServer = new ApolloServer({ typeDefs, resolvers })
+// const startServer = apolloServer.start()
 
 async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true')
@@ -17,6 +17,8 @@ async function handler(req, res) {
     res.end()
     return false
   }
+  const apolloServer = new ApolloServer({ typeDefs, resolvers })
+  const startServer = apolloServer.start()
 
   await startServer
   await apolloServer.createHandler({
