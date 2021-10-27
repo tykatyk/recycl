@@ -1,44 +1,39 @@
 import { gql } from 'apollo-server-micro'
 
 export const typeDefs = gql`
-  scalar Date
-
   type Query {
     getRemovalApplication(id: String!): RemovalApplicationOutput
     getRemovalApplications: [RemovalApplicationOutput]
     getRemovalApplicationsWithMessageCount: [RemovalApplicationsWithMessageCountOutput]
-    getWasteTypes: [WasteTypeOutput]
   }
 
   type Mutation {
     createRemovalApplication(
-      application: RemovalApplication
+      application: RemovalApplication!
     ): RemovalApplicationOutput
     updateRemovalApplication(
-      id: String
-      newValues: RemovalApplication
+      id: String!
+      newValues: RemovalApplication!
     ): RemovalApplicationOutput
     deleteRemovalApplication(id: String!): RemovalApplicationOutput
-    deleteRemovalApplications(ids: [String]!): DeleteManyOutput
-    createMessage(message: String, aplId: String): String
-    createUser(user: UserInput): UserOutput
+    deleteRemovalApplications(ids: [String!]!): DeleteManyOutput
   }
 
   type RemovalApplicationOutput {
-    _id: String
-    wasteLocation: LocationOutput
-    wasteType: WasteTypeOutput
-    quantity: Int
+    _id: String!
+    wasteLocation: LocationOutput!
+    wasteType: WasteTypeOutput!
+    quantity: Int!
     comment: String
     passDocumet: Boolean
     notificationCitiesCheckbox: Boolean
-    notificationCities: [LocationOutput]
+    notificationCities: [LocationOutput!]
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
   }
 
   type RemovalApplicationsWithMessageCountOutput {
-    document: RemovalApplicationOutput
+    document: RemovalApplicationOutput!
     messageCount: Int
   }
 
@@ -46,11 +41,6 @@ export const typeDefs = gql`
     description: String
     place_id: String
     structured_formatting: StructuredFormattingOutput
-  }
-
-  type WasteTypeOutput {
-    _id: String
-    name: String
   }
 
   type StructuredFormattingOutput {
@@ -68,33 +58,6 @@ export const typeDefs = gql`
     n: Int
     ok: Int
     deletedCount: Int
-  }
-
-  type MessageOutput {
-    _id: ID!
-    message: String!
-    applId: ID!
-    initiatorId: ID!
-    senderId: ID!
-    receiverId: ID!
-    isRead: Boolean
-  }
-
-  type UserOutput {
-    _id: ID!
-    login: String!
-    email: String!
-    roles: [String!]!
-    isActive: Boolean
-    createdAt: Date!
-    updatedAd: Date!
-  }
-
-  type LastMessageByApplicationAndUserOutput {
-    lastMessage: String!
-    isRead: Boolean
-    wasteLocation: String
-    wasteType: String
   }
 
   input FormattingObject {
@@ -115,29 +78,14 @@ export const typeDefs = gql`
   }
 
   input RemovalApplication {
-    wasteLocation: Location
-    wasteType: String
-    quantity: Int
+    wasteLocation: Location!
+    wasteType: String!
+    quantity: Int!
     comment: String
     passDocumet: Boolean
     notificationCitiesCheckbox: Boolean
-    notificationCities: [Location]
+    notificationCities: [Location!]
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
-  }
-
-  input Message {
-    message: String!
-    applId: ID!
-    initiatorId: ID!
-    senderId: ID!
-    receiverId: ID!
-  }
-
-  input UserInput {
-    login: String!
-    email: String!
-    roles: [String!]!
-    isActive: Boolean
   }
 `
