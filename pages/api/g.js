@@ -1,11 +1,12 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
+import { makeExecutableSchema } from 'graphql'
 import dbConnect from '../../server/db/connection'
 import { typeDefs } from '../../server/graphql/types'
 import resolvers from '../../server/graphql/resolvers'
 
 // const apolloServer = new ApolloServer({ typeDefs, resolvers })
 // const startServer = apolloServer.start()
-
+console.log(makeExecutableSchema)
 async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.setHeader(
