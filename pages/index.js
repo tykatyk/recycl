@@ -1,6 +1,6 @@
 import React from 'react'
-import HomePage from '../src/client/homePage/HomePage.jsx'
+import HomePage from '../client/homePage/Index.jsx'
 
-export default function Index() {
+export default function index() {
   return <HomePage />
 }

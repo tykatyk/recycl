@@ -1,9 +1,9 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
-import dbConnect from '../../src/server/dbConnect'
-import { typeDefs, resolvers } from '../../src/server/graphQlTypes'
+import dbConnect from '../../server/db/connection'
+import { typeDefs } from '../../server/graphql/types'
+import resolvers from '../../server/graphql/resolvers'
 
 const apolloServer = new ApolloServer({ typeDefs, resolvers })
-
 const startServer = apolloServer.start()
 
 async function handler(req, res) {

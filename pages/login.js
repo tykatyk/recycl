@@ -1,6 +1,6 @@
 import React from 'react'
-import LoginPage from '../src/client/LoginPage.jsx'
+import LoginPage from '../client/LoginPage.jsx'
 
-export default function Index() {
+export default function login() {
   return <LoginPage />
 }

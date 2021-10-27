@@ -1,5 +1,5 @@
 import React from 'react'
-import Messages from '../src/client/Messages.jsx'
+import Messages from '../../client/Messages.jsx'
 
 export default function Index() {
   return <Messages />

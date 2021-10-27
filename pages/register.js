@@ -1,6 +1,6 @@
 import React from 'react'
-import RegisterPage from '../src/client/RegisterPage.jsx'
+import RegisterPage from '../client/RegisterPage.jsx'
 
-export default function Index() {
+export default function register() {
   return <RegisterPage />
 }
