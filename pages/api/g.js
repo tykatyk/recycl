@@ -8,7 +8,10 @@ import resolvers from '../../server/graphql/resolvers'
 
 async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true')
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+  res.setHeader(
+    'Access-Control-Allow-Origin',
+    `${process.env.NEXT_PUBLIC_PRODUCTION_URL}`
+  )
   res.setHeader(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept'
