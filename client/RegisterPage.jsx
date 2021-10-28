@@ -12,10 +12,11 @@ import {
   useTheme,
   Container,
 } from '@material-ui/core'
-
+import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
-
+import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
+import * as yup from 'yup'
 
 function Copyright() {
   return (
@@ -50,6 +51,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const required = '*Обязательное поле'
+
 export default function SignIn() {
   const classes = useStyles()
   const theme = useTheme()
@@ -63,59 +66,105 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Регистрация
         </Typography>
-        <form className={classes.form} noValidate autocomplete="off">
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Электронная почта"
-            name="email"
-            autoFocus
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Пароль"
-            type="password"
-            id="password"
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password2"
-            label="Пароль повторно"
-            type="password"
-            id="password2"
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="secondary"
-            className={classes.submit}
-          >
-            Зарегистрироваться
-          </Button>
-          <Grid container style={{ justifyContent: 'flex-end' }}>
-            <Grid item>
-              <Link
-                href="#"
-                variant="body2"
-                style={{ color: `${theme.palette.text.secondary}` }}
-              >
-                {'Уже есть аккаунт? Войдите'}
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
+        <Formik
+          initialValues={{
+            username: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+          }}
+          validationSchema={yup.object().shape({
+            username: yup
+              .string()
+              .required(required)
+              .min(3, 'Минимум 3 символа')
+              .max(255, 'Максимум 255 символов'),
+            email: yup
+              .string()
+              .required(required)
+              .email('Недействительный адрес электронной почты'),
+            password: yup
+              .string()
+              .required(required)
+              .min(6, 'Минимум 6 символов')
+              .max(255, 'Максимум 255 символов'),
+            confirmPassword: yup
+              .string()
+              .oneOf([yup.ref('password'), null], 'Пароли не совпадают!')
+              .required(required),
+          })}
+          onSubmit={(values, { setSubmitting }) => {}}
+        >
+          {({ isSubmitting }) => {
+            return (
+              <Form className={classes.form} noValidate autoComplete="off">
+                <Field
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="username"
+                  label="Имя или название организации"
+                  name="username"
+                  component={TextFieldFormik}
+                  autoFocus
+                />
+                <Field
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Электронная почта"
+                  name="email"
+                  component={TextFieldFormik}
+                />
+                <Field
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Пароль"
+                  type="password"
+                  id="password"
+                  component={TextFieldFormik}
+                />
+                <Field
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="confirmPassword"
+                  label="Пароль повторно"
+                  type="password"
+                  id="confirmPassword"
+                  component={TextFieldFormik}
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  className={classes.submit}
+                >
+                  Зарегистрироваться
+                </Button>
+                <Grid container style={{ justifyContent: 'flex-end' }}>
+                  <Grid item>
+                    <Link
+                      href="#"
+                      variant="body2"
+                      style={{ color: `${theme.palette.text.secondary}` }}
+                    >
+                      {'Уже есть аккаунт? Войдите'}
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Form>
+            )
+          }}
+        </Formik>
       </div>
       <Box mt={8}>
         <Copyright />

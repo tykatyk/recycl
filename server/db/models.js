@@ -61,11 +61,11 @@ export const Message =
 //User
 const userSchema = Schema(
   {
-    login: {
+    username: {
       type: String,
       required: true,
       minLength: 3,
-      maxLength: 20,
+      maxLength: 255,
     },
     email: {
       type: String,
