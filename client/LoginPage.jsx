@@ -12,10 +12,11 @@ import {
   useTheme,
   Container,
 } from '@material-ui/core'
-
+import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
-
+import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
+import * as yup from 'yup'
 
 function Copyright() {
   return (
@@ -50,6 +51,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const required = '*Обязательное поле'
+
 export default function SignIn() {
   const classes = useStyles()
   const theme = useTheme()
@@ -63,61 +66,82 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Вход
         </Typography>
-        <form className={classes.form} noValidate autoComplete="off">
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Электронная почта"
-            name="email"
-            autoFocus
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Пароль"
-            type="password"
-            id="password"
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="secondary" />}
-            label="Запомнить меня"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="secondary"
-            className={classes.submit}
-          >
-            Войти
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link
-                href="#"
-                variant="body2"
-                style={{ color: `${theme.palette.text.secondary}` }}
-              >
-                Забыли пароль?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link
-                href="#"
-                variant="body2"
-                style={{ color: `${theme.palette.text.secondary}` }}
-              >
-                {'Нет аккаунта? Зарегистрируйтесь'}
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
+        <Formik
+          initialValues={{
+            email: '',
+            password: '',
+          }}
+          validationSchema={yup.object().shape({
+            email: yup
+              .string()
+              .required(required)
+              .email('Недействительный адрес электронной почты'),
+            password: yup.string().required(required),
+          })}
+          onSubmit={(values, { setSubmitting }) => {}}
+        >
+          {({ isSubmitting }) => {
+            return (
+              <Form className={classes.form} noValidate autoComplete="off">
+                <Field
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Электронная почта"
+                  name="email"
+                  autoFocus
+                  component={TextFieldFormik}
+                />
+                <Field
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Пароль"
+                  type="password"
+                  id="password"
+                  component={TextFieldFormik}
+                />
+                <FormControlLabel
+                  control={<Checkbox value="remember" color="secondary" />}
+                  label="Запомнить меня"
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  className={classes.submit}
+                >
+                  Войти
+                </Button>
+                <Grid container>
+                  <Grid item xs>
+                    <Link
+                      href="#"
+                      variant="body2"
+                      style={{ color: `${theme.palette.text.secondary}` }}
+                    >
+                      Забыли пароль?
+                    </Link>
+                  </Grid>
+                  <Grid item>
+                    <Link
+                      href="#"
+                      variant="body2"
+                      style={{ color: `${theme.palette.text.secondary}` }}
+                    >
+                      {'Нет аккаунта? Зарегистрируйтесь'}
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Form>
+            )
+          }}
+        </Formik>
       </div>
       <Box mt={8}>
         <Copyright />
