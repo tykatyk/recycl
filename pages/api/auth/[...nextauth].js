@@ -2,7 +2,7 @@ import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { mutate } from '@apollo/client'
-console.log(mutate)
+console.log('mutate function is ' + mutate)
 import { CREATE_USER } from '../../../client/helpers/queries/user'
 export default NextAuth({
   // Configure one or more authentication providers
@@ -21,6 +21,7 @@ export default NextAuth({
       credentials: {
         username: {},
         password: {},
+        roles: {},
       },
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
@@ -30,6 +31,7 @@ export default NextAuth({
           variables: {
             username: credentials.username,
             password: credentials.password,
+            roles: [credentials.role],
           },
         })
           .then((user) => {
@@ -48,4 +50,7 @@ export default NextAuth({
       },
     }),
   ],
+  pages: {
+    signIn: '/login',
+  },
 })

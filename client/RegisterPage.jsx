@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 
 const required = '*Обязательное поле'
 
-export default function SignIn() {
+export default function SignIn({ csrfToken }) {
   const classes = useStyles()
   const theme = useTheme()
 
@@ -69,6 +69,8 @@ export default function SignIn() {
         </Typography>
         <Formik
           initialValues={{
+            csrfToken: csrfToken,
+            role: 'user',
             username: '',
             email: '',
             password: '',
@@ -94,11 +96,33 @@ export default function SignIn() {
               .oneOf([yup.ref('password'), null], 'Пароли не совпадают!')
               .required(required),
           })}
-          onSubmit={(values, { setSubmitting }) => {}}
+          onSubmit={(values, { setSubmitting }) => {
+            setSubmitting(true)
+            const res = fetch('/api/auth/register', {
+              method: 'POST',
+              body: JSON.stringify(values),
+              headers: { 'Content-Type': 'application/json' },
+            })
+              .then((res) => {
+                console.log('response is ')
+                console.log(res)
+                return res.json()
+              })
+              .then((user) => {
+                console.log('user is ' + user)
+              })
+              .catch((error) => {
+                console.log('got an error ' + error)
+              })
+
+            setSubmitting(false)
+          }}
         >
           {({ isSubmitting }) => {
             return (
               <Form className={classes.form} noValidate autoComplete="off">
+                <Field type="hidden" name="csrfToken" />
+                <Field type="hidden" name="role" />
                 <Field
                   variant="outlined"
                   margin="normal"
@@ -172,4 +196,8 @@ export default function SignIn() {
       </Box>
     </Container>
   )
+}
+
+export async function getServerSideProps(context) {
+  return { props: { csrfToken: await getCsrfToken(context) } }
 }

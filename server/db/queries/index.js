@@ -7,4 +7,5 @@ export default {
   message: messageQueries,
   removalApplication: removalApplicationQueries,
   wasteType: wasteTypeQueries,
+  user: userQueries,
 }
