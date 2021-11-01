@@ -2,33 +2,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Head from 'next/head'
 import { ThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core'
+import appoloClient from '../lib/appoloClient'
 import { theme } from './helpers/themeStub'
-
 import GlobalCss from './uiParts/GlobalCss.jsx'
-
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
-import { httpLink, clearTypeNameLink } from './helpers/appoloLinks'
-
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  from,
-} from '@apollo/client'
-
 const globalStyles = <GlobalCss />
-
-const additiveLink = from([clearTypeNameLink, httpLink])
-
-const client = new ApolloClient({
-  link: additiveLink,
-  cache: new InMemoryCache(),
-  connectToDevTools: true,
-})
 
 export default function App(props) {
   const { Component, pageProps } = props
@@ -53,7 +35,7 @@ export default function App(props) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {globalStyles}
-        <ApolloProvider client={client}>
+        <ApolloProvider client={appoloClient}>
           <Component {...pageProps} />
         </ApolloProvider>
       </ThemeProvider>

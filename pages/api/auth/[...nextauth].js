@@ -25,7 +25,7 @@ export default NextAuth({
       },
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
-        const user = { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
+
         mutate({
           mutation: CREATE_USER,
           variables: {
