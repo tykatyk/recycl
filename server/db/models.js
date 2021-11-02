@@ -102,3 +102,13 @@ const userSchema = Schema(
   { timestamps: true }
 )
 export const User = mongoose.models.User || mongoose.model('User', userSchema)
+
+//UserRole
+const userRoleSchema = Schema(
+  {
+    name: String,
+  },
+  { timestamps: true }
+)
+export const userRole =
+  mongoose.models.UserRole || mongoose.model('UserRole', userRoleSchema)
