@@ -17,7 +17,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
 import * as yup from 'yup'
-import { getCsrfToken } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 
 function Copyright() {
   return (
@@ -75,6 +75,7 @@ export default function SignIn({ csrfToken }) {
             email: '',
             password: '',
             confirmPassword: '',
+            csrfToken: csrfToken,
           }}
           validationSchema={yup.object().shape({
             username: yup
@@ -98,7 +99,13 @@ export default function SignIn({ csrfToken }) {
           })}
           onSubmit={(values, { setSubmitting }) => {
             setSubmitting(true)
-            const res = fetch('/api/auth/register', {
+            signIn('credentials', {
+              username: values.username,
+              email: values.password,
+              password: values.password,
+              role: values.role,
+            })
+            /*fetch('/api/auth/signin/credentials', {
               method: 'POST',
               body: JSON.stringify(values),
               headers: { 'Content-Type': 'application/json' },
@@ -109,11 +116,13 @@ export default function SignIn({ csrfToken }) {
                 return res.json()
               })
               .then((user) => {
-                console.log('user is ' + user)
+                console.log('user is ')
+                console.log(user)
               })
               .catch((error) => {
-                console.log('got an error ' + error)
-              })
+                console.log('got an error ')
+                console.log(error)
+              })*/
 
             setSubmitting(false)
           }}

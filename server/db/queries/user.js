@@ -3,8 +3,12 @@ import { User } from '../models'
 export default {
   create: async (data) => {
     try {
+      console.log('Mongodb user create entered. Data is ')
+      console.log(data)
       return await new User(data).save()
     } catch (err) {
+      console.log('Mongodb error ')
+      console.log(err)
       return err
     }
   },

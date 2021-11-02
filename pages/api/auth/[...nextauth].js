@@ -1,9 +1,12 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { mutate } from '@apollo/client'
-console.log('mutate function is ' + mutate)
+import appoloClient from '../../../lib/appoloClient'
+
 import { CREATE_USER } from '../../../client/helpers/queries/user'
+
+console.log('...nextauth route entered')
+
 export default NextAuth({
   // Configure one or more authentication providers
   providers: [
@@ -21,27 +24,36 @@ export default NextAuth({
       credentials: {
         username: {},
         password: {},
+        email: {},
         roles: {},
       },
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
-
-        mutate({
-          mutation: CREATE_USER,
-          variables: {
-            username: credentials.username,
-            password: credentials.password,
-            roles: [credentials.role],
-          },
-        })
+        console.log('credentials are ')
+        console.log(credentials)
+        appoloClient
+          .mutate({
+            mutation: CREATE_USER,
+            variables: {
+              user: {
+                username: credentials.username,
+                email: credentials.email,
+                password: credentials.password,
+                roles: [credentials.role],
+                isActive: true,
+              },
+            },
+          })
           .then((user) => {
             // Any object returned will be saved in `user` property of the JWT
+            console.log('User is ')
             console.log(user)
             return user
           })
           .catch((error) => {
             // If you return null or false then the credentials will be rejected
-            console.log(error)
+            console.log('Error is ')
+            console.log(JSON.stringify(error, null, 2))
             return null
           })
         // You can also Reject this callback with an Error or with a URL:
@@ -51,6 +63,15 @@ export default NextAuth({
     }),
   ],
   pages: {
-    signIn: '/login',
+    signIn: '/register',
+  },
+  session: {
+    jwt: true,
+  },
+  callbacks: {
+    async signIn({ credentials }) {
+      console.log('credentials are ')
+      console.log(credentials)
+    },
   },
 })

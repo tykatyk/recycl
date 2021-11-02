@@ -15,8 +15,9 @@ export default gql`
   }
 
   input UserInput {
-    login: String!
+    username: String!
     email: String!
+    password: String!
     roles: [String!]!
     isActive: Boolean
   }
