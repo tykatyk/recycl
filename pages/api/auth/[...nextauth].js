@@ -1,9 +1,9 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import appoloClient from '../../../lib/appoloClient'
+import appoloClient from '../../../lib/appoloClient/appoloClient'
 
-import { CREATE_USER } from '../../../client/helpers/queries/user'
+import { CREATE_USER } from '../../../lib/graphql/queries/user'
 
 console.log('...nextauth route entered')
 

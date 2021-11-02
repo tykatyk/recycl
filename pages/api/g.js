@@ -1,17 +1,16 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
 import { makeExecutableSchema } from 'graphql'
-import dbConnect from '../../server/db/connection'
-import schema from '../../server/graphql/schema'
-import resolvers from '../../server/graphql/resolvers'
+import dbConnect from '../../lib/db/connection'
+import schema from '../../lib/graphql/schema'
+import resolvers from '../../lib/graphql/resolvers'
 
 // const apolloServer = new ApolloServer({ typeDefs, resolvers })
 // const startServer = apolloServer.start()
 async function handler(req, res) {
+  console.log('path is ')
+  console.log(process.env.GRAPHQL_URL)
   res.setHeader('Access-Control-Allow-Credentials', 'true')
-  res.setHeader(
-    'Access-Control-Allow-Origin',
-    `${process.env.NEXT_PUBLIC_PRODUCTION_URL}`
-  )
+  res.setHeader('Access-Control-Allow-Origin', `${process.env.NEXT_PUBLIC_URL}`)
   res.setHeader(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept'
@@ -25,7 +24,7 @@ async function handler(req, res) {
 
   await startServer
   await apolloServer.createHandler({
-    path: process.env.GRAPHQL_URL,
+    path: '/api/g',
   })(req, res)
 }
 export default dbConnect(handler)

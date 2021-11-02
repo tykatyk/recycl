@@ -27,9 +27,9 @@ import {
   CREATE_REMOVAL_APPLICATION,
   GET_REMOVAL_APPLICATION,
   UPDATE_REMOVAL_APPLICATION,
-} from '../helpers/queries/removalApplication'
+} from '../../lib/graphql/queries/removalApplication'
 
-import { GET_WASTE_TYPES } from '../helpers/queries/wasteType'
+import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
 
 import {
   getInitialValues,

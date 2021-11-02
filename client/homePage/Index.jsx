@@ -9,7 +9,7 @@ import {
   useTheme,
 } from '@material-ui/core'
 import Layout from '../layouts/Layout.jsx'
-import isMobile from '../helpers/detectMobile'
+import isMobile from '../../lib/detectMobile'
 import cardsContent from './cardsContent'
 import homePageStyles from './styles'
 import { setSplashMinHeight, handleResize } from './resizeHandlers'

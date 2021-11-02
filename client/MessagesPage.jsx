@@ -15,7 +15,7 @@ import DataGridFooter from './DataGridFooter.jsx'
 
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery, useMutation } from '@apollo/client'
-import { GET_MESSAGES_BY_APPLICATION } from '../server/graphqlQueries'
+import { GET_MESSAGES_BY_APPLICATION } from '../lib/graphql/queries'
 
 const useStyles = makeStyles((theme) => ({
   root: {

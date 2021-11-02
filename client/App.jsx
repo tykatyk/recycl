@@ -3,14 +3,13 @@ import PropTypes from 'prop-types'
 import Head from 'next/head'
 import { ThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core'
 import { ApolloProvider } from '@apollo/client'
-import appoloClient from '../lib/appoloClient'
-import { theme } from './helpers/themeStub'
+import appoloClient from '../lib/appoloClient/appoloClient'
+import { theme } from './uiParts/themeStub'
 import GlobalCss from './uiParts/GlobalCss.jsx'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
-
 const globalStyles = <GlobalCss />
 
 export default function App(props) {

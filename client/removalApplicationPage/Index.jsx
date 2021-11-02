@@ -19,7 +19,7 @@ import { useQuery, useMutation } from '@apollo/client'
 import {
   GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT,
   DELETE_REMOVAL_APPLICATIONS,
-} from '../helpers/queries/removalApplication'
+} from '../../lib/graphql/queries/removalApplication'
 
 import Router from 'next/router'
 
@@ -99,6 +99,7 @@ export default function removalApplications() {
   if (loading) return <Typography>Идет загрузка данных</Typography>
 
   if (error) {
+    console.log(JSON.stringify(error, null, 2))
     return <Typography>Возникла ошибка при загрузке данных</Typography>
   }
 

@@ -17,7 +17,7 @@ import { Formik, Form, Field } from 'formik'
 import removalFormStyles from '../removalApplicationPage/removalFormStyles'
 
 import { useMutation } from '@apollo/client'
-import { CREATE_MESSAGE } from '../helpers/queries/message'
+import { CREATE_MESSAGE } from '../../lib/graphql/queries/message'
 import { useRouter } from 'next/router'
 
 const useStyles = removalFormStyles
