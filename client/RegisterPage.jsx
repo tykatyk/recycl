@@ -11,6 +11,7 @@ import {
   makeStyles,
   useTheme,
   Container,
+  CircularProgress,
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
@@ -18,6 +19,8 @@ import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
 import * as yup from 'yup'
 import { signIn } from 'next-auth/react'
+import { GET_ROLE_ID } from '../lib/graphql/queries/userRole'
+import { useQuery } from '@apollo/client'
 
 function Copyright() {
   return (
@@ -57,7 +60,28 @@ const required = '*Обязательное поле'
 export default function SignIn({ csrfToken }) {
   const classes = useStyles()
   const theme = useTheme()
+  const { loading, data, error } = useQuery(GET_ROLE_ID, {
+    variables: { roleName: 'user' },
+  })
+  console.log('Error is ')
+  console.log(JSON.stringify(error, null, 2))
+  console.log('Data is ')
+  console.log(data)
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: ' 50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <CircularProgress color="secondary" />
+      </div>
+    )
+  }
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>

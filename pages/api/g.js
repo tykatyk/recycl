@@ -7,8 +7,6 @@ import resolvers from '../../lib/graphql/resolvers'
 // const apolloServer = new ApolloServer({ typeDefs, resolvers })
 // const startServer = apolloServer.start()
 async function handler(req, res) {
-  console.log('path is ')
-  console.log(process.env.GRAPHQL_URL)
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.setHeader('Access-Control-Allow-Origin', `${process.env.NEXT_PUBLIC_URL}`)
   res.setHeader(
