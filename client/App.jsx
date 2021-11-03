@@ -4,6 +4,7 @@ import Head from 'next/head'
 import { ThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core'
 import { ApolloProvider } from '@apollo/client'
 import appoloClient from '../lib/appoloClient/appoloClient'
+import { SessionProvider } from 'next-auth/react'
 import { theme } from './uiParts/themeStub'
 import GlobalCss from './uiParts/GlobalCss.jsx'
 import '@fontsource/roboto/300.css'
@@ -13,7 +14,10 @@ import '@fontsource/roboto/700.css'
 const globalStyles = <GlobalCss />
 
 export default function App(props) {
-  const { Component, pageProps } = props
+  const {
+    Component,
+    pageProps: { session, ...pageProps },
+  } = props
 
   React.useEffect(() => {
     // Remove the server-side injected CSS.
@@ -35,9 +39,11 @@ export default function App(props) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {globalStyles}
-        <ApolloProvider client={appoloClient}>
-          <Component {...pageProps} />
-        </ApolloProvider>
+        <SessionProvider session={session}>
+          <ApolloProvider client={appoloClient}>
+            <Component {...pageProps} />
+          </ApolloProvider>
+        </SessionProvider>
       </ThemeProvider>
     </React.Fragment>
   )

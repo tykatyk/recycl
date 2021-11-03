@@ -130,7 +130,7 @@ export default function SignIn() {
                   </Grid>
                   <Grid item>
                     <Link
-                      href="#"
+                      href="/register"
                       variant="body2"
                       style={{ color: `${theme.palette.text.secondary}` }}
                     >

@@ -16,6 +16,8 @@ import DataGridFooter from '../uiParts/DataGridFooter.jsx'
 
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery, useMutation } from '@apollo/client'
+import { useSession } from 'next-auth/react'
+
 import {
   GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT,
   DELETE_REMOVAL_APPLICATIONS,
@@ -82,11 +84,11 @@ export default function removalApplications() {
   const { loading, error, data } = useQuery(
     GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT
   )
-
   const [
     deleteMutation,
     { loading: deleting, error: deleteError, data: deleteData },
   ] = useMutation(DELETE_REMOVAL_APPLICATIONS)
+  const { data: session, status } = useSession()
 
   const clickHandler = function (event) {
     if (selected.length < 1) return
@@ -96,65 +98,72 @@ export default function removalApplications() {
     })
   }
 
-  if (loading) return <Typography>Идет загрузка данных</Typography>
-
-  if (error) {
-    console.log(JSON.stringify(error, null, 2))
-    return <Typography>Возникла ошибка при загрузке данных</Typography>
+  if (status === 'unauthenticated') {
+    Router.push('/login')
+    return <p>Перенаправление...</p>
   }
+  if (status === 'authenticated') {
+    if (loading) return <Typography>Идет загрузка данных</Typography>
 
-  const rows = data.getRemovalApplicationsWithMessageCount.map((item) => {
-    const newItem = {}
-    newItem.id = item.document['_id']
-    newItem.wasteType = item.document.wasteType.name
-    newItem.wasteLocation = item.document.wasteLocation.description
-    newItem.quantity = item.document.quantity
-    newItem.messageCount = item.messageCount
-    return newItem
-  })
+    if (error) {
+      console.log(JSON.stringify(error, null, 2))
+      return <Typography>Возникла ошибка при загрузке данных</Typography>
+    }
 
-  return (
-    <Layout>
-      <Grid
-        container
-        direction="column"
-        style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '16px',
-        }}
-      >
-        <Typography gutterBottom variant="h4">
-          Заявки на вывоз отходов
-        </Typography>
-        <div style={{ width: '100%' }}>
-          <DataGrid
-            classes={{ root: classes.root, row: classes.row }}
-            autoHeight
-            rows={rows}
-            columns={columns}
-            autoPageSize
-            checkboxSelection
-            disableSelectionOnClick
-            onCellClick={(params, event) => {
-              if (params.field === 'messages') {
-                Router.push(`/messages`)
-                return
-              }
-              if (params.field !== '__check__')
-                Router.push(`/removal/${params.id}`)
-            }}
-            onSelectionModelChange={(params) => {
-              setSelected(params)
-            }}
-            components={{
-              Footer: DataGridFooter,
-              Pagination: TablePagination,
-            }}
-            componentsProps={{ footer: { clickHandler, deleting, selected } }}
-          />
-        </div>
-      </Grid>
-    </Layout>
-  )
+    const rows = data.getRemovalApplicationsWithMessageCount.map((item) => {
+      const newItem = {}
+      newItem.id = item.document['_id']
+      newItem.wasteType = item.document.wasteType.name
+      newItem.wasteLocation = item.document.wasteLocation.description
+      newItem.quantity = item.document.quantity
+      newItem.messageCount = item.messageCount
+      return newItem
+    })
+
+    return (
+      <Layout>
+        <Grid
+          container
+          direction="column"
+          style={{
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '16px',
+          }}
+        >
+          <Typography gutterBottom variant="h4">
+            Заявки на вывоз отходов
+          </Typography>
+          <div style={{ width: '100%' }}>
+            <DataGrid
+              classes={{ root: classes.root, row: classes.row }}
+              autoHeight
+              rows={rows}
+              columns={columns}
+              autoPageSize
+              checkboxSelection
+              disableSelectionOnClick
+              onCellClick={(params, event) => {
+                if (params.field === 'messages') {
+                  Router.push(`/messages`)
+                  return
+                }
+                if (params.field !== '__check__')
+                  Router.push(`/removal/${params.id}`)
+              }}
+              onSelectionModelChange={(params) => {
+                setSelected(params)
+              }}
+              components={{
+                Footer: DataGridFooter,
+                Pagination: TablePagination,
+              }}
+              componentsProps={{ footer: { clickHandler, deleting, selected } }}
+            />
+          </div>
+        </Grid>
+      </Layout>
+    )
+  }
+  return ''
 }

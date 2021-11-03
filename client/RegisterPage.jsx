@@ -63,8 +63,7 @@ export default function SignIn({ csrfToken }) {
   const { loading, data, error } = useQuery(GET_ROLE_ID, {
     variables: { roleName: 'user' },
   })
-  console.log('data is ')
-  console.log(data)
+
   if (loading) {
     return (
       <div
@@ -219,7 +218,7 @@ export default function SignIn({ csrfToken }) {
                 <Grid container style={{ justifyContent: 'flex-end' }}>
                   <Grid item>
                     <Link
-                      href="#"
+                      href="/login"
                       variant="body2"
                       style={{ color: `${theme.palette.text.secondary}` }}
                     >
