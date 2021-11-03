@@ -63,11 +63,8 @@ export default function SignIn({ csrfToken }) {
   const { loading, data, error } = useQuery(GET_ROLE_ID, {
     variables: { roleName: 'user' },
   })
-  console.log('Error is ')
-  console.log(JSON.stringify(error, null, 2))
-  console.log('Data is ')
+  console.log('data is ')
   console.log(data)
-
   if (loading) {
     return (
       <div
@@ -94,7 +91,7 @@ export default function SignIn({ csrfToken }) {
         <Formik
           initialValues={{
             csrfToken: csrfToken,
-            role: 'user',
+            role: data.getRoleId,
             username: '',
             email: '',
             password: '',
@@ -125,7 +122,7 @@ export default function SignIn({ csrfToken }) {
             setSubmitting(true)
             signIn('credentials', {
               username: values.username,
-              email: values.password,
+              email: values.email,
               password: values.password,
               role: values.role,
             })
@@ -152,6 +149,7 @@ export default function SignIn({ csrfToken }) {
           }}
         >
           {({ isSubmitting }) => {
+            console.log(isSubmitting)
             return (
               <Form className={classes.form} noValidate autoComplete="off">
                 <Field type="hidden" name="csrfToken" />
@@ -205,8 +203,18 @@ export default function SignIn({ csrfToken }) {
                   variant="contained"
                   color="secondary"
                   className={classes.submit}
+                  disabled={isSubmitting}
                 >
                   Зарегистрироваться
+                  {isSubmitting && (
+                    <CircularProgress
+                      size={24}
+                      style={{
+                        color: 'black',
+                        marginLeft: '1em',
+                      }}
+                    />
+                  )}
                 </Button>
                 <Grid container style={{ justifyContent: 'flex-end' }}>
                   <Grid item>
