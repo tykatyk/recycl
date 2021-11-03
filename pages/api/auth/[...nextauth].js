@@ -2,6 +2,7 @@ import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import appoloClient from '../../../lib/appoloClient/appoloClient'
+import { hash } from 'bcrypt'
 
 import { CREATE_USER } from '../../../lib/graphql/queries/user'
 
@@ -38,7 +39,7 @@ export default NextAuth({
               user: {
                 username: credentials.username,
                 email: credentials.email,
-                password: credentials.password,
+                password: await hash(credentials.password, 12),
                 roles: [credentials.role],
                 isActive: true,
               },
