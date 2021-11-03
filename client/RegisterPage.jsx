@@ -21,6 +21,7 @@ import * as yup from 'yup'
 import { signIn } from 'next-auth/react'
 import { GET_ROLE_ID } from '../lib/graphql/queries/userRole'
 import { useQuery } from '@apollo/client'
+import { useRouter } from 'next/router'
 
 function Copyright() {
   return (
@@ -58,6 +59,8 @@ const useStyles = makeStyles((theme) => ({
 const required = '*Обязательное поле'
 
 export default function SignIn({ csrfToken }) {
+  const router = useRouter()
+  console.log(router)
   const classes = useStyles()
   const theme = useTheme()
   const { loading, data, error } = useQuery(GET_ROLE_ID, {
@@ -124,6 +127,8 @@ export default function SignIn({ csrfToken }) {
               email: values.email,
               password: values.password,
               role: values.role,
+              callbackUrl:
+                router.query && router.query.from ? router.query.from : '/',
             })
             /*fetch('/api/auth/signin/credentials', {
               method: 'POST',

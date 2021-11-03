@@ -6,8 +6,6 @@ import { hash } from 'bcrypt'
 
 import { CREATE_USER } from '../../../lib/graphql/queries/user'
 
-console.log('...nextauth route entered')
-
 export default NextAuth({
   // Configure one or more authentication providers
   providers: [
@@ -30,8 +28,6 @@ export default NextAuth({
       },
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
-        console.log('credentials are ')
-        console.log(credentials)
         appoloClient
           .mutate({
             mutation: CREATE_USER,
@@ -47,13 +43,10 @@ export default NextAuth({
           })
           .then((user) => {
             // Any object returned will be saved in `user` property of the JWT
-            console.log('User is ')
-            console.log(user)
             return user
           })
           .catch((error) => {
             // If you return null or false then the credentials will be rejected
-            console.log('Error is ')
             console.log(JSON.stringify(error, null, 2))
             return null
           })
@@ -70,9 +63,6 @@ export default NextAuth({
     jwt: true,
   },
   callbacks: {
-    async signIn({ credentials }) {
-      console.log('credentials are ')
-      console.log(credentials)
-    },
+    async signIn({ credentials }) {},
   },
 })

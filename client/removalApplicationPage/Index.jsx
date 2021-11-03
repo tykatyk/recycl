@@ -78,7 +78,9 @@ const columns = [
   },
 ]
 
-export default function removalApplications() {
+export default function removalApplications(props) {
+  console.log('props are')
+  console.log(props)
   const classes = useStyles()
   const [selected, setSelected] = useState([])
   const { loading, error, data } = useQuery(
@@ -99,7 +101,12 @@ export default function removalApplications() {
   }
 
   if (status === 'unauthenticated') {
-    Router.push('/login')
+    Router.push({
+      pathname: '/login',
+      query: {
+        from: '/removal/application',
+      },
+    })
     return <p>Перенаправление...</p>
   }
   if (status === 'authenticated') {
