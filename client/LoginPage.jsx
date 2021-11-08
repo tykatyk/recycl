@@ -16,6 +16,7 @@ import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
+import Head from './uiParts/Head.jsx'
 import * as yup from 'yup'
 
 function Copyright() {
@@ -58,94 +59,131 @@ export default function SignIn() {
   const theme = useTheme()
 
   return (
-    <Container component="main" maxWidth="xs">
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Вход
-        </Typography>
-        <Formik
-          initialValues={{
-            email: '',
-            password: '',
-          }}
-          validationSchema={yup.object().shape({
-            email: yup
-              .string()
-              .required(required)
-              .email('Недействительный адрес электронной почты'),
-            password: yup.string().required(required),
-          })}
-          onSubmit={(values, { setSubmitting }) => {}}
-        >
-          {({ isSubmitting }) => {
-            return (
-              <Form className={classes.form} noValidate autoComplete="off">
-                <Field
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Электронная почта"
-                  name="email"
-                  autoFocus
-                  component={TextFieldFormik}
-                />
-                <Field
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Пароль"
-                  type="password"
-                  id="password"
-                  component={TextFieldFormik}
-                />
-                <FormControlLabel
-                  control={<Checkbox value="remember" color="secondary" />}
-                  label="Запомнить меня"
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="secondary"
-                  className={classes.submit}
-                >
-                  Войти
-                </Button>
-                <Grid container>
-                  <Grid item xs>
-                    <Link
-                      href="#"
-                      variant="body2"
-                      style={{ color: `${theme.palette.text.secondary}` }}
-                    >
-                      Забыли пароль?
-                    </Link>
+    <>
+      <Head title="Recycl | Login" />
+      <Container component="main" maxWidth="xs">
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Вход
+          </Typography>
+          <Formik
+            initialValues={{
+              email: '',
+              password: '',
+            }}
+            validationSchema={yup.object().shape({
+              email: yup
+                .string()
+                .required(required)
+                .email('Недействительный адрес электронной почты'),
+              password: yup.string().required(required),
+            })}
+            onSubmit={(values, { setSubmitting }) => {
+              setSubmitting(true)
+
+              fetch('/api/auth/signup/', {
+                method: 'POST',
+                body: JSON.stringify(values),
+                headers: { 'Content-Type': 'application/json' },
+              })
+                .then((res) => {
+                  console.log('response is ')
+                  console.log(res)
+                })
+                .catch((error) => {
+                  console.log('got an error ')
+                  console.log(error)
+                  return
+                })
+
+              const error = signIn('credentials', {
+                username: values.username,
+                email: values.email,
+                password: values.password,
+                role: values.role,
+
+                redirect: false,
+              })
+                .then((err) => {
+                  return err
+                })
+                .catch((err) => {
+                  return err
+                })
+
+              setSubmitting(false)
+            }}
+          >
+            {({ isSubmitting }) => {
+              return (
+                <Form className={classes.form} noValidate autoComplete="off">
+                  <Field
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Электронная почта"
+                    name="email"
+                    autoFocus
+                    component={TextFieldFormik}
+                  />
+                  <Field
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Пароль"
+                    type="password"
+                    id="password"
+                    component={TextFieldFormik}
+                  />
+                  <FormControlLabel
+                    control={<Checkbox value="remember" color="secondary" />}
+                    label="Запомнить меня"
+                  />
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="secondary"
+                    className={classes.submit}
+                  >
+                    Войти
+                  </Button>
+                  <Grid container>
+                    <Grid item xs>
+                      <Link
+                        href="#"
+                        variant="body2"
+                        style={{ color: `${theme.palette.text.secondary}` }}
+                      >
+                        Забыли пароль?
+                      </Link>
+                    </Grid>
+                    <Grid item>
+                      <Link
+                        href="/register"
+                        variant="body2"
+                        style={{ color: `${theme.palette.text.secondary}` }}
+                      >
+                        {'Нет аккаунта? Зарегистрируйтесь'}
+                      </Link>
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                    <Link
-                      href="/register"
-                      variant="body2"
-                      style={{ color: `${theme.palette.text.secondary}` }}
-                    >
-                      {'Нет аккаунта? Зарегистрируйтесь'}
-                    </Link>
-                  </Grid>
-                </Grid>
-              </Form>
-            )
-          }}
-        </Formik>
-      </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
-    </Container>
+                </Form>
+              )
+            }}
+          </Formik>
+        </div>
+        <Box mt={8}>
+          <Copyright />
+        </Box>
+      </Container>
+    </>
   )
 }

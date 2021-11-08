@@ -17,6 +17,7 @@ import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
+import Head from './uiParts/Head.jsx'
 import * as yup from 'yup'
 import { signIn } from 'next-auth/react'
 import { GET_ROLE_ID } from '../lib/graphql/queries/userRole'
@@ -57,8 +58,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const required = '*Обязательное поле'
-
 export default function SignIn({ csrfToken }) {
   const router = useRouter()
   const classes = useStyles()
@@ -81,153 +80,137 @@ export default function SignIn({ csrfToken }) {
       </div>
     )
   }
+
   return (
-    <Container component="main" maxWidth="xs">
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Регистрация
-        </Typography>
-        <Formik
-          initialValues={{
-            csrfToken: csrfToken,
-            role: data.getRoleId,
-            username: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-            csrfToken: csrfToken,
-          }}
-          validationSchema={registerSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            setSubmitting(true)
+    <>
+      <Head title="Recycl | Register" />
+      <Container component="main" maxWidth="xs">
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Регистрация
+          </Typography>
+          <Formik
+            initialValues={{
+              csrfToken: csrfToken,
+              role: data.getRoleId,
+              username: '',
+              email: '',
+              password: '',
+              confirmPassword: '',
+              csrfToken: csrfToken,
+            }}
+            validationSchema={registerSchema}
+            onSubmit={(values, { setSubmitting }) => {
+              setSubmitting(true)
 
-            fetch('/api/auth/signup/', {
-              method: 'POST',
-              body: JSON.stringify(values),
-              headers: { 'Content-Type': 'application/json' },
-            })
-              .then((res) => {
-                console.log('response is ')
-                console.log(res)
-                return res.json()
+              fetch('/api/auth/signup/', {
+                method: 'POST',
+                body: JSON.stringify(values),
+                headers: { 'Content-Type': 'application/json' },
               })
-              .then((user) => {
-                console.log('user is ')
-                console.log(user)
-              })
-              .catch((error) => {
-                console.log('got an error ')
-                console.log(error)
-              })
-            const error = signIn('credentials', {
-              username: values.username,
-              email: values.email,
-              password: values.password,
-              role: values.role,
-
-              redirect: false,
-            })
-              .then((err) => {
-                return err
-              })
-              .catch((err) => {
-                return err
-              })
-
-            setSubmitting(false)
-          }}
-        >
-          {({ isSubmitting }) => {
-            console.log(isSubmitting)
-            return (
-              <Form className={classes.form} noValidate autoComplete="off">
-                <Field type="hidden" name="csrfToken" />
-                <Field type="hidden" name="role" />
-                <Field
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="username"
-                  label="Имя или название организации"
-                  name="username"
-                  component={TextFieldFormik}
-                  autoFocus
-                />
-                <Field
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Электронная почта"
-                  name="email"
-                  component={TextFieldFormik}
-                />
-                <Field
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Пароль"
-                  type="password"
-                  id="password"
-                  component={TextFieldFormik}
-                />
-                <Field
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="confirmPassword"
-                  label="Пароль повторно"
-                  type="password"
-                  id="confirmPassword"
-                  component={TextFieldFormik}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="secondary"
-                  className={classes.submit}
-                  disabled={isSubmitting}
-                >
-                  Зарегистрироваться
-                  {isSubmitting && (
-                    <CircularProgress
-                      size={24}
-                      style={{
-                        color: theme.palette.secondary.main,
-                        marginLeft: '1em',
-                      }}
-                    />
-                  )}
-                </Button>
-                <Grid container style={{ justifyContent: 'flex-end' }}>
-                  <Grid item>
-                    <Link
-                      href="/login"
-                      variant="body2"
-                      style={{ color: `${theme.palette.text.secondary}` }}
-                    >
-                      {'Уже есть аккаунт? Войдите'}
-                    </Link>
+                .then((res) => {
+                  console.log('response is ')
+                  console.log(res)
+                })
+                .catch((error) => {
+                  console.log('got an error ')
+                  console.log(error)
+                  return
+                })
+              setSubmitting(false)
+            }}
+          >
+            {({ isSubmitting }) => {
+              return (
+                <Form className={classes.form} noValidate autoComplete="off">
+                  <Field type="hidden" name="csrfToken" />
+                  <Field type="hidden" name="role" />
+                  <Field
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="username"
+                    label="Имя или название организации"
+                    name="username"
+                    component={TextFieldFormik}
+                    autoFocus
+                  />
+                  <Field
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Электронная почта"
+                    name="email"
+                    component={TextFieldFormik}
+                  />
+                  <Field
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Пароль"
+                    type="password"
+                    id="password"
+                    component={TextFieldFormik}
+                  />
+                  <Field
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="confirmPassword"
+                    label="Пароль повторно"
+                    type="password"
+                    id="confirmPassword"
+                    component={TextFieldFormik}
+                  />
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="secondary"
+                    className={classes.submit}
+                    disabled={isSubmitting}
+                  >
+                    Зарегистрироваться
+                    {isSubmitting && (
+                      <CircularProgress
+                        size={24}
+                        style={{
+                          color: theme.palette.secondary.main,
+                          marginLeft: '1em',
+                        }}
+                      />
+                    )}
+                  </Button>
+                  <Grid container style={{ justifyContent: 'flex-end' }}>
+                    <Grid item>
+                      <Link
+                        href="/login"
+                        variant="body2"
+                        style={{ color: `${theme.palette.text.secondary}` }}
+                      >
+                        {'Уже есть аккаунт? Войдите'}
+                      </Link>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </Form>
-            )
-          }}
-        </Formik>
-      </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
-    </Container>
+                </Form>
+              )
+            }}
+          </Formik>
+        </div>
+        <Box mt={8}>
+          <Copyright />
+        </Box>
+      </Container>
+    </>
   )
 }
 

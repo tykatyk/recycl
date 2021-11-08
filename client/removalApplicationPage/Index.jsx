@@ -128,7 +128,7 @@ export default function removalApplications(props) {
     })
 
     return (
-      <Layout>
+      <Layout title="Recycl | Removal Applications">
         <Grid
           container
           direction="column"

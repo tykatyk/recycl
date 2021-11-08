@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Head from 'next/head'
 import { ThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core'
 import { ApolloProvider } from '@apollo/client'
 import appoloClient from '../lib/appoloClient/appoloClient'
@@ -29,13 +28,6 @@ export default function App(props) {
 
   return (
     <React.Fragment>
-      <Head>
-        <title>Recycl</title>
-        <meta
-          name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width"
-        />
-      </Head>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {globalStyles}

@@ -3,13 +3,17 @@ import Container from '@material-ui/core/Container'
 import Wrapper from './Wrapper.jsx'
 import Header from '../uiParts/header/Header.jsx'
 import Footer from '../uiParts/Footer.jsx'
+import Head from '../uiParts/Head.jsx'
 
-export default function Layout(props) {
+export default function Layout({ children, title }) {
   return (
-    <Wrapper>
-      <Header />
-      <main>{props.children}</main>
-      <Footer />
-    </Wrapper>
+    <>
+      <Head title={title} />
+      <Wrapper>
+        <Header />
+        <main>{children}</main>
+        <Footer />
+      </Wrapper>
+    </>
   )
 }

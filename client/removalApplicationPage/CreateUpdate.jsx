@@ -6,7 +6,7 @@ import RemovalForm from './RemovalForm.jsx'
 
 export default function RemovalApplication(props) {
   return (
-    <Layout>
+    <Layout title="Recycl | Removal Application">
       <Grid
         container
         direction="column"
