@@ -31,11 +31,9 @@ import {
 
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
 
-import {
-  getInitialValues,
-  validationSchema,
-  getNormalizedValues,
-} from './removalFormConfig.js'
+import { getInitialValues, getNormalizedValues } from './removalFormConfig.js'
+
+import { removalApplicationSchema } from '../../lib/validation'
 
 const useStyles = removalFormStyles
 const initialValues = getInitialValues()
@@ -84,7 +82,7 @@ export default function RemovalForm(props) {
       <Formik
         enableReinitialize
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        validationSchema={removalApplicationSchema}
         onSubmit={(values, { setSubmitting }) => {
           if (id) {
             updateHandler(values, setSubmitting)

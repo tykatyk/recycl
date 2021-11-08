@@ -22,6 +22,7 @@ import { signIn } from 'next-auth/react'
 import { GET_ROLE_ID } from '../lib/graphql/queries/userRole'
 import { useQuery } from '@apollo/client'
 import { useRouter } from 'next/router'
+import { registerSchema } from '../lib/validation/'
 
 function Copyright() {
   return (
@@ -60,7 +61,6 @@ const required = '*Обязательное поле'
 
 export default function SignIn({ csrfToken }) {
   const router = useRouter()
-  console.log(router)
   const classes = useStyles()
   const theme = useTheme()
   const { loading, data, error } = useQuery(GET_ROLE_ID, {
@@ -100,37 +100,11 @@ export default function SignIn({ csrfToken }) {
             confirmPassword: '',
             csrfToken: csrfToken,
           }}
-          validationSchema={yup.object().shape({
-            username: yup
-              .string()
-              .required(required)
-              .min(3, 'Минимум 3 символа')
-              .max(255, 'Максимум 255 символов'),
-            email: yup
-              .string()
-              .required(required)
-              .email('Недействительный адрес электронной почты'),
-            password: yup
-              .string()
-              .required(required)
-              .min(6, 'Минимум 6 символов')
-              .max(255, 'Максимум 255 символов'),
-            confirmPassword: yup
-              .string()
-              .oneOf([yup.ref('password'), null], 'Пароли не совпадают!')
-              .required(required),
-          })}
+          validationSchema={registerSchema}
           onSubmit={(values, { setSubmitting }) => {
             setSubmitting(true)
-            signIn('credentials', {
-              username: values.username,
-              email: values.email,
-              password: values.password,
-              role: values.role,
-              callbackUrl:
-                router.query && router.query.from ? router.query.from : '/',
-            })
-            /*fetch('/api/auth/signin/credentials', {
+
+            fetch('/api/auth/signup/', {
               method: 'POST',
               body: JSON.stringify(values),
               headers: { 'Content-Type': 'application/json' },
@@ -147,7 +121,21 @@ export default function SignIn({ csrfToken }) {
               .catch((error) => {
                 console.log('got an error ')
                 console.log(error)
-              })*/
+              })
+            const error = signIn('credentials', {
+              username: values.username,
+              email: values.email,
+              password: values.password,
+              role: values.role,
+
+              redirect: false,
+            })
+              .then((err) => {
+                return err
+              })
+              .catch((err) => {
+                return err
+              })
 
             setSubmitting(false)
           }}
@@ -214,7 +202,7 @@ export default function SignIn({ csrfToken }) {
                     <CircularProgress
                       size={24}
                       style={{
-                        color: 'black',
+                        color: theme.palette.secondary.main,
                         marginLeft: '1em',
                       }}
                     />

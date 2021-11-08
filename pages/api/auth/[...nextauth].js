@@ -1,55 +1,19 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import appoloClient from '../../../lib/appoloClient/appoloClient'
-import { hash } from 'bcrypt'
-
-import { CREATE_USER } from '../../../lib/graphql/queries/user'
 
 export default NextAuth({
   // Configure one or more authentication providers
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
-    }),
+    // GoogleProvider({
+    //   clientId: process.env.GOOGLE_ID,
+    //   clientSecret: process.env.GOOGLE_SECRET,
+    // }),
     CredentialsProvider({
-      // The name to display on the sign in form (e.g. 'Sign in with...')
-      name: 'Логин / пароль',
-      // The credentials is used to generate a suitable form on the sign in page.
-      // You can specify whatever fields you are expecting to be submitted.
-      // e.g. domain, username, password, 2FA token, etc.
-      // You can pass any HTML attribute to the <input> tag through the object.
-      credentials: {
-        username: {},
-        password: {},
-        email: {},
-        roles: {},
-      },
       async authorize(credentials, req) {
-        // Add logic here to look up the user from the credentials supplied
-        appoloClient
-          .mutate({
-            mutation: CREATE_USER,
-            variables: {
-              user: {
-                username: credentials.username,
-                email: credentials.email,
-                password: await hash(credentials.password, 12),
-                roles: [credentials.role],
-                isActive: true,
-              },
-            },
-          })
-          .then((user) => {
-            // Any object returned will be saved in `user` property of the JWT
-            return user
-          })
-          .catch((error) => {
-            // If you return null or false then the credentials will be rejected
-            console.log(JSON.stringify(error, null, 2))
-            return null
-          })
+        // Any object returned will be saved in `user` property of the JWT
+        // If you return null or false then the credentials will be rejected
+        // console.log(JSON.stringify(error, null, 2))
         // You can also Reject this callback with an Error or with a URL:
         // throw new Error('error message') // Redirect to error page
         // throw '/path/to/redirect'        // Redirect to a URL
@@ -57,12 +21,32 @@ export default NextAuth({
     }),
   ],
   pages: {
-    signIn: '/register',
+    signIn: '/login',
   },
-  session: {
-    jwt: true,
-  },
+  // session: {
+  //   jwt: true,
+  // },
   callbacks: {
-    async signIn({ credentials }) {},
+    jwt: ({ token, user }) => {
+      console.log('user is')
+      console.log(user)
+      // first time jwt callback is run, user object is available
+      if (user) {
+        token.id = user.id
+      }
+
+      return token
+    },
+    session: ({ session, token }) => {
+      if (token) {
+        session.id = token.id
+      }
+
+      return session
+    },
+  },
+  secret: process.env.AUTH_SECRET,
+  jwt: {
+    encryption: true,
   },
 })
