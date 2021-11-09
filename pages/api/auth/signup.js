@@ -1,7 +1,7 @@
 import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { hash } from 'bcrypt'
 import { CREATE_USER, USER_EXISTS } from '../../../lib/graphql/queries/user'
-import registerSchema from '../../../lib/validation'
+import { registerSchema } from '../../../lib/validation'
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -9,66 +9,67 @@ export default async function handler(req, res) {
 
     //check correctness of data needed to create a user
     try {
-      await registerSchema.validate({
-        username,
-        email,
-        password,
-        confirmPassword,
-        role,
-      })
+      await registerSchema.validate(
+        {
+          username,
+          email,
+          password,
+          confirmPassword,
+          role,
+        },
+        { abortEarly: false }
+      )
     } catch (error) {
-      res.status(422).json({ errors: err.errors })
+      console.log('Error during validation request body')
+      console.log(error)
+      res.status(422).json({ message: error })
       return
     }
 
     //if data is correct, check if user already exists
     try {
-      let userExists = appoloClient
-        .query(USER_EXISTS, { variables: { email } })
-        .then((result) => {
-          return result.data.userExists
-        })
+      let result = await appoloClient.query({
+        query: USER_EXISTS,
+        variables: { email },
+      })
 
-      if (userExists) {
+      if (result.data.userExists) {
         res
           .status(422)
-          .json({ errors: ['Пользователь с таким email уже зарегистрирован'] })
+          .json({ message: 'Пользователь с таким email уже зарегистрирован' })
         return
       }
     } catch (error) {
       res.status(500).json({
-        errors: ['Возникла ошибка при проверке существования пользователя'],
+        message: 'Возникла ошибка при проверке существования пользователя',
       })
-      console.log(JSON.stringify(error, null, 2))
+      console.log(error)
       return
     }
 
-    //if user doesn't exist create one
+    //if user doesn't exist, create one
     try {
-      appoloClient
-        .mutate({
-          mutation: CREATE_USER,
-          variables: {
-            user: {
-              username,
-              email,
-              password: await hash(password, 12),
-              roles: [role],
-              isActive: true,
-            },
+      let result = await appoloClient.mutate({
+        mutation: CREATE_USER,
+        variables: {
+          user: {
+            username,
+            email,
+            password: await hash(password, 12),
+            roles: [role],
+            isActive: true,
           },
-        })
-        .then((result) => {
-          res.status(201).json({ user: result.data.createUser })
-        })
-    } catch (error) {
-      res.status(500).json({
-        errors: ['Возникла ошибка при создании пользователя'],
+        },
       })
-      console.log(JSON.stringify(error, null, 2))
-      return
+      res.status(201).json({ message: { user: result.data.createUser } })
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({
+        message: 'Возникла ошибка при создании пользователя',
+      })
     }
   } else {
-    res.status(500).json({ errors: ['Only POST method is allowed'] })
+    console.log('Only POST method is allowed')
+    res.status(500).json({ message: 'Only POST method is allowed' })
   }
 }
