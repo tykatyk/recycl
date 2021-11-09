@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Button,
@@ -65,6 +65,7 @@ export default function SignUp() {
   const { loading, data, error } = useQuery(GET_ROLE_ID, {
     variables: { roleName: 'user' },
   })
+  const [backendError, setBackendError] = useState(null)
 
   if (loading) {
     return (
@@ -86,15 +87,17 @@ export default function SignUp() {
       <Head title="Recycl | Register" />
       <Container component="main" maxWidth="xs">
         <div className={classes.paper}>
-          <Box>
-            <Typography></Typography>
-          </Box>
           <Avatar className={classes.avatar}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Регистрация
           </Typography>
+          {backendError && (
+            <Box>
+              <Typography>{backendError}</Typography>
+            </Box>
+          )}
           <Formik
             initialValues={{
               role: data.getRoleId,
@@ -104,7 +107,7 @@ export default function SignUp() {
               confirmPassword: '',
             }}
             validationSchema={registerSchema}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={(values, { setSubmitting, setErrors }) => {
               console.log('submitting true ')
               setSubmitting(true)
 
@@ -121,6 +124,13 @@ export default function SignUp() {
                 .then((data) => {
                   console.log('data is ')
                   console.log(data)
+                  if (data.error && data.error.type === 'perField') {
+                    setErrors(data.error.message)
+                    return
+                  }
+                  if (data.error && data.error.type === 'perForm') {
+                    setBackendError(data.message)
+                  }
                 })
                 .finally(() => {
                   setSubmitting(false)
@@ -128,7 +138,7 @@ export default function SignUp() {
                 })
             }}
           >
-            {({ isSubmitting }) => {
+            {({ isSubmitting, errors }) => {
               return (
                 <Form className={classes.form} noValidate autoComplete="off">
                   <Field type="hidden" name="role" />
@@ -141,7 +151,6 @@ export default function SignUp() {
                     label="Имя или название организации"
                     name="username"
                     component={TextFieldFormik}
-                    autoFocus
                   />
                   <Field
                     variant="outlined"

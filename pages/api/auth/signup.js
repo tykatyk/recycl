@@ -21,8 +21,15 @@ export default async function handler(req, res) {
       )
     } catch (error) {
       console.log('Error during validation request body')
-      console.log(error)
-      res.status(422).json({ message: error })
+      let mappedErrors = {}
+      if (error.inner && error.inner.length > 0) {
+        error.inner.forEach((item, i) => {
+          if (!mappedErrors[item.path]) mappedErrors[item.path] = item.message
+        })
+      }
+      res
+        .status(422)
+        .json({ error: { type: 'perField', message: mappedErrors } })
       return
     }
 
@@ -34,14 +41,20 @@ export default async function handler(req, res) {
       })
 
       if (result.data.userExists) {
-        res
-          .status(422)
-          .json({ message: 'Пользователь с таким email уже зарегистрирован' })
+        res.status(422).json({
+          error: {
+            type: 'perForm',
+            message: 'Пользователь с таким email уже зарегистрирован',
+          },
+        })
         return
       }
     } catch (error) {
       res.status(500).json({
-        message: 'Возникла ошибка при проверке существования пользователя',
+        error: {
+          type: 'perForm',
+          message: 'Возникла ошибка при проверке существования пользователя',
+        },
       })
       console.log(error)
       return
@@ -61,15 +74,23 @@ export default async function handler(req, res) {
           },
         },
       })
-      res.status(201).json({ message: { user: result.data.createUser } })
+      res.status(201).json({ user: result.data.createUser })
     } catch (error) {
       console.log(error)
       res.status(500).json({
-        message: 'Возникла ошибка при создании пользователя',
+        error: {
+          type: 'perForm',
+          message: 'Возникла ошибка при создании пользователя',
+        },
       })
     }
   } else {
     console.log('Only POST method is allowed')
-    res.status(500).json({ message: 'Only POST method is allowed' })
+    res.status(500).json({
+      error: {
+        type: 'perForm',
+        message: 'Only POST method is allowed',
+      },
+    })
   }
 }

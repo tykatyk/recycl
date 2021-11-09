@@ -19,8 +19,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Snackbars(props) {
   const classes = useStyles()
-  const [open, setOpen] = React.useState(props.open || false)
-  const { message, severity } = props
+  const { message, severity, open } = props
+
+  const [open, setOpen] = React.useState(open || false)
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
