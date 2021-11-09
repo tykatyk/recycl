@@ -1,15 +1,17 @@
 import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { hash } from 'bcrypt'
 import { CREATE_USER, USER_EXISTS } from '../../../lib/graphql/queries/user'
-import { registerSchema } from '../../../lib/validation'
+import { registerSchema, emailIsUnique } from '../../../lib/validation'
 
 export default async function handler(req, res) {
+  const validationSchema = registerSchema.concat(emailIsUnique)
+
   if (req.method === 'POST') {
     const { username, email, password, confirmPassword, role } = req.body
 
     //check correctness of data needed to create a user
     try {
-      await registerSchema.validate(
+      await validationSchema.validate(
         {
           username,
           email,
@@ -34,7 +36,7 @@ export default async function handler(req, res) {
     }
 
     //if data is correct, check if user already exists
-    try {
+    /*try {
       let result = await appoloClient.query({
         query: USER_EXISTS,
         variables: { email },
@@ -58,7 +60,7 @@ export default async function handler(req, res) {
       })
       console.log(error)
       return
-    }
+    }*/
 
     //if user doesn't exist, create one
     try {
