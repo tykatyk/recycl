@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function SignIn({ csrfToken }) {
+export default function SignUp() {
   const router = useRouter()
   const classes = useStyles()
   const theme = useTheme()
@@ -86,6 +86,9 @@ export default function SignIn({ csrfToken }) {
       <Head title="Recycl | Register" />
       <Container component="main" maxWidth="xs">
         <div className={classes.paper}>
+          <Box>
+            <Typography></Typography>
+          </Box>
           <Avatar className={classes.avatar}>
             <LockOutlinedIcon />
           </Avatar>
@@ -94,39 +97,40 @@ export default function SignIn({ csrfToken }) {
           </Typography>
           <Formik
             initialValues={{
-              csrfToken: csrfToken,
               role: data.getRoleId,
               username: '',
               email: '',
               password: '',
               confirmPassword: '',
-              csrfToken: csrfToken,
             }}
             validationSchema={registerSchema}
             onSubmit={(values, { setSubmitting }) => {
+              console.log('submitting true ')
               setSubmitting(true)
 
               fetch('/api/auth/signup/', {
                 method: 'POST',
                 body: JSON.stringify(values),
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                  'Content-Type': 'application/json',
+                },
               })
                 .then((res) => {
-                  console.log('response is ')
-                  console.log(res)
+                  return res.json()
                 })
-                .catch((error) => {
-                  console.log('got an error ')
-                  console.log(error)
-                  return
+                .then((data) => {
+                  console.log('data is ')
+                  console.log(data)
                 })
-              setSubmitting(false)
+                .finally(() => {
+                  setSubmitting(false)
+                  console.log('submitting false ')
+                })
             }}
           >
             {({ isSubmitting }) => {
               return (
                 <Form className={classes.form} noValidate autoComplete="off">
-                  <Field type="hidden" name="csrfToken" />
                   <Field type="hidden" name="role" />
                   <Field
                     variant="outlined"
@@ -212,8 +216,4 @@ export default function SignIn({ csrfToken }) {
       </Container>
     </>
   )
-}
-
-export async function getServerSideProps(context) {
-  return { props: { csrfToken: await getCsrfToken(context) } }
 }
