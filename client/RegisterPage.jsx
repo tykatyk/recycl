@@ -108,7 +108,6 @@ export default function SignUp() {
             }}
             validationSchema={registerSchema}
             onSubmit={(values, { setSubmitting, setErrors }) => {
-              console.log('submitting true ')
               setSubmitting(true)
 
               fetch('/api/auth/signup/', {
@@ -136,7 +135,7 @@ export default function SignUp() {
                 })
                 .finally(() => {
                   setSubmitting(false)
-                  console.log('submitting false ')
+                  router.push('/')
                 })
             }}
           >
