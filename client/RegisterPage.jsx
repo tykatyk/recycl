@@ -16,6 +16,7 @@ import {
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
+import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import Snackbar from './uiParts/Snackbars.jsx'
 import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
@@ -68,20 +69,7 @@ export default function SignUp() {
   })
   const [backendError, setBackendError] = useState(null)
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          position: 'fixed',
-          top: ' 50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
-        <CircularProgress color="secondary" />
-      </div>
-    )
-  }
+  if (loading) return <PageLoadingCircle />
 
   if (error) {
     return <Typography>Возникла ошибка при получении данных</Typography>

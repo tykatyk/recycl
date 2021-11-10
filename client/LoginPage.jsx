@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import {
   Avatar,
@@ -20,7 +20,8 @@ import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
 import Snackbar from './uiParts/Snackbars.jsx'
-import { signIn } from 'next-auth/react'
+import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
+import { signIn, getSession } from 'next-auth/react'
 import * as yup from 'yup'
 import { loginSchema } from '../lib/validation/'
 
@@ -57,13 +58,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const required = '*Обязательное поле'
+// const required = '*Обязательное поле'
 
 export default function SignIn() {
   const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
+
+  useEffect(() => {
+    getSession().then((session) => {
+      if (session) {
+        router.replace('/')
+      } else {
+        setLoading(false)
+      }
+    })
+  }, [])
+
+  if (loading) return <PageLoadingCircle />
 
   return (
     <>
