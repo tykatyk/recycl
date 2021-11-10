@@ -11,12 +11,12 @@ import {
   makeStyles,
   useTheme,
   Container,
-  CircularProgress,
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
+import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import Snackbar from './uiParts/Snackbars.jsx'
 import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
@@ -182,15 +182,7 @@ export default function SignUp() {
                     disabled={isSubmitting}
                   >
                     Зарегистрироваться
-                    {isSubmitting && (
-                      <CircularProgress
-                        size={24}
-                        style={{
-                          color: theme.palette.secondary.main,
-                          marginLeft: '1em',
-                        }}
-                      />
-                    )}
+                    {isSubmitting && <ButtonSubmittingCircle />}
                   </Button>
                   <Grid container style={{ justifyContent: 'flex-end' }}>
                     <Grid item>

@@ -12,7 +12,6 @@ import {
   makeStyles,
   useTheme,
   Container,
-  CircularProgress,
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
@@ -21,6 +20,7 @@ import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
 import Snackbar from './uiParts/Snackbars.jsx'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
+import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import { signIn, getSession } from 'next-auth/react'
 import * as yup from 'yup'
 import { loginSchema } from '../lib/validation/'
@@ -176,15 +176,7 @@ export default function SignIn() {
                     disabled={isSubmitting}
                   >
                     Войти
-                    {isSubmitting && (
-                      <CircularProgress
-                        size={24}
-                        style={{
-                          color: theme.palette.secondary.main,
-                          marginLeft: '1em',
-                        }}
-                      />
-                    )}
+                    {isSubmitting && <ButtonSubmittingCircle />}
                   </Button>
                   <Grid container>
                     <Grid item xs>
