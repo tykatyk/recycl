@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Button,
@@ -11,19 +11,23 @@ import {
   makeStyles,
   useTheme,
   Container,
+  CircularProgress,
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
+import Snackbar from './uiParts/Snackbars.jsx'
+import { signIn } from 'next-auth/react'
 import * as yup from 'yup'
+import { loginSchema } from '../lib/validation/'
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href={`${process.env.NEXT_PUBLIC_PRODUCTION_URL}`}>
+      <Link color="inherit" href={`${process.env.NEXT_PUBLIC_URL}`}>
         Recycl
       </Link>{' '}
       {new Date().getFullYear()}
@@ -57,6 +61,7 @@ const required = '*Обязательное поле'
 export default function SignIn() {
   const classes = useStyles()
   const theme = useTheme()
+  const [backendError, setBackendError] = useState(null)
 
   return (
     <>
@@ -74,47 +79,39 @@ export default function SignIn() {
               email: '',
               password: '',
             }}
-            validationSchema={yup.object().shape({
-              email: yup
-                .string()
-                .required(required)
-                .email('Недействительный адрес электронной почты'),
-              password: yup.string().required(required),
-            })}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={(values, { setSubmitting, setErrors }) => {
               setSubmitting(true)
 
-              fetch('/api/auth/signup/', {
-                method: 'POST',
-                body: JSON.stringify(values),
-                headers: { 'Content-Type': 'application/json' },
-              })
-                .then((res) => {
-                  console.log('response is ')
-                  console.log(res)
-                })
-                .catch((error) => {
-                  console.log('got an error ')
-                  console.log(error)
-                  return
-                })
-
-              const error = signIn('credentials', {
-                username: values.username,
+              signIn('credentials', {
                 email: values.email,
                 password: values.password,
-                role: values.role,
-
                 redirect: false,
               })
-                .then((err) => {
-                  return err
-                })
-                .catch((err) => {
-                  return err
-                })
+                .then((response) => {
+                  console.log('response')
+                  console.log(response)
+                  console.log(JSON.parse(response.error))
+                  if (response && response.error) {
+                    let error = JSON.parse(response.error)
 
-              setSubmitting(false)
+                    if (error && error.type === 'perField') {
+                      setErrors(error.message)
+                      return
+                    }
+                    if (error && error.type === 'perForm') {
+                      setBackendError(error.message)
+                      return
+                    }
+                  }
+                  return response
+                })
+                .catch((error) => {
+                  console.log(error)
+                  setBackendError('Неизвестная ошибка')
+                })
+                .finally(() => {
+                  setSubmitting(false)
+                })
             }}
           >
             {({ isSubmitting }) => {
@@ -128,7 +125,6 @@ export default function SignIn() {
                     id="email"
                     label="Электронная почта"
                     name="email"
-                    autoFocus
                     component={TextFieldFormik}
                   />
                   <Field
@@ -152,8 +148,18 @@ export default function SignIn() {
                     variant="contained"
                     color="secondary"
                     className={classes.submit}
+                    disabled={isSubmitting}
                   >
                     Войти
+                    {isSubmitting && (
+                      <CircularProgress
+                        size={24}
+                        style={{
+                          color: theme.palette.secondary.main,
+                          marginLeft: '1em',
+                        }}
+                      />
+                    )}
                   </Button>
                   <Grid container>
                     <Grid item xs>
@@ -184,6 +190,14 @@ export default function SignIn() {
           <Copyright />
         </Box>
       </Container>
+      <Snackbar
+        severity="error"
+        open={!!backendError}
+        message={backendError}
+        handleClose={() => {
+          setBackendError(null)
+        }}
+      />
     </>
   )
 }
