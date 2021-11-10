@@ -105,25 +105,32 @@ export default function SignUp() {
                   'Content-Type': 'application/json',
                 },
               })
-                .then((res) => {
-                  return res.json()
+                .then((response) => {
+                  return response.json()
                 })
                 .then((data) => {
-                  if (data.error && data.error.type === 'perField') {
-                    setErrors(data.error.message)
+                  if (data.error) {
+                    if (data.error.type === 'perField') {
+                      setErrors(data.error.message)
+                      return
+                    }
+                    if (data.error.type === 'perForm') {
+                      setBackendError(data.error.message)
+                      return
+                    }
+
+                    setBackendError(
+                      'Неизвестная ошибка при обработке ответа сервера'
+                    )
                     return
                   }
-                  if (data.error && data.error.type === 'perForm') {
-                    setBackendError(data.error.message)
-                    return
-                  }
+                  router.push('/')
                 })
                 .catch((error) => {
                   setBackendError('Ошибка при отпавке запроса на сервер')
                 })
                 .finally(() => {
                   setSubmitting(false)
-                  router.push('/')
                 })
             }}
           >

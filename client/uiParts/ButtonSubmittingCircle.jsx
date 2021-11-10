@@ -1,7 +1,8 @@
 import React from 'react'
-import { CircularProgress } from '@material-ui/core'
+import { CircularProgress, useTheme } from '@material-ui/core'
 
 export default function ButtonSubmittingCircle() {
+  const theme = useTheme()
   return (
     <CircularProgress
       size={24}

@@ -116,6 +116,10 @@ export default function SignIn() {
                         setBackendError(error.message)
                         return
                       }
+                      setBackendError(
+                        'Неизвестная ошибка при обработке ответа сервера'
+                      )
+                      return
                     } catch (err) {
                       setBackendError(
                         'Неизвестная ошибка при обработке ответа сервера'
