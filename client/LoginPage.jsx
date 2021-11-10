@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useRouter } from 'next/router'
 import {
   Avatar,
   Button,
@@ -62,6 +63,7 @@ export default function SignIn() {
   const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
+  const router = useRouter()
 
   return (
     <>
@@ -79,6 +81,7 @@ export default function SignIn() {
               email: '',
               password: '',
             }}
+            validationSchema={loginSchema}
             onSubmit={(values, { setSubmitting, setErrors }) => {
               setSubmitting(true)
 
@@ -88,25 +91,33 @@ export default function SignIn() {
                 redirect: false,
               })
                 .then((response) => {
-                  console.log('response')
-                  console.log(response)
-                  console.log(JSON.parse(response.error))
-                  if (response && response.error) {
-                    let error = JSON.parse(response.error)
-
-                    if (error && error.type === 'perField') {
-                      setErrors(error.message)
-                      return
-                    }
-                    if (error && error.type === 'perForm') {
-                      setBackendError(error.message)
+                  if (response.error) {
+                    try {
+                      let error = JSON.parse(response.error)
+                      if (error.type === 'perField') {
+                        setErrors(error.message)
+                        return
+                      }
+                      if (error.type === 'perForm') {
+                        setBackendError(error.message)
+                        return
+                      }
+                    } catch (err) {
+                      setBackendError(
+                        'Неизвестная ошибка при обработке ответа сервера'
+                      )
                       return
                     }
                   }
-                  return response
+
+                  if (router.query && router.query.from) {
+                    router.push(router.query.from)
+                    return
+                  }
+
+                  router.push('/')
                 })
                 .catch((error) => {
-                  console.log(error)
                   setBackendError('Неизвестная ошибка')
                 })
                 .finally(() => {

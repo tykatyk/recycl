@@ -46,8 +46,10 @@ export default NextAuth({
             })
             throw new Error(
               JSON.stringify({
-                type: 'perField',
-                message: mappedErrors,
+                error: {
+                  type: 'perField',
+                  message: mappedErrors,
+                },
               })
             )
           } else {
