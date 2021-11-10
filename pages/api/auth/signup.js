@@ -1,17 +1,15 @@
 import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { hash } from 'bcrypt'
 import { CREATE_USER, USER_EXISTS } from '../../../lib/graphql/queries/user'
-import { registerSchema, emailIsUnique } from '../../../lib/validation'
+import { registerSchema } from '../../../lib/validation'
 
 export default async function handler(req, res) {
-  const validationSchema = registerSchema.concat(emailIsUnique)
-
   if (req.method === 'POST') {
     const { username, email, password, confirmPassword, role } = req.body
 
     //check correctness of data needed to create a user
     try {
-      await validationSchema.validate(
+      await registerSchema.validate(
         {
           username,
           email,
@@ -23,20 +21,29 @@ export default async function handler(req, res) {
       )
     } catch (error) {
       console.log('Error during validation request body')
-      let mappedErrors = {}
       if (error.inner && error.inner.length > 0) {
+        let mappedErrors = {}
         error.inner.forEach((item, i) => {
           if (!mappedErrors[item.path]) mappedErrors[item.path] = item.message
         })
+
+        res
+          .status(422)
+          .json({ error: { type: 'perField', message: mappedErrors } })
+        return
+      } else {
+        res.status(500).json({
+          error: {
+            type: 'perForm',
+            message: 'Возникла ошибка при проверке данных формы',
+          },
+        })
+        return
       }
-      res
-        .status(422)
-        .json({ error: { type: 'perField', message: mappedErrors } })
-      return
     }
 
     //if data is correct, check if user already exists
-    /*try {
+    try {
       let result = await appoloClient.query({
         query: USER_EXISTS,
         variables: { email },
@@ -45,8 +52,10 @@ export default async function handler(req, res) {
       if (result.data.userExists) {
         res.status(422).json({
           error: {
-            type: 'perForm',
-            message: 'Пользователь с таким email уже зарегистрирован',
+            type: 'perField',
+            message: {
+              email: 'Пользователь с таким email уже зарегистрирован',
+            },
           },
         })
         return
@@ -60,7 +69,7 @@ export default async function handler(req, res) {
       })
       console.log(error)
       return
-    }*/
+    }
 
     //if user doesn't exist, create one
     try {

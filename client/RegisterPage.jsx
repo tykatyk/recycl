@@ -16,6 +16,7 @@ import {
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
+import Snackbar from './uiParts/Snackbars.jsx'
 import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
 import * as yup from 'yup'
@@ -82,6 +83,10 @@ export default function SignUp() {
     )
   }
 
+  if (error) {
+    return <Typography>Возникла ошибка при получении данных</Typography>
+  }
+
   return (
     <>
       <Head title="Recycl | Register" />
@@ -93,11 +98,6 @@ export default function SignUp() {
           <Typography component="h1" variant="h5">
             Регистрация
           </Typography>
-          {backendError && (
-            <Box>
-              <Typography>{backendError}</Typography>
-            </Box>
-          )}
           <Formik
             initialValues={{
               role: data.getRoleId,
@@ -122,15 +122,17 @@ export default function SignUp() {
                   return res.json()
                 })
                 .then((data) => {
-                  console.log('data is ')
-                  console.log(data)
                   if (data.error && data.error.type === 'perField') {
                     setErrors(data.error.message)
                     return
                   }
                   if (data.error && data.error.type === 'perForm') {
-                    setBackendError(data.message)
+                    setBackendError(data.error.message)
+                    return
                   }
+                })
+                .catch((error) => {
+                  setBackendError('Ошибка при отпавке запроса на сервер')
                 })
                 .finally(() => {
                   setSubmitting(false)
@@ -223,6 +225,14 @@ export default function SignUp() {
           <Copyright />
         </Box>
       </Container>
+      <Snackbar
+        severity="error"
+        open={!!backendError}
+        message={backendError}
+        handleClose={() => {
+          setBackendError(null)
+        }}
+      />
     </>
   )
 }

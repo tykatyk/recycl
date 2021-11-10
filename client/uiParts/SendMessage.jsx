@@ -1,4 +1,4 @@
-import { React, useEffect } from 'react'
+import { React, useState } from 'react'
 import {
   TextField,
   Box,
@@ -30,6 +30,7 @@ export default function SendMessage() {
 
   const [createMessageMutation, { data, loading, error }] =
     useMutation(CREATE_MESSAGE)
+  const { showNotification, setShowNotification } = useState(!!data)
 
   const submitHandler = (values, setSubmitting, resetForm) => {
     createMessageMutation({
@@ -48,7 +49,10 @@ export default function SendMessage() {
     <Box p={3} style={{ background: theme.palette.primary.main }}>
       {data && (
         <Snackbars
-          open={true}
+          open={showNotification}
+          onClose={() => {
+            setShowNotification(false)
+          }}
           message="Сообщение отправлено"
           severity="success"
         />

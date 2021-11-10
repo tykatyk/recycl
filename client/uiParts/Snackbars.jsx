@@ -1,8 +1,6 @@
 import React from 'react'
-import Button from '@material-ui/core/Button'
-import Snackbar from '@material-ui/core/Snackbar'
+import { Button, Snackbar, makeStyles } from '@material-ui/core'
 import MuiAlert from '@material-ui/lab/Alert'
-import { makeStyles } from '@material-ui/core/styles'
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />
@@ -19,17 +17,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Snackbars(props) {
   const classes = useStyles()
-  const { message, severity, open } = props
-
-  const [open, setOpen] = React.useState(open || false)
-
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return
-    }
-
-    setOpen(false)
-  }
+  const { message, severity, open, handleClose } = props
 
   return (
     <div className={classes.root}>
