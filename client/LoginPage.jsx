@@ -180,30 +180,63 @@ export default function SignIn() {
                     Войти
                     {isSubmitting && <ButtonSubmittingCircle />}
                   </Button>
-                  <Grid container>
-                    <Grid item xs>
-                      <Link
-                        href="#"
-                        variant="body2"
-                        style={{ color: `${theme.palette.text.secondary}` }}
-                      >
-                        Забыли пароль?
-                      </Link>
-                    </Grid>
-                    <Grid item>
-                      <Link
-                        href="/register"
-                        variant="body2"
-                        style={{ color: `${theme.palette.text.secondary}` }}
-                      >
-                        {'Нет аккаунта? Зарегистрируйтесь'}
-                      </Link>
-                    </Grid>
-                  </Grid>
                 </Form>
               )
             }}
           </Formik>
+          <Formik
+            initialValues={{
+              callbackUrl: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
+            }}
+            onSubmit={async (values, { setSubmitting }) => {
+              setSubmitting(true)
+              await signIn('google')
+              setSubmitting(false)
+            }}
+          >
+            {({ isSubmitting }) => {
+              return (
+                <Form className={classes.form} noValidate autoComplete="off">
+                  <Field
+                    name="callbackUrl"
+                    type="hidden"
+                    component={TextFieldFormik}
+                  />
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="secondary"
+                    className={classes.submit}
+                    disabled={isSubmitting}
+                  >
+                    Войти через Google
+                    {isSubmitting && <ButtonSubmittingCircle />}
+                  </Button>
+                </Form>
+              )
+            }}
+          </Formik>
+          <Grid container>
+            <Grid item xs>
+              <Link
+                href="#"
+                variant="body2"
+                style={{ color: `${theme.palette.text.secondary}` }}
+              >
+                Забыли пароль?
+              </Link>
+            </Grid>
+            <Grid item>
+              <Link
+                href="/register"
+                variant="body2"
+                style={{ color: `${theme.palette.text.secondary}` }}
+              >
+                {'Нет аккаунта? Зарегистрируйтесь'}
+              </Link>
+            </Grid>
+          </Grid>
         </div>
         <Box mt={8}>
           <Copyright />

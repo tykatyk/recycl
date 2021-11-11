@@ -13,10 +13,10 @@ export default NextAuth({
   },
   // Configure one or more authentication providers
   providers: [
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_ID,
-    //   clientSecret: process.env.GOOGLE_SECRET,
-    // }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+    }),
     CredentialsProvider({
       async authorize(credentials) {
         // Any object returned will be saved in `user` property of the JWT

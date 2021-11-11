@@ -1,11 +1,11 @@
 import isMobile from '../../lib/detectMobile'
 
 export const setSplashMinHeight = (isLoaded, stateHandler) => {
+  if (!isLoaded) return
   const headerHeight = document.getElementById('mainHeader').offsetHeight
   const windowHeight = window.innerHeight
   let minHeight = windowHeight - headerHeight
 
-  if (!isLoaded) return
   if (isMobile()) {
     const portraitMode = window.innerHeight > window.innerWidth
     if (state.splashMinHeight === 0 || state.portraitMode != portraitMode) {
