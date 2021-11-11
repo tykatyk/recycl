@@ -32,8 +32,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function Header() {
-  console.log('useSession is')
-  console.log(useSession)
   const preventDefault = () => false
   const classes = useStyles()
   const theme = useTheme()

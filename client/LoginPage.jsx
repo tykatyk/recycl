@@ -233,7 +233,7 @@ export default function SignIn() {
                 variant="body2"
                 style={{ color: `${theme.palette.text.secondary}` }}
               >
-                {'Нет аккаунта? Зарегистрируйтесь'}
+                {'Нет аккаунта?'}
               </Link>
             </Grid>
           </Grid>

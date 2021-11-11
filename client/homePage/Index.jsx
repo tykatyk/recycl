@@ -18,49 +18,42 @@ const useStyles = homePageStyles
 export default function HomePage() {
   const theme = useTheme()
 
-  let inPortraitMode = false
-  let landscapeHeight = 0
-  let portraitHeight = 0
-
-  // Defining viewport's height in order to set background image of the home page
-  // to be 100% of screen height.
-  // When rendered on server, window object is undefined,
-  // as well as navigator object in isMobile function.
-  // We need custom login for mobile devices
-  // in order to prevent content from irritating "jumping"
-  // when address bar dissappears in mobile browsers
-
-  if (typeof window !== 'undefined' && isMobile()) {
-    inPortraitMode = window.innerHeight > window.innerWidth
-
-    // Viewport's height is set depending on the screen orientation of user's device.
-    portraitHeight = inPortraitMode ? window.innerHeight : window.innerWidth
-    landscapeHeight = inPortraitMode ? window.innerWidth : window.innerHeight
+  // let inPortraitMode = false
+  // let landscapeHeight = 0
+  // let portraitHeight = 0
+  const options = {
+    portraitMode: true,
+    landscapeHeight: 0,
+    portraitHeight: 0,
+    minHeight: 0,
   }
 
-  const [state, setState] = useState({
-    splashMinHeight: 0,
-    portraitMode: inPortraitMode,
-    landscapeHeight,
-    portraitHeight,
-  })
+  const [splashMinHeight, setSplashMinHeight] = useState(0)
 
-  // this hook is for setting min-height of the container
-  // of the background image to be 100% of available viewport height
+  // if (typeof window != 'undefined' && isMobile()) {
+  //   console.log('here')
+  //   let inPortraitMode = window.innerHeight > window.innerWidth
+  //   setState({
+  //     portraitMode: inPortraitMode,
+  //     portraitHeight: inPortraitMode ? window.innerHeight : window.innerWidth,
+  //     landscapeHeight: inPortraitMode ? window.innerWidth : window.innerHeight,
+  //   })
+  // }
+
   useEffect(() => {
     let isLoaded = true
 
-    if (typeof window !== 'undefined') {
-      setSplashMinHeight(isLoaded, setState)
+    handleResize(isLoaded, options, setSplashMinHeight)
 
-      window.addEventListener('resize', () => handleResize(isLoaded, setState))
+    window.addEventListener('resize', () =>
+      handleResize(isLoaded, options, setSplashMinHeight)
+    )
 
-      return () => {
-        isLoaded = false
-        window.removeEventListener('resize', () =>
-          handleResize(isLoaded, setState)
-        )
-      }
+    return () => {
+      isLoaded = false
+      window.removeEventListener('resize', () =>
+        handleResize(isLoaded, options, setSplashMinHeight)
+      )
     }
   }, [])
 
@@ -70,7 +63,7 @@ export default function HomePage() {
     <Layout title="Recycl | Home">
       <div
         className={classes.splash}
-        style={{ minHeight: `${state.splashMinHeight}px` }}
+        style={{ minHeight: `${splashMinHeight}px` }}
       >
         <Typography
           component="h1"

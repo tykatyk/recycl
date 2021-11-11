@@ -198,7 +198,7 @@ export default function SignUp() {
                         variant="body2"
                         style={{ color: `${theme.palette.text.secondary}` }}
                       >
-                        {'Уже есть аккаунт? Войдите'}
+                        {'Уже есть аккаунт?'}
                       </Link>
                     </Grid>
                   </Grid>
