@@ -58,8 +58,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-// const required = '*Обязательное поле'
-
 export default function SignIn() {
   const classes = useStyles()
   const theme = useTheme()

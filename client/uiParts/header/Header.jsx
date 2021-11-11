@@ -18,8 +18,9 @@ import {
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import MenuIcon from '@material-ui/icons/Menu'
 import Link from '../Link.jsx'
-
 import HeaderLinks from './HeaderLinks.jsx'
+import { useSession } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -31,6 +32,8 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function Header() {
+  console.log('useSession is')
+  console.log(useSession)
   const preventDefault = () => false
   const classes = useStyles()
   const theme = useTheme()
@@ -39,6 +42,7 @@ export default function Header() {
     mobileView: false,
     drawerOpen: false,
   })
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -166,9 +170,22 @@ export default function Header() {
                         </Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}>
-                        <Link href="#" onClick={preventDefault} color="inherit">
-                          Выйти
-                        </Link>
+                        {status === 'unauthenticated' && (
+                          <Link href="/login" color="inherit">
+                            Войти
+                          </Link>
+                        )}
+                        {status === 'authenticated' && (
+                          <Link
+                            href="#"
+                            onClick={() => {
+                              preventDefault(), signOut()
+                            }}
+                            color="inherit"
+                          >
+                            Выйти
+                          </Link>
+                        )}
                       </MenuItem>
                     </MenuList>
                   </ClickAwayListener>
