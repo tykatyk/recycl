@@ -18,9 +18,6 @@ const useStyles = homePageStyles
 export default function HomePage() {
   const theme = useTheme()
 
-  // let inPortraitMode = false
-  // let landscapeHeight = 0
-  // let portraitHeight = 0
   const options = {
     portraitMode: true,
     landscapeHeight: 0,
@@ -29,16 +26,6 @@ export default function HomePage() {
   }
 
   const [splashMinHeight, setSplashMinHeight] = useState(0)
-
-  // if (typeof window != 'undefined' && isMobile()) {
-  //   console.log('here')
-  //   let inPortraitMode = window.innerHeight > window.innerWidth
-  //   setState({
-  //     portraitMode: inPortraitMode,
-  //     portraitHeight: inPortraitMode ? window.innerHeight : window.innerWidth,
-  //     landscapeHeight: inPortraitMode ? window.innerWidth : window.innerHeight,
-  //   })
-  // }
 
   useEffect(() => {
     let isLoaded = true

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import {
   Avatar,
+  Icon,
   Button,
   TextField,
   FormControlLabel,
@@ -15,6 +16,7 @@ import {
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
+import GoogleIcon from '@mui/icons-material/Google'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
@@ -203,14 +205,16 @@ export default function SignIn() {
                     component={TextFieldFormik}
                   />
                   <Button
+                    style={{ marginTop: 0 }}
                     type="submit"
                     fullWidth
                     variant="contained"
                     color="secondary"
                     className={classes.submit}
                     disabled={isSubmitting}
+                    startIcon={<GoogleIcon />}
                   >
-                    Войти через Google
+                    Вход с аккаунтом Google
                     {isSubmitting && <ButtonSubmittingCircle />}
                   </Button>
                 </Form>
@@ -238,7 +242,7 @@ export default function SignIn() {
             </Grid>
           </Grid>
         </div>
-        <Box mt={8}>
+        <Box mt={8} mb={4}>
           <Copyright />
         </Box>
       </Container>
