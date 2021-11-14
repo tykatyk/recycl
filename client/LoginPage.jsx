@@ -20,25 +20,13 @@ import GoogleIcon from '@mui/icons-material/Google'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
+import Copyright from './uiParts/Copyright.jsx'
 import Snackbar from './uiParts/Snackbars.jsx'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import { signIn, getSession } from 'next-auth/react'
 import * as yup from 'yup'
 import { loginSchema } from '../lib/validation/'
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href={`${process.env.NEXT_PUBLIC_URL}`}>
-        Recycl
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
 
 const useStyles = makeStyles((theme) => ({
   paper: {

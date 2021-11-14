@@ -20,25 +20,13 @@ import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import Snackbar from './uiParts/Snackbars.jsx'
 import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
+import Copyright from './uiParts/Copyright.jsx'
 import * as yup from 'yup'
 import { signIn } from 'next-auth/react'
 import { GET_ROLE_ID } from '../lib/graphql/queries/userRole'
 import { useQuery } from '@apollo/client'
 import { useRouter } from 'next/router'
 import { registerSchema } from '../lib/validation/'
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href={`${process.env.NEXT_PUBLIC_URL}`}>
-        Recycl
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
 
 const useStyles = makeStyles((theme) => ({
   paper: {

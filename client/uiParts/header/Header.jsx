@@ -41,7 +41,6 @@ export default function Header() {
     drawerOpen: false,
   })
   const { data: session, status } = useSession()
-  console.log(session)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

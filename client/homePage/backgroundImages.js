@@ -5,6 +5,5 @@ export default {
   smallRetinaPortrait: 'images/homeBackground/smallRetinaPortrait.jpg',
   mediumRetinaPortrait: 'images/homeBackground/mediumRetinaPortrait.jpg',
   mediumLandscape: 'images/homeBackground/mediumLandscape.jpg',
-  largeLandscape: 'images/homeBackground/largeLandscape.jpg',
   xLargeLandscape: 'images/homeBackground/xLargeLandscape.jpg',
 }
