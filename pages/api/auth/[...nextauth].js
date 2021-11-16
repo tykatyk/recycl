@@ -92,8 +92,6 @@ export default NextAuth({
         }
 
         let user = result.data.getUser
-        console.log('user is')
-        console.log(user)
 
         const checkPassword = await compare(password, user.password)
         if (!checkPassword) {
