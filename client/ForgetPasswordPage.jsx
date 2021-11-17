@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function ForgotPassword() {
+export default function ForgetPassword() {
   const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
@@ -161,4 +161,19 @@ export default function ForgotPassword() {
       />
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+  const { res } = context
+  const data = await res.json()
+  if (data.error) {
+    return {
+      props: {
+        error,
+      },
+    }
+  }
+  return {
+    props: {}, // will be passed to the page component as props
+  }
 }

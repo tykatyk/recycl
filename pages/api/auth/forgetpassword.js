@@ -1,5 +1,3 @@
-import appoloClient from '../../../lib/appoloClient/appoloClient'
-import { GET_USER } from '../../../lib/graphql/queries/user'
 import { emailSchema } from '../../../lib/validation'
 import * as yup from 'yup'
 import mail from '@sendgrid/mail'
@@ -94,22 +92,17 @@ export default async function forgetPasswordHandler(req, res) {
     html: message.replace(/\r\n/g, '<br>'),
   }
 
-  mail.send(mailOptions, (error, result) => {
-    if (error) {
-      console.log('error is')
-      console.log(error)
-      if (error)
-        console.log(JSON.stringify(error.response.body.errors, null, 2))
-      return res.status(500).json({
-        error: {
-          type: 'perForm',
-          message: 'Возникла ошибка при отправке сообщения',
-        },
-      })
-    }
-
+  try {
+    await mail.send(mailOptions)
     return res.status(200).json({
       message: `Сообщение для сброса пароля отправлено на ${user.email}`,
     })
-  })
+  } catch (error) {
+    return res.status(500).json({
+      error: {
+        type: 'perForm',
+        message: 'Возникла ошибка при отправке сообщения',
+      },
+    })
+  }
 }
