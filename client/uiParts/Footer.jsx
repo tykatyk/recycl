@@ -1,10 +1,5 @@
 import React from 'react'
-import {
-  Typography,
-  Container,
-  makeStyles,
-  Grid,
-} from '@material-ui/core/Typography'
+import { Typography, Container, makeStyles, Grid } from '@material-ui/core'
 import Copyright from './Copyright.jsx'
 
 const useStyles = makeStyles((theme) => ({
