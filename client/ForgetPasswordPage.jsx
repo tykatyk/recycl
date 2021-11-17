@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Typography,
   Box,
@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import Head from './uiParts/Head.jsx'
+import Snackbar from './uiParts/Snackbars.jsx'
 import Copyright from './uiParts/Copyright.jsx'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
@@ -39,6 +40,18 @@ export default function ForgotPassword() {
   const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [severity, setSeverity] = useState('error')
+  useEffect(() => {
+    if (backendError) {
+      setSeverity('error')
+      setBackendError(backendError)
+    } else if (successMessage) {
+      setSeverity('success')
+      setSuccessMessage(successMessage)
+    }
+  }, [backendError, successMessage])
+
   return (
     <>
       <Head title="Recycl | Forget password" />
@@ -49,10 +62,16 @@ export default function ForgotPassword() {
             variant="h3"
             align="center"
             style={{ marginBottom: `${theme.spacing(6)}px` }}
+            color="secondary"
           >
-            Сброс пароля
+            Забыли пароль?
           </Typography>
-          <Typography align="center">
+          <Typography
+            align="center"
+            style={{
+              marginBottom: `${theme.spacing(2)}px`,
+            }}
+          >
             Введите ваш email и мы вышлем вам код подтверждения. Вы сможете
             установить новый пароль после перехода по ссылке из полученного
             письма.
@@ -68,37 +87,29 @@ export default function ForgotPassword() {
                 body: JSON.stringify(values),
               })
                 .then((response) => {
-                  if (response.error) {
-                    try {
-                      let error = JSON.parse(response.error)
-                      if (error.type === 'perField') {
-                        setErrors(error.message)
-                        return
-                      }
-                      if (error.type === 'perForm') {
-                        setBackendError(error.message)
-                        return
-                      }
-                      setBackendError(
-                        'Неизвестная ошибка при обработке ответа сервера'
-                      )
-                      return
-                    } catch (err) {
-                      setBackendError(
-                        'Неизвестная ошибка при обработке ответа сервера'
-                      )
+                  return response.json()
+                })
+                .then((data) => {
+                  if (data.error) {
+                    const error = data.error
+                    if (error.type === 'perField') {
+                      setErrors(error.message)
                       return
                     }
-                  }
-
-                  if (router.query && router.query.from) {
-                    router.push(router.query.from)
+                    if (error.type === 'perForm') {
+                      setBackendError(error.message)
+                      return
+                    }
+                    setBackendError(
+                      'Неизвестная ошибка при обработке ответа сервера'
+                    )
                     return
+                  } else {
+                    setSuccessMessage(data.message)
                   }
-
-                  router.push('/')
                 })
                 .catch((error) => {
+                  console.log(error)
                   setBackendError('Неизвестная ошибка')
                 })
                 .finally(() => {
@@ -139,6 +150,15 @@ export default function ForgotPassword() {
           </Box>
         </div>
       </Container>
+      <Snackbar
+        severity={severity}
+        open={!!backendError || !!successMessage}
+        message={backendError || successMessage}
+        handleClose={() => {
+          setBackendError(null)
+          setSuccessMessage(null)
+        }}
+      />
     </>
   )
 }
