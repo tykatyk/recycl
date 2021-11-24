@@ -22,6 +22,7 @@ import Link from './uiParts/Link.jsx'
 import Head from './uiParts/Head.jsx'
 import Copyright from './uiParts/Copyright.jsx'
 import Snackbar from './uiParts/Snackbars.jsx'
+import BackButton from './uiParts/BackButton.jsx'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import { signIn, getSession } from 'next-auth/react'
@@ -70,6 +71,7 @@ export default function SignIn() {
   return (
     <>
       <Head title="Recycl | Login" />
+      <BackButton />
       <Container component="main" maxWidth="xs">
         <div className={classes.paper}>
           <Avatar className={classes.avatar}>
