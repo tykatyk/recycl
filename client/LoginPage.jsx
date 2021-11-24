@@ -202,7 +202,7 @@ export default function SignIn() {
                     disabled={isSubmitting}
                     startIcon={<GoogleIcon />}
                   >
-                    Вход с аккаунтом Google
+                    Войти с аккаунтом Google
                     {isSubmitting && <ButtonSubmittingCircle />}
                   </Button>
                 </Form>
