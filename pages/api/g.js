@@ -17,14 +17,14 @@ async function handler(req, res) {
     res.end()
     return false
   }
-
+  await dbConnect()
   await startServer
   await apolloServer.createHandler({
     path: '/api/g',
   })(req, res)
 }
 
-export default dbConnect(handler)
+export default handler
 export const config = {
   api: {
     bodyParser: false,
