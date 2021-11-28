@@ -26,7 +26,6 @@ const Text = () => {
   return (
     <Grid container direction="column" alignItems="center" justify="center">
       <Alert severity="error">Срок действия токена истек</Alert>
-      <Typography></Typography>
     </Grid>
   )
 }
