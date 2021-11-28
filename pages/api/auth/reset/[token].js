@@ -2,7 +2,7 @@ import dbConnect from '../../../../lib/db/connection'
 import { User } from '../../../../lib/db/models'
 
 export default async function resetPasswordHandler(req, res) {
-  // await dbConnect()
+  await dbConnect()
 
   console.log('query is')
   console.log(req.query)
@@ -31,7 +31,6 @@ export default async function resetPasswordHandler(req, res) {
         destination: '/resetpassworderror',
       },
     }
- 
   } else {
     //Redirect user to form with the email address
     return {

@@ -37,6 +37,7 @@ export default async function forgetPasswordHandler(req, res) {
   let user
   try {
     const email = body.email
+    await dbConnect()
     user = await User.findOne({ email })
 
     if (user) {
