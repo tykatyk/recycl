@@ -2,7 +2,8 @@ import dbConnect from '../../../../lib/db/connection'
 import { User } from '../../../../lib/db/models'
 
 export default async function resetPasswordHandler(req, res) {
-  // dbConnect()<-this doesn't work
+  // await dbConnect()
+
   console.log('query is')
   console.log(req.query)
 
@@ -24,18 +25,19 @@ export default async function resetPasswordHandler(req, res) {
   console.log('user')
   console.log(user)
   if (!user) {
-    res.status(401).json({
-      error: {
-        type: 'perForm',
-        message: 'Токен недействительный или его срок действия истек',
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/resetpassworderror',
       },
-    })
+    }
+ 
   } else {
     //Redirect user to form with the email address
     return {
       redirect: {
         permanent: false,
-        destination: '/resetpassword',
+        destination: '/restorepassword',
       },
     }
   }
