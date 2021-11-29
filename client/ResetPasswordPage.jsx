@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function SignIn() {
+export default function ResetPassword() {
   const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
