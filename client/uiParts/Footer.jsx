@@ -4,7 +4,6 @@ import Copyright from './Copyright.jsx'
 
 const useStyles = makeStyles((theme) => ({
   footer: {
-    borderTop: `1px solid ${theme.palette.divider}`,
     marginTop: 'auto',
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
