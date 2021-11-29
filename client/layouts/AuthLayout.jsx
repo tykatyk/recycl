@@ -1,5 +1,5 @@
 import React from 'react'
-import Wrapper from './Wrapper.jsx'
+import Wrapper from '../uiParts/Wrapper.jsx'
 import Footer from '../uiParts/Footer.jsx'
 import Head from '../uiParts/Head.jsx'
 import BackButton from '../uiParts/BackButton.jsx'
