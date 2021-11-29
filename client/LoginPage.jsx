@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import {
   Avatar,
-  Icon,
   Button,
-  TextField,
   FormControlLabel,
   Checkbox,
   Grid,
-  Box,
   Typography,
   makeStyles,
   useTheme,
@@ -19,15 +16,13 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import GoogleIcon from '@mui/icons-material/Google'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Link from './uiParts/Link.jsx'
-import Head from './uiParts/Head.jsx'
-import Copyright from './uiParts/Copyright.jsx'
 import Snackbar from './uiParts/Snackbars.jsx'
-import BackButton from './uiParts/BackButton.jsx'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import { signIn, getSession } from 'next-auth/react'
 import * as yup from 'yup'
 import { loginSchema } from '../lib/validation/'
+import AuthLayout from './layouts/AuthLayout.jsx'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -70,172 +65,170 @@ export default function SignIn() {
 
   return (
     <>
-      <Head title="Recycl | Login" />
-      <BackButton />
-      <Container component="main" maxWidth="xs">
-        <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Вход
-          </Typography>
-          <Formik
-            initialValues={{
-              email: '',
-              password: '',
-            }}
-            validationSchema={loginSchema}
-            onSubmit={(values, { setSubmitting, setErrors }) => {
-              setSubmitting(true)
+      <AuthLayout title="Recycl | Login">
+        <Container component="main" maxWidth="xs">
+          <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Вход
+            </Typography>
+            <Formik
+              initialValues={{
+                email: '',
+                password: '',
+              }}
+              validationSchema={loginSchema}
+              onSubmit={(values, { setSubmitting, setErrors }) => {
+                setSubmitting(true)
 
-              signIn('credentials', {
-                email: values.email,
-                password: values.password,
-                redirect: false,
-              })
-                .then((response) => {
-                  if (response.error) {
-                    try {
-                      let error = JSON.parse(response.error)
-                      if (error.type === 'perField') {
-                        setErrors(error.message)
+                signIn('credentials', {
+                  email: values.email,
+                  password: values.password,
+                  redirect: false,
+                })
+                  .then((response) => {
+                    if (response.error) {
+                      try {
+                        let error = JSON.parse(response.error)
+                        if (error.type === 'perField') {
+                          setErrors(error.message)
+                          return
+                        }
+                        if (error.type === 'perForm') {
+                          setBackendError(error.message)
+                          return
+                        }
+                        setBackendError(
+                          'Неизвестная ошибка при обработке ответа сервера'
+                        )
+                        return
+                      } catch (error) {
+                        setBackendError(
+                          'Неизвестная ошибка при обработке ответа сервера'
+                        )
                         return
                       }
-                      if (error.type === 'perForm') {
-                        setBackendError(error.message)
-                        return
-                      }
-                      setBackendError(
-                        'Неизвестная ошибка при обработке ответа сервера'
-                      )
-                      return
-                    } catch (error) {
-                      setBackendError(
-                        'Неизвестная ошибка при обработке ответа сервера'
-                      )
+                    }
+
+                    if (router.query && router.query.from) {
+                      router.push(router.query.from)
                       return
                     }
-                  }
 
-                  if (router.query && router.query.from) {
-                    router.push(router.query.from)
-                    return
-                  }
+                    router.push('/')
+                  })
+                  .catch((error) => {
+                    setBackendError('Неизвестная ошибка')
+                  })
+                  .finally(() => {
+                    setSubmitting(false)
+                  })
+              }}
+            >
+              {({ isSubmitting }) => {
+                return (
+                  <Form className={classes.form} noValidate autoComplete="off">
+                    <Field
+                      variant="outlined"
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="email"
+                      label="Электронная почта"
+                      name="email"
+                      component={TextFieldFormik}
+                    />
+                    <Field
+                      variant="outlined"
+                      margin="normal"
+                      required
+                      fullWidth
+                      name="password"
+                      label="Пароль"
+                      type="password"
+                      id="password"
+                      component={TextFieldFormik}
+                    />
+                    <FormControlLabel
+                      control={<Checkbox value="remember" color="secondary" />}
+                      label="Запомнить меня"
+                    />
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      color="secondary"
+                      className={classes.submit}
+                      disabled={isSubmitting}
+                    >
+                      Войти
+                      {isSubmitting && <ButtonSubmittingCircle />}
+                    </Button>
+                  </Form>
+                )
+              }}
+            </Formik>
+            <Formik
+              initialValues={{
+                callbackUrl: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
+              }}
+              onSubmit={async ({ setSubmitting }) => {
+                setSubmitting(true)
+                await signIn('google')
+                setSubmitting(false)
+              }}
+            >
+              {({ isSubmitting }) => {
+                return (
+                  <Form className={classes.form} noValidate autoComplete="off">
+                    <Field
+                      name="callbackUrl"
+                      type="hidden"
+                      component={TextFieldFormik}
+                    />
+                    <Button
+                      style={{ marginTop: 0 }}
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      color="secondary"
+                      className={classes.submit}
+                      disabled={isSubmitting}
+                      startIcon={<GoogleIcon />}
+                    >
+                      Войти с аккаунтом Google
+                      {isSubmitting && <ButtonSubmittingCircle />}
+                    </Button>
+                  </Form>
+                )
+              }}
+            </Formik>
+            <Grid container>
+              <Grid item xs>
+                <Link
+                  href="#"
+                  variant="body2"
+                  style={{ color: `${theme.palette.text.secondary}` }}
+                >
+                  Забыли пароль?
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link
+                  href="/register"
+                  variant="body2"
+                  style={{ color: `${theme.palette.text.secondary}` }}
+                >
+                  {'Нет аккаунта?'}
+                </Link>
+              </Grid>
+            </Grid>
+          </div>
+        </Container>
+      </AuthLayout>
 
-                  router.push('/')
-                })
-                .catch((error) => {
-                  setBackendError('Неизвестная ошибка')
-                })
-                .finally(() => {
-                  setSubmitting(false)
-                })
-            }}
-          >
-            {({ isSubmitting }) => {
-              return (
-                <Form className={classes.form} noValidate autoComplete="off">
-                  <Field
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="email"
-                    label="Электронная почта"
-                    name="email"
-                    component={TextFieldFormik}
-                  />
-                  <Field
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Пароль"
-                    type="password"
-                    id="password"
-                    component={TextFieldFormik}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox value="remember" color="secondary" />}
-                    label="Запомнить меня"
-                  />
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="secondary"
-                    className={classes.submit}
-                    disabled={isSubmitting}
-                  >
-                    Войти
-                    {isSubmitting && <ButtonSubmittingCircle />}
-                  </Button>
-                </Form>
-              )
-            }}
-          </Formik>
-          <Formik
-            initialValues={{
-              callbackUrl: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
-            }}
-            onSubmit={async (values, { setSubmitting }) => {
-              setSubmitting(true)
-              await signIn('google')
-              setSubmitting(false)
-            }}
-          >
-            {({ isSubmitting }) => {
-              return (
-                <Form className={classes.form} noValidate autoComplete="off">
-                  <Field
-                    name="callbackUrl"
-                    type="hidden"
-                    component={TextFieldFormik}
-                  />
-                  <Button
-                    style={{ marginTop: 0 }}
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="secondary"
-                    className={classes.submit}
-                    disabled={isSubmitting}
-                    startIcon={<GoogleIcon />}
-                  >
-                    Войти с аккаунтом Google
-                    {isSubmitting && <ButtonSubmittingCircle />}
-                  </Button>
-                </Form>
-              )
-            }}
-          </Formik>
-          <Grid container>
-            <Grid item xs>
-              <Link
-                href="#"
-                variant="body2"
-                style={{ color: `${theme.palette.text.secondary}` }}
-              >
-                Забыли пароль?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link
-                href="/register"
-                variant="body2"
-                style={{ color: `${theme.palette.text.secondary}` }}
-              >
-                {'Нет аккаунта?'}
-              </Link>
-            </Grid>
-          </Grid>
-        </div>
-        <Box mt={8} mb={4}>
-          <Copyright />
-        </Box>
-      </Container>
       <Snackbar
         severity="error"
         open={!!backendError}
