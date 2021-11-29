@@ -110,7 +110,7 @@ export default function SignIn() {
                         'Неизвестная ошибка при обработке ответа сервера'
                       )
                       return
-                    } catch (err) {
+                    } catch (error) {
                       setBackendError(
                         'Неизвестная ошибка при обработке ответа сервера'
                       )
