@@ -192,9 +192,6 @@ export default function SignUp() {
               }}
             </Formik>
           </div>
-          <Box mt={8}>
-            <Copyright />
-          </Box>
         </Container>
       </AuthLayout>
       <Snackbar
