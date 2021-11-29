@@ -27,6 +27,7 @@ import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import { signIn, getSession } from 'next-auth/react'
 import * as yup from 'yup'
 import { loginSchema } from '../lib/validation/'
+import { useSession } from 'next-auth/react'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -54,6 +55,7 @@ export default function ResetPassword() {
   const [backendError, setBackendError] = useState(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const { status } = useSession()
 
   /*  useEffect(() => {
     getSession().then((session) => {
@@ -66,6 +68,11 @@ export default function ResetPassword() {
   }, [])*/
 
   /*if (loading) return <PageLoadingCircle />*/
+
+  if (status === 'authenticated') {
+    router.replace('/')
+    return ''
+  }
 
   return (
     <>
