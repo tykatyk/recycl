@@ -2,6 +2,7 @@ import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { hash } from 'bcrypt'
 import { CREATE_USER, USER_EXISTS } from '../../../lib/graphql/queries/user'
 import { registerSchema } from '../../../lib/validation'
+import { mapErrors } from '../../../lib/mapErrors'
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -21,12 +22,9 @@ export default async function handler(req, res) {
       )
     } catch (error) {
       console.log('Error during validation request body')
-      if (error.inner && error.inner.length > 0) {
-        let mappedErrors = {}
-        error.inner.forEach((item, i) => {
-          if (!mappedErrors[item.path]) mappedErrors[item.path] = item.message
-        })
 
+      let mappedErrors = mapErrors(error)
+      if (mappedErrors) {
         res
           .status(422)
           .json({ error: { type: 'perField', message: mappedErrors } })

@@ -4,6 +4,7 @@ import mail from '@sendgrid/mail'
 mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../lib/db/connection'
 import { User } from '../../../lib/db/models'
+import mapErrors from '../../../lib/mapErrors'
 
 export default async function forgetPasswordHandler(req, res) {
   //check if request data is correct before processing further
@@ -12,11 +13,8 @@ export default async function forgetPasswordHandler(req, res) {
     body = JSON.parse(req.body)
     await emailSchema.validate(body, { abortEarly: false })
   } catch (error) {
-    if (error.inner && error.inner.length > 0) {
-      let mappedErrors = {}
-      error.inner.forEach((item, i) => {
-        if (!mappedErrors[item.path]) mappedErrors[item.path] = item.message
-      })
+    let mappedErrors = mapErrors(error)
+    if (mappedErrors) {
       return res.status(422).json({
         error: {
           type: 'perField',
