@@ -30,10 +30,7 @@ export default function ResetPasswordToken() {
       </>
     )
 
-  if (error) {
-    console.log(error)
-    return <Content message="Возникла ошибка при проверке токена" />
-  }
+  if (error) return <Content message="Возникла ошибка при проверке токена" />
 
   if (!data.getByToken) return <Content message="Срок действия ссылки истек" />
 
