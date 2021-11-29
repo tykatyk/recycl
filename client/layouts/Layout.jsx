@@ -1,5 +1,4 @@
 import React from 'react'
-import Container from '@material-ui/core/Container'
 import Wrapper from './Wrapper.jsx'
 import Header from '../uiParts/header/Header.jsx'
 import Footer from '../uiParts/Footer.jsx'
