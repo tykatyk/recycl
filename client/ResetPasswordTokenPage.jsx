@@ -4,6 +4,7 @@ import Alert from '@material-ui/lab/Alert'
 import { GET_USER_BY_TOKEN } from '../lib/graphql/queries/user'
 import { useQuery } from '@apollo/client'
 import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import Head from './uiParts/Head.jsx'
 import AuthLayout from './layouts/AuthLayout.jsx'
@@ -11,9 +12,15 @@ import AuthLayout from './layouts/AuthLayout.jsx'
 export default function ResetPasswordToken() {
   const router = useRouter()
   const { token } = router.query
+  const { status } = useSession()
   const { loading, error, data } = useQuery(GET_USER_BY_TOKEN, {
     variables: { token },
   })
+
+  if (status === 'authenticated') {
+    router.replace('/')
+    return ''
+  }
 
   if (loading)
     return (
