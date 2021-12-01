@@ -165,18 +165,3 @@ export default function ForgetPassword() {
     </>
   )
 }
-
-export async function getServerSideProps(context) {
-  const { res } = context
-  const data = await res.json()
-  if (data.error) {
-    return {
-      props: {
-        error,
-      },
-    }
-  }
-  return {
-    props: {},
-  }
-}
