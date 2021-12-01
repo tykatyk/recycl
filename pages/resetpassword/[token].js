@@ -1,6 +1,13 @@
 import React from 'react'
-import ResetPasswordTokenPage from '../../client/ResetPasswordTokenPage.jsx'
+import ResetPasswordPage from '../../client/ResetPasswordPage.jsx'
 
-export default function ResetPasswordToken() {
-  return <ResetPasswordTokenPage />
+export default function Reset(props) {
+  const { token } = props
+  return <ResetPasswordPage token={token} />
+}
+
+export async function getServerSideProps(context) {
+  return {
+    props: { token: context.query.token }, // will be passed to the page component as props
+  }
 }
