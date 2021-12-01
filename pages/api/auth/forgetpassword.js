@@ -1,5 +1,4 @@
 import { emailSchema } from '../../../lib/validation'
-import * as yup from 'yup'
 import mail from '@sendgrid/mail'
 mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../lib/db/connection'
