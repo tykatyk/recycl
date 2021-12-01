@@ -86,7 +86,7 @@ export default async function forgetPasswordHandler(req, res) {
 
   const mailOptions = {
     to: user.email,
-    from: 'tykatyk@gmail.com',
+    from: process.env.EMAIL_FROM,
     subject: `Запрос на сброс пароля на сайте ${process.env.NEXT_PUBLIC_URL}`,
     text: message,
     html: message.replace(/\r\n/g, '<br>'),
