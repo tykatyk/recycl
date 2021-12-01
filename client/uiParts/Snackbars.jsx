@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Snackbar, makeStyles } from '@material-ui/core'
+import { Snackbar, makeStyles } from '@material-ui/core'
 import MuiAlert from '@material-ui/lab/Alert'
 
 function Alert(props) {
