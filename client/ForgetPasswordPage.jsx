@@ -13,7 +13,6 @@ import Snackbar from './uiParts/Snackbars.jsx'
 import Copyright from './uiParts/Copyright.jsx'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
-import * as yup from 'yup'
 import { emailSchema } from '../lib/validation/'
 
 const useStyles = makeStyles((theme) => ({
@@ -80,6 +79,7 @@ export default function ForgetPassword() {
             initialValues={{
               email: '',
             }}
+            validationSchema={emailSchema}
             onSubmit={(values, { setSubmitting, setErrors }) => {
               setSubmitting(true)
               fetch('/api/auth/forgetpassword', {
