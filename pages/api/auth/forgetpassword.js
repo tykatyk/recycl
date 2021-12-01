@@ -23,7 +23,7 @@ export default async function forgetPasswordHandler(req, res) {
         },
       })
     } else {
-      return res.status(422).json({
+      return res.status(500).json({
         error: {
           type: 'perForm',
           message: 'Возникла ошибка при проверке данных формы',
