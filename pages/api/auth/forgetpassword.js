@@ -13,6 +13,7 @@ export default async function forgetPasswordHandler(req, res) {
     body = JSON.parse(req.body)
     await emailSchema.validate(body, { abortEarly: false })
   } catch (error) {
+    console.log(error)
     let mappedErrors = mapErrors(error)
     if (mappedErrors) {
       return res.status(422).json({
@@ -53,7 +54,6 @@ export default async function forgetPasswordHandler(req, res) {
       })
     }
   } catch (error) {
-    console.log('Error while checking user existance')
     console.log(error)
 
     return res.status(500).json({
@@ -68,6 +68,7 @@ export default async function forgetPasswordHandler(req, res) {
   try {
     await user.save()
   } catch (error) {
+    console.log(error)
     return res.status(500).json({
       error: {
         type: 'perForm',
@@ -97,6 +98,7 @@ export default async function forgetPasswordHandler(req, res) {
       message: `Сообщение для сброса пароля отправлено на ${user.email}`,
     })
   } catch (error) {
+    console.log(error)
     return res.status(500).json({
       error: {
         type: 'perForm',
