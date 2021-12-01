@@ -1,152 +1,55 @@
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import {
-  Avatar,
-  Icon,
-  Button,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  Grid,
-  Box,
-  Typography,
-  makeStyles,
-  useTheme,
-  Container,
-} from '@material-ui/core'
-import { Formik, Form, Field } from 'formik'
-import RotateLeftSharpIcon from '@material-ui/icons/RotateLeftSharp'
-import GoogleIcon from '@mui/icons-material/Google'
-import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
-import Link from './uiParts/Link.jsx'
-import Head from './uiParts/Head.jsx'
-import Copyright from './uiParts/Copyright.jsx'
-import Snackbar from './uiParts/Snackbars.jsx'
+import React from 'react'
+import { Grid } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
+import { GET_USER_BY_TOKEN } from '../lib/graphql/queries/user'
+import { useQuery } from '@apollo/client'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
-import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
-import { signIn, getSession } from 'next-auth/react'
-import * as yup from 'yup'
-import { loginSchema } from '../lib/validation/'
-import { useSession } from 'next-auth/react'
+import Head from './uiParts/Head.jsx'
+import AuthLayout from './layouts/AuthLayout.jsx'
+import ResetPassword from './ResetPassword.jsx'
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}))
+export default function ResetPasswordPage({ token }) {
+  const { loading, error, data } = useQuery(GET_USER_BY_TOKEN, {
+    variables: { token },
+  })
 
-export default function ResetPassword() {
-  const classes = useStyles()
-  const theme = useTheme()
-  const [backendError, setBackendError] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
-  const { status } = useSession()
+  if (loading)
+    return (
+      <>
+        <Head title="Recycl | Reset Password" />
+        <PageLoadingCircle />
+      </>
+    )
 
-  /*  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        router.replace('/')
-      } else {
-        setLoading(false)
-      }
-    })
-  }, [])*/
+  if (error) return <Content message="Возникла ошибка при проверке токена" />
 
-  /*if (loading) return <PageLoadingCircle />*/
+  if (!data.getByToken) return <Content message="Срок действия ссылки истек" />
 
-  if (status === 'authenticated') {
-    router.replace('/')
-    return ''
-  }
+  return <ResetPassword token={token} />
+}
 
+const Content = (props) => {
   return (
-    <>
-      <Head title="Recycl | Reset password" />
-      <Container component="main" maxWidth="xs">
-        <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <RotateLeftSharpIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Сброс пароля
-          </Typography>
-          <Formik
-            initialValues={{
-              email: '',
-              password: '',
-            }}
-            validationSchema={loginSchema}
-            onSubmit={(values, { setSubmitting, setErrors }) => {
-              setSubmitting(true)
-            }}
+    <AuthLayout title="Recycl | Error">
+      <Grid
+        container
+        alignItems="center"
+        direction="column"
+        style={{ flex: '1 0 auto' }}
+      >
+        <Grid item>
+          <Grid
+            container
+            direction="column"
+            alignItems="center"
+            justify="center"
           >
-            {({ isSubmitting }) => {
-              return (
-                <Form className={classes.form} noValidate autoComplete="off">
-                  <Field
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="password"
-                    label="Новый пароль"
-                    name="password"
-                    component={TextFieldFormik}
-                  />
-                  <Field
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="confirmPassword"
-                    label="Повторите пароль"
-                    type="password"
-                    id="confirmPassword"
-                    component={TextFieldFormik}
-                  />
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="secondary"
-                    className={classes.submit}
-                    disabled={isSubmitting}
-                  >
-                    Отправить
-                    {isSubmitting && <ButtonSubmittingCircle />}
-                  </Button>
-                </Form>
-              )
-            }}
-          </Formik>
-          <Box mt={8} mb={4}>
-            <Copyright />
-          </Box>
-        </div>
-      </Container>
-      <Snackbar
-        severity="error"
-        open={!!backendError}
-        message={backendError}
-        handleClose={() => {
-          setBackendError(null)
-        }}
-      />
-    </>
+            <Alert variant="filled" severity="error">
+              {props.message}
+            </Alert>
+          </Grid>
+        </Grid>
+      </Grid>
+    </AuthLayout>
   )
 }
