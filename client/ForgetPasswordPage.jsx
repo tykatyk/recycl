@@ -85,6 +85,9 @@ export default function ForgetPassword() {
               fetch('/api/auth/forgetpassword', {
                 method: 'POST',
                 body: JSON.stringify(values),
+                headers: {
+                  'Content-Type': 'application/json',
+                },
               })
                 .then((response) => {
                   return response.json()
