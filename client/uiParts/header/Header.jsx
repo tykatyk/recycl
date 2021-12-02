@@ -121,7 +121,7 @@ export default function Header() {
   const displayDesktop = () => <HeaderLinks isDesktop />
 
   return (
-    <AppBar position="static" id="mainHeader" className={classes.appBar}>
+    <AppBar position="static" id="mainHeader">
       <Container component="div">
         <Toolbar className={classes.header}>
           {mobileView ? displayMobile() : displayDesktop()}
