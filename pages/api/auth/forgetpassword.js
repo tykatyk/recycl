@@ -7,9 +7,8 @@ import mapErrors from '../../../lib/mapErrors'
 
 export default async function forgetPasswordHandler(req, res) {
   //check if request data is correct before processing further
-  let body
+  let body = req.body
   try {
-    body = JSON.parse(req.body)
     await emailSchema.validate(body, { abortEarly: false })
   } catch (error) {
     console.log(error)
