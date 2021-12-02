@@ -26,7 +26,7 @@ export default function HeaderLinks(props) {
     },
     {
       text: 'Заявки на сдачу',
-      href: '/removal',
+      href: '/removal/application',
     },
     {
       text: 'Переработчики',
