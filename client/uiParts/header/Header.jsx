@@ -172,7 +172,10 @@ export default function Header() {
                           <Link
                             href="#"
                             onClick={() => {
-                              preventDefault(), signOut()
+                              preventDefault(),
+                                signOut({
+                                  callbackUrl: `${window.location.origin}`,
+                                })
                             }}
                             color="inherit"
                           >
