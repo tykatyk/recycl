@@ -76,7 +76,7 @@ export default async function forgetPasswordHandler(req, res) {
   }
 
   // send email
-  const link = `${process.env.NEXT_PUBLIC_URL}resetpassword/${user.resetPasswordToken}`
+  const link = `${process.env.NEXT_PUBLIC_URL}auth/resetpassword/${user.resetPasswordToken}`
   const message = `Здравствуйте.\r\n
       Вы получили это письмо потому что запросили операцию сброса пароля на сайте ${process.env.NEXT_PUBLIC_URL}\r\n
                   Для сброса пароля перейдите по ссылке ${link} (ссылка действительна на протяжении часа). \r\n
