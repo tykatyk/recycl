@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Avatar,
-  Button,
   Typography,
+  Button,
   makeStyles,
+  useTheme,
   Container,
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
-import RotateLeftSharpIcon from '@material-ui/icons/RotateLeftSharp'
-import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
-import Snackbar from './uiParts/Snackbars.jsx'
-import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
-import { passwordSchema } from '../lib/validation'
-import AuthLayout from './layouts/AuthLayout.jsx'
+import Snackbar from '../uiParts/Snackbars.jsx'
+import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik.jsx'
+import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
+import AuthLayout from '../layouts/AuthLayout.jsx'
+import { emailSchema } from '../../lib/validation'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -34,8 +32,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function ResetPassword({ token }) {
+export default function ForgetPassword() {
   const classes = useStyles()
+  const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [severity, setSeverity] = useState('error')
@@ -51,32 +50,38 @@ export default function ResetPassword({ token }) {
 
   return (
     <>
-      <AuthLayout title="Recycl | Reset password">
+      <AuthLayout title="Recycl | Forget password">
         <Container component="main" maxWidth="xs">
           <div className={classes.paper}>
-            <Avatar className={classes.avatar}>
-              <RotateLeftSharpIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Восстановление пароля
+            <Typography
+              component="h1"
+              variant="h3"
+              align="center"
+              style={{ marginBottom: `${theme.spacing(6)}px` }}
+              color="secondary"
+            >
+              Забыли пароль?
+            </Typography>
+            <Typography
+              align="center"
+              style={{
+                marginBottom: `${theme.spacing(2)}px`,
+              }}
+            >
+              Введите ваш email и мы вышлем вам код подтверждения. Вы сможете
+              установить новый пароль после перехода по ссылке из полученного
+              письма.
             </Typography>
             <Formik
               initialValues={{
-                password: '',
-                confirmPassword: '',
+                email: '',
               }}
-              validationSchema={passwordSchema}
+              validationSchema={emailSchema}
               onSubmit={(values, { setSubmitting, setErrors }) => {
                 setSubmitting(true)
-                console.log(
-                  JSON.stringify({ password: values.password, token })
-                )
-                fetch('/api/auth/restorepassword/', {
+                fetch('/api/auth/forgetpassword', {
                   method: 'POST',
-                  body: JSON.stringify({
-                    password: values.password,
-                    token,
-                  }),
+                  body: JSON.stringify(values),
                   headers: {
                     'Content-Type': 'application/json',
                   },
@@ -86,24 +91,25 @@ export default function ResetPassword({ token }) {
                   })
                   .then((data) => {
                     if (data.error) {
-                      if (data.error.type === 'perField') {
-                        setErrors(data.error.message)
+                      const error = data.error
+                      if (error.type === 'perField') {
+                        setErrors(error.message)
                         return
                       }
-                      if (data.error.type === 'perForm') {
-                        setBackendError(data.error.message)
+                      if (error.type === 'perForm') {
+                        setBackendError(error.message)
                         return
                       }
-
                       setBackendError(
                         'Неизвестная ошибка при обработке ответа сервера'
                       )
                       return
                     } else {
-                      setSuccessMessage('Пароль успешно изменен')
+                      setSuccessMessage(data.message)
                     }
                   })
                   .catch((error) => {
+                    console.log(error)
                     setBackendError('Неизвестная ошибка')
                   })
                   .finally(() => {
@@ -119,21 +125,9 @@ export default function ResetPassword({ token }) {
                       margin="normal"
                       required
                       fullWidth
-                      name="password"
-                      id="password"
-                      label="Новый пароль"
-                      type="password"
-                      component={TextFieldFormik}
-                    />
-                    <Field
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      name="confirmPassword"
-                      id="confirmPassword"
-                      label="Повторите пароль"
-                      type="password"
+                      id="email"
+                      label="Электронная почта"
+                      name="email"
                       component={TextFieldFormik}
                     />
                     <Button
@@ -153,16 +147,17 @@ export default function ResetPassword({ token }) {
             </Formik>
           </div>
         </Container>
-        <Snackbar
-          severity={severity}
-          open={!!backendError || !!successMessage}
-          message={backendError || successMessage}
-          handleClose={() => {
-            setBackendError(null)
-            setSuccessMessage(null)
-          }}
-        />
       </AuthLayout>
+
+      <Snackbar
+        severity={severity}
+        open={!!backendError || !!successMessage}
+        message={backendError || successMessage}
+        handleClose={() => {
+          setBackendError(null)
+          setSuccessMessage(null)
+        }}
+      />
     </>
   )
 }

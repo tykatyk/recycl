@@ -1,11 +1,11 @@
 import React from 'react'
 import { Grid } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
-import { GET_USER_BY_TOKEN } from '../lib/graphql/queries/user'
+import { GET_USER_BY_TOKEN } from '../../lib/graphql/queries/user'
 import { useQuery } from '@apollo/client'
-import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
-import Head from './uiParts/Head.jsx'
-import AuthLayout from './layouts/AuthLayout.jsx'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
+import Head from '../uiParts/Head.jsx'
+import AuthLayout from '../layouts/AuthLayout.jsx'
 import ResetPassword from './ResetPassword.jsx'
 
 export default function ResetPasswordPage({ token }) {

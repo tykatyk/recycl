@@ -1,33 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Avatar,
   Button,
-  Grid,
-  Box,
   Typography,
   makeStyles,
-  useTheme,
   Container,
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
-import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
-import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
-import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
-import Snackbar from './uiParts/Snackbars.jsx'
-import Link from './uiParts/Link.jsx'
-import Copyright from './uiParts/Copyright.jsx'
-import * as yup from 'yup'
-import { signIn } from 'next-auth/react'
-import { GET_ROLE_ID } from '../lib/graphql/queries/userRole'
-import { useQuery } from '@apollo/client'
-import { useRouter } from 'next/router'
-import { registerSchema } from '../lib/validation/'
-import AuthLayout from './layouts/AuthLayout.jsx'
+import RotateLeftSharpIcon from '@material-ui/icons/RotateLeftSharp'
+import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik.jsx'
+import Snackbar from '../uiParts/Snackbars.jsx'
+import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
+import { passwordSchema } from '../../lib/validation'
+import AuthLayout from '../layouts/AuthLayout.jsx'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    // marginTop: theme.spacing(8),
+    marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -45,47 +34,49 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function SignUp() {
-  const router = useRouter()
+export default function ResetPassword({ token }) {
   const classes = useStyles()
-  const theme = useTheme()
-  const { loading, data, error } = useQuery(GET_ROLE_ID, {
-    variables: { roleName: 'user' },
-  })
   const [backendError, setBackendError] = useState(null)
-
-  if (loading) return <PageLoadingCircle />
-
-  if (error) {
-    return <Typography>Возникла ошибка при получении данных</Typography>
-  }
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [severity, setSeverity] = useState('error')
+  useEffect(() => {
+    if (backendError) {
+      setSeverity('error')
+      setBackendError(backendError)
+    } else if (successMessage) {
+      setSeverity('success')
+      setSuccessMessage(successMessage)
+    }
+  }, [backendError, successMessage])
 
   return (
     <>
-      <AuthLayout title="Recycl | Register">
+      <AuthLayout title="Recycl | Reset password">
         <Container component="main" maxWidth="xs">
           <div className={classes.paper}>
             <Avatar className={classes.avatar}>
-              <LockOutlinedIcon />
+              <RotateLeftSharpIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Регистрация
+              Восстановление пароля
             </Typography>
             <Formik
               initialValues={{
-                role: data.getRoleId,
-                username: '',
-                email: '',
                 password: '',
                 confirmPassword: '',
               }}
-              validationSchema={registerSchema}
+              validationSchema={passwordSchema}
               onSubmit={(values, { setSubmitting, setErrors }) => {
                 setSubmitting(true)
-
-                fetch('/api/auth/signup/', {
+                console.log(
+                  JSON.stringify({ password: values.password, token })
+                )
+                fetch('/api/auth/restorepassword/', {
                   method: 'POST',
-                  body: JSON.stringify(values),
+                  body: JSON.stringify({
+                    password: values.password,
+                    token,
+                  }),
                   headers: {
                     'Content-Type': 'application/json',
                   },
@@ -108,11 +99,12 @@ export default function SignUp() {
                         'Неизвестная ошибка при обработке ответа сервера'
                       )
                       return
+                    } else {
+                      setSuccessMessage('Пароль успешно изменен')
                     }
-                    router.push('/')
                   })
                   .catch((error) => {
-                    setBackendError('Ошибка при отпавке запроса на сервер')
+                    setBackendError('Неизвестная ошибка')
                   })
                   .finally(() => {
                     setSubmitting(false)
@@ -122,36 +114,15 @@ export default function SignUp() {
               {({ isSubmitting }) => {
                 return (
                   <Form className={classes.form} noValidate autoComplete="off">
-                    <Field type="hidden" name="role" />
-                    <Field
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="username"
-                      label="Имя или название организации"
-                      name="username"
-                      component={TextFieldFormik}
-                    />
-                    <Field
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="email"
-                      label="Электронная почта"
-                      name="email"
-                      component={TextFieldFormik}
-                    />
                     <Field
                       variant="outlined"
                       margin="normal"
                       required
                       fullWidth
                       name="password"
-                      label="Пароль"
-                      type="password"
                       id="password"
+                      label="Новый пароль"
+                      type="password"
                       component={TextFieldFormik}
                     />
                     <Field
@@ -160,9 +131,9 @@ export default function SignUp() {
                       required
                       fullWidth
                       name="confirmPassword"
-                      label="Пароль повторно"
-                      type="password"
                       id="confirmPassword"
+                      label="Повторите пароль"
+                      type="password"
                       component={TextFieldFormik}
                     />
                     <Button
@@ -173,35 +144,25 @@ export default function SignUp() {
                       className={classes.submit}
                       disabled={isSubmitting}
                     >
-                      Зарегистрироваться
+                      Отправить
                       {isSubmitting && <ButtonSubmittingCircle />}
                     </Button>
-                    <Grid container style={{ justifyContent: 'flex-end' }}>
-                      <Grid item>
-                        <Link
-                          href="/login"
-                          variant="body2"
-                          style={{ color: `${theme.palette.text.secondary}` }}
-                        >
-                          {'Уже есть аккаунт?'}
-                        </Link>
-                      </Grid>
-                    </Grid>
                   </Form>
                 )
               }}
             </Formik>
           </div>
         </Container>
+        <Snackbar
+          severity={severity}
+          open={!!backendError || !!successMessage}
+          message={backendError || successMessage}
+          handleClose={() => {
+            setBackendError(null)
+            setSuccessMessage(null)
+          }}
+        />
       </AuthLayout>
-      <Snackbar
-        severity="error"
-        open={!!backendError}
-        message={backendError}
-        handleClose={() => {
-          setBackendError(null)
-        }}
-      />
     </>
   )
 }

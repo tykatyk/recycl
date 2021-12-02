@@ -12,14 +12,14 @@ import {
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import GoogleIcon from '@mui/icons-material/Google'
-import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
-import Link from './uiParts/Link.jsx'
-import Snackbar from './uiParts/Snackbars.jsx'
-import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
-import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
+import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik.jsx'
+import Link from '../uiParts/Link.jsx'
+import Snackbar from '../uiParts/Snackbars.jsx'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
+import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import { signIn, getSession } from 'next-auth/react'
-import { loginSchema } from '../lib/validation/'
-import AuthLayout from './layouts/AuthLayout.jsx'
+import { loginSchema } from '../../lib/validation'
+import AuthLayout from '../layouts/AuthLayout.jsx'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -201,7 +201,7 @@ export default function SignIn() {
             <Grid container>
               <Grid item xs>
                 <Link
-                  href="/forgetpassword"
+                  href="/auth/forgetpassword"
                   variant="body2"
                   style={{ color: `${theme.palette.text.secondary}` }}
                 >
@@ -210,7 +210,7 @@ export default function SignIn() {
               </Grid>
               <Grid item>
                 <Link
-                  href="/register"
+                  href="/auth/register"
                   variant="body2"
                   style={{ color: `${theme.palette.text.secondary}` }}
                 >
