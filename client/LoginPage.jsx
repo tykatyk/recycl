@@ -3,8 +3,6 @@ import { useRouter } from 'next/router'
 import {
   Avatar,
   Button,
-  FormControlLabel,
-  Checkbox,
   Grid,
   Typography,
   makeStyles,
@@ -20,7 +18,6 @@ import Snackbar from './uiParts/Snackbars.jsx'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import { signIn, getSession } from 'next-auth/react'
-import * as yup from 'yup'
 import { loginSchema } from '../lib/validation/'
 import AuthLayout from './layouts/AuthLayout.jsx'
 
