@@ -165,7 +165,7 @@ export default function Header() {
                       </MenuItem>
                       <MenuItem onClick={handleClose}>
                         {status === 'unauthenticated' && (
-                          <Link href="/login" color="inherit">
+                          <Link href="/auth/login" color="inherit">
                             Войти
                           </Link>
                         )}
