@@ -5,20 +5,15 @@ import { useRouter } from 'next/router'
 
 export default function BackButton(props) {
   const theme = useTheme()
-  const { message = 'Назад', to } = props
+  const { text = 'Назад', to } = props
   const router = useRouter()
   const handleClick = () => {
     if (to) {
-      router.replace(to)
+      router.push(to)
       return
     }
 
-    if (router.query.from) {
-      router.replace(router.query.from)
-      return
-    }
-
-    router.replace('/')
+    router.back()
   }
 
   return (
@@ -29,7 +24,7 @@ export default function BackButton(props) {
       }}
     >
       <Button onClick={handleClick} startIcon={<ArrowBackIosIcon />}>
-        {message}
+        {text}
       </Button>
     </div>
   )
