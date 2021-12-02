@@ -159,7 +159,11 @@ export default function Header() {
                         </Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}>
-                        <Link href="#" onClick={preventDefault} color="inherit">
+                        <Link
+                          href="/myaccount/settings"
+                          onClick={preventDefault}
+                          color="inherit"
+                        >
                           Настройки
                         </Link>
                       </MenuItem>
