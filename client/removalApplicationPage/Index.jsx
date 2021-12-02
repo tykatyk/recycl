@@ -102,7 +102,7 @@ export default function removalApplications(props) {
 
   if (status === 'unauthenticated') {
     Router.push({
-      pathname: '/login',
+      pathname: '/auth/login',
       query: {
         from: '/removal/application',
       },
