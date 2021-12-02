@@ -79,8 +79,6 @@ const columns = [
 ]
 
 export default function removalApplications(props) {
-  console.log('props are')
-  console.log(props)
   const classes = useStyles()
   const [selected, setSelected] = useState([])
   const { loading, error, data } = useQuery(
