@@ -2,17 +2,15 @@ import React, { useState, useEffect } from 'react'
 import {
   Grid,
   Card,
-  Container,
   CardHeader,
   CardContent,
   Typography,
   useTheme,
 } from '@material-ui/core'
 import Layout from '../layouts/Layout.jsx'
-import isMobile from '../../lib/detectMobile'
 import cardsContent from './cardsContent'
 import homePageStyles from './styles'
-import { setSplashMinHeight, handleResize } from './resizeHandlers'
+import { handleResize } from './resizeHandlers'
 const useStyles = homePageStyles
 
 export default function HomePage() {
@@ -47,6 +45,7 @@ export default function HomePage() {
   const classes = useStyles()
 
   return (
+    //ToDo make separate layout for home page
     <Layout title="Recycl | Home">
       <div
         className={classes.splash}
