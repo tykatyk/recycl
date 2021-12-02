@@ -67,10 +67,6 @@ export default function Header() {
 
   const open = Boolean(anchorEl)
 
-  const handleChange = (event) => {
-    setAuth(event.target.checked)
-  }
-
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget)
   }
