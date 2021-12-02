@@ -152,11 +152,7 @@ export default function Header() {
               >
                 <Paper>
                   <ClickAwayListener onClickAway={handleClose}>
-                    <MenuList
-                      autoFocusItem={open}
-                      id="menu-list-grow"
-                      onKeyDown={handleListKeyDown}
-                    >
+                    <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
                       <MenuItem onClick={handleClose}>
                         <Link href="#" onClick={preventDefault} color="inherit">
                           Мои заявки
