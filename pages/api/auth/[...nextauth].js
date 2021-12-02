@@ -113,7 +113,7 @@ export default NextAuth({
   },
 
   callbacks: {
-    jwt: ({ token, user, account }) => {
+    jwt: ({ token, user }) => {
       // first time jwt callback is run, user object is available
       if (user) {
         token.id = user.id
