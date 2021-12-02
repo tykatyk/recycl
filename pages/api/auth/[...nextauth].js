@@ -104,7 +104,7 @@ export default NextAuth({
           )
         }
 
-        return { email: user.email, id: user['_id'] }
+        return { email: user.email, id: user['_id'], name: user.name }
       }, //end of authorize function
     }),
   ],
@@ -117,6 +117,7 @@ export default NextAuth({
       // first time jwt callback is run, user object is available
       if (user) {
         token.id = user.id
+        token.username = user.name
       }
 
       return token
@@ -124,6 +125,7 @@ export default NextAuth({
     session: ({ session, token }) => {
       if (token) {
         session.id = token.id
+        session.username = token.username
       }
 
       return session
