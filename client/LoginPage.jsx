@@ -26,7 +26,7 @@ import AuthLayout from './layouts/AuthLayout.jsx'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(8),
+    // marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -151,10 +151,6 @@ export default function SignIn() {
                       id="password"
                       component={TextFieldFormik}
                     />
-                    <FormControlLabel
-                      control={<Checkbox value="remember" color="secondary" />}
-                      label="Запомнить меня"
-                    />
                     <Button
                       type="submit"
                       fullWidth
@@ -208,7 +204,7 @@ export default function SignIn() {
             <Grid container>
               <Grid item xs>
                 <Link
-                  href="#"
+                  href="/forgetpassword"
                   variant="body2"
                   style={{ color: `${theme.palette.text.secondary}` }}
                 >
@@ -221,7 +217,7 @@ export default function SignIn() {
                   variant="body2"
                   style={{ color: `${theme.palette.text.secondary}` }}
                 >
-                  {'Нет аккаунта?'}
+                  Нет аккаунта?
                 </Link>
               </Grid>
             </Grid>
