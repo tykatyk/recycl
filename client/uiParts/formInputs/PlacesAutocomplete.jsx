@@ -34,10 +34,9 @@ export default function PlacesAutocomplete(props) {
   const {
     form: { setFieldValue, handleBlur, setFieldTouched, values },
     field: { name },
-    maps,
   } = props
 
-  const { type, label, variant, value, onBlur, error, helperText, disabled } =
+  const { label, variant, value, error, helperText, disabled } =
     fieldToTextField(props)
   const classes = useStyles()
   const [inputValue, setInputValue] = React.useState('')
