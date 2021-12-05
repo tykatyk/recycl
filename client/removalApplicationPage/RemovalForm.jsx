@@ -121,7 +121,6 @@ export default function RemovalForm(props) {
             }
           }, [id, applicationData, wasteTypesData])
 
-          const initialValues = getInitialValues()
           const shouldDisable =
             gettingApplication || gettingWasteTypes || isSubmitting
 
