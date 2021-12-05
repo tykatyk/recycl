@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from '@material-ui/core'
-import Layout from '../layouts/Layout.jsx'
+import HomeLayout from '../layouts/HomeLayout.jsx'
 import cardsContent from './cardsContent'
 import homePageStyles from './styles'
 import { handleResize } from './resizeHandlers'
@@ -45,8 +45,7 @@ export default function HomePage() {
   const classes = useStyles()
 
   return (
-    //ToDo make separate layout for home page
-    <Layout title="Recycl | Home">
+    <HomeLayout title="Recycl | Home">
       <div
         className={classes.splash}
         style={{ minHeight: `${splashMinHeight}px` }}
@@ -97,6 +96,6 @@ export default function HomePage() {
           ))}
         </Grid>
       </div>
-    </Layout>
+    </HomeLayout>
   )
 }
