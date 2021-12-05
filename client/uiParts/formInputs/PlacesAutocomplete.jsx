@@ -28,6 +28,13 @@ const useStyles = makeStyles((theme) => ({
   locationIcon: {
     marginRight: theme.spacing(2),
   },
+  paper: ({ backgroundColor }) => {
+    return {
+      background: backgroundColor
+        ? backgroundColor
+        : theme.palette.background.paper,
+    }
+  },
 }))
 
 export default function PlacesAutocomplete(props) {
@@ -38,7 +45,7 @@ export default function PlacesAutocomplete(props) {
 
   const { label, variant, value, error, helperText, disabled } =
     fieldToTextField(props)
-  const classes = useStyles()
+  const classes = useStyles(props)
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
   const [shouldOpen, setShouldOpen] = React.useState(false)
@@ -131,6 +138,7 @@ export default function PlacesAutocomplete(props) {
       key={key}
       classes={{
         root: classes.root,
+        paper: classes.paper,
         focused: classes.focused,
         popupIndicator: classes.popupIndicator,
         clearIndicator: classes.clearIndicator,
