@@ -9,11 +9,9 @@ import {
   makeStyles,
 } from '@material-ui/core'
 import { fieldToTextField } from 'formik-material-ui'
-import { Field } from 'formik'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox.jsx'
-import { useRouter } from 'next/router'
 
 function loadScript(src, position, id) {
   if (!position) return
@@ -42,8 +40,6 @@ export default function PlacesAutocomplete(props) {
   const { type, label, variant, value, onBlur, error, helperText, disabled } =
     fieldToTextField(props)
   const classes = useStyles()
-  const router = useRouter()
-  const { id } = router.query
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
   const [shouldOpen, setShouldOpen] = React.useState(false)
