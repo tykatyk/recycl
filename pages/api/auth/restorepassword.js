@@ -1,5 +1,4 @@
 import { passwordSchema } from '../../../lib/validation'
-import * as yup from 'yup'
 import mail from '@sendgrid/mail'
 mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../lib/db/connection'
@@ -11,9 +10,7 @@ export default async function restorePasswordHandler(req, res) {
   //check if request data is correct before processing further
   const { password, token } = req.body
   try {
-    await yup
-      .reach(passwordSchema, 'password')
-      .validate(password, { abortEarly: false })
+    await passwordSchema.validate(password, { abortEarly: false })
   } catch (error) {
     console.log(error)
     let mappedErrors = mapErrors(error)
