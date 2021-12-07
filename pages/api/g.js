@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server-micro'
+import { ApolloServer } from 'apollo-server-micro'
 import dbConnect from '../../lib/db/connection'
 import schema from '../../lib/graphql/schema'
 import resolvers from '../../lib/graphql/resolvers'
