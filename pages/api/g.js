@@ -2,8 +2,31 @@ import { ApolloServer } from 'apollo-server-micro'
 import dbConnect from '../../lib/db/connection'
 import schema from '../../lib/graphql/schema'
 import resolvers from '../../lib/graphql/resolvers'
+import { getSession } from 'next-auth/react'
+import { User } from '../../lib/db/models'
 
-const apolloServer = new ApolloServer({ typeDefs: schema, resolvers })
+const context = ({ req }) => {
+  return (async () => {
+    const session = await getSession({ req })
+    try {
+      await dbConnect()
+    } catch (error) {
+      throw new Error("Can't connect to the database")
+    }
+    try {
+      const user = await User.findById(session.id)
+      return { user }
+    } catch (error) {
+      return { user: null }
+    }
+  })()
+}
+
+const apolloServer = new ApolloServer({
+  typeDefs: schema,
+  resolvers,
+  context,
+})
 const startServer = apolloServer.start()
 
 async function handler(req, res) {
@@ -17,7 +40,7 @@ async function handler(req, res) {
     res.end()
     return false
   }
-  await dbConnect()
+  // await dbConnect()
   await startServer
   await apolloServer.createHandler({
     path: '/api/g',
