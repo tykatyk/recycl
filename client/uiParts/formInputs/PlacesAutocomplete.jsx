@@ -212,13 +212,40 @@ export default function PlacesAutocomplete(props) {
         )
       }}
       renderOption={(option) => {
-        const matches =
+        if (
+          option.structured_formatting &&
           option.structured_formatting.main_text_matched_substrings
+        ) {
+          const matches =
+            option.structured_formatting.main_text_matched_substrings
 
-        const parts = parse(
-          option.structured_formatting.main_text,
-          matches.map((match) => [match.offset, match.offset + match.length])
-        )
+          const parts = parse(
+            option.structured_formatting.main_text,
+            matches.map((match) => [match.offset, match.offset + match.length])
+          )
+
+          return (
+            <Grid container alignItems="center">
+              <Grid item>
+                <LocationOnIcon className={classes.locationIcon} />
+              </Grid>
+              <Grid item xs>
+                {parts.map((part, index) => (
+                  <span
+                    key={index}
+                    style={{ fontWeight: part.highlight ? 700 : 400 }}
+                  >
+                    {part.text}
+                  </span>
+                ))}
+
+                <Typography variant="body2">
+                  {option.structured_formatting.secondary_text}
+                </Typography>
+              </Grid>
+            </Grid>
+          )
+        }
 
         return (
           <Grid container alignItems="center">
@@ -226,14 +253,12 @@ export default function PlacesAutocomplete(props) {
               <LocationOnIcon className={classes.locationIcon} />
             </Grid>
             <Grid item xs>
-              {parts.map((part, index) => (
-                <span
-                  key={index}
-                  style={{ fontWeight: part.highlight ? 700 : 400 }}
-                >
-                  {part.text}
-                </span>
-              ))}
+              <span
+                key={index}
+                style={{ fontWeight: part.highlight ? 700 : 400 }}
+              >
+                {option.structured_formatting.main_text}
+              </span>
 
               <Typography variant="body2">
                 {option.structured_formatting.secondary_text}
