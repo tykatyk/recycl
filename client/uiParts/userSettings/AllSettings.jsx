@@ -37,9 +37,6 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.typography.pxToRem(16),
     fontWeight: theme.typography.fontWeightRegular,
   },
-  accordion: {
-    marginBottom: theme.spacing(4),
-  },
 }))
 
 export default function SimpleAccordion() {
@@ -48,7 +45,7 @@ export default function SimpleAccordion() {
   return (
     <Layout title="Recycl | Настройки">
       <div className={classes.root}>
-        <Accordion className={classes.accordion}>
+        <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1a-content"
