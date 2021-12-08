@@ -6,6 +6,8 @@ import PlacesAutocomplete from '../formInputs/PlacesAutocomplete.jsx'
 import TextFieldFormik from '../formInputs/TextFieldFormik.jsx'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle.jsx'
 import { contactsSchema } from '../../../lib/validation'
+import { UPDATE_USER_CONTACTS } from '../../../lib/graphql/queries/user'
+import { useMutation } from '@apollo/client'
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -33,6 +35,10 @@ export default function ContactsForm() {
   const [backendError, setBackendError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [severity, setSeverity] = useState('error')
+
+  const [updateContacts, { data, loading, error }] =
+    useMutation(UPDATE_USER_CONTACTS)
+
   useEffect(() => {
     if (backendError) {
       setSeverity('error')
@@ -51,44 +57,16 @@ export default function ContactsForm() {
             location: '',
           }}
           validationSchema={contactsSchema}
-          onSubmit={(values, { setSubmitting, setErrors }) => {
+        onSubmit={async (values, { setSubmitting, setErrors }) => {
             setSubmitting(true)
-            fetch('/api/myaccount/settings', {
-              method: 'POST',
-              body: JSON.stringify(values),
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            })
-              .then((response) => {
-                return response.json()
-              })
-              .then((data) => {
-                if (data.error) {
-                  const error = data.error
-                  if (error.type === 'perField') {
-                    setErrors(error.message)
-                    return
-                  }
-                  if (error.type === 'perForm') {
-                    setBackendError(error.message)
-                    return
-                  }
-                  setBackendError(
-                    'Неизвестная ошибка при обработке ответа сервера'
-                  )
-                  return
-                } else {
-                  setSuccessMessage(data.message)
+          const location = {
+            description: values.location.description,
+            place_id: values.location.place_id,
                 }
-              })
-              .catch((error) => {
-                console.log(error)
-                setBackendError('Неизвестная ошибка')
-              })
-              .finally(() => {
+          values.location = location
+
+          await updateContacts({ variables: { contacts: values } })
                 setSubmitting(false)
-              })
           }}
         >
           {({ isSubmitting }) => {
