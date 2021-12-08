@@ -11,13 +11,14 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Layout from '../../layouts/Layout.jsx'
 import ContactsForm from './ContactsForm.jsx'
 
-const Accordion = withStyles({
+const Accordion = withStyles((theme) => ({
   root: {
+    marginBottom: theme.spacing(3),
     '&:before': {
       display: 'none',
     },
   },
-})(MuiAccordion)
+}))(MuiAccordion)
 
 const AccordionSummary = withStyles((theme) => ({
   focused: {},
