@@ -21,7 +21,12 @@ const Accordion = withStyles((theme) => ({
 }))(MuiAccordion)
 
 const AccordionSummary = withStyles((theme) => ({
-  focused: {},
+  root: {
+    '&$expanded': {
+      borderBottom: '1px solid rgba(0, 0, 0, .125)',
+    },
+  },
+  expanded: {},
 }))(MuiAccordionSummary)
 
 const useStyles = makeStyles((theme) => ({
