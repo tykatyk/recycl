@@ -13,10 +13,6 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: '400px',
     display: 'flex',
     flexDirection: 'column',
-  },
-  paper: {
-    display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
   },
   form: {
@@ -49,7 +45,6 @@ export default function ContactsForm() {
 
   return (
     <Box className={classes.box}>
-      <div className={classes.paper}>
         <Formik
           initialValues={{
             username: '',
@@ -138,7 +133,6 @@ export default function ContactsForm() {
             )
           }}
         </Formik>
-      </div>
 
       <Snackbar
         severity={severity}
