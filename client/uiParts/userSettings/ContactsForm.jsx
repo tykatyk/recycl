@@ -54,7 +54,6 @@ export default function ContactsForm() {
           try {
             await updateContacts({ variables: { contacts: values } })
           } catch (error) {
-            console.log(error)
             if (
               error.graphQLErrors &&
               error.graphQLErrors.length > 0 &&
@@ -63,6 +62,7 @@ export default function ContactsForm() {
             ) {
               setErrors(error.graphQLErrors[0].extensions.detailedMessages)
             } else {
+              console.log(error)
               setBackendError('Возникла ошибка при сохранении данных')
             }
           } finally {
