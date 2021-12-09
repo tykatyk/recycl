@@ -258,13 +258,15 @@ export default function PlacesAutocomplete(props) {
             </Grid>
             <Grid item xs>
               <span key={index} style={{ fontWeight: 700 }}>
-                {option.structured_formatting.main_text
+                {option.structured_formatting &&
+                option.structured_formatting.main_text
                   ? option.structured_formatting.main_text
                   : ''}
               </span>
 
               <Typography variant="body2">
-                {option.structured_formatting.secondary_text
+                {option.structured_formatting &&
+                option.structured_formatting.secondary_text
                   ? option.structured_formatting.secondary_text
                   : ''}
               </Typography>
