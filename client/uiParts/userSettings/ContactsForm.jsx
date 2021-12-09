@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Button, Box, makeStyles, useTheme } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import Snackbar from '../Snackbars.jsx'
@@ -34,14 +34,7 @@ export default function ContactsForm() {
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
 
-  const [updateContacts, { data, loading, error }] =
-    useMutation(UPDATE_USER_CONTACTS)
-
-  useEffect(() => {
-    if (error) {
-      setBackendError(error)
-    }
-  }, [error])
+  const [updateContacts, { data, loading }] = useMutation(UPDATE_USER_CONTACTS)
 
   return (
     <Box className={classes.box}>
@@ -58,9 +51,23 @@ export default function ContactsForm() {
             place_id: values.location.place_id,
           }
           values.location = location
-
-          await updateContacts({ variables: { contacts: values } })
-          setSubmitting(false)
+          try {
+            await updateContacts({ variables: { contacts: values } })
+          } catch (error) {
+            console.log(error)
+            if (
+              error.graphQLErrors &&
+              error.graphQLErrors.length > 0 &&
+              error.graphQLErrors[0].extensions &&
+              error.graphQLErrors[0].extensions.detailedMessages
+            ) {
+              setErrors(error.graphQLErrors[0].extensions.detailedMessages)
+            } else {
+              setBackendError('Возникла ошибка при сохранении данных')
+            }
+          } finally {
+            setSubmitting(false)
+          }
         }}
       >
         {({ isSubmitting }) => {
@@ -107,8 +114,8 @@ export default function ContactsForm() {
 
       <Snackbar
         severity="error"
-        open={backendError}
-        message="Возникла ошибка при сохранении данных"
+        open={!!backendError}
+        message={backendError}
         handleClose={() => {
           setBackendError(null)
         }}
