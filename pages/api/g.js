@@ -14,7 +14,7 @@ const context = ({ req }) => {
       throw new Error("Can't connect to the database")
     }
     try {
-      const user = await User.findById(session.id)
+      const user = await User.findById(session.id, { password: 0 })
       return { user }
     } catch (error) {
       return { user: null }
