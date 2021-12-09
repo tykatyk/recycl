@@ -80,7 +80,6 @@ export default function ContactsForm() {
               <Field
                 variant="outlined"
                 margin="normal"
-                required
                 fullWidth
                 id="location"
                 label="Город"
