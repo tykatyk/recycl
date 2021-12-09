@@ -146,7 +146,11 @@ export default function PlacesAutocomplete(props) {
       noOptionsText="Нет вариантов"
       loadingText="Загрузка"
       getOptionLabel={(option) =>
-        typeof option === 'string' ? option : option.description
+        typeof option === 'string'
+          ? option
+          : option.description
+          ? option.description
+          : ''
       }
       filterOptions={(x) => x}
       ListboxComponent={Listbox}
@@ -253,15 +257,16 @@ export default function PlacesAutocomplete(props) {
               <LocationOnIcon className={classes.locationIcon} />
             </Grid>
             <Grid item xs>
-              <span
-                key={index}
-                style={{ fontWeight: part.highlight ? 700 : 400 }}
-              >
-                {option.structured_formatting.main_text}
+              <span key={index} style={{ fontWeight: 700 }}>
+                {option.structured_formatting.main_text
+                  ? option.structured_formatting.main_text
+                  : ''}
               </span>
 
               <Typography variant="body2">
-                {option.structured_formatting.secondary_text}
+                {option.structured_formatting.secondary_text
+                  ? option.structured_formatting.secondary_text
+                  : ''}
               </Typography>
             </Grid>
           </Grid>
