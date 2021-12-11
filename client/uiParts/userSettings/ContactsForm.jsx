@@ -1,18 +1,42 @@
-import React, { useState } from 'react'
-import { Button, Box, makeStyles, useTheme } from '@material-ui/core'
+import React, { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import {
+  Avatar,
+  Button,
+  Box,
+  Typography,
+  makeStyles,
+  useTheme,
+} from '@material-ui/core'
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline'
 import { Formik, Form, Field } from 'formik'
 import Snackbar from '../Snackbars.jsx'
 import PlacesAutocomplete from '../formInputs/PlacesAutocomplete.jsx'
 import TextFieldFormik from '../formInputs/TextFieldFormik.jsx'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle.jsx'
+import PageLoadingCircle from '../PageLoadingCircle.jsx'
 import { contactsSchema } from '../../../lib/validation'
-import { UPDATE_USER_CONTACTS } from '../../../lib/graphql/queries/user'
-import { useMutation } from '@apollo/client'
+import {
+  GET_USER_CONTACTS,
+  UPDATE_USER_CONTACTS,
+} from '../../../lib/graphql/queries/user'
+import { useMutation, useQuery } from '@apollo/client'
 
 const useStyles = makeStyles((theme) => ({
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+
   box: {
     width: '100%',
     maxWidth: '400px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  alternativeBox: {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -32,9 +56,36 @@ const useStyles = makeStyles((theme) => ({
 export default function ContactsForm() {
   const classes = useStyles()
   const theme = useTheme()
+  const { data: session } = useSession()
+  const [id, setId] = useState('')
   const [backendError, setBackendError] = useState(null)
+  const {
+    data: contactsData,
+    error: contactsError,
+    loading: gettingContacts,
+  } = useQuery(GET_USER_CONTACTS, { variables: { id } })
 
-  const [updateContacts, { data, loading }] = useMutation(UPDATE_USER_CONTACTS)
+  useEffect(() => {
+    if (session) setId(session.id)
+  }, [session])
+
+  if (gettingContacts)
+    return (
+      <Box className={classes.alternativeBox}>
+        <PageLoadingCircle style={{ position: 'static' }} />
+      </Box>
+    )
+
+  if (contactsError) {
+    return (
+      <Box className={classes.alternativeBox}>
+        <Avatar className={classes.avatar}>
+          <ErrorOutlineIcon />
+        </Avatar>
+        <Typography variant="body2">Ошибка при получении данных</Typography>
+      </Box>
+    )
+  }
 
   return (
     <Box className={classes.box}>
@@ -65,7 +116,19 @@ export default function ContactsForm() {
           }
         }}
       >
-        {({ isSubmitting }) => {
+        {({ isSubmitting, setFieldValue }) => {
+          useEffect(() => {
+            if (!contactsData.getUserContacts) return
+
+            setFieldValue('username', contactsData.getUserContacts.name, false)
+
+            const locationToShow = contactsData.getUserContacts.location
+              ? contactsData.getUserContacts.location
+              : null
+
+            setFieldValue('location', locationToShow, false)
+          }, [contactsData])
+
           return (
             <Form className={classes.form} noValidate autoComplete="off">
               <Field
