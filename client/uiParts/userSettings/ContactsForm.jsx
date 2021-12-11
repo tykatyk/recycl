@@ -59,6 +59,7 @@ export default function ContactsForm() {
   const { data: session } = useSession()
   const [id, setId] = useState('')
   const [backendError, setBackendError] = useState(null)
+  const [updateContacts] = useMutation(UPDATE_USER_CONTACTS)
   const {
     data: contactsData,
     error: contactsError,
