@@ -98,6 +98,14 @@ export default function ContactsForm() {
         validationSchema={contactsSchema}
         onSubmit={async (values, { setSubmitting, setErrors }) => {
           setSubmitting(true)
+
+          if (values.location) {
+            const locationToSave = {
+              description: values.location.description,
+              place_id: values.location.place_id,
+            }
+            values.location = locationToSave
+          }
           try {
             await updateContacts({ variables: { contacts: values } })
           } catch (error) {
