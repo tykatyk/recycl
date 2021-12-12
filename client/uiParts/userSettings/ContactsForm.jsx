@@ -109,6 +109,7 @@ export default function ContactsForm() {
           } catch (error) {
             if (
               error.graphQLErrors &&
+              error.graphQLErrors.length > 0 &&
               error.graphQLErrors[0].extensions.detailedMessages
             ) {
               setErrors(error.graphQLErrors[0].extensions.detailedMessages)
