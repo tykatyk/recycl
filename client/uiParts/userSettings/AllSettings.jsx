@@ -10,6 +10,7 @@ import MuiAccordionSummary from '@material-ui/core/AccordionSummary'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Layout from '../../layouts/Layout.jsx'
 import ContactsForm from './ContactsForm.jsx'
+import PhoneForm from './PhoneForm.jsx'
 
 const Accordion = withStyles((theme) => ({
   root: {
@@ -70,7 +71,7 @@ export default function SimpleAccordion() {
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Typography>Accordion 2</Typography>
+            <PhoneForm />
           </AccordionDetails>
         </Accordion>
         <Accordion className={classes.accordion}>
