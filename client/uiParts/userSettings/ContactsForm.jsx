@@ -60,24 +60,22 @@ export default function ContactsForm() {
   const [id, setId] = useState('')
   const [backendError, setBackendError] = useState(null)
   const [updateContacts] = useMutation(UPDATE_USER_CONTACTS)
-  const {
-    data: contactsData,
-    error: contactsError,
-    loading: gettingContacts,
-  } = useQuery(GET_USER_CONTACTS, { variables: { id } })
+  const { data, error, loading } = useQuery(GET_USER_CONTACTS, {
+    variables: { id },
+  })
 
   useEffect(() => {
     if (session) setId(session.id)
   }, [session])
 
-  if (gettingContacts)
+  if (loading)
     return (
       <Box className={classes.alternativeBox}>
         <PageLoadingCircle style={{ position: 'static' }} />
       </Box>
     )
 
-  if (contactsError) {
+  if (error) {
     return (
       <Box className={classes.alternativeBox}>
         <Avatar className={classes.avatar}>
@@ -125,16 +123,16 @@ export default function ContactsForm() {
       >
         {({ isSubmitting, setFieldValue }) => {
           useEffect(() => {
-            if (!contactsData.getUserContacts) return
+            if (!data.getUserContacts) return
 
-            setFieldValue('username', contactsData.getUserContacts.name, false)
+            setFieldValue('username', data.getUserContacts.name, false)
 
-            const locationToShow = contactsData.getUserContacts.location
-              ? contactsData.getUserContacts.location
+            const locationToShow = data.getUserContacts.location
+              ? data.getUserContacts.location
               : null
 
             setFieldValue('location', locationToShow, false)
-          }, [contactsData])
+          }, [data])
 
           return (
             <Form className={classes.form} noValidate autoComplete="off">
