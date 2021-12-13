@@ -58,11 +58,22 @@ export default function ContactsForm() {
   const theme = useTheme()
   const { data: session } = useSession()
   const [id, setId] = useState('')
+  const [severity, setSeverity] = useState('error')
   const [backendError, setBackendError] = useState(null)
-  const [updateContacts] = useMutation(UPDATE_USER_CONTACTS)
+  const [successMessage, setSuccessMessage] = useState(null)
+
+  const [updateContacts, { data: updateData }] =
+    useMutation(UPDATE_USER_CONTACTS)
   const { data, error, loading } = useQuery(GET_USER_CONTACTS, {
     variables: { id },
   })
+
+  useEffect(() => {
+    if (updateData && updateData.updateUserContacts) {
+      setSeverity('success')
+      setSuccessMessage('Данные успешно обновлены')
+    }
+  }, [updateData])
 
   useEffect(() => {
     if (session) setId(session.id)
@@ -114,7 +125,7 @@ export default function ContactsForm() {
             ) {
               setErrors(error.graphQLErrors[0].extensions.detailedMessages)
             } else {
-              console.log(error)
+              setSeverity('error')
               setBackendError('Возникла ошибка при сохранении данных')
             }
           } finally {
@@ -177,11 +188,12 @@ export default function ContactsForm() {
       </Formik>
 
       <Snackbar
-        severity="error"
-        open={!!backendError}
-        message={backendError}
+        severity={severity}
+        open={!!backendError || !!successMessage}
+        message={backendError || successMessage}
         handleClose={() => {
           setBackendError(null)
+          setSuccessMessage(null)
         }}
       />
     </Box>

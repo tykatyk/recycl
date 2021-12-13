@@ -46,11 +46,20 @@ export default function PhoneForm() {
   const classes = useStyles()
   const { data: session } = useSession()
   const [id, setId] = useState('')
+  const [severity, setSeverity] = useState('error')
+  const [successMessage, setSuccessMessage] = useState(null)
   const [backendError, setBackendError] = useState(null)
-  const [updatePhone] = useMutation(UPDATE_PHONE)
+  const [updatePhone, { data: updateData }] = useMutation(UPDATE_PHONE)
   const { data, error, loading } = useQuery(GET_PHONE, {
     variables: { id },
   })
+
+  useEffect(() => {
+    if (updateData && updateData.updatePhone) {
+      setSeverity('success')
+      setSuccessMessage('Данные успешно обновлены')
+    }
+  }, [updateData])
 
   useEffect(() => {
     if (session) setId(session.id)
@@ -83,7 +92,6 @@ export default function PhoneForm() {
         validationSchema={phoneSchema}
         onSubmit={async (values, { setSubmitting, setErrors }) => {
           setSubmitting(true)
-          console.log(values)
           try {
             await updatePhone({ variables: { phone: values.phone } })
           } catch (error) {
@@ -94,7 +102,7 @@ export default function PhoneForm() {
             ) {
               setErrors(error.graphQLErrors[0].extensions.detailedMessages)
             } else {
-              console.log(JSON.stringify(error, null, 2))
+              setSeverity('error')
               setBackendError('Возникла ошибка при сохранении данных')
             }
           } finally {
@@ -139,11 +147,12 @@ export default function PhoneForm() {
       </Formik>
 
       <Snackbar
-        severity="error"
-        open={!!backendError}
-        message={backendError}
+        severity={severity}
+        open={!!backendError || !!successMessage}
+        message={backendError || successMessage}
         handleClose={() => {
           setBackendError(null)
+          setSuccessMessage(null)
         }}
       />
     </Box>
