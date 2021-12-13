@@ -66,12 +66,11 @@ export default NextAuth({
         let result
         try {
           result = await appoloClient.query({
-            query: GET_USER,
+            query: GET_USER_BY_EMAIL,
             variables: { email },
           })
         } catch (error) {
           console.log('Error while checking user existance')
-          console.log(JSON.stringify(error, null, 2))
           throw new Error(
             JSON.stringify({
               type: 'perForm',
@@ -81,7 +80,7 @@ export default NextAuth({
           )
         }
 
-        if (result.data && !result.data.getUser) {
+        if (result.data && !result.data.getUserByEmail) {
           console.log('error while getting user from the database')
           throw new Error(
             JSON.stringify({
@@ -91,7 +90,7 @@ export default NextAuth({
           )
         }
 
-        let user = result.data.getUser
+        let user = result.data.getUserByEmail
 
         const checkPassword = await compare(password, user.password)
         if (!checkPassword) {
