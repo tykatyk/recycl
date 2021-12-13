@@ -6,7 +6,7 @@ import { useQuery } from '@apollo/client'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
 import Head from '../uiParts/Head.jsx'
 import AuthLayout from '../layouts/AuthLayout.jsx'
-import ResetPassword from './ResetPassword.jsx'
+import ResetPasswordForm from './ResetPasswordForm.jsx'
 
 export default function ResetPasswordPage({ token }) {
   const { loading, error, data } = useQuery(GET_USER_BY_TOKEN, {
@@ -25,7 +25,7 @@ export default function ResetPasswordPage({ token }) {
 
   if (!data.getByToken) return <Content message="Срок действия ссылки истек" />
 
-  return <ResetPassword token={token} />
+  return <ResetPasswordForm token={token} />
 }
 
 const Content = (props) => {

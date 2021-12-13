@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function ResetPassword({ token }) {
+export default function ResetPasswordForm({ token }) {
   const classes = useStyles()
   const [backendError, setBackendError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
