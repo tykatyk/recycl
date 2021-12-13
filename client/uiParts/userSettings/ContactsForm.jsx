@@ -135,7 +135,7 @@ export default function ContactsForm() {
       >
         {({ isSubmitting, setFieldValue }) => {
           useEffect(() => {
-            if (!data.getUserContacts) return
+            if (!data || !data.getUserContacts) return
 
             setFieldValue('username', data.getUserContacts.name, false)
 

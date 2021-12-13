@@ -112,8 +112,7 @@ export default function PhoneForm() {
       >
         {({ isSubmitting, setFieldValue }) => {
           useEffect(() => {
-            if (!data.getPhone || !data.getPhone.phone) return
-            console.log(data)
+            if (!data || !data.getPhone || !data.getPhone.phone) return
             setFieldValue('phone', data.getPhone.phone, false)
           }, [data])
 
