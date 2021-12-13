@@ -11,6 +11,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Layout from '../../layouts/Layout.jsx'
 import ContactsForm from './ContactsForm.jsx'
 import PhoneForm from './PhoneForm.jsx'
+import ChangePasswordForm from './ChangePasswordForm.jsx'
 
 const Accordion = withStyles((theme) => ({
   root: {
@@ -82,6 +83,9 @@ export default function SimpleAccordion() {
           >
             <Typography className={classes.heading}>Изменить пароль</Typography>
           </AccordionSummary>
+          <AccordionDetails>
+            <ChangePasswordForm />
+          </AccordionDetails>
         </Accordion>
         <Accordion className={classes.accordion}>
           <AccordionSummary
