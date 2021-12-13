@@ -4,7 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 
 import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { compare } from 'bcrypt'
-import { GET_USER } from '../../../lib/graphql/queries/user'
+import { GET_USER_BY_EMAIL } from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation'
 
 export default NextAuth({
