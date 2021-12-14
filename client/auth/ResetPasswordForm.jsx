@@ -100,6 +100,7 @@ export default function ResetPasswordForm({ token }) {
                       )
                       return
                     } else {
+                      setSeverity('success')
                       setSuccessMessage('Пароль успешно изменен')
                     }
                   })

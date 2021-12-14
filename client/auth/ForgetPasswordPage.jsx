@@ -105,6 +105,7 @@ export default function ForgetPassword() {
                       )
                       return
                     } else {
+                      setSeverity('success')
                       setSuccessMessage(data.message)
                     }
                   })
