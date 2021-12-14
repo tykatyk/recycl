@@ -12,6 +12,7 @@ import Layout from '../../layouts/Layout.jsx'
 import ContactsForm from './ContactsForm.jsx'
 import PhoneForm from './PhoneForm.jsx'
 import ChangePasswordForm from './ChangePasswordForm.jsx'
+import ChangeEmailForm from './ChangeEmailForm.jsx'
 
 const Accordion = withStyles((theme) => ({
   root: {
@@ -97,6 +98,9 @@ export default function SimpleAccordion() {
               Изменить email-адрес
             </Typography>
           </AccordionSummary>
+          <AccordionDetails>
+            <ChangeEmailForm />
+          </AccordionDetails>
         </Accordion>
         <Accordion className={classes.accordion}>
           <AccordionSummary
