@@ -5,6 +5,7 @@ import Snackbar from '../Snackbars.jsx'
 import TextFieldFormik from '../formInputs/TextFieldFormik.jsx'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle.jsx'
 import { emailSchema } from '../../../lib/validation'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -36,6 +37,18 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 0, 2),
   },
 }))
+
+const handleToken = (token) => {
+  setForm((currentForm) => {
+    return { ...currentForm, token }
+  })
+}
+
+const handleExpire = () => {
+  setForm((currentForm) => {
+    return { ...currentForm, token: null }
+  })
+}
 
 export default function ChangeEmailForm() {
   const classes = useStyles()
@@ -105,6 +118,13 @@ export default function ChangeEmailForm() {
                 component={TextFieldFormik}
                 className={classes.field}
               />
+              <div>
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  onChange={handleToken}
+                  onExpire={handleExpire}
+                />
+              </div>
               <Button
                 type="submit"
                 fullWidth
