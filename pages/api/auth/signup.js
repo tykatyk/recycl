@@ -2,7 +2,7 @@ import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { hash } from 'bcrypt'
 import { CREATE_USER, USER_EXISTS } from '../../../lib/graphql/queries/user'
 import { registerSchema } from '../../../lib/validation'
-import { mapErrors } from '../../../lib/mapErrors'
+import mapErrors from '../../../lib/mapErrors'
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
