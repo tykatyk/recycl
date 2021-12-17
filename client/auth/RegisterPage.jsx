@@ -73,7 +73,7 @@ export default function SignUp() {
             <Formik
               initialValues={{
                 role: data.getRoleId,
-                username: '',
+                name: '',
                 email: '',
                 password: '',
                 confirmPassword: '',
@@ -127,9 +127,9 @@ export default function SignUp() {
                       margin="normal"
                       required
                       fullWidth
-                      id="username"
+                      id="name"
                       label="Имя или название организации"
-                      name="username"
+                      name="name"
                       component={TextFieldFormik}
                     />
                     <Field

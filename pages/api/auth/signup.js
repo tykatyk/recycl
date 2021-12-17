@@ -1,18 +1,50 @@
 import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { hash } from 'bcrypt'
-import { CREATE_USER, USER_EXISTS } from '../../../lib/graphql/queries/user'
+import {
+  CREATE_USER,
+  GET_USER_BY_EMAIL,
+} from '../../../lib/graphql/queries/user'
 import { registerSchema } from '../../../lib/validation'
 import mapErrors from '../../../lib/mapErrors'
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { username, email, password, confirmPassword, role } = req.body
+    const { name, email, password, confirmPassword, role, recaptcha } = req.body
+
+    const captchaPassed = await fetch(
+      'https://www.google.com/recaptcha/api/siteverify',
+      {
+        method: 'POST',
+        body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptcha}`,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    )
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        return data.success
+      })
+      .catch((error) => {
+        console.log(error)
+        //ToDo: add error handling
+      })
+
+    if (!captchaPassed) {
+      res.status(401).json({
+        error: {
+          type: 'perForm',
+          message: 'Пожалуйста, подтвердите что вы не робот',
+        },
+      })
+      return
+    }
 
     //check correctness of data needed to create a user
     try {
       await registerSchema.validate(
         {
-          username,
+          name,
           email,
           password,
           confirmPassword,
@@ -43,11 +75,11 @@ export default async function handler(req, res) {
     //if data is correct, check if user already exists
     try {
       let result = await appoloClient.query({
-        query: USER_EXISTS,
+        query: GET_USER_BY_EMAIL,
         variables: { email },
       })
 
-      if (result.data.userExists) {
+      if (result.data.getUserByEmail) {
         res.status(422).json({
           error: {
             type: 'perField',
@@ -75,7 +107,7 @@ export default async function handler(req, res) {
         mutation: CREATE_USER,
         variables: {
           user: {
-            username,
+            name,
             email,
             password: await hash(password, 12),
             roles: [role],
