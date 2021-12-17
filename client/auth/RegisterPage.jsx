@@ -23,6 +23,7 @@ import { useQuery } from '@apollo/client'
 import { useRouter } from 'next/router'
 import { registerSchema } from '../../lib/validation'
 import AuthLayout from '../layouts/AuthLayout.jsx'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -52,6 +53,17 @@ export default function SignUp() {
     variables: { roleName: 'user' },
   })
   const [backendError, setBackendError] = useState(null)
+  const [recaptcha, setRecaptcha] = useState(null)
+  const [showRecaptcha, setShowRecaptcha] = useState(false)
+  const recaptchaRef = React.createRef()
+
+  const handleToken = (token) => {
+    setRecaptcha(token)
+  }
+
+  const handleExpire = () => {
+    setRecaptcha(null)
+  }
 
   if (loading) return <PageLoadingCircle />
 
@@ -81,10 +93,22 @@ export default function SignUp() {
               validationSchema={registerSchema}
               onSubmit={(values, { setSubmitting, setErrors }) => {
                 setSubmitting(true)
+                if (!showRecaptcha) {
+                  setShowRecaptcha(true)
+                  setSubmitting(false)
+                  return
+                }
+
+                if (!recaptcha) {
+                  setSubmitting(false)
+                  return
+                }
+
+                const merged = { ...values, ...{ recaptcha: recaptcha } }
 
                 fetch('/api/auth/signup/', {
                   method: 'POST',
-                  body: JSON.stringify(values),
+                  body: JSON.stringify(merged),
                   headers: {
                     'Content-Type': 'application/json',
                   },
@@ -114,6 +138,10 @@ export default function SignUp() {
                     setBackendError('Ошибка при отпавке запроса на сервер')
                   })
                   .finally(() => {
+                    if (recaptchaRef.current) {
+                      recaptchaRef.current.reset()
+                    }
+                    setRecaptcha(null)
                     setSubmitting(false)
                   })
               }}
@@ -175,6 +203,22 @@ export default function SignUp() {
                       Зарегистрироваться
                       {isSubmitting && <ButtonSubmittingCircle />}
                     </Button>
+
+                    <div
+                      style={{
+                        display: showRecaptcha ? 'flex' : 'none',
+                        justifyContent: 'center',
+                        margin: theme.spacing(2, 0),
+                      }}
+                    >
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                        onChange={handleToken}
+                        onExpired={handleExpire}
+                      />
+                    </div>
+
                     <Grid container style={{ justifyContent: 'flex-end' }}>
                       <Grid item>
                         <Link
