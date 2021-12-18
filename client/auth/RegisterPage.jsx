@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Avatar,
   Button,
@@ -55,9 +55,9 @@ export default function SignUp() {
   const [backendError, setBackendError] = useState(null)
   const [recaptcha, setRecaptcha] = useState(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
-  const recaptchaRef = React.createRef()
+  const recaptchaRef = useRef(null)
 
-  const handleToken = (token) => {
+  const handleChange = (token) => {
     setRecaptcha(token)
   }
 
@@ -138,7 +138,7 @@ export default function SignUp() {
                     setBackendError('Ошибка при отпавке запроса на сервер')
                   })
                   .finally(() => {
-                    if (recaptchaRef.current) {
+                    if (recaptchaRef && recaptchaRef.current) {
                       recaptchaRef.current.reset()
                     }
                     setRecaptcha(null)
@@ -214,7 +214,7 @@ export default function SignUp() {
                       <ReCAPTCHA
                         ref={recaptchaRef}
                         sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                        onChange={handleToken}
+                        onChange={handleChange}
                         onExpired={handleExpire}
                       />
                     </div>
