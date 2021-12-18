@@ -6,29 +6,13 @@ import {
 } from '../../../lib/graphql/queries/user'
 import { registerSchema } from '../../../lib/validation'
 import mapErrors from '../../../lib/mapErrors'
+import { checkCaptcha } from '../../../lib/checkCaptcha'
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { name, email, password, confirmPassword, role, recaptcha } = req.body
 
-    const captchaPassed = await fetch(
-      'https://www.google.com/recaptcha/api/siteverify',
-      {
-        method: 'POST',
-        body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptcha}`,
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      }
-    )
-      .then((response) => {
-        return response.json()
-      })
-      .then((data) => {
-        return data.success
-      })
-      .catch((error) => {
-        console.log(error)
-        //ToDo: add error handling
-      })
+    const captchaPassed = await checkCaptcha(recaptcha)
 
     if (!captchaPassed) {
       res.status(401).json({
