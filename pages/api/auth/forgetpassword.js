@@ -4,12 +4,26 @@ mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../lib/db/connection'
 import { User } from '../../../lib/db/models'
 import mapErrors from '../../../lib/mapErrors'
+import { checkCaptcha } from '../../../lib/checkCaptcha'
 
 export default async function forgetPasswordHandler(req, res) {
   //check if request data is correct before processing further
-  let body = req.body
+  const { email, recaptcha } = req.body
+
+  const captchaPassed = await checkCaptcha(recaptcha)
+
+  if (!captchaPassed) {
+    res.status(401).json({
+      error: {
+        type: 'perForm',
+        message: 'Пожалуйста, подтвердите что вы не робот',
+      },
+    })
+    return
+  }
+
   try {
-    await emailSchema.validate(body, { abortEarly: false })
+    await emailSchema.validate({ email }, { abortEarly: false })
   } catch (error) {
     console.log(error)
     let mappedErrors = mapErrors(error)
@@ -33,7 +47,6 @@ export default async function forgetPasswordHandler(req, res) {
   //check if a user exists
   let user
   try {
-    const email = body.email
     await dbConnect()
     user = await User.findOne({ email })
 

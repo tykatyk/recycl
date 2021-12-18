@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Typography,
   Button,
@@ -12,6 +12,7 @@ import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik.jsx'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import AuthLayout from '../layouts/AuthLayout.jsx'
 import { emailSchema } from '../../lib/validation'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -32,12 +33,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function ForgetPassword() {
+export default function ForgetPasswordPage() {
   const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [severity, setSeverity] = useState('error')
+  const [recaptcha, setRecaptcha] = useState(null)
+  const recaptchaRef = useRef(null)
+
+  const handleChange = (token) => {
+    setRecaptcha(token)
+  }
+
+  const handleExpire = () => {
+    setRecaptcha(null)
+  }
+
   useEffect(() => {
     if (backendError) {
       setSeverity('error')
@@ -79,9 +91,17 @@ export default function ForgetPassword() {
               validationSchema={emailSchema}
               onSubmit={(values, { setSubmitting, setErrors }) => {
                 setSubmitting(true)
+
+                if (!recaptcha) {
+                  setSubmitting(false)
+                  return
+                }
+
+                const merged = { ...values, ...{ recaptcha: recaptcha } }
+
                 fetch('/api/auth/forgetpassword', {
                   method: 'POST',
-                  body: JSON.stringify(values),
+                  body: JSON.stringify(merged),
                   headers: {
                     'Content-Type': 'application/json',
                   },
@@ -114,6 +134,10 @@ export default function ForgetPassword() {
                     setBackendError('Неизвестная ошибка')
                   })
                   .finally(() => {
+                    if (recaptchaRef && recaptchaRef.current) {
+                      recaptchaRef.current.reset()
+                    }
+                    setRecaptcha(null)
                     setSubmitting(false)
                   })
               }}
@@ -142,6 +166,20 @@ export default function ForgetPassword() {
                       Отправить
                       {isSubmitting && <ButtonSubmittingCircle />}
                     </Button>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        margin: theme.spacing(2, 0),
+                      }}
+                    >
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                        onChange={handleChange}
+                        onExpired={handleExpire}
+                      />
+                    </div>
                   </Form>
                 )
               }}
