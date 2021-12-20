@@ -72,7 +72,7 @@ export default function SignUp() {
 
   return (
     <>
-      <AuthLayout title="Recycl | Register">
+      <AuthLayout title="Recycl | Регистрация">
         <Container component="main" maxWidth="xs">
           <div className={classes.paper}>
             <Avatar className={classes.avatar}>
