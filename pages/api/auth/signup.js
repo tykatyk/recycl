@@ -7,6 +7,7 @@ import {
 import { registerSchema } from '../../../lib/validation'
 import mapErrors from '../../../lib/mapErrors'
 import { checkCaptcha } from '../../../lib/checkCaptcha'
+import sendEmail from '../../../lib/sendEmail'
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -86,8 +87,9 @@ export default async function handler(req, res) {
     }
 
     //if user doesn't exist, create one
+    let user = null
     try {
-      let result = await appoloClient.mutate({
+      user = await appoloClient.mutate({
         mutation: CREATE_USER,
         variables: {
           user: {
@@ -98,7 +100,6 @@ export default async function handler(req, res) {
           },
         },
       })
-      res.status(201).json({ user: result.data.createUser })
     } catch (error) {
       console.log(error)
       return res.status(500).json({
@@ -108,6 +109,34 @@ export default async function handler(req, res) {
         },
       })
     }
+
+    if (user.data && user.data.createUser) {
+      // send email
+      const to = email
+      const subject = 'Подтверждение регистрации'
+
+      const link = `${process.env.NEXT_PUBLIC_URL}auth/confirmemail/${user.data.createUser.confirmEmailToken}`
+      const message = `Здравствуйте.\r\n
+  Для завершения регистрации перейдите по ссылке ${link}\r\n
+              Cсылка действительна на протяжении часа.\r\n
+              Если вы не совершали это действие, просто проигнорируйте это письмо.\r\n`
+      const frontendMessage =
+        'Для завершения регистрации перейдите по ссылке, которая отправлена на ваш почтовый ящик'
+
+      return await sendEmail(res, {
+        to,
+        subject,
+        message,
+        frontendMessage,
+      })
+    }
+
+    return res.status(500).json({
+      error: {
+        type: 'perForm',
+        message: 'Неизвестная ошибка сервера',
+      },
+    })
   } else {
     console.log('Only POST method is allowed')
     return res.status(500).json({
