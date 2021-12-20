@@ -3,7 +3,6 @@ import {
   Avatar,
   Button,
   Grid,
-  Box,
   Typography,
   makeStyles,
   useTheme,
@@ -16,7 +15,6 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import Snackbar from '../uiParts/Snackbars.jsx'
 import Link from '../uiParts/Link.jsx'
-import { signIn } from 'next-auth/react'
 import { GET_ROLE_ID } from '../../lib/graphql/queries/userRole'
 import { useQuery } from '@apollo/client'
 import { useRouter } from 'next/router'
