@@ -24,10 +24,15 @@ export default function ResetPasswordPage({ token }) {
     )
 
   if (error)
-    return <ResetLayout message="Возникла ошибка при проверке токена" />
+    return (
+      <ResetLayout
+        title={title}
+        message="Возникла ошибка при проверке токена"
+      />
+    )
 
   if (!data.getByToken)
-    return <ResetLayout message="Срок действия ссылки истек" />
+    return <ResetLayout title={title} message="Срок действия ссылки истек" />
 
   return <ResetPasswordForm token={token} />
 }
