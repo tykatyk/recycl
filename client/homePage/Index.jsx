@@ -45,7 +45,7 @@ export default function HomePage() {
   const classes = useStyles()
 
   return (
-    <HomeLayout title="Recycl | Home">
+    <HomeLayout title="Recycl | Главная">
       <div
         className={classes.splash}
         style={{ minHeight: `${splashMinHeight}px` }}
