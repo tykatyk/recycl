@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   Avatar,
   Button,
@@ -48,10 +48,12 @@ export default function SignUp() {
   const router = useRouter()
   const classes = useStyles()
   const theme = useTheme()
+  const [backendError, setBackendError] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [severity, setSeverity] = useState('error')
   const { loading, data, error } = useQuery(GET_ROLE_ID, {
     variables: { roleName: 'user' },
   })
-  const [backendError, setBackendError] = useState(null)
   const [recaptcha, setRecaptcha] = useState(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
   const recaptchaRef = useRef(null)
@@ -63,6 +65,16 @@ export default function SignUp() {
   const handleExpire = () => {
     setRecaptcha(null)
   }
+
+  useEffect(() => {
+    if (backendError) {
+      setSeverity('error')
+      setBackendError(backendError)
+    } else if (successMessage) {
+      setSeverity('success')
+      setSuccessMessage(successMessage)
+    }
+  }, [backendError, successMessage])
 
   if (loading) return <PageLoadingCircle />
 
@@ -131,10 +143,11 @@ export default function SignUp() {
                       )
                       return
                     }
-                    router.push('/')
+                    setSeverity('success')
+                    setSuccessMessage(data.message)
                   })
                   .catch((error) => {
-                    setBackendError('Ошибка при отпавке запроса на сервер')
+                    setBackendError('Неизвестная ошибка')
                   })
                   .finally(() => {
                     if (recaptchaRef && recaptchaRef.current) {
@@ -237,11 +250,12 @@ export default function SignUp() {
         </Container>
       </AuthLayout>
       <Snackbar
-        severity="error"
-        open={!!backendError}
-        message={backendError}
+        severity={severity}
+        open={!!backendError || !!successMessage}
+        message={backendError || successMessage}
         handleClose={() => {
           setBackendError(null)
+          setSuccessMessage(null)
         }}
       />
     </>
