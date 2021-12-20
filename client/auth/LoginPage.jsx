@@ -62,7 +62,7 @@ export default function SignIn() {
 
   return (
     <>
-      <AuthLayout title="Recycl | Login">
+      <AuthLayout title="Recycl | Вход">
         <Container component="main" maxWidth="xs">
           <div className={classes.paper}>
             <Avatar className={classes.avatar}>
