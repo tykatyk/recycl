@@ -13,10 +13,12 @@ export default function ResetPasswordPage({ token }) {
     variables: { token },
   })
 
+  const title = 'Сброс пароля'
+
   if (loading)
     return (
       <>
-        <Head title="Recycl | Reset Password" />
+        <Head title={title} />
         <PageLoadingCircle />
       </>
     )
