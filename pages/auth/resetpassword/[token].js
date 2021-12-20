@@ -8,6 +8,6 @@ export default function Reset(props) {
 
 export async function getServerSideProps(context) {
   return {
-    props: { token: context.query.token }, // will be passed to the page component as props
+    props: { token: context.query.token },
   }
 }
