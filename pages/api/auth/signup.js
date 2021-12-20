@@ -102,7 +102,7 @@ export default async function handler(req, res) {
       res.status(201).json({ user: result.data.createUser })
     } catch (error) {
       console.log(error)
-      res.status(500).json({
+      return res.status(500).json({
         error: {
           type: 'perForm',
           message: 'Возникла ошибка при создании пользователя',
@@ -111,7 +111,7 @@ export default async function handler(req, res) {
     }
   } else {
     console.log('Only POST method is allowed')
-    res.status(500).json({
+    return res.status(500).json({
       error: {
         type: 'perForm',
         message: 'Only POST method is allowed',
