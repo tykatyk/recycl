@@ -4,6 +4,7 @@ mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../../../lib/db/connection'
 import { User } from '../../../../../lib/db/models'
 import mapErrors from '../../../../../lib/mapErrors'
+import sendEmail from '../../../../../lib/sendEmail'
 import { getSession } from 'next-auth/react'
 
 export default async function changeEmailHandler(req, res) {
@@ -72,35 +73,21 @@ export default async function changeEmailHandler(req, res) {
   }
 
   // send email
+  const to = req.body.email
+  const subject = `Запрос на смену email на сайте ${process.env.NEXT_PUBLIC_URL}`
+
   const link = `${process.env.NEXT_PUBLIC_URL}myaccount/settings/changeemail/${user.resetEmailToken}`
   const message = `Здравствуйте.\r\n
   Вы получили это письмо потому что запросили операцию смены адреса электронной почты на сайте ${process.env.NEXT_PUBLIC_URL}\r\n
               Для подтверждения перейдите по ссылке ${link}\r\n
               Cсылка действительна на протяжении часа.\r\n
               Если вы не запрашивали это действие, просто проигнорируйте это письмо.\r\n`
+  const frontendMessage = `Для смены email перейдите по ссылке из письма, которое отпавлено на ${to}`
 
-  const { email } = req.body
-
-  const mailOptions = {
-    to: email,
-    from: process.env.EMAIL_FROM,
-    subject: `Запрос на смену email на сайте ${process.env.NEXT_PUBLIC_URL}`,
-    text: message,
-    html: message.replace(/\r\n/g, '<br>'),
-  }
-
-  try {
-    await mail.send(mailOptions)
-    return res.status(200).json({
-      message: `Письмо с подтверждением отправлено на ${user.email}`,
-    })
-  } catch (error) {
-    console.log(error)
-    return res.status(500).json({
-      error: {
-        type: 'perForm',
-        message: 'Возникла ошибка при отправке сообщения',
-      },
-    })
-  }
+  return await sendEmail(res, {
+    to,
+    subject,
+    message,
+    frontendMessage,
+  })
 }
