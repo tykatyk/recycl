@@ -95,7 +95,6 @@ export default async function handler(req, res) {
             email,
             password: await hash(password, 12),
             roles: [role],
-            isActive: true,
           },
         },
       })
