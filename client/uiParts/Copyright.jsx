@@ -10,7 +10,6 @@ export default function Copyright() {
         Recycl
       </Link>{' '}
       {new Date().getFullYear()}
-      {'.'}
     </Typography>
   )
 }
