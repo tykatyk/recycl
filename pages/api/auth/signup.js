@@ -132,7 +132,7 @@ export default async function handler(req, res) {
           user: {
             name,
             email,
-            password: await hash(password, 12),
+            password: await hash(password, process.env.HASHING_ROUNDS),
             roles: [role],
           },
         },
