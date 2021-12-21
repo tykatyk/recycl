@@ -66,8 +66,6 @@ export default async function restorePasswordHandler(req, res) {
     user.password = await hash(password, 12)
     user.resetPasswordToken = undefined
     user.resetPasswordExpires = undefined
-
-    // Save
     await user.save()
   } catch (error) {
     console.log(error)
