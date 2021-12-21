@@ -88,8 +88,8 @@ export default async function handler(req, res) {
       ) {
         //delete this user
         try {
-          await appoloClient.query({
-            query: DELETE_NOT_CONFIRMED_USER,
+          await appoloClient.mutate({
+            mutation: DELETE_NOT_CONFIRMED_USER,
             variables: { id: _id },
           })
         } catch (error) {
