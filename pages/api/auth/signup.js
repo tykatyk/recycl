@@ -84,7 +84,7 @@ export default async function handler(req, res) {
       if (
         !emailConfirmed &&
         typeof confirmEmailExpires != undefined &&
-        confirmEmailExpires >= Date.now()
+        new Date(confirmEmailExpires * 1000) >= Date.now()
       ) {
         //delete this user
         try {
@@ -109,7 +109,7 @@ export default async function handler(req, res) {
         emailConfirmed ||
         (!emailConfirmed &&
           typeof confirmEmailExpires != undefined &&
-          confirmEmailExpires < Date.now())
+          new Date(confirmEmailExpires * 1000) < Date.now())
       ) {
         res.status(422).json({
           error: {
