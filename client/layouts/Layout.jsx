@@ -7,7 +7,8 @@ import Head from '../uiParts/Head.jsx'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: theme.spacing(6),
+    paddingTop: theme.spacing(6),
+    paddingBottom: theme.spacing(6),
   },
 }))
 
