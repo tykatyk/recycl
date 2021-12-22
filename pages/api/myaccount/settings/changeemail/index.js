@@ -86,13 +86,9 @@ export default async function changeEmailHandler(req, res) {
       })
     }
 
-    if (user) {
-      //Generate and set email reset token
-      user.generateEmailReset()
-    } else {
-      //if user doesn't exist return error
-      return res.status(401).end()
-    }
+    //Generate and set email reset token
+    user.generateEmailReset()
+    user.newEmail = newEmail
   } catch (error) {
     console.log(error)
 
@@ -118,7 +114,6 @@ export default async function changeEmailHandler(req, res) {
   }
 
   // send email
-  const to = req.body.email
   const subject = `Запрос на смену email на сайте ${process.env.NEXT_PUBLIC_URL}`
 
   const link = `${process.env.NEXT_PUBLIC_URL}myaccount/settings/changeemail/${user.resetEmailToken}`
@@ -127,10 +122,10 @@ export default async function changeEmailHandler(req, res) {
               Для подтверждения перейдите по ссылке ${link}\r\n
               Cсылка действительна на протяжении часа.\r\n
               Если вы не запрашивали это действие, просто проигнорируйте это письмо.\r\n`
-  const frontendMessage = `Для смены email перейдите по ссылке из письма, которое отпавлено на ${to}`
+  const frontendMessage = `Для смены email перейдите по ссылке из письма, которое отпавлено на ${newEmail}`
 
   return await sendEmail(res, {
-    to,
+    to: newEmail,
     subject,
     message,
     frontendMessage,
