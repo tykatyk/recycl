@@ -4,8 +4,8 @@ import dbConnect from '../../../../lib/db/connection'
 import { User } from '../../../../lib/db/models'
 
 export default function ChangeEmail(props) {
-  const { user } = props
-  return <ChangeEmailPage user={user} />
+  const { urlIsValid } = props
+  return <ChangeEmailPage urlIsValid={urlIsValid} />
 }
 
 export async function getServerSideProps(context) {
