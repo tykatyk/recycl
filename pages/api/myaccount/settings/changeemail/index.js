@@ -75,6 +75,16 @@ export default async function changeEmailHandler(req, res) {
     const passwordCorrect = await compare(password, user.password)
     if (!passwordCorrect) return userNotFound(res)
 
+    if (user.email === newEmail) {
+      return res.status(422).json({
+        error: {
+          type: 'perField',
+          message: {
+            email: 'Этот адрес уже установлен в качестве текущего',
+          },
+        },
+      })
+    }
 
     if (user) {
       //Generate and set email reset token
