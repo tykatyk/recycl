@@ -1,4 +1,4 @@
-import { emailSchema } from '../../../../../lib/validation'
+import { loginSchema as changeEmailSchema } from '../../../../../lib/validation'
 import mail from '@sendgrid/mail'
 mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../../../lib/db/connection'
@@ -6,6 +6,16 @@ import { User } from '../../../../../lib/db/models'
 import mapErrors from '../../../../../lib/mapErrors'
 import sendEmail from '../../../../../lib/sendEmail'
 import { getSession } from 'next-auth/react'
+import { compare } from 'bcrypt'
+
+const userNotFound = function (res) {
+  return res.status(401).json({
+    error: {
+      type: 'perForm',
+      message: 'Пользователь не найден',
+    },
+  })
+}
 
 export default async function changeEmailHandler(req, res) {
   if (req.method === 'GET') res.status(405).end()
@@ -15,7 +25,7 @@ export default async function changeEmailHandler(req, res) {
 
   //check if request data is correct before processing further
   try {
-    await emailSchema.validate(req.body, { abortEarly: false })
+    await changeEmailSchema.validate(req.body, { abortEarly: false })
   } catch (error) {
     const mappedErrors = mapErrors(error)
     if (mappedErrors) {
@@ -36,10 +46,35 @@ export default async function changeEmailHandler(req, res) {
   }
 
   //check if a user exists
-  let user
+  let result = null
+  const newEmail = req.body.email
+  const password = req.body.password
   try {
     await dbConnect()
-    user = await User.findById(session.id)
+    result = await Promise.all([
+      User.findById(session.id),
+      User.find({ email: newEmail, _id: { $ne: session.id } }),
+    ]).then((result) => {
+      return result
+    })
+    const [user, otherUsers] = result
+
+    if (!user) return userNotFound(res)
+
+    if (otherUsers && otherUsers.length > 0) {
+      return res.status(422).json({
+        error: {
+          type: 'perField',
+          message: {
+            email: 'Этот адрес уже используется',
+          },
+        },
+      })
+    }
+
+    const passwordCorrect = await compare(password, user.password)
+    if (!passwordCorrect) return userNotFound(res)
+
 
     if (user) {
       //Generate and set email reset token

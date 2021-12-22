@@ -4,7 +4,7 @@ import { Formik, Form, Field } from 'formik'
 import Snackbar from '../Snackbars.jsx'
 import TextFieldFormik from '../formInputs/TextFieldFormik.jsx'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle.jsx'
-import { emailSchema } from '../../../lib/validation'
+import { loginSchema as changeEmailSchema } from '../../../lib/validation'
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -48,8 +48,9 @@ export default function ChangeEmailForm() {
       <Formik
         initialValues={{
           email: '',
+          password: '',
         }}
-        validationSchema={emailSchema}
+        validationSchema={changeEmailSchema}
         onSubmit={async (values, { setSubmitting, setErrors }) => {
           setSubmitting(true)
 
@@ -105,7 +106,18 @@ export default function ChangeEmailForm() {
                 component={TextFieldFormik}
                 className={classes.field}
               />
-
+              <Field
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="password"
+                label="Текущий пароль"
+                name="password"
+                type="password"
+                component={TextFieldFormik}
+                className={classes.field}
+              />
               <Button
                 type="submit"
                 fullWidth
