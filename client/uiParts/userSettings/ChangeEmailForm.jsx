@@ -93,7 +93,7 @@ export default function ChangeEmailForm() {
           setSubmitting(false)
         }}
       >
-        {({ isSubmitting, setFieldValue }) => {
+        {({ isSubmitting }) => {
           return (
             <Form className={classes.form} noValidate autoComplete="off">
               <Field
