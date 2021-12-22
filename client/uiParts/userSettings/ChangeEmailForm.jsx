@@ -71,6 +71,7 @@ export default function ChangeEmailForm() {
                   setErrors(error.message)
                   return
                 }
+                setSeverity('error')
                 if (error.type === 'perForm') {
                   setBackendError(error.message)
                   return
@@ -86,6 +87,7 @@ export default function ChangeEmailForm() {
             })
             .catch((error) => {
               console.log(error)
+              setSeverity('error')
               setBackendError('Неизвестная ошибка')
             })
           setSubmitting(false)
