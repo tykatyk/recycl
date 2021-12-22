@@ -54,7 +54,7 @@ export default function ChangeEmailForm() {
         onSubmit={async (values, { setSubmitting, setErrors }) => {
           setSubmitting(true)
 
-          fetch('/api/myaccount/settings/changeemail', {
+          await fetch('/api/myaccount/settings/changeemail', {
             method: 'POST',
             body: JSON.stringify(values),
             headers: {
@@ -88,9 +88,7 @@ export default function ChangeEmailForm() {
               console.log(error)
               setBackendError('Неизвестная ошибка')
             })
-            .finally(() => {
-              setSubmitting(false)
-            })
+          setSubmitting(false)
         }}
       >
         {({ isSubmitting, setFieldValue }) => {
