@@ -57,38 +57,6 @@ export default async function changeEmailHandler(req, res) {
     ]).then((result) => {
       return result
     })
-    const [user, otherUsers] = result
-
-    if (!user) return userNotFound(res)
-
-    if (otherUsers && otherUsers.length > 0) {
-      return res.status(422).json({
-        error: {
-          type: 'perField',
-          message: {
-            email: 'Этот адрес уже используется',
-          },
-        },
-      })
-    }
-
-    const passwordCorrect = await compare(password, user.password)
-    if (!passwordCorrect) return userNotFound(res)
-
-    if (user.email === newEmail) {
-      return res.status(422).json({
-        error: {
-          type: 'perField',
-          message: {
-            email: 'Этот адрес уже установлен в качестве текущего',
-          },
-        },
-      })
-    }
-
-    //Generate and set email reset token
-    user.generateEmailReset()
-    user.newEmail = newEmail
   } catch (error) {
     console.log(error)
 
@@ -99,6 +67,39 @@ export default async function changeEmailHandler(req, res) {
       },
     })
   }
+
+  const [user, otherUsers] = result
+
+  if (!user) return userNotFound(res)
+
+  if (otherUsers && otherUsers.length > 0) {
+    return res.status(422).json({
+      error: {
+        type: 'perField',
+        message: {
+          email: 'Этот адрес уже используется',
+        },
+      },
+    })
+  }
+
+  const passwordCorrect = await compare(password, user.password)
+  if (!passwordCorrect) return userNotFound(res)
+
+  if (user.email === newEmail) {
+    return res.status(422).json({
+      error: {
+        type: 'perField',
+        message: {
+          email: 'Этот адрес уже установлен в качестве текущего',
+        },
+      },
+    })
+  }
+
+  //Generate and set email reset token
+  user.generateEmailReset()
+  user.newEmail = newEmail
 
   //saving updated user to the database
   try {
@@ -116,18 +117,20 @@ export default async function changeEmailHandler(req, res) {
   // send email
   const subject = `Запрос на смену email на сайте ${process.env.NEXT_PUBLIC_URL}`
 
-  const link = `${process.env.NEXT_PUBLIC_URL}myaccount/settings/changeemail/${user.resetEmailToken}`
-  const message = `Здравствуйте.\r\n
-  Вы получили это письмо потому что запросили операцию смены адреса электронной почты на сайте ${process.env.NEXT_PUBLIC_URL}\r\n
-              Для подтверждения перейдите по ссылке ${link}\r\n
-              Cсылка действительна на протяжении часа.\r\n
-              Если вы не запрашивали это действие, просто проигнорируйте это письмо.\r\n`
+  const changeEmailUrl = `${process.env.NEXT_PUBLIC_URL}myaccount/settings/changeemail/${user.resetEmailToken}`
+  const dynamicTemplateData = {
+    name: user.name,
+    hostUrl: process.env.NEXT_PUBLIC_URL,
+    changeEmailUrl,
+    date: new Date().getFullYear(),
+  }
   const frontendMessage = `Для смены email перейдите по ссылке из письма, которое отпавлено на ${newEmail}`
 
   return await sendEmail(res, {
     to: newEmail,
     subject,
-    message,
+    templateId: 'd-4254ded0205f41dd89036ad2fd1f30b0',
+    dynamicTemplateData,
     frontendMessage,
   })
 }
