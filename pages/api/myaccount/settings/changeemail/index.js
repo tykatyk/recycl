@@ -115,20 +115,17 @@ export default async function changeEmailHandler(req, res) {
   }
 
   // send email
-  const subject = `Запрос на смену email на сайте ${process.env.NEXT_PUBLIC_URL}`
-
-  const changeEmailUrl = `${process.env.NEXT_PUBLIC_URL}myaccount/settings/changeemail/${user.resetEmailToken}`
+  const actionUrl = `${process.env.NEXT_PUBLIC_URL}myaccount/settings/changeemail/${user.resetEmailToken}`
   const dynamicTemplateData = {
     name: user.name,
     hostUrl: process.env.NEXT_PUBLIC_URL,
-    changeEmailUrl,
+    actionUrl,
     date: new Date().getFullYear(),
   }
   const frontendMessage = `Для смены email перейдите по ссылке из письма, которое отпавлено на ${newEmail}`
 
   return await sendEmail(res, {
     to: newEmail,
-    subject,
     templateId: 'd-4254ded0205f41dd89036ad2fd1f30b0',
     dynamicTemplateData,
     frontendMessage,

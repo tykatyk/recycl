@@ -89,20 +89,19 @@ export default async function forgetPasswordHandler(req, res) {
 
   // send email
   const to = user.email
-  const subject = `Запрос на сброс пароля на сайте ${process.env.NEXT_PUBLIC_URL}`
-
-  const link = `${process.env.NEXT_PUBLIC_URL}auth/resetpassword/${user.resetPasswordToken}`
-  const message = `Здравствуйте.\r\n
-  Вы получили это письмо потому что запросили операцию сброса пароля на сайте ${process.env.NEXT_PUBLIC_URL}\r\n
-              Для сброса пароля перейдите по ссылке ${link}\r\n
-              Cсылка действительна на протяжении часа.\r\n
-              Если вы не запрашивали это действие, просто проигнорируйте это письмо.\r\n`
+  const actionUrl = `${process.env.NEXT_PUBLIC_URL}auth/resetpassword/${user.resetPasswordToken}`
+  const dynamicTemplateData = {
+    name: user.name,
+    hostUrl: process.env.NEXT_PUBLIC_URL,
+    actionUrl,
+    date: new Date().getFullYear(),
+  }
   const frontendMessage = `Для сброса пароля перейдите по ссылке из письма, которое отпавлено на ${to}`
 
   return await sendEmail(res, {
     to,
-    subject,
-    message,
+    templateId: 'd-6c14e6364c4e4ff3b7d50d9a449df529',
+    dynamicTemplateData,
     frontendMessage,
   })
 }
