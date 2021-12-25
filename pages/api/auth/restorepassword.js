@@ -63,7 +63,10 @@ export default async function restorePasswordHandler(req, res) {
 
   try {
     //Set the new password
-    user.password = await hash(password, 12)
+    user.password = await hash(
+      password,
+      parseInt(process.env.HASHING_ROUNDS, 10)
+    )
     user.resetPasswordToken = undefined
     user.resetPasswordExpires = undefined
     await user.save()
