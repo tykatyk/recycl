@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>{{title}}</title>
+    <meta name='author' content='recycl' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <meta http-equiv='Content-Type' content='text/html charset=UTF-8' />
+
+    <link rel='preconnect' href='https://fonts.googleapis.com' />
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />
+    <link
+      href='https://fonts.googleapis.com/css2?family=Roboto&ampdisplay=swap'
+      rel='stylesheet'
+    />
+    <script
+      src='https://gist.github.com/DavidWells/18e73022e723037a50d6.js'
+    ></script>
+    <style>
+      html, body { height: 100%; } body { font-family: 'Roboto', sans-serif;
+      font-size: 16px; color: #fff; line-height: 1.5 } a, a:visited { color:
+      #32a8a4; text-decoration: none; } a:hover { text-decoration: underline }
+      main { flex: 1 0 auto; } p.greeting { margin-top: 0; } p.message {
+      display: flex; flex-direction: column; } hr{ width: 100%; color: #fff;
+      margin-bottom: 24px; } footer { font-size: 12px; text-align: center }
+      footer a, footer a:visited { color: #fff; flex: 0 0 auto; } .container {
+      margin: 0 auto; max-width: 600px; background: #223c4a; box-sizing:
+      border-box; } .wrapper { box-sizing: border-box; padding: 24px; display:
+      flex; height: 100%; flex-direction: column; }
+
+    </style>
+  </head>
+
+  <body>
+    <div class='container'>
+      <div class='wrapper'>
+        <main>
+          <p class='greeting'>Здравствуйте, {{name}}</p>
+          <p class='message'>
+            <span>
+              Вы запросили операцию смены адреса электронной почты на сайте
+              <a href={{hostUrl}}>Recycl</a>.
+            </span>
+            <span>Для подтверждения перейдите по этой
+              <a href={{changeEmailUrl}}>ссылке</a>.</span>
+            <span>Cсылка действительна на протяжении часа.</span>
+            <span>Если вы не запрашивали это действие, просто проигнорируйте это
+              письмо.</span>
+          </p>
+        </main>
+        <hr />
+        <footer>
+          <div>
+            <span><a href={{hostUrl}}>Recycl</a> {{date}} {{{copy}}}</span>
+
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
