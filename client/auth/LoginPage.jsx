@@ -167,7 +167,7 @@ export default function SignIn() {
               initialValues={{
                 callbackUrl: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
               }}
-              onSubmit={async ({ setSubmitting }) => {
+              onSubmit={async (values, { setSubmitting }) => {
                 setSubmitting(true)
                 await signIn('google')
                 setSubmitting(false)
