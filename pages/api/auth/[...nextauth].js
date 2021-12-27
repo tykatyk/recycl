@@ -6,6 +6,7 @@ import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { compare } from 'bcrypt'
 import { GET_USER_BY_EMAIL } from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation'
+import nextAuthDbAdapter from '../../../lib/nextAuthDbAdapter'
 
 export default NextAuth({
   session: {
@@ -110,7 +111,7 @@ export default NextAuth({
   pages: {
     signIn: '/auth/login',
   },
-
+  adapter: nextAuthDbAdapter(),
   callbacks: {
     jwt: ({ token, user }) => {
       // first time jwt callback is run, user object is available
