@@ -9,7 +9,7 @@ import { loginSchema } from '../../../lib/validation'
 
 export default NextAuth({
   session: {
-    jwt: true,
+    strategy: 'jwt',
   },
   // Configure one or more authentication providers
   providers: [
