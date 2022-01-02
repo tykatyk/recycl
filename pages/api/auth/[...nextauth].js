@@ -1,7 +1,6 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-
 import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { compare } from 'bcrypt'
 import { GET_USER_BY_EMAIL } from '../../../lib/graphql/queries/user'
@@ -92,8 +91,12 @@ export default NextAuth({
         }
 
         let user = result.data.getUserByEmail
+        let checkPassword = false
 
-        const checkPassword = await compare(password, user.password)
+        if (user && user.password) {
+          checkPassword = await compare(password, user.password)
+        }
+
         if (!checkPassword) {
           console.log('error while checing password')
           throw new Error(
@@ -119,7 +122,6 @@ export default NextAuth({
         token.id = user.id
         token.username = user.name
       }
-
       return token
     },
     session: ({ session, token }) => {
