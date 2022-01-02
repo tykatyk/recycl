@@ -20,6 +20,7 @@ import Link from '../Link.jsx'
 import HeaderLinks from './HeaderLinks.jsx'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
+import appoloClient from '../../../lib/appoloClient/appoloClient'
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -171,11 +172,12 @@ export default function Header() {
                         {status === 'authenticated' && (
                           <Link
                             href="#"
-                            onClick={() => {
+                            onClick={async () => {
                               preventDefault(),
-                                signOut({
+                                await signOut({
                                   callbackUrl: `${window.location.origin}`,
                                 })
+                              await appoloClient.resetStore()
                             }}
                             color="inherit"
                           >
