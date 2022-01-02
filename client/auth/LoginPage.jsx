@@ -87,26 +87,19 @@ export default function SignIn() {
                 })
                   .then((response) => {
                     if (response.error) {
-                      try {
-                        let error = JSON.parse(response.error)
-                        if (error.type === 'perField') {
-                          setErrors(error.message)
-                          return
-                        }
-                        if (error.type === 'perForm') {
-                          setBackendError(error.message)
-                          return
-                        }
-                        setBackendError(
-                          'Неизвестная ошибка при обработке ответа сервера'
-                        )
-                        return
-                      } catch (error) {
-                        setBackendError(
-                          'Неизвестная ошибка при обработке ответа сервера'
-                        )
+                      let error = JSON.parse(response.error)
+                      if (error.type === 'perField') {
+                        setErrors(error.message)
                         return
                       }
+                      if (error.type === 'perForm') {
+                        setBackendError(error.message)
+                        return
+                      }
+                      setBackendError(
+                        'Неизвестная ошибка при обработке ответа сервера'
+                      )
+                      return
                     }
 
                     if (router.query && router.query.from) {
