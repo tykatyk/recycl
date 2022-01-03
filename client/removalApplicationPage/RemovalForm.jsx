@@ -67,25 +67,30 @@ export default function RemovalForm(props) {
       fetchPolicy: 'no-cache',
     })
       .then((data) => {
-        setSubmitting(false)
         router.push('/removal/application')
       })
       .catch((err) => {
         console.log(err)
         setBackendError('Возникла ошибка при создании заявки')
       })
+      .finally(() => {
+        setSubmitting(false)
+      })
   }
 
   const updateHandler = (values, setSubmitting) => {
     const normalizedValues = getNormalizedValues(values)
     updateMutation({ variables: { id: id, newValues: normalizedValues } })
-      .then((data) => {
-        setSubmitting(false)
-      })
+      .then((data) => {})
       .catch((err) => {
         console.log(err)
         setBackendError('Возникла ошибка при сохранении заявки')
       })
+      .finally(() => {
+        setSubmitting(false)
+      })
+  }
+
 
   if (gettingApplication || gettingWasteTypes) {
     return (
