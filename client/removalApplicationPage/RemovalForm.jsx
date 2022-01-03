@@ -86,6 +86,20 @@ export default function RemovalForm(props) {
         console.log(err)
         setBackendError('Возникла ошибка при сохранении заявки')
       })
+
+  if (gettingApplication || gettingWasteTypes) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: ' 50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <CircularProgress color="secondary" />
+      </div>
+    )
   }
 
   return (
@@ -131,18 +145,6 @@ export default function RemovalForm(props) {
 
           return (
             <Form className={classes.formRoot}>
-              {(gettingApplication || gettingWasteTypes) && (
-                <div
-                  style={{
-                    position: 'fixed',
-                    top: ' 50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                >
-                  <CircularProgress color="secondary" />
-                </div>
-              )}
               <Grid
                 item
                 container
