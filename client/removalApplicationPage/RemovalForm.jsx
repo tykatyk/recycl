@@ -38,6 +38,21 @@ export default function RemovalForm(props) {
   const router = useRouter()
   const { id } = router.query
   const [backendError, setBackendError] = useState(null)
+  const {
+    loading: gettingWasteTypes,
+    data: wasteTypesData,
+    error: wasteTypesError,
+  } = useQuery(GET_WASTE_TYPES)
+
+  const [
+    getRemovalApplication,
+    {
+      called,
+      loading: gettingApplication,
+      data: applicationData,
+      error: gettingError,
+    },
+  ] = useLazyQuery(GET_REMOVAL_APPLICATION)
 
   const [createMutation, { data: createData, loading: creating, crateError }] =
     useMutation(CREATE_REMOVAL_APPLICATION)
@@ -88,22 +103,6 @@ export default function RemovalForm(props) {
         }}
       >
         {({ isSubmitting, values, setFieldValue }) => {
-          const [
-            getRemovalApplication,
-            {
-              called,
-              loading: gettingApplication,
-              data: applicationData,
-              error: gettingError,
-            },
-          ] = useLazyQuery(GET_REMOVAL_APPLICATION)
-
-          const {
-            loading: gettingWasteTypes,
-            data: wasteTypesData,
-            error: wasteTypesError,
-          } = useQuery(GET_WASTE_TYPES)
-
           useEffect(() => {
             if (id && !called) getRemovalApplication({ variables: { id } })
             if (applicationData && wasteTypesData) {
