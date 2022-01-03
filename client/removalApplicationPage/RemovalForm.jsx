@@ -1,4 +1,4 @@
-import { React, useEffect } from 'react'
+import { React, useEffect, useState } from 'react'
 import {
   Grid,
   Typography,
@@ -7,30 +7,25 @@ import {
   CircularProgress,
   useTheme,
 } from '@material-ui/core'
-
 import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete.jsx'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik.jsx'
 import TextFieldDependantFormik from '../uiParts/formInputs/TextFieldDependantFormik.jsx'
 import RemovalPopover from './RemovalPopover.jsx'
 import SelectFormik from '../uiParts/formInputs/SelectFormik.jsx'
 import SendMessage from '../uiParts/SendMessage.jsx'
-
+import Snackbar from '../uiParts/Snackbars.jsx'
 import { CheckboxWithLabel } from 'formik-material-ui'
 import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './removalFormStyles'
 import { useRouter } from 'next/router'
 import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
-
 import {
   CREATE_REMOVAL_APPLICATION,
   GET_REMOVAL_APPLICATION,
   UPDATE_REMOVAL_APPLICATION,
 } from '../../lib/graphql/queries/removalApplication'
-
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
-
 import { getInitialValues, getNormalizedValues } from './removalFormConfig.js'
-
 import { removalApplicationSchema } from '../../lib/validation'
 
 const useStyles = removalFormStyles
@@ -42,6 +37,7 @@ export default function RemovalForm(props) {
   const theme = useTheme()
   const router = useRouter()
   const { id } = router.query
+  const [backendError, setBackendError] = useState(null)
 
   const [createMutation, { data: createData, loading: creating, crateError }] =
     useMutation(CREATE_REMOVAL_APPLICATION)
@@ -61,6 +57,7 @@ export default function RemovalForm(props) {
       })
       .catch((err) => {
         console.log(err)
+        setBackendError('Возникла ошибка при создании заявки')
       })
   }
 
@@ -72,6 +69,7 @@ export default function RemovalForm(props) {
       })
       .catch((err) => {
         console.log(err)
+        setBackendError('Возникла ошибка при сохранении заявки')
       })
   }
 
@@ -368,6 +366,14 @@ export default function RemovalForm(props) {
       <Grid item xs={12}>
         <SendMessage />
       </Grid>
+      <Snackbar
+        severity="error"
+        open={!!backendError}
+        message={backendError}
+        handleClose={() => {
+          setBackendError(null)
+        }}
+      />
     </>
   )
 }
