@@ -150,7 +150,11 @@ export default function Header() {
                   <ClickAwayListener onClickAway={handleClose}>
                     <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
                       <MenuItem onClick={handleClose}>
-                        <Link href="#" onClick={preventDefault} color="inherit">
+                        <Link
+                          href="/removal/application"
+                          onClick={preventDefault}
+                          color="inherit"
+                        >
                           Мои заявки
                         </Link>
                       </MenuItem>
