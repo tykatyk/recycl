@@ -1,19 +1,17 @@
-import React, { useState } from 'react'
-import { Button, TablePagination, makeStyles } from '@material-ui/core'
-
-const handleChangePage = (event, newPage) => {
-  setPage(newPage)
-}
-
-const handleChangeRowsPerPage = (event) => {
-  setRowsPerPage(parseInt(event.target.value, 10))
-  setPage(0)
-}
+import React from 'react'
+import { Button, TablePagination } from '@material-ui/core'
 
 export default function DataGridFooter(props) {
-  const { deleting, selected, clickHandler } = props
-  const [page, setPage] = React.useState(0)
-  const [rowsPerPage, setRowsPerPage] = React.useState(10)
+  const {
+    deleting,
+    selected,
+    deleteHandler,
+    numRows,
+    handlePageChange,
+    handlePageSizeChange,
+    pageSize,
+    page,
+  } = props
 
   return (
     <div
@@ -26,19 +24,17 @@ export default function DataGridFooter(props) {
       <Button
         color="secondary"
         disabled={deleting || selected.length < 1}
-        onClick={(event) => {
-          clickHandler(event)
-        }}
+        onClick={(event) => deleteHandler(event)}
       >
         Удалить отмеченные
       </Button>
       <TablePagination
         component="div"
-        count={100}
+        count={numRows}
         page={page}
-        onChangePage={handleChangePage}
-        rowsPerPage={rowsPerPage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={pageSize}
+        onChangePage={handlePageChange}
+        onChangeRowsPerPage={handlePageSizeChange}
       />
     </div>
   )
