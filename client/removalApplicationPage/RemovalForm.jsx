@@ -89,6 +89,8 @@ export default function RemovalForm(props) {
       })
   }
 
+  if (gettingError)
+    return <Typography>Возникла ошибка при загрузке данных</Typography>
 
   if (gettingApplication || gettingWasteTypes) {
     return (
@@ -137,14 +139,6 @@ export default function RemovalForm(props) {
 
           const shouldDisable =
             gettingApplication || gettingWasteTypes || isSubmitting
-
-          if (gettingError)
-            return <Typography>Возникла ошибка при загрузке данных</Typography>
-
-          if (crateError)
-            return (
-              <Typography>Возникла ошибка при сохранении данных</Typography>
-            )
 
           return (
             <Form className={classes.formRoot}>
