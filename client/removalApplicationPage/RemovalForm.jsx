@@ -61,6 +61,7 @@ export default function RemovalForm(props) {
     useMutation(UPDATE_REMOVAL_APPLICATION)
 
   const createHandler = (values, setSubmitting) => {
+    setSubmitting(true)
     const normalizedValues = getNormalizedValues(values)
     createMutation({
       variables: { application: normalizedValues },
@@ -70,7 +71,6 @@ export default function RemovalForm(props) {
         router.push('/removal/application')
       })
       .catch((err) => {
-        console.log(err)
         setBackendError('Возникла ошибка при создании заявки')
       })
       .finally(() => {
@@ -79,11 +79,11 @@ export default function RemovalForm(props) {
   }
 
   const updateHandler = (values, setSubmitting) => {
+    setSubmitting(true)
     const normalizedValues = getNormalizedValues(values)
     updateMutation({ variables: { id: id, newValues: normalizedValues } })
       .then((data) => {})
       .catch((err) => {
-        console.log(err)
         setBackendError('Возникла ошибка при сохранении заявки')
       })
       .finally(() => {
