@@ -54,11 +54,9 @@ export default function RemovalForm(props) {
     },
   ] = useLazyQuery(GET_REMOVAL_APPLICATION)
 
-  const [createMutation, { data: createData, loading: creating, crateError }] =
-    useMutation(CREATE_REMOVAL_APPLICATION)
+  const [createMutation] = useMutation(CREATE_REMOVAL_APPLICATION)
 
-  const [updateMutation, { data: updateData, loading: updating, updateError }] =
-    useMutation(UPDATE_REMOVAL_APPLICATION)
+  const [updateMutation] = useMutation(UPDATE_REMOVAL_APPLICATION)
 
   const createHandler = (values, setSubmitting) => {
     setSubmitting(true)
