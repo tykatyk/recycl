@@ -70,6 +70,11 @@ const columns = [
       return ''
     },
   },
+  {
+    field: 'expires',
+    headerName: 'До',
+    width: 110,
+  },
 ]
 
 export default function removalApplications(props) {
@@ -118,6 +123,11 @@ export default function removalApplications(props) {
         newItem.wasteLocation = item.document.wasteLocation.description
         newItem.quantity = item.document.quantity
         newItem.messageCount = item.messageCount
+        const expires = new Date()
+        newItem.expires = expires.toLocaleString('ru-RU', {
+          day: '2-digit',
+          month: 'short',
+        })
         return newItem
       })
     }
