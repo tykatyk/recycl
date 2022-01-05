@@ -93,7 +93,7 @@ export default function removalApplications(props) {
     if (selected.length < 1) return
     deleteMutation({
       variables: { ids: selected },
-      // refetchQueries: [{ query: GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT }],
+      refetchQueries: [{ query: GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT }],
     })
   }
   const handlePageChange = (_, newPage) => setPage(newPage)
