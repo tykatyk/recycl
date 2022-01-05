@@ -11,10 +11,12 @@ import {
   Paper,
   Popper,
   MenuList,
+  Badge,
   makeStyles,
   useTheme,
 } from '@material-ui/core'
 import AccountCircle from '@material-ui/icons/AccountCircle'
+import MailIcon from '@material-ui/icons/Mail'
 import MenuIcon from '@material-ui/icons/Menu'
 import Link from '../Link.jsx'
 import HeaderLinks from './HeaderLinks.jsx'
@@ -26,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   header: {
     padding: 0,
   },
-  accountBtn: {
+  actions: {
     marginLeft: 'auto',
   },
 }))
@@ -121,16 +123,28 @@ export default function Header() {
       <Container component="div">
         <Toolbar className={classes.header}>
           {mobileView ? displayMobile() : displayDesktop()}
-          <IconButton
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={handleMenu}
-            color="inherit"
-            className={classes.accountBtn}
-          >
-            <AccountCircle />
-          </IconButton>
+
+          <div className={classes.actions}>
+            <IconButton href="#">
+              <Badge badgeContent={4} color="secondary">
+                <MailIcon
+                  aria-label="incoming messages"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="false"
+                  color="inherit"
+                />
+              </Badge>
+            </IconButton>
+            <IconButton
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </div>
           <Popper
             open={open}
             anchorEl={anchorEl}
