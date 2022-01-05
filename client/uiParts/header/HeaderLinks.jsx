@@ -21,19 +21,15 @@ export default function HeaderLinks(props) {
 
   const links = [
     {
-      text: 'Заявки на сортировку',
+      text: 'Сдать отходы',
       href: '#',
     },
     {
-      text: 'Заявки на сдачу',
+      text: 'Получить отходы',
       href: '/removal/application',
     },
     {
-      text: 'Переработчики',
-      href: '#',
-    },
-    {
-      text: 'Сортировщики',
+      text: 'Сортировать отходы',
       href: '#',
     },
   ]
