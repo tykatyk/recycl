@@ -116,6 +116,8 @@ export default function removalApplications(props) {
 
   if (status === 'authenticated') {
     if (!error) {
+      //ToDo: Refactor returned data, so that data contain objects in needed form
+      //so that to avoid mapping
       rows = data.getRemovalApplicationsWithMessageCount.map((item) => {
         const newItem = {}
         newItem.id = item.document['_id']
