@@ -129,7 +129,6 @@ export default function removalApplications(props) {
             container
             direction="column"
             style={{
-              maxWidth: '800px',
               margin: '0 auto',
               padding: '16px',
             }}
