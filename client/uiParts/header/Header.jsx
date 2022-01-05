@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import {
   AppBar,
   Toolbar,
+  Button,
   IconButton,
   MenuItem,
   Drawer,
@@ -125,6 +126,14 @@ export default function Header() {
           {mobileView ? displayMobile() : displayDesktop()}
 
           <div className={classes.actions}>
+            <Button
+              variant="outlined"
+              color="inherit"
+              href="/removal/application/create"
+              style={{ textTransform: 'capitalize ' }}
+            >
+              Создать
+            </Button>
             <IconButton href="#">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon
