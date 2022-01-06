@@ -22,7 +22,7 @@ export default function HeaderLinks(props) {
   const links = [
     {
       text: 'Сдать отходы',
-      href: '#',
+      href: '/applications',
     },
     {
       text: 'Получить отходы',
