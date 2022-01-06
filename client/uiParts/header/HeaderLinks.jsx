@@ -11,7 +11,6 @@ import Link from '../Link.jsx'
 const useStyles = makeStyles((theme) => ({
   navLinks: {
     flexGrow: 1,
-    marginRight: theme.spacing(5),
   },
 }))
 
