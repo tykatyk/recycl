@@ -3,7 +3,10 @@ import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import appoloClient from '../../../lib/appoloClient/appoloClient'
 import { compare } from 'bcrypt'
-import { GET_USER_BY_EMAIL } from '../../../lib/graphql/queries/user'
+import {
+  GET_USER_BY_EMAIL,
+  DELETE_NOT_CONFIRMED_USER,
+} from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation'
 import nextAuthDbAdapter from '../../../lib/nextAuthDbAdapter'
 
@@ -90,10 +93,29 @@ export default NextAuth({
           )
         }
 
-        let user = result.data.getUserByEmail
-        let checkPassword = false
+        const user = result.data.getUserByEmail
+        const { _id, emailConfirmed, confirmEmailExpires } = user
 
-        if (user && user.password) {
+        if (
+          !emailConfirmed &&
+          typeof confirmEmailExpires != undefined &&
+          new Date(confirmEmailExpires * 1000) >= Date.now()
+        ) {
+          //delete this user
+          await appoloClient.mutate({
+            mutation: DELETE_NOT_CONFIRMED_USER,
+            variables: { id: _id },
+          })
+          throw new Error(
+            JSON.stringify({
+              type: 'perForm',
+              message: 'Пользователь с такими учетными данными не найден',
+            })
+          )
+        }
+
+        let checkPassword = false
+        if (user.password) {
           checkPassword = await compare(password, user.password)
         }
 
