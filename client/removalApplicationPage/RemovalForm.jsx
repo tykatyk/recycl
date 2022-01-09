@@ -150,7 +150,7 @@ export default function RemovalForm(props) {
               >
                 <Grid item xs={12} className={classes.sectionTitle}>
                   <Typography gutterBottom variant="h4">
-                    Параметры заявки
+                    Заявка на сдачу отходов
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -361,9 +361,6 @@ export default function RemovalForm(props) {
           )
         }}
       </Formik>
-      <Grid item xs={12}>
-        <SendMessage />
-      </Grid>
       <Snackbar
         severity="error"
         open={!!backendError}
