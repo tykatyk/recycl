@@ -35,6 +35,7 @@
     "bcrypt": "^5.0.1",
     "cross-env": "^7.0.3",
     "crypto-random-string": "^4.0.0",
+    "fetch-jsonp": "^1.2.1",
     "formik": "^2.2.9",
     "formik-material-ui": "^4.0.0-alpha.1",
     "formik-material-ui-lab": "^1.0.0-alpha.1",
