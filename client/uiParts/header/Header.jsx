@@ -34,6 +34,8 @@ const useStyles = makeStyles((theme) => ({
   },
   actions: {
     marginLeft: 'auto',
+    paddingLeft: theme.spacing(4),
+  },
   },
 }))
 
