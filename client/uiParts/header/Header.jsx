@@ -26,6 +26,9 @@ import { signOut } from 'next-auth/react'
 import appoloClient from '../../../lib/appoloClient/appoloClient'
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
   header: {
     padding: 0,
   },
@@ -120,7 +123,7 @@ export default function Header() {
   const displayDesktop = () => <HeaderLinks isDesktop />
 
   return (
-    <AppBar position="static" id="mainHeader">
+    <AppBar position="static" id="mainHeader" className={classes.root}>
       <Container component="div">
         <Toolbar className={classes.header}>
           {mobileView ? displayMobile() : displayDesktop()}
