@@ -41,7 +41,7 @@ export default function Header() {
   const preventDefault = () => false
   const classes = useStyles()
   const theme = useTheme()
-  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [anchorEl, setAnchorEl] = useState(null)
   const [state, setState] = useState({
     mobileView: false,
     drawerOpen: false,
