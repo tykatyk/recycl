@@ -12,15 +12,14 @@ import {
   Paper,
   Popper,
   MenuList,
-  Badge,
   makeStyles,
   useTheme,
 } from '@material-ui/core'
 import AccountCircle from '@material-ui/icons/AccountCircle'
-import MailIcon from '@material-ui/icons/Mail'
 import MenuIcon from '@material-ui/icons/Menu'
 import Link from '../Link.jsx'
 import HeaderLinks from './HeaderLinks.jsx'
+import UnreadMessages from './UnreadMessages.jsx'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import appoloClient from '../../../lib/appoloClient/appoloClient'
@@ -36,6 +35,9 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 'auto',
     paddingLeft: theme.spacing(4),
   },
+  createButton: {
+    textTransform: 'capitalize',
+    marginRight: theme.spacing(2),
   },
 }))
 
@@ -129,36 +131,28 @@ export default function Header() {
       <Container component="div">
         <Toolbar className={classes.header}>
           {mobileView ? displayMobile() : displayDesktop()}
-
-          <div className={classes.actions}>
-            <Button
-              variant="outlined"
-              color="inherit"
-              href="/removal/application/create"
-              style={{ textTransform: 'capitalize ' }}
-            >
-              Создать
-            </Button>
-            <IconButton href="#">
-              <Badge badgeContent={4} color="secondary">
-                <MailIcon
-                  aria-label="incoming messages"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="false"
-                  color="inherit"
-                />
-              </Badge>
-            </IconButton>
-            <IconButton
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-          </div>
+          {status === 'authenticated' && (
+            <div className={classes.actions}>
+              <Button
+                variant="outlined"
+                color="inherit"
+                href="/removal/application/create"
+                className={classes.createButton}
+              >
+                Создать
+              </Button>
+              <UnreadMessages />
+            </div>
+          )}
+          <IconButton
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+            color="inherit"
+          >
+            <AccountCircle />
+          </IconButton>
           <Popper
             open={open}
             anchorEl={anchorEl}
