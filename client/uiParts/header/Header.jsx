@@ -46,7 +46,7 @@ export default function Header() {
     mobileView: false,
     drawerOpen: false,
   })
-  const { data: session, status } = useSession()
+  const { status } = useSession()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
