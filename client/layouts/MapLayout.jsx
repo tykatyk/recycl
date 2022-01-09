@@ -10,10 +10,10 @@ export default function MapLayout({ children, title }) {
       <Head title={title} />
       <Wrapper>
         <Header />
-        <main style={{ display: 'flex', flex: '1 1 auto' }}>
+        <div style={{ display: 'flex', flex: '1 1 auto' }}>
           <MapSidebar />
-          {children}
-        </main>
+          <main style={{ display: 'flex', flex: '1 1 auto' }}>{children}</main>
+        </div>
       </Wrapper>
     </>
   )
