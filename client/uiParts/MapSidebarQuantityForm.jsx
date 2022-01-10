@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function SidebarQuantityForm() {
+export default function MapSidebarQuantityForm() {
   const classes = useStyles()
 
   return (
