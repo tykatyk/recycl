@@ -3,7 +3,7 @@ import MapLayout from './layouts/MapLayout.jsx'
 import Map from './uiParts/Map.jsx'
 import getCoordinates from '../lib/getCoordinates'
 
-export default function ApplicationsPage() {
+export default function RemovalApplicationsPage() {
   const [center, setCenter] = useState(null)
   const [zoom, setZoom] = useState(5)
 

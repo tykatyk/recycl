@@ -1,6 +1,6 @@
 import React from 'react'
-import ApplicationsPage from '../client/ApplicationsPage.jsx'
+import RemovalApplicationsPage from '../client/RemovalApplicationsPage.jsx'
 
-export default function applications() {
-  return <ApplicationsPage />
+export default function removalApplications() {
+  return <RemovalApplicationsPage />
 }
