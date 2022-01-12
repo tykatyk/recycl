@@ -1,7 +1,9 @@
 import React from 'react'
-import { Typography, InputAdornment, makeStyles } from '@material-ui/core'
-import TextFieldFormik from './formInputs/TextFieldFormik.jsx'
-import { Formik, Form, Field } from 'formik'
+import { TextField, Button, Typography, makeStyles } from '@material-ui/core'
+import { Formik, Form, ErrorMessage } from 'formik'
+import ButtonSubmittingCircle from './ButtonSubmittingCircle.jsx'
+import { quantitySchema } from '../../lib/validation'
+import mapErrors from '../../lib/mapErrors'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -10,8 +12,14 @@ const useStyles = makeStyles((theme) => ({
   },
   wrapper: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-around',
+    '& > *': {
+      marginRight: theme.spacing(1),
+    },
+    '& > :last-child': {
+      marginRight: 0,
+    },
   },
   helperTextRoot: {
     textAlign: 'center',
@@ -22,7 +30,17 @@ const useStyles = makeStyles((theme) => ({
       padding: '3px !important',
     },
   },
+  submit: {
+    marginTop: 5,
+  },
 }))
+
+//ToDo:this should be pulled from database
+const validationContext = {
+  min: 22,
+  max: 33,
+}
+let errorMsg = null
 
 export default function MapSidebarQuantityForm() {
   const classes = useStyles()
@@ -35,16 +53,39 @@ export default function MapSidebarQuantityForm() {
         max: '',
       }}
       onSubmit={(values, { setSubmitting }) => {}}
+      validate={async (values) => {
+        return await quantitySchema
+          .validate(values, { abortEarly: false, validationContext })
+          .then(() => ({}))
+          .catch((error) => {
+            // console.log(JSON.stringify(error, null, 2))
+            const errors = mapErrors(error)
+            return errors
+          })
+      }}
     >
-      {({ isSubmitting, values, setFieldValue }) => {
+      {({
+        isSubmitting,
+        handleChange,
+        handleBlur,
+        touched,
+        values,
+        errors,
+        setFieldValue,
+      }) => {
+        if (touched.min && Boolean(errors.min)) {
+          errorMsg = <ErrorMessage name="min" />
+        } else if (touched.max && Boolean(errors.max)) {
+          errorMsg = <ErrorMessage name="max" />
+        } else {
+          errorMsg = null
+        }
         return (
           <Form className={classes.root}>
             <div className={classes.wrapper}>
-              <div style={{ marginRight: '10px' }}>
-                <Field
-                  component={TextFieldFormik}
+              <div>
+                <TextField
                   color="secondary"
-                  type="number"
                   fullWidth
                   name="min"
                   variant="outlined"
@@ -53,13 +94,15 @@ export default function MapSidebarQuantityForm() {
                   }}
                   helperText="От"
                   size="small"
+                  value={values.min}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.min && Boolean(errors.min)}
                 />
               </div>
               <div>
-                <Field
-                  component={TextFieldFormik}
+                <TextField
                   color="secondary"
-                  type="number"
                   fullWidth
                   name="max"
                   variant="outlined"
@@ -68,8 +111,37 @@ export default function MapSidebarQuantityForm() {
                   }}
                   helperText="До"
                   size="small"
+                  value={values.max}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.max && Boolean(errors.max)}
                 />
               </div>
+              <div>
+                <Button
+                  size="small"
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  className={classes.submit}
+                  disabled={isSubmitting}
+                >
+                  Ок
+                  {isSubmitting && <ButtonSubmittingCircle />}
+                </Button>
+              </div>
+            </div>
+            <div>
+              {errorMsg && (
+                <Typography
+                  color="error"
+                  variant="body2"
+                  style={{ marginTop: 8 }}
+                >
+                  {errorMsg}
+                </Typography>
+              )}
             </div>
           </Form>
         )
