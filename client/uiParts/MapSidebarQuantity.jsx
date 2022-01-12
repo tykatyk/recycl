@@ -6,7 +6,7 @@ export default function MapSidebarQuantity(props) {
   const { open } = props
 
   return (
-    <Collapse in={open} timeout="auto" unmountOnExit>
+    <Collapse in={open} timeout="auto">
       <List>
         <ListItem>
           <MapSidebarQuantityForm />
