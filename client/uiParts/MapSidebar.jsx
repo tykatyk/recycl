@@ -53,7 +53,6 @@ export default function MapSidebar() {
   const [open, setOpen] = useState(false)
   const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
   const [quantityOpen, setQuantityOpen] = useState(true)
-  const [checked, setChecked] = useState([0])
 
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -118,7 +117,6 @@ export default function MapSidebar() {
             <ListItemText primary={'Тип отходов'} />
             {wasteTypeOpen ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
-
           <MapSidebarWasteTypes open={wasteTypeOpen} />
         </List>
       </Drawer>
