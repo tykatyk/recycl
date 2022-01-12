@@ -2,7 +2,7 @@ import { createMuiTheme } from '@material-ui/core/styles'
 import { ruRU as coreRuRu } from '@material-ui/core/locale'
 import { ruRU } from '@mui/x-data-grid'
 
-export const theme = createMuiTheme(
+const theme = createMuiTheme(
   {
     palette: {
       type: 'dark',
@@ -21,3 +21,4 @@ export const theme = createMuiTheme(
   coreRuRu,
   ruRU
 )
+export default theme
