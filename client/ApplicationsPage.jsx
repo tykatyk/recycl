@@ -19,7 +19,7 @@ export default function ApplicationsPage() {
   }, [])
 
   return (
-    <MapLayout title="Recycl | Сбор отходов">
+    <MapLayout title="Сбор отходов | Recycl">
       <Map center={center} zoom={zoom} />
     </MapLayout>
   )
