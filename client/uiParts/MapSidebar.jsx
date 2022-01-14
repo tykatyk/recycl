@@ -11,14 +11,8 @@ import {
   makeStyles,
 } from '@material-ui/core'
 import HomeIcon from '@material-ui/icons/Home'
-import BlurOnIcon from '@material-ui/icons/BlurOn'
-import LineWeightIcon from '@material-ui/icons/LineWeight'
-import ExpandLess from '@material-ui/icons/ExpandLess'
-import ExpandMore from '@material-ui/icons/ExpandMore'
 import AddIcon from '@material-ui/icons/Add'
-import MapSidebarQuantity from './MapSidebarQuantity'
 import MapActionButton from './MapActionButton'
-import MapSidebarWasteTypes from './MapSidebarWasteTypes'
 
 const drawerWidth = 240
 
@@ -48,21 +42,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function MapSidebar() {
+export default function MapSidebar(props) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
-  const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
-  const [quantityOpen, setQuantityOpen] = useState(true)
-
   const handleDrawerToggle = () => {
     setOpen(!open)
   }
-  const handleWasteTypeToggle = () => {
-    setWasteTypeOpen(!wasteTypeOpen)
-  }
-  const handleQuantityToggle = () => {
-    setQuantityOpen(!quantityOpen)
-  }
+  const { children } = props
 
   return (
     <>
@@ -101,23 +87,7 @@ export default function MapSidebar() {
             <ListItemText primary="Подать заявку" />
           </ListItem>
           <Divider variant="inset" component="li" />
-          <ListItem button key={'Количество'} onClick={handleQuantityToggle}>
-            <ListItemIcon>
-              <LineWeightIcon />
-            </ListItemIcon>
-            <ListItemText primary={'Количество'} />
-            {quantityOpen ? <ExpandLess /> : <ExpandMore />}
-          </ListItem>
-          <MapSidebarQuantity open={quantityOpen} />
-          <Divider variant="inset" component="li" />
-          <ListItem button key={'Тип отходов'} onClick={handleWasteTypeToggle}>
-            <ListItemIcon>
-              <BlurOnIcon />
-            </ListItemIcon>
-            <ListItemText primary={'Тип отходов'} />
-            {wasteTypeOpen ? <ExpandLess /> : <ExpandMore />}
-          </ListItem>
-          <MapSidebarWasteTypes open={wasteTypeOpen} />
+          {children}
         </List>
       </Drawer>
     </>
