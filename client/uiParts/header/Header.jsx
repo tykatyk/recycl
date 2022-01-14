@@ -197,7 +197,7 @@ export default function Header() {
                         )}
                         {status === 'authenticated' && (
                           <Link
-                            href="#"
+                            href="/"
                             onClick={async () => {
                               preventDefault(),
                                 await signOut({
