@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import MapLayout from './layouts/MapLayout.jsx'
 import Map from './uiParts/Map.jsx'
-import getCoordinates from '../lib/getCoordinates'
+import getUserLocation from '../lib/getUserLocation'
 
 export default function RemovalApplicationsPage() {
   const [center, setCenter] = useState(null)
