@@ -11,7 +11,6 @@ import {
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
-import GoogleIcon from '@mui/icons-material/Google'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik.jsx'
 import Link from '../uiParts/Link.jsx'
 import Snackbar from '../uiParts/Snackbars.jsx'
@@ -182,7 +181,6 @@ export default function SignIn() {
                       color="secondary"
                       className={classes.submit}
                       disabled={isSubmitting}
-                      startIcon={<GoogleIcon />}
                     >
                       Войти с аккаунтом Google
                       {isSubmitting && <ButtonSubmittingCircle />}
