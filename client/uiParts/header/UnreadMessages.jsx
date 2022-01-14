@@ -50,14 +50,16 @@ export default function UnreadMessages() {
           />
         </Badge>
       </IconButton>
-      <Snackbar
-        severity="error"
-        open={!!backendError}
-        message={backendError}
-        handleClose={() => {
-          setBackendError(null)
-        }}
-      />
+      {backendError && (
+        <Snackbar
+          severity="error"
+          open={true}
+          message={backendError}
+          handleClose={() => {
+            setBackendError(null)
+          }}
+        />
+      )}
     </>
   )
 }
