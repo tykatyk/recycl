@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
     padding: 0,
   },
   actions: {
+    display: 'flex',
     marginLeft: 'auto',
     paddingLeft: theme.spacing(4),
   },
@@ -131,28 +132,32 @@ export default function Header() {
       <Container component="div">
         <Toolbar className={classes.header}>
           {mobileView ? displayMobile() : displayDesktop()}
-          {status === 'authenticated' && (
-            <div className={classes.actions}>
-              <Button
-                variant="outlined"
-                color="inherit"
-                href="/removal/application/create"
-                className={classes.createButton}
-              >
-                Создать
-              </Button>
-              <UnreadMessages />
-            </div>
-          )}
-          <IconButton
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={handleMenu}
-            color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
+
+          <div className={classes.actions}>
+            {status === 'authenticated' && (
+              <>
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  href="/removal/application/create"
+                  className={classes.createButton}
+                >
+                  Создать
+                </Button>
+                <UnreadMessages />
+              </>
+            )}
+            <IconButton
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </div>
+
           <Popper
             open={open}
             anchorEl={anchorEl}
