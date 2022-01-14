@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { TextField, Button, Typography, makeStyles } from '@material-ui/core'
 import { Formik, Form, ErrorMessage } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle.jsx'
@@ -35,27 +35,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-//ToDo:this should be pulled from database
-const validationContext = {
-  min: 22,
-  max: 33,
-}
-let errorMsg = null
-
-export default function MapSidebarQuantityForm() {
+export default function MapSidebarQuantityForm(props) {
   const classes = useStyles()
+  const { min = 0, max = 0 } = props
+  let errorMsg = null
 
   return (
     <Formik
       enableReinitialize
       initialValues={{
-        min: '',
-        max: '',
+        min,
+        max,
       }}
       onSubmit={(values, { setSubmitting }) => {}}
       validate={async (values) => {
         return await quantitySchema
-          .validate(values, { abortEarly: false, validationContext })
+          .validate(values, {
+            abortEarly: false,
+            validationContext: { min, max },
+          })
           .then(() => ({}))
           .catch((error) => {
             // console.log(JSON.stringify(error, null, 2))
@@ -80,6 +78,12 @@ export default function MapSidebarQuantityForm() {
         } else {
           errorMsg = null
         }
+
+        useEffect(() => {
+          if (min) setFieldValue('min', min) //ToDo add check for min == 0
+          if (max) setFieldValue('max', max) //ToDo add check for max == 0
+        }, [min, max])
+
         return (
           <Form className={classes.root}>
             <div className={classes.wrapper}>
