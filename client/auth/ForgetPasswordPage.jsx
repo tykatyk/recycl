@@ -40,6 +40,7 @@ export default function ForgetPasswordPage() {
   const [successMessage, setSuccessMessage] = useState(null)
   const [severity, setSeverity] = useState('error')
   const [recaptcha, setRecaptcha] = useState(null)
+  const [showRecaptcha, setShowRecaptcha] = useState(false)
   const recaptchaRef = useRef(null)
 
   const handleChange = (token) => {
@@ -91,6 +92,11 @@ export default function ForgetPasswordPage() {
               validationSchema={emailSchema}
               onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                 setSubmitting(true)
+                if (!showRecaptcha) {
+                  setShowRecaptcha(true)
+                  setSubmitting(false)
+                  return
+                }
 
                 if (!recaptcha) {
                   setSubmitting(false)
@@ -130,13 +136,13 @@ export default function ForgetPasswordPage() {
                     setSuccessMessage(data.message)
                   })
                   .catch((error) => {
-                    console.log(error)
                     setBackendError('Неизвестная ошибка')
                   })
                   .finally(() => {
                     if (recaptchaRef && recaptchaRef.current) {
                       recaptchaRef.current.reset()
                     }
+                    setShowRecaptcha(false)
                     setRecaptcha(null)
                     setSubmitting(false)
                   })
@@ -168,7 +174,7 @@ export default function ForgetPasswordPage() {
                     </Button>
                     <div
                       style={{
-                        display: 'flex',
+                        display: showRecaptcha ? 'flex' : 'none',
                         justifyContent: 'center',
                         margin: theme.spacing(2, 0),
                       }}
