@@ -46,13 +46,18 @@ const MapContainer = (props) => {
   return (
     <>
       <div className={classes.mapContainer} ref={ref} id="map" />
-      {children}
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          // set the map prop on the child component
+          return React.cloneElement(child, { map })
+        }
+      })}
     </>
   )
 }
 
 export default function Map(props) {
-  const { center, zoom, onIdle } = props
+  const { center, zoom, onIdle, children } = props
   const render = (status) => {
     if (status === Status.LOADING) return <PageLoadingCircle />
 
@@ -75,7 +80,9 @@ export default function Map(props) {
       apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
       render={render}
     >
-      <MapContainer center={center} zoom={zoom} onIdle={onIdle} />
+      <MapContainer center={center} zoom={zoom} onIdle={onIdle}>
+        {children}
+      </MapContainer>
     </Wrapper>
   )
 }

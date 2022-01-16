@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { Divider } from '@material-ui/core'
 import MapLayout from './layouts/MapLayout.jsx'
 import Map from './uiParts/Map.jsx'
+import Marker from './uiParts/Marker.jsx'
 import MapSidebarQuantity from './uiParts/MapSidebarQuantity'
 import MapSidebarWasteTypes from './uiParts/MapSidebarWasteTypes'
 import MapSidebar from './uiParts/MapSidebar.jsx'
 import getUserLocation from '../lib/getUserLocation'
-
-import { GET_REMOVAL_APPLICATIONS } from '../lib/graphql/queries/removalApplication'
+import { GET_REMOVAL_APPLICATIONS_FOR_MAP } from '../lib/graphql/queries/removalApplication'
 import { useLazyQuery } from '@apollo/client'
 
 export default function RemovalApplicationsPage() {
@@ -18,6 +18,30 @@ export default function RemovalApplicationsPage() {
   const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
   const [quantityOpen, setQuantityOpen] = useState(true)
   const [checked, setChecked] = useState([0])
+  const [getApplications, { loading, error, data }] = useLazyQuery(
+    GET_REMOVAL_APPLICATIONS_FOR_MAP
+  )
+  const [markers, setMarkers] = useState(null)
+  useEffect(() => {
+    if (
+      data &&
+      data.getRemovalApplicationsForMap &&
+      data.getRemovalApplicationsForMap.length > 0
+    ) {
+      const markersToShow = data.getRemovalApplicationsForMap.map(
+        (element, index) => {
+          const coords = {}
+          coords.lat = element.wasteLocation.position.coordinates[1]
+          coords.lng = element.wasteLocation.position.coordinates[0]
+          return <Marker key={index} position={coords} />
+        }
+      )
+      setMarkers(markersToShow)
+    }
+  }, [data])
+
+  if (error) console.log(JSON.stringify(error, null, 2))
+
   const handleChange = (value) => () => {
     const currentIndex = checked.indexOf(value)
     const newChecked = [...checked]
@@ -38,9 +62,34 @@ export default function RemovalApplicationsPage() {
   }
 
   const onIdle = (m) => {
-    console.log('onIdle')
     setZoom(m.getZoom())
     setCenter(m.getCenter().toJSON())
+    const bounds = m.getBounds()
+    const boundsNeLatLng = bounds.getNorthEast()
+    const boundsSwLatLng = bounds.getSouthWest()
+    const boundsNwLatLng = new google.maps.LatLng(
+      boundsNeLatLng.lat(),
+      boundsSwLatLng.lng()
+    )
+    const boundsSeLatLng = new google.maps.LatLng(
+      boundsSwLatLng.lat(),
+      boundsNeLatLng.lng()
+    )
+
+    const visibleRect = [
+      [
+        [boundsNeLatLng.lng(), boundsNeLatLng.lat()],
+        [boundsSeLatLng.lng(), boundsSeLatLng.lat()],
+        [boundsSwLatLng.lng(), boundsSwLatLng.lat()],
+        [boundsNwLatLng.lng(), boundsNwLatLng.lat()],
+        [boundsNeLatLng.lng(), boundsNeLatLng.lat()],
+      ],
+    ]
+    getApplications({
+      variables: {
+        visibleRect: visibleRect,
+      },
+    })
   }
 
   useEffect(() => {
@@ -75,7 +124,9 @@ export default function RemovalApplicationsPage() {
           />
         </MapSidebar>
         <main style={{ display: 'flex', flex: '1 1 auto' }}>
-          <Map center={center} zoom={zoom} onIdle={onIdle} />
+          <Map center={center} zoom={zoom} onIdle={onIdle}>
+            {markers}
+          </Map>
         </main>
       </>
     </MapLayout>
