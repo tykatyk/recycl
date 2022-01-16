@@ -89,7 +89,7 @@ export default function ForgetPasswordPage() {
                 email: '',
               }}
               validationSchema={emailSchema}
-              onSubmit={(values, { setSubmitting, setErrors }) => {
+              onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                 setSubmitting(true)
 
                 if (!recaptcha) {
@@ -124,10 +124,10 @@ export default function ForgetPasswordPage() {
                         'Неизвестная ошибка при обработке ответа сервера'
                       )
                       return
-                    } else {
-                      setSeverity('success')
-                      setSuccessMessage(data.message)
                     }
+                    resetForm()
+                    setSeverity('success')
+                    setSuccessMessage(data.message)
                   })
                   .catch((error) => {
                     console.log(error)
