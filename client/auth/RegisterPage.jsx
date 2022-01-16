@@ -100,7 +100,7 @@ export default function SignUp() {
                 confirmPassword: '',
               }}
               validationSchema={registerSchema}
-              onSubmit={(values, { setSubmitting, setErrors }) => {
+              onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                 setSubmitting(true)
                 if (!showRecaptcha) {
                   setShowRecaptcha(true)
@@ -141,6 +141,7 @@ export default function SignUp() {
                       )
                       return
                     }
+                    resetForm()
                     setSeverity('success')
                     setSuccessMessage(data.message)
                   })
