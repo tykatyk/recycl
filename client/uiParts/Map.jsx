@@ -41,7 +41,7 @@ const MapContainer = (props) => {
         map.addListener('idle', () => onIdle(map))
       }
     }
-  }, [onIdle])
+  }, [map, onIdle])
 
   return (
     <>
