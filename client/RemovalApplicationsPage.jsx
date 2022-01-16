@@ -13,8 +13,8 @@ import { useLazyQuery } from '@apollo/client'
 export default function RemovalApplicationsPage() {
   const [center, setCenter] = useState(null)
   const [zoom, setZoom] = useState(null)
-  const [min, setMin] = useState(null)
-  const [max, setMax] = useState(null)
+  const [min, setMin] = useState('')
+  const [max, setMax] = useState('')
   const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
   const [quantityOpen, setQuantityOpen] = useState(true)
   const [checked, setChecked] = useState([0])
