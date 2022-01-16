@@ -152,6 +152,7 @@ export default function SignUp() {
                     if (recaptchaRef && recaptchaRef.current) {
                       recaptchaRef.current.reset()
                     }
+                    setShowRecaptcha(false)
                     setRecaptcha(null)
                     setSubmitting(false)
                   })
