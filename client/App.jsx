@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { ThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core'
+import { ThemeProvider, CssBaseline } from '@material-ui/core'
 import { ApolloProvider } from '@apollo/client'
 import appoloClient from '../lib/appoloClient/appoloClient'
 import { SessionProvider } from 'next-auth/react'
