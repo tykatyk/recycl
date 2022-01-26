@@ -2,56 +2,52 @@ import React, { useState, useEffect } from 'react'
 import {
   AppBar,
   Toolbar,
-  Button,
-  IconButton,
-  MenuItem,
-  Drawer,
   Container,
-  ClickAwayListener,
-  Grow,
-  Paper,
-  Popper,
-  MenuList,
   makeStyles,
   useTheme,
 } from '@material-ui/core'
-import AccountCircle from '@material-ui/icons/AccountCircle'
-import MenuIcon from '@material-ui/icons/Menu'
-import Link from '../Link.jsx'
-import HeaderLinks from './HeaderLinks.jsx'
+import UserMenu from './UserMenu.jsx'
 import UnreadMessages from './UnreadMessages.jsx'
+import UserAvatar from './UserAvatar.jsx'
+import DesktopNavigation from './DesktopNavigation.jsx'
+import MobileNavigation from './MobileNavigation.jsx'
+import CreateButton from './CreateButton.jsx'
 import { useSession } from 'next-auth/react'
-import { signOut } from 'next-auth/react'
-import appoloClient from '../../../lib/appoloClient/appoloClient'
 
 const useStyles = makeStyles((theme) => ({
   root: {
     zIndex: theme.zIndex.drawer + 1,
   },
   header: {
+    display: 'flex',
+    justifyContent: 'space-between',
     padding: 0,
   },
-  actions: {
+  buttons: {
     display: 'flex',
+    alignItems: 'center',
     marginLeft: 'auto',
-    paddingLeft: theme.spacing(4),
   },
-  createButton: {
-    textTransform: 'capitalize',
-    marginRight: theme.spacing(2),
+  gutter: {
+    display: 'flex',
+    paddingLeft: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      paddingLeft: 0,
+    },
   },
 }))
 
 export default function Header() {
-  const preventDefault = () => false
   const classes = useStyles()
   const theme = useTheme()
   const [anchorEl, setAnchorEl] = useState(null)
+  const menuOpen = Boolean(anchorEl)
   const [state, setState] = useState({
     mobileView: false,
     drawerOpen: false,
   })
-  const { status } = useSession()
+  const { mobileView, drawerOpen } = state
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -74,18 +70,17 @@ export default function Header() {
     }
   }, [])
 
-  const { mobileView, drawerOpen } = state
-
-  const open = Boolean(anchorEl)
+  const handleDrawerOpen = () =>
+    setState((prevState) => ({ ...prevState, drawerOpen: true }))
+  const handleDrawerClose = () =>
+    setState((prevState) => ({ ...prevState, drawerOpen: false }))
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget)
   }
-
   const handleClose = () => {
     setAnchorEl(null)
   }
-
   function handleListKeyDown(event) {
     if (event.key === 'Tab') {
       event.preventDefault()
@@ -93,135 +88,32 @@ export default function Header() {
     }
   }
 
-  const displayMobile = () => {
-    const handleDrawerOpen = () =>
-      setState((prevState) => ({ ...prevState, drawerOpen: true }))
-
-    const handleDrawerClose = () =>
-      setState((prevState) => ({ ...prevState, drawerOpen: false }))
-
-    return (
-      <>
-        <IconButton
-          {...{
-            'aria-label': 'menu',
-            'aria-haspopup': 'true',
-            onClick: handleDrawerOpen,
-            color: 'inherit',
-          }}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Drawer
-          {...{
-            anchor: 'left',
-            open: drawerOpen,
-            onClose: handleDrawerClose,
-          }}
-        >
-          <HeaderLinks isDesktop={false} />
-        </Drawer>
-      </>
-    )
-  }
-
-  const displayDesktop = () => <HeaderLinks isDesktop />
-
   return (
     <AppBar position="static" id="mainHeader" className={classes.root}>
       <Container component="div">
         <Toolbar className={classes.header}>
-          {mobileView ? displayMobile() : displayDesktop()}
-
-          <div className={classes.actions}>
+          {mobileView ? (
+            <MobileNavigation
+              {...{ drawerOpen, handleDrawerOpen, handleDrawerClose }}
+            />
+          ) : (
+            <DesktopNavigation />
+          )}
+          <div className={classes.buttons}>
             {status === 'authenticated' && (
-              <>
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  href="/removal/application/create"
-                  className={classes.createButton}
-                >
-                  Создать
-                </Button>
+              <div className={classes.gutter}>
+                <CreateButton />
                 <UnreadMessages />
-              </>
+              </div>
             )}
-            <IconButton
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            <UserAvatar handleMenu={handleMenu} />
           </div>
-
-          <Popper
-            open={open}
+          <UserMenu
+            open={menuOpen}
             anchorEl={anchorEl}
-            role={undefined}
-            transition
-            disablePortal
-          >
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                style={{
-                  transformOrigin:
-                    placement === 'bottom' ? 'center top' : 'center bottom',
-                }}
-              >
-                <Paper>
-                  <ClickAwayListener onClickAway={handleClose}>
-                    <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                      <MenuItem onClick={handleClose}>
-                        <Link
-                          href="/removal/application"
-                          onClick={preventDefault}
-                          color="inherit"
-                        >
-                          Мои заявки
-                        </Link>
-                      </MenuItem>
-                      <MenuItem onClick={handleClose}>
-                        <Link
-                          href="/myaccount/settings"
-                          onClick={preventDefault}
-                          color="inherit"
-                        >
-                          Настройки
-                        </Link>
-                      </MenuItem>
-                      <MenuItem onClick={handleClose}>
-                        {status === 'unauthenticated' && (
-                          <Link href="/auth/login" color="inherit">
-                            Войти
-                          </Link>
-                        )}
-                        {status === 'authenticated' && (
-                          <Link
-                            href="/"
-                            onClick={async () => {
-                              preventDefault(),
-                                await signOut({
-                                  callbackUrl: `${window.location.origin}`,
-                                })
-                              await appoloClient.resetStore()
-                            }}
-                            color="inherit"
-                          >
-                            Выйти
-                          </Link>
-                        )}
-                      </MenuItem>
-                    </MenuList>
-                  </ClickAwayListener>
-                </Paper>
-              </Grow>
-            )}
-          </Popper>
+            handleClose={handleClose}
+            handleListKeyDown={handleListKeyDown}
+          />
         </Toolbar>
       </Container>
     </AppBar>
