@@ -11,7 +11,6 @@ export default function UnreadMessages() {
 
   useEffect(() => {
     if (error) {
-      console.log(JSON.stringify(error, null, 2))
       setBackendError('Не могу получить число непрочитанных сообщений')
     }
   }, [error])
