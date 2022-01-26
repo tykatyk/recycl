@@ -142,14 +142,12 @@ export default NextAuth({
       // first time jwt callback is run, user object is available
       if (user) {
         token.id = user.id
-        token.username = user.name
       }
       return token
     },
     session: ({ session, token }) => {
       if (token) {
         session.id = token.id
-        session.username = token.username
       }
 
       return session
