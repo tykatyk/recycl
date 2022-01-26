@@ -48,13 +48,17 @@ export default makeStyles((theme) => ({
     textAlign: 'center',
   },
 
-  splashMainHeader: {
+  splashHeader: {
+    margin: '0 auto',
+    padding: '0 24px',
+    maxWidth: '100%',
+    [theme.breakpoints.up('md')]: {
+      maxWidth: 700,
+    },
+    boxSizing: 'border-box',
     fontWeight: 'bold',
-  },
-  splashSubHeader: {
-    fontWeight: 'bold',
-    wordWrap: 'break-word',
-    padding: '0 10px',
+    textShadow: '2px 1px #152229',
+    overflowWrap: 'break-word',
   },
   cardContainer: {
     maxWidth: `${theme.breakpoints.values.lg}px`,

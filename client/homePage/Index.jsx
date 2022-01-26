@@ -6,6 +6,7 @@ import {
   CardContent,
   Typography,
   useTheme,
+  useMediaQuery,
 } from '@material-ui/core'
 import HomeLayout from '../layouts/HomeLayout.jsx'
 import cardsContent from './cardsContent'
@@ -15,7 +16,7 @@ const useStyles = homePageStyles
 
 export default function HomePage() {
   const theme = useTheme()
-
+  const matches = useMediaQuery(theme.breakpoints.down('sm'))
   const options = {
     portraitMode: true,
     landscapeHeight: 0,
@@ -51,18 +52,9 @@ export default function HomePage() {
         style={{ minHeight: `${splashMinHeight}px` }}
       >
         <Typography
-          component="h1"
-          variant="h1"
-          paragraph
-          className={classes.splashMainHeader}
-        >
-          Recycl
-        </Typography>
-        <Typography
           component="h2"
-          variant="h4"
-          paragraph
-          className={classes.splashSubHeader}
+          variant={matches ? 'h3' : 'h2'}
+          className={classes.splashHeader}
         >
           Помогаем собирать и перерабатывать отходы
         </Typography>
