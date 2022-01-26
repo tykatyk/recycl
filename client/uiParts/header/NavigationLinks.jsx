@@ -12,6 +12,11 @@ const useStyles = makeStyles((theme) => ({
   navLinks: {
     flexGrow: 1,
   },
+  link: {
+    '&:hover': {
+      color: '#adce5d',
+    },
+  },
 }))
 
 export default function HeaderLinks(props) {
@@ -44,7 +49,13 @@ export default function HeaderLinks(props) {
         {links.map((link, index) => (
           <ListItem key={index} style={styles}>
             <ListItemText>
-              <Link href={link.href} onClick={preventDefault} color="inherit">
+              <Link
+                href={link.href}
+                onClick={preventDefault}
+                color="inherit"
+                underline="none"
+                className={classes.link}
+              >
                 {link.text}
               </Link>
             </ListItemText>
