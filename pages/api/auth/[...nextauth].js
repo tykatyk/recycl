@@ -130,7 +130,12 @@ export default NextAuth({
           )
         }
 
-        return { email: user.email, id: user['_id'], name: user.name }
+        return {
+          email: user.email,
+          id: user['_id'],
+          name: user.name,
+          image: user.image,
+        }
       }, //end of authorize function
     }),
   ],
