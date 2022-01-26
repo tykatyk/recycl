@@ -46,7 +46,7 @@ export default function HomePage() {
 
   return (
     <HomeLayout title="Recycl | Главная">
-      <div
+      <section
         className={classes.splash}
         style={{ minHeight: `${splashMinHeight}px` }}
       >
@@ -66,8 +66,8 @@ export default function HomePage() {
         >
           Помогаем собирать и перерабатывать отходы
         </Typography>
-      </div>
-      <div className={classes.cardContainer}>
+      </section>
+      <section className={classes.cardContainer}>
         <Grid container spacing={5}>
           {cardsContent.map((card) => (
             <Grid item key={card.title} xs={12} sm={6} md={4}>
@@ -95,7 +95,7 @@ export default function HomePage() {
             </Grid>
           ))}
         </Grid>
-      </div>
+      </section>
     </HomeLayout>
   )
 }
