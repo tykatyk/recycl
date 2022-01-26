@@ -9,6 +9,7 @@ import {
 } from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation'
 import nextAuthDbAdapter from '../../../lib/nextAuthDbAdapter'
+import * as nodeUrl from 'url'
 
 export default NextAuth({
   session: {
@@ -151,6 +152,15 @@ export default NextAuth({
       }
 
       return session
+    },
+    redirect: ({ url }) => {
+      const queryData = nodeUrl.parse(url, true).query
+
+      if (queryData.from) {
+        return queryData.from
+      }
+
+      return url
     },
   },
   secret: process.env.AUTH_SECRET,
