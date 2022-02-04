@@ -51,10 +51,7 @@ export default makeStyles((theme) => ({
   splashHeader: {
     margin: '0 auto',
     padding: '0 24px',
-    maxWidth: '100%',
-    [theme.breakpoints.up('md')]: {
-      maxWidth: 700,
-    },
+    maxWidth: 700,
     boxSizing: 'border-box',
     fontWeight: 'bold',
     textShadow: '2px 1px #152229',
