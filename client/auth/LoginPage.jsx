@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import {
   Avatar,
@@ -14,15 +14,13 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik.jsx'
 import Link from '../uiParts/Link.jsx'
 import Snackbar from '../uiParts/Snackbars.jsx'
-import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
-import { signIn, getSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import { loginSchema } from '../../lib/validation'
 import AuthLayout from '../layouts/AuthLayout.jsx'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    // marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -44,20 +42,7 @@ export default function SignIn() {
   const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
-  const [loading, setLoading] = useState(true)
   const router = useRouter()
-
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        router.replace('/')
-      } else {
-        setLoading(false)
-      }
-    })
-  }, [])
-
-  if (loading) return <PageLoadingCircle />
 
   return (
     <>
