@@ -68,12 +68,6 @@ export default function MapSidebar(props) {
       >
         <Toolbar />
         <List>
-          <ListItem button component="a" href="/" key="На главную">
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="На главную" />
-          </ListItem>
           <ListItem
             button
             component="a"
