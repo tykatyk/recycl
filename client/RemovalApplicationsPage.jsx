@@ -106,7 +106,7 @@ export default function RemovalApplicationsPage() {
   }, [])
 
   return (
-    <MapLayout title="Сбор отходов | Recycl">
+    <MapLayout title="Получить отходы | Recycl">
       <>
         <MapSidebar>
           <MapSidebarQuantity
