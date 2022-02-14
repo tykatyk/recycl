@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Checkbox, Collapse, makeStyles } from '@material-ui/core'
+import React from 'react'
+import { Checkbox, Collapse } from '@material-ui/core'
 import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
 import { useQuery } from '@apollo/client'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
@@ -7,14 +7,7 @@ import BlurOnIcon from '@material-ui/icons/BlurOn'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 
-const useStyles = makeStyles((theme) => ({
-  nested: {
-    paddingLeft: theme.spacing(4),
-  },
-}))
-
 export default function MapSidebarWasteTypes(props) {
-  const classes = useStyles()
   const { loading, data, error } = useQuery(GET_WASTE_TYPES)
   const { open, onClick, checked, handleChange } = props
 
@@ -47,7 +40,11 @@ export default function MapSidebarWasteTypes(props) {
                     disableRipple
                     inputProps={{ 'aria-labelledby': labelId }}
                   />
-                  <ListItemText id={labelId} primary={item.name} />
+                  <ListItemText
+                    id={labelId}
+                    primary={item.name}
+                    primaryTypographyProps={{ variant: 'body2', noWrap: true }}
+                  />
                 </ListItem>
               )
             })}
