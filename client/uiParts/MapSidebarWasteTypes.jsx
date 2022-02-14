@@ -30,12 +30,11 @@ export default function MapSidebarWasteTypes(props) {
                   role={undefined}
                   button
                   key={item['_id']}
-                  onClick={handleChange(item.name)}
-                  className={classes.nested}
+                  onClick={handleChange(item['_id'])}
                 >
                   <Checkbox
                     edge="start"
-                    checked={checked.indexOf(item.name) !== -1}
+                    checked={checked.indexOf(item['_id']) !== -1}
                     tabIndex={-1}
                     disableRipple
                     inputProps={{ 'aria-labelledby': labelId }}
