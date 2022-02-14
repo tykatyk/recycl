@@ -17,7 +17,6 @@ import Snackbar from '../uiParts/Snackbars.jsx'
 import Link from '../uiParts/Link.jsx'
 import { GET_ROLE_ID } from '../../lib/graphql/queries/userRole'
 import { useQuery } from '@apollo/client'
-import { useRouter } from 'next/router'
 import { registerSchema } from '../../lib/validation'
 import AuthLayout from '../layouts/AuthLayout.jsx'
 import ReCAPTCHA from 'react-google-recaptcha'
@@ -42,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function SignUp() {
-  const router = useRouter()
   const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
