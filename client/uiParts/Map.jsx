@@ -33,10 +33,6 @@ const MapContainer = (props) => {
         google.maps.event.clearListeners(map, eventName)
       )
 
-      /*if (onClick) {
-        map.addListener("click", onClick);
-      }*/
-
       if (onIdle) {
         map.addListener('idle', () => onIdle(map))
       }
@@ -57,7 +53,7 @@ const MapContainer = (props) => {
 }
 
 export default function Map(props) {
-  const { center, zoom, onIdle, children } = props
+  const { center, zoom = 11, onIdle, children } = props
   const render = (status) => {
     if (status === Status.LOADING) return <PageLoadingCircle />
 
@@ -72,8 +68,7 @@ export default function Map(props) {
     }
     return null
   }
-
-  if (!center || !zoom) return <PageLoadingCircle />
+  if (!center) return <PageLoadingCircle />
 
   return (
     <Wrapper
