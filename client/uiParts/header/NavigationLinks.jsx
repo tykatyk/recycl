@@ -27,11 +27,11 @@ export default function HeaderLinks(props) {
   const links = [
     {
       text: 'Сдать отходы',
-      href: '/applications',
+      href: '/proposals',
     },
     {
       text: 'Получить отходы',
-      href: '/removal/application',
+      href: '/applications',
     },
     {
       text: 'Сортировать отходы',
