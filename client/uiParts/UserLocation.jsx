@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: theme.spacing(12),
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -121,25 +121,24 @@ export default function UserLocation(props) {
                 Продолжить
                 {isSubmitting && <ButtonSubmittingCircle />}
               </Button>
-
-              <div
-                style={{
-                  display: showRecaptcha ? 'flex' : 'none',
-                  justifyContent: 'center',
-                  margin: theme.spacing(2, 0),
-                }}
-              >
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                  onChange={handleChange}
-                  onExpired={handleExpire}
-                />
-              </div>
             </Form>
           )
         }}
       </Formik>
+      <div
+        style={{
+          display: showRecaptcha ? 'flex' : 'none',
+          justifyContent: 'center',
+          margin: theme.spacing(2, 0),
+        }}
+      >
+        <ReCAPTCHA
+          ref={recaptchaRef}
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+          onChange={handleChange}
+          onExpired={handleExpire}
+        />
+      </div>
       {!!backendError && (
         <Snackbar
           severity="error"
