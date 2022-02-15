@@ -12,7 +12,6 @@ import PlacesAutocomplete from './formInputs/PlacesAutocomplete.jsx'
 import Snackbar from './Snackbars.jsx'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { userLocationSchema } from '../../lib/validation'
-import getCoords from '../../lib/getCoords'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,6 +39,8 @@ export default function UserLocation(props) {
   const [showRecaptcha, setShowRecaptcha] = useState(false)
   const recaptchaRef = useRef(null)
   const [backendError, setBackendError] = useState(null)
+  const loaded = useRef(false)
+  const [geocoder, setGeocoder] = useState(null)
 
   const handleChange = (token) => {
     setRecaptcha(token)
@@ -50,6 +51,11 @@ export default function UserLocation(props) {
   }
   const classes = useStyles()
   const { setCenter, setLocationError } = props
+
+  if (typeof window !== 'undefined' && window.google && !loaded.current) {
+    setGeocoder(new google.maps.Geocoder())
+    loaded.current = true
+  }
 
   return (
     <Container className={classes.root}>
@@ -70,17 +76,26 @@ export default function UserLocation(props) {
             return
           }
 
-          if (!recaptcha) {
+          if (!recaptcha || !geocoder) {
             setSubmitting(false)
             return
           }
-          getCoords(values.userLocation['place_id'])
-            .then((coords) => {
-              if (coords) {
-                console.log(coords)
+          geocoder
+            .geocode({ placeId: values.userLocation['place_id'] })
+            .then((response) => {
+              if (
+                response.results &&
+                response.results.length > 0 &&
+                response.results[0].geometry &&
+                response.results[0].geometry.location
+              ) {
+                let coords = {}
+                coords.lng = response.results[0].geometry.location.lng()
+                coords.lat = response.results[0].geometry.location.lat()
+
                 setCenter(coords)
-                setLocationError(false)
                 resetForm()
+                setLocationError(false)
               } else {
                 setBackendError(
                   'Не удалось получить координаты населенного пункта'
@@ -90,10 +105,10 @@ export default function UserLocation(props) {
             .finally(() => {
               if (recaptchaRef && recaptchaRef.current) {
                 recaptchaRef.current.reset()
+                setShowRecaptcha(false)
+                setRecaptcha(null)
+                setSubmitting(false)
               }
-              setShowRecaptcha(false)
-              setRecaptcha(null)
-              setSubmitting(false)
             })
         }}
       >
