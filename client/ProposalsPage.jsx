@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ProposalsPage() {
   const [center, setCenter] = useState(null)
   const [zoom, setZoom] = useState(11)
-  const [locationError, setLocationError] = useState(true)
+  const [locationError, setLocationError] = useState(false)
   const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
   const [checked, setChecked] = useState([])
   const [visibleRect, setVisibleRect] = useState([])
