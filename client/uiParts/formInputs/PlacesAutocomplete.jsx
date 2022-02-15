@@ -78,10 +78,16 @@ export default function PlacesAutocomplete(props) {
       setInputValue(value ? value.description : '')
     }
 
-    if (!autocompleteService.current && window.google) {
+    if (
+      !autocompleteService.current &&
+      window.google &&
+      window.google.maps &&
+      window.google.maps.places
+    ) {
       autocompleteService.current = new google.maps.places.AutocompleteService()
       setSessionToken(new google.maps.places.AutocompleteSessionToken())
     }
+
     if (!autocompleteService.current) return undefined
 
     if (inputValue === '') {
