@@ -53,7 +53,7 @@ export default function PlacesAutocomplete(props) {
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
 
-  if (typeof window !== 'undefined' && !loaded.current) {
+  if (typeof window !== 'undefined' && !window.google && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
       loadScript(
         `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`,
