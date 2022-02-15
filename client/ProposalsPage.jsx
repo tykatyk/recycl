@@ -10,6 +10,8 @@ import UserLocation from './uiParts/UserLocation.jsx'
 import getUserLocation from '../lib/getUserLocation'
 import { GET_REMOVAL_APPLICATIONS_FOR_MAP } from '../lib/graphql/queries/removalApplication'
 import { useLazyQuery } from '@apollo/client'
+import { Wrapper, Status } from '@googlemaps/react-wrapper'
+import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -163,5 +165,30 @@ export default function RemovalApplicationsPage() {
     )
   }
 
-  return <MapLayout title="Сдать отходы | Recycl">{content}</MapLayout>
+  const render = (status) => {
+    if (status === Status.LOADING) return <PageLoadingCircle />
+
+    if (status === Status.FAILURE) {
+      return (
+        <Snackbars
+          severity="error"
+          open={true}
+          message="Не могу загрузить карту"
+        />
+      )
+    }
+    return null
+  }
+
+  return (
+    <MapLayout title="Сдать отходы | Recycl">
+      <Wrapper
+        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+        render={render}
+        libraries={['places', 'geocoder']}
+      >
+        {content}
+      </Wrapper>
+    </MapLayout>
+  )
 }
