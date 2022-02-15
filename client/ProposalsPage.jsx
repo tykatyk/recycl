@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function RemovalApplicationsPage() {
+export default function ProposalsPage() {
   const [center, setCenter] = useState(null)
   const [zoom, setZoom] = useState(11)
   const [locationError, setLocationError] = useState(true)
