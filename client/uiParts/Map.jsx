@@ -1,7 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core'
-import { Wrapper, Status } from '@googlemaps/react-wrapper'
-import Snackbar from './Snackbars.jsx'
 import PageLoadingCircle from './PageLoadingCircle.jsx'
 
 const useStyles = makeStyles((theme) => ({
@@ -54,30 +52,12 @@ const MapContainer = (props) => {
 
 export default function Map(props) {
   const { center, zoom = 11, onIdle, children } = props
-  const render = (status) => {
-    if (status === Status.LOADING) return <PageLoadingCircle />
 
-    if (status === Status.FAILURE) {
-      return (
-        <Snackbar
-          severity="error"
-          open={true}
-          message="Не могу загрузить карту"
-        />
-      )
-    }
-    return null
-  }
   if (!center) return <PageLoadingCircle />
 
   return (
-    <Wrapper
-      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-      render={render}
-    >
-      <MapContainer center={center} zoom={zoom} onIdle={onIdle}>
-        {children}
-      </MapContainer>
-    </Wrapper>
+    <MapContainer center={center} zoom={zoom} onIdle={onIdle}>
+      {children}
+    </MapContainer>
   )
 }
