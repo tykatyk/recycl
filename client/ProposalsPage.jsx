@@ -117,14 +117,13 @@ export default function RemovalApplicationsPage() {
   }
 
   useEffect(() => {
-    getUserLocation()
-      .then((coordinates) => {
-        setCenter(coordinates)
-      })
-      .catch((error) => {
-        //ToDo: Add UI for requesting a user to set location manually
+    getUserLocation().then((coordinates) => {
+      if (!coordinates.lat || !coordinates.lng) {
         setLocationError(true)
-      })
+        return
+      }
+      setCenter(coordinates)
+    })
   }, [])
 
   let content
