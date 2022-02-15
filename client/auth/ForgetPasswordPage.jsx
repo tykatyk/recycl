@@ -15,7 +15,7 @@ import { emailSchema } from '../../lib/validation'
 import ReCAPTCHA from 'react-google-recaptcha'
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
+  root: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -64,132 +64,130 @@ export default function ForgetPasswordPage() {
   return (
     <>
       <AuthLayout title="Recycl | Forget password">
-        <Container component="main" maxWidth="xs">
-          <div className={classes.paper}>
-            <Typography
-              component="h1"
-              variant="h3"
-              align="center"
-              style={{ marginBottom: `${theme.spacing(6)}px` }}
-              color="secondary"
-            >
-              Забыли пароль?
-            </Typography>
-            <Typography
-              align="center"
-              style={{
-                marginBottom: `${theme.spacing(2)}px`,
-              }}
-            >
-              Введите ваш email и мы вышлем вам код подтверждения. Вы сможете
-              установить новый пароль после перехода по ссылке из полученного
-              письма.
-            </Typography>
-            <Formik
-              initialValues={{
-                email: '',
-              }}
-              validationSchema={emailSchema}
-              onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-                setSubmitting(true)
-                if (!showRecaptcha) {
-                  setShowRecaptcha(true)
-                  setSubmitting(false)
-                  return
-                }
+        <Container className={classes.root} component="main" maxWidth="xs">
+          <Typography
+            component="h1"
+            variant="h3"
+            align="center"
+            style={{ marginBottom: `${theme.spacing(6)}px` }}
+            color="secondary"
+          >
+            Забыли пароль?
+          </Typography>
+          <Typography
+            align="center"
+            style={{
+              marginBottom: `${theme.spacing(2)}px`,
+            }}
+          >
+            Введите ваш email и мы вышлем вам код подтверждения. Вы сможете
+            установить новый пароль после перехода по ссылке из полученного
+            письма.
+          </Typography>
+          <Formik
+            initialValues={{
+              email: '',
+            }}
+            validationSchema={emailSchema}
+            onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+              setSubmitting(true)
+              if (!showRecaptcha) {
+                setShowRecaptcha(true)
+                setSubmitting(false)
+                return
+              }
 
-                if (!recaptcha) {
-                  setSubmitting(false)
-                  return
-                }
+              if (!recaptcha) {
+                setSubmitting(false)
+                return
+              }
 
-                const merged = { ...values, ...{ recaptcha: recaptcha } }
+              const merged = { ...values, ...{ recaptcha: recaptcha } }
 
-                fetch('/api/auth/forgetpassword', {
-                  method: 'POST',
-                  body: JSON.stringify(merged),
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
+              fetch('/api/auth/forgetpassword', {
+                method: 'POST',
+                body: JSON.stringify(merged),
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              })
+                .then((response) => {
+                  return response.json()
                 })
-                  .then((response) => {
-                    return response.json()
-                  })
-                  .then((data) => {
-                    if (data.error) {
-                      const error = data.error
-                      if (error.type === 'perField') {
-                        setErrors(error.message)
-                        return
-                      }
-                      if (error.type === 'perForm') {
-                        setBackendError(error.message)
-                        return
-                      }
-                      setBackendError(
-                        'Неизвестная ошибка при обработке ответа сервера'
-                      )
+                .then((data) => {
+                  if (data.error) {
+                    const error = data.error
+                    if (error.type === 'perField') {
+                      setErrors(error.message)
                       return
                     }
-                    resetForm()
-                    setSeverity('success')
-                    setSuccessMessage(data.message)
-                  })
-                  .catch((error) => {
-                    setBackendError('Неизвестная ошибка')
-                  })
-                  .finally(() => {
-                    if (recaptchaRef && recaptchaRef.current) {
-                      recaptchaRef.current.reset()
+                    if (error.type === 'perForm') {
+                      setBackendError(error.message)
+                      return
                     }
+                    setBackendError(
+                      'Неизвестная ошибка при обработке ответа сервера'
+                    )
+                    return
+                  }
+                  resetForm()
+                  setSeverity('success')
+                  setSuccessMessage(data.message)
+                })
+                .catch((error) => {
+                  setBackendError('Неизвестная ошибка')
+                })
+                .finally(() => {
+                  if (recaptchaRef && recaptchaRef.current) {
+                    recaptchaRef.current.reset()
                     setShowRecaptcha(false)
                     setRecaptcha(null)
                     setSubmitting(false)
-                  })
-              }}
-            >
-              {({ isSubmitting }) => {
-                return (
-                  <Form className={classes.form} noValidate autoComplete="off">
-                    <Field
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="email"
-                      label="Электронная почта"
-                      name="email"
-                      component={TextFieldFormik}
-                    />
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      color="secondary"
-                      className={classes.submit}
-                      disabled={isSubmitting}
-                    >
-                      Отправить
-                      {isSubmitting && <ButtonSubmittingCircle />}
-                    </Button>
-                    <div
-                      style={{
-                        display: showRecaptcha ? 'flex' : 'none',
-                        justifyContent: 'center',
-                        margin: theme.spacing(2, 0),
-                      }}
-                    >
-                      <ReCAPTCHA
-                        ref={recaptchaRef}
-                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                        onChange={handleChange}
-                        onExpired={handleExpire}
-                      />
-                    </div>
-                  </Form>
-                )
-              }}
-            </Formik>
+                  }
+                })
+            }}
+          >
+            {({ isSubmitting }) => {
+              return (
+                <Form className={classes.form} noValidate autoComplete="off">
+                  <Field
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Электронная почта"
+                    name="email"
+                    component={TextFieldFormik}
+                  />
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="secondary"
+                    className={classes.submit}
+                    disabled={isSubmitting}
+                  >
+                    Отправить
+                    {isSubmitting && <ButtonSubmittingCircle />}
+                  </Button>
+                </Form>
+              )
+            }}
+          </Formik>
+          <div
+            style={{
+              display: showRecaptcha ? 'flex' : 'none',
+              justifyContent: 'center',
+              margin: theme.spacing(2, 0),
+            }}
+          >
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+              onChange={handleChange}
+              onExpired={handleExpire}
+            />
           </div>
         </Container>
       </AuthLayout>
