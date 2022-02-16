@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Divider } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core'
 import MapLayout from './layouts/MapLayout.jsx'
 import Map from './uiParts/Map.jsx'
 import Marker from './uiParts/Marker.jsx'
@@ -9,6 +9,13 @@ import MapSidebar from './uiParts/MapSidebar.jsx'
 import getUserLocation from '../lib/getUserLocation'
 import { GET_REMOVAL_APPLICATIONS_FOR_MAP } from '../lib/graphql/queries/removalApplication'
 import { useLazyQuery } from '@apollo/client'
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flex: '1 1 auto',
+  },
+}))
 
 export default function RemovalApplicationsPage() {
   const [center, setCenter] = useState(null)
@@ -21,7 +28,8 @@ export default function RemovalApplicationsPage() {
   const [getApplications, { loading, error, data }] = useLazyQuery(
     GET_REMOVAL_APPLICATIONS_FOR_MAP
   )
-  const [markers, setMarkers] = useState(null)
+  const classes = useStyles()
+
   useEffect(() => {
     if (
       data &&
@@ -123,7 +131,7 @@ export default function RemovalApplicationsPage() {
             checked={checked}
           />
         </MapSidebar>
-        <main style={{ display: 'flex', flex: '1 1 auto' }}>
+        <main className={classes.root}>
           <Map center={center} zoom={zoom} onIdle={onIdle}>
             {markers}
           </Map>
