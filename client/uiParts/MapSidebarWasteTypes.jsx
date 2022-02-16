@@ -1,6 +1,12 @@
 import React from 'react'
-import { Checkbox, Collapse } from '@material-ui/core'
-import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
+import {
+  Collapse,
+  Radio,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@material-ui/core'
 import { useQuery } from '@apollo/client'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
 import BlurOnIcon from '@material-ui/icons/BlurOn'
@@ -9,8 +15,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore'
 
 export default function MapSidebarWasteTypes(props) {
   const { loading, data, error } = useQuery(GET_WASTE_TYPES)
-  const { open, onClick, checked, handleChange } = props
-
+  const { open, onClick, selectedValue, handleChange } = props
   return (
     <>
       <ListItem button key={'Тип отходов'} onClick={onClick}>
@@ -32,12 +37,11 @@ export default function MapSidebarWasteTypes(props) {
                   key={item['_id']}
                   onClick={handleChange(item['_id'])}
                 >
-                  <Checkbox
-                    edge="start"
-                    checked={checked.indexOf(item['_id']) !== -1}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ 'aria-labelledby': labelId }}
+                  <Radio
+                    checked={selectedValue === item['_id']}
+                    value={item['_id']}
+                    name="waste-type"
+                    inputProps={{ 'aria-label': item.name }}
                   />
                   <ListItemText
                     id={labelId}
