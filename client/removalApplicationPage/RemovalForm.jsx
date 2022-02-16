@@ -272,7 +272,7 @@ export default function RemovalForm(props) {
                       xs={1}
                       container
                       alignItems="center"
-                      justify="center"
+                      justifyContent="center"
                     >
                       <RemovalPopover id="notificationRadiusPopover">
                         <Typography
@@ -320,7 +320,7 @@ export default function RemovalForm(props) {
                       xs={1}
                       container
                       alignItems="center"
-                      justify="center"
+                      justifyContent="center"
                     >
                       <RemovalPopover id="notificationCitiesPopover">
                         <Typography

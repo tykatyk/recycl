@@ -20,7 +20,7 @@ export default function ResetLayout(props) {
             container
             direction="column"
             alignItems="center"
-            justify="center"
+            justifyContent="center"
           >
             <Alert variant="filled" severity={severity}>
               {message}
