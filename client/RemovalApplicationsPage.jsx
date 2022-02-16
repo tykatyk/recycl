@@ -3,12 +3,15 @@ import { makeStyles } from '@material-ui/core'
 import MapLayout from './layouts/MapLayout.jsx'
 import Map from './uiParts/Map.jsx'
 import Marker from './uiParts/Marker.jsx'
-import MapSidebarQuantity from './uiParts/MapSidebarQuantity'
+import Snackbars from './uiParts/Snackbars.jsx'
 import MapSidebarWasteTypes from './uiParts/MapSidebarWasteTypes'
 import MapSidebar from './uiParts/MapSidebar.jsx'
+import UserLocation from './uiParts/UserLocation.jsx'
 import getUserLocation from '../lib/getUserLocation'
 import { GET_REMOVAL_APPLICATIONS_FOR_MAP } from '../lib/graphql/queries/removalApplication'
 import { useLazyQuery } from '@apollo/client'
+import { Wrapper, Status } from '@googlemaps/react-wrapper'
+import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,16 +22,36 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RemovalApplicationsPage() {
   const [center, setCenter] = useState(null)
-  const [zoom, setZoom] = useState(null)
-  const [min, setMin] = useState('')
-  const [max, setMax] = useState('')
+  const [zoom, setZoom] = useState(11)
+  const [locationError, setLocationError] = useState(false)
   const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
-  const [quantityOpen, setQuantityOpen] = useState(true)
-  const [checked, setChecked] = useState([0])
+  const [selectedValue, setSelectedValue] = useState('')
+  const [visibleRect, setVisibleRect] = useState([])
   const [getApplications, { loading, error, data }] = useLazyQuery(
     GET_REMOVAL_APPLICATIONS_FOR_MAP
   )
+  const [markers, setMarkers] = useState([])
   const classes = useStyles()
+
+  useEffect(() => {
+    if (visibleRect.length == 0) return
+
+    getApplications({
+      variables: {
+        visibleRect: visibleRect,
+        wasteTypes: selectedValue,
+      },
+    })
+  }, [visibleRect])
+
+  useEffect(() => {
+    getApplications({
+      variables: {
+        visibleRect: visibleRect,
+        wasteTypes: selectedValue,
+      },
+    })
+  }, [selectedValue])
 
   useEffect(() => {
     if (
@@ -45,28 +68,17 @@ export default function RemovalApplicationsPage() {
         }
       )
       setMarkers(markersToShow)
+    } else {
+      setMarkers([])
     }
   }, [data])
 
-  if (error) console.log(JSON.stringify(error, null, 2))
-
   const handleChange = (value) => () => {
-    const currentIndex = checked.indexOf(value)
-    const newChecked = [...checked]
-
-    if (currentIndex === -1) {
-      newChecked.push(value)
-    } else {
-      newChecked.splice(currentIndex, 1)
-    }
-    setChecked(newChecked)
+    setSelectedValue(value)
   }
 
   const handleWasteTypeToggle = () => {
     setWasteTypeOpen(!wasteTypeOpen)
-  }
-  const handleQuantityToggle = () => {
-    setQuantityOpen(!quantityOpen)
   }
 
   const onIdle = (m) => {
@@ -93,43 +105,81 @@ export default function RemovalApplicationsPage() {
         [boundsNeLatLng.lng(), boundsNeLatLng.lat()],
       ],
     ]
-    getApplications({
-      variables: {
-        visibleRect: visibleRect,
-      },
-    })
+    setVisibleRect(visibleRect)
   }
 
   useEffect(() => {
-    getUserLocation()
-      .then((coordinates) => {
-        setCenter(coordinates)
-        setZoom(11)
-      })
-      .catch((error) => {
-        //ToDo: Add UI for requesting a user to set location manually
-        setCenter({ lat: 49.82, lng: 21.01 })
-        setZoom(5)
-      })
+    getUserLocation().then((coordinates) => {
+      if (!coordinates.lat || !coordinates.lng) {
+        setLocationError(true)
+        return
+      }
+      setCenter(coordinates)
+    })
   }, [])
 
-  return (
-    <MapLayout title="Получить отходы | Recycl">
+  let content
+
+  if (locationError) {
+    content = (
+      <main className={classes.root}>
+        <UserLocation
+          setCenter={setCenter}
+          setLocationError={setLocationError}
+        />
+      </main>
+    )
+  } else {
+    content = (
       <>
         <MapSidebar>
           <MapSidebarWasteTypes
             open={wasteTypeOpen}
             onClick={handleWasteTypeToggle}
             handleChange={handleChange}
-            checked={checked}
+            selectedValue={selectedValue}
           />
         </MapSidebar>
+        {!!error && (
+          <Snackbars
+            message="Ошибка при загрузке данных"
+            severity="error"
+            open={true}
+          />
+        )}
         <main className={classes.root}>
           <Map center={center} zoom={zoom} onIdle={onIdle}>
             {markers}
           </Map>
         </main>
       </>
+    )
+  }
+
+  const render = (status) => {
+    if (status === Status.LOADING) return <PageLoadingCircle />
+
+    if (status === Status.FAILURE) {
+      return (
+        <Snackbars
+          severity="error"
+          open={true}
+          message="Не могу загрузить карту"
+        />
+      )
+    }
+    return null
+  }
+
+  return (
+    <MapLayout title="Сдать отходы | Recycl">
+      <Wrapper
+        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+        render={render}
+        libraries={['places', 'geocoder']}
+      >
+        {content}
+      </Wrapper>
     </MapLayout>
   )
 }
