@@ -117,13 +117,6 @@ export default function RemovalApplicationsPage() {
     <MapLayout title="Получить отходы | Recycl">
       <>
         <MapSidebar>
-          <MapSidebarQuantity
-            min={min}
-            max={max}
-            open={quantityOpen}
-            onClick={handleQuantityToggle}
-          />
-          <Divider variant="inset" component="li" />
           <MapSidebarWasteTypes
             open={wasteTypeOpen}
             onClick={handleWasteTypeToggle}
