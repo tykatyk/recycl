@@ -7,6 +7,7 @@ import Snackbars from './uiParts/Snackbars.jsx'
 import MapSidebarWasteTypes from './uiParts/MapSidebarWasteTypes'
 import MapSidebar from './uiParts/MapSidebar.jsx'
 import UserLocation from './uiParts/UserLocation.jsx'
+import MapInfoWindow from './uiParts/MapInfoWindow.jsx'
 import getUserLocation from '../lib/getUserLocation'
 import { GET_REMOVAL_APPLICATIONS_FOR_MAP } from '../lib/graphql/queries/removalApplication'
 import { useLazyQuery } from '@apollo/client'
@@ -61,10 +62,20 @@ export default function RemovalApplicationsPage() {
     ) {
       const markersToShow = data.getRemovalApplicationsForMap.map(
         (element, index) => {
+          console.log(element)
           const coords = {}
           coords.lat = element.wasteLocation.position.coordinates[1]
           coords.lng = element.wasteLocation.position.coordinates[0]
-          return <Marker key={index} position={coords} />
+          return (
+            <Marker key={index} position={coords}>
+              <MapInfoWindow
+                totalProposals={element.totalProposals}
+                city={element.wasteLocation.place_id}
+                totalWeight={element.totalWeight}
+                wasteType={element.wasteType}
+              />
+            </Marker>
+          )
         }
       )
       setMarkers(markersToShow)
