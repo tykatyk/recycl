@@ -5,6 +5,7 @@ export default function Marker(options) {
   const [marker, setMarker] = useState(null)
   const { children, map, ...rest } = options
   const [infoWindow, setInfoWindow] = useState(null)
+  const [listenerAdded, setListenerAdded] = useState(false)
 
   useEffect(() => {
     if (!marker) {
@@ -32,7 +33,7 @@ export default function Marker(options) {
     if (marker) {
       marker.setOptions({ map, ...rest })
     }
-    if (infoWindow) {
+    if (infoWindow && !listenerAdded) {
       marker.addListener('click', () => {
         
         infoWindow.open({
@@ -41,6 +42,7 @@ export default function Marker(options) {
           shouldFocus: false,
         })
       })
+      setListenerAdded(true)
     }
   }, [marker, rest])
 
