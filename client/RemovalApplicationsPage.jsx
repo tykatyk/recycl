@@ -62,7 +62,6 @@ export default function RemovalApplicationsPage() {
     ) {
       const markersToShow = data.getRemovalApplicationsForMap.map(
         (element, index) => {
-          console.log(element)
           const coords = {}
           coords.lat = element.wasteLocation.position.coordinates[1]
           coords.lng = element.wasteLocation.position.coordinates[0]
