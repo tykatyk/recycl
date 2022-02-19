@@ -12,15 +12,6 @@ export default function Marker(options) {
       setMarker(new google.maps.Marker())
     }
 
-    if (children) {
-      const content = ReactDOMServer.renderToString(children)
-      setInfoWindow(
-        new google.maps.InfoWindow({
-          content,
-        })
-      )
-    }
-
     // remove marker from map on unmount
     return () => {
       if (marker) {
@@ -28,6 +19,16 @@ export default function Marker(options) {
       }
     }
   }, [marker])
+
+  useEffect(() => {
+    if (children && !infoWindow) {
+      setInfoWindow(
+        new google.maps.InfoWindow({
+          content,
+        })
+      )
+    }
+  }, [children])
 
   useEffect(() => {
     if (marker) {
