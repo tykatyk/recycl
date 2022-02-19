@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import ReactDOMServer from 'react-dom/server'
+import ReactDOM from 'react-dom'
 
 export default function Marker(options) {
   const [marker, setMarker] = useState(null)
   const { children, map, ...rest } = options
   const [infoWindow, setInfoWindow] = useState(null)
   const [listenerAdded, setListenerAdded] = useState(false)
+  const [content, setContent] = useState(document.createElement('div'))
 
   useEffect(() => {
     if (!marker) {
@@ -36,16 +37,17 @@ export default function Marker(options) {
     }
     if (infoWindow && !listenerAdded) {
       marker.addListener('click', () => {
-        
         infoWindow.open({
           anchor: marker,
           map,
           shouldFocus: false,
         })
       })
+
+      infoWindow.setContent(content)
       setListenerAdded(true)
     }
   }, [marker, rest])
 
-  return null
+  return ReactDOM.createPortal(children, content)
 }
