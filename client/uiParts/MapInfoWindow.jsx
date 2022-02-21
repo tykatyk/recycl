@@ -9,9 +9,6 @@ const useStyles = makeStyles((theme) => ({
     color: 'black',
     maxWidth: 150,
   },
-  divider: {
-    marginBottom: '0.35em',
-  },
   link: {
     alignSelf: 'flex-start',
   },
@@ -32,7 +29,6 @@ export default function MapInfoWindow(props) {
         color="inherit"
         gutterBottom={true}
       >{`Общий вес: ${totalWeight} кг.`}</Typography>
-      <Divider className={classes.divider} />
       <Link
         className={classes.link}
         href={`/applications?city=${cityId}&wasteType=${wasteTypeId}`}
