@@ -5,6 +5,14 @@ import clsx from 'clsx'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import MuiLink from '@material-ui/core/Link'
+import { makeStyles } from '@material-ui/core'
+import lime from '@material-ui/core/colors/lime'
+
+const useStyles = makeStyles(() => ({
+  active: {
+    color: lime['300'],
+  },
+}))
 
 const NextComposed = React.forwardRef(function NextComposed(props, ref) {
   const { as, href, ...other } = props
@@ -25,20 +33,13 @@ NextComposed.propTypes = {
 // A styled version of the Next.js Link component:
 // https://nextjs.org/docs/#with-link
 function Link(props) {
-  const {
-    href,
-    activeClassName = 'active',
-    className: classNameProps,
-    innerRef,
-    naked,
-    ...other
-  } = props
+  const { href, className: classNameProps, innerRef, naked, ...other } = props
+  const classes = useStyles()
 
   const router = useRouter()
   const pathname = typeof href === 'string' ? href : href.pathname
   const className = clsx(classNameProps, {
-    [activeClassName]:
-      router && router.pathname === pathname && activeClassName,
+    [classes.active]: router && router.pathname === pathname,
   })
 
   if (naked) {
