@@ -19,19 +19,23 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MapInfoWindow(props) {
   const classes = useStyles()
-  const { totalProposals, totalWeight, city, wasteType } = props
+  const { cityId, wasteTypeId, totalProposals, totalWeight } = props
 
   return (
     <div className={classes.root}>
       <Typography
         variant="body2"
         color="inherit"
+      >{`Предложений: ${totalProposals}.`}</Typography>
+      <Typography
+        variant="body2"
+        color="inherit"
         gutterBottom={true}
-      >{`Найдено ${totalProposals} предложений общим весом ${totalWeight} кг.`}</Typography>
+      >{`Общий вес: ${totalWeight} кг.`}</Typography>
       <Divider className={classes.divider} />
       <Link
         className={classes.link}
-        href={`/applications?city=${city}&wasteType=${wasteType}`}
+        href={`/applications?city=${cityId}&wasteType=${wasteTypeId}`}
       >
         Посмотреть
       </Link>
