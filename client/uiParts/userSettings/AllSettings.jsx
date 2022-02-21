@@ -8,7 +8,7 @@ import {
 import MuiAccordion from '@material-ui/core/Accordion'
 import MuiAccordionSummary from '@material-ui/core/AccordionSummary'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import Session from '../Session'
+import RedirectUnathenticatedUser from '../RedirectUnathenticatedUser.jsx'
 import Layout from '../../layouts/Layout.jsx'
 import ContactsForm from './ContactsForm.jsx'
 import PhoneForm from './PhoneForm.jsx'
@@ -48,7 +48,7 @@ export default function AllSettings() {
   const classes = useStyles()
 
   return (
-    <Session>
+    <RedirectUnathenticatedUser>
       <Layout title="Recycl | Настройки">
         <div className={classes.root}>
           <Accordion>
@@ -123,6 +123,6 @@ export default function AllSettings() {
           </Accordion>
         </div>
       </Layout>
-    </Session>
+    </RedirectUnathenticatedUser>
   )
 }

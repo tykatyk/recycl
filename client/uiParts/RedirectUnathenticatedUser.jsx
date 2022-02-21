@@ -1,10 +1,10 @@
 import React from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
+import PageLoadingCircle from './PageLoadingCircle.jsx'
 
-export default function Session(props) {
-  const { children } = props
+export default function RedirectUnathenticatedUser(props) {
+  const { children = null } = props
   const { status } = useSession()
   const router = useRouter()
 
@@ -17,10 +17,10 @@ export default function Session(props) {
         from: router.pathname,
       },
     })
-    return <div>Перенаправление...</div>
+    return null
   }
 
   if (status === 'authenticated') {
-    return children || ''
+    return <>{children}</>
   }
 }
