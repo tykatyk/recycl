@@ -63,15 +63,15 @@ export default function RemovalApplicationsPage() {
       const markersToShow = data.getRemovalApplicationsForMap.map(
         (element, index) => {
           const coords = {}
-          coords.lat = element.wasteLocation.position.coordinates[1]
-          coords.lng = element.wasteLocation.position.coordinates[0]
+          coords.lat = element.wasteLocation[1]
+          coords.lng = element.wasteLocation[0]
           return (
             <Marker key={index} position={coords}>
               <MapInfoWindow
+                cityId={element._id}
+                wasteTypeId={element.wasteTypeId}
                 totalProposals={element.totalProposals}
-                city={element.wasteLocation.place_id}
                 totalWeight={element.totalWeight}
-                wasteType={element.wasteType}
               />
             </Marker>
           )
