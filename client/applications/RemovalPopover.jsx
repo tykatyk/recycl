@@ -1,9 +1,15 @@
 import React from 'react'
 import { Popover, makeStyles, useTheme } from '@material-ui/core'
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined'
-import removalPopoverStyles from './removalPopoverStyles'
 
-const useStyles = removalPopoverStyles
+const useStyles = makeStyles((theme) => ({
+  popover: {
+    pointerEvents: 'none',
+  },
+  paper: {
+    padding: theme.spacing(1),
+  },
+}))
 
 export default function RemovalPopover(props) {
   const theme = useTheme()
