@@ -1,25 +1,22 @@
 import React from 'react'
-import { CircularProgress } from '@material-ui/core'
+import { makeStyles, CircularProgress } from '@material-ui/core'
 
-export default function PageLoadingCircle({ style }) {
-  if (style) {
-    return (
-      <div style={style}>
-        <CircularProgress color="secondary" />
-      </div>
-    )
-  }
+const useStyles = makeStyles((theme) => ({
+  root: {
+    position: 'fixed',
+    top: ' 50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+  },
+}))
+
+export default function PageLoadingCircle(props) {
+  const { size = 24, className = undefined } = props
+  const classes = useStyles()
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: ' 50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-      }}
-    >
-      <CircularProgress color="secondary" />
+    <div className={className ? className : classes.root}>
+      <CircularProgress size={size} color="secondary" />
     </div>
   )
 }
