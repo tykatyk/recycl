@@ -21,7 +21,7 @@ export default function DataGridErrorOverlay() {
   return (
     <GridOverlay className={classes.root}>
       <InfoIcon color="error" fontSize="large" />
-      <div className={classes.label}>Возникла ошибка при загрузке данных</div>
+      <div className={classes.label}>Ошибка при загрузке данных</div>
     </GridOverlay>
   )
 }
