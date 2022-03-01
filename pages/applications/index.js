@@ -1,15 +1,24 @@
 import React from 'react'
-import { useRouter } from 'next/router'
-import IndexPage from '../../client/applications/Index.jsx'
-import AppliicationsOnMap from '../../client/applications/ApplicationsOnMap.jsx'
+import IndexPage from '../../components/applications/Index.jsx'
+import AppliicationsOnMap from '../../components/applications/ApplicationsOnMap.jsx'
 
-export default function Index() {
-  const router = useRouter()
-  const { city, wasteType } = router.query
+export default function Index(props) {
+  const { city, wasteType } = props
 
   if (city && wasteType) {
     return <IndexPage />
   }
 
   return <AppliicationsOnMap />
+}
+
+export async function getServerSideProps(context) {
+  const { city, wasteType } = context.query
+
+  return {
+    props: {
+      city: city || null,
+      wasteType: wasteType || null,
+    },
+  }
 }
