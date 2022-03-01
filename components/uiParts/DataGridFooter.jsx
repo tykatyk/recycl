@@ -3,9 +3,9 @@ import { Button, TablePagination } from '@material-ui/core'
 
 export default function DataGridFooter(props) {
   const {
-    deleting,
-    selected,
-    deleteHandler,
+    deleting = false,
+    selected = [],
+    deleteHandler = () => {},
     numRows,
     handlePageChange,
     handlePageSizeChange,
