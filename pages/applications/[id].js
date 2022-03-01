@@ -1,5 +1,5 @@
 import React from 'react'
-import CreateUpdate from '../../client/removalApplicationPage/CreateUpdate.jsx'
+import CreateUpdate from '../../components/removalApplicationPage/CreateUpdate.jsx'
 
 export default function updateRemovalApplication() {
   return <CreateUpdate />
