@@ -1,6 +1,17 @@
 import React from 'react'
-import CreateUpdate from '../../components/removalApplicationPage/CreateUpdate.jsx'
+import ShowSingle from '../../components/applications/ShowSingle.jsx'
 
-export default function updateRemovalApplication() {
-  return <CreateUpdate />
+export default function updateRemovalApplication(props) {
+  const { id } = props //removal application id
+  return <ShowSingle id={id} />
+}
+
+export async function getServerSideProps(context) {
+  const { id } = context.query
+
+  return {
+    props: {
+      id,
+    },
+  }
 }
