@@ -14,7 +14,7 @@ export default function RedirectUnathenticatedUser(props) {
     router.push({
       pathname: '/auth/login',
       query: {
-        from: router.pathname,
+        from: router.asPath,
       },
     })
     return null
