@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function PageLoadingCircle(props) {
-  const { size = 24, className = undefined } = props
+  const { size = 40, className = undefined } = props
   const classes = useStyles()
 
   return (
