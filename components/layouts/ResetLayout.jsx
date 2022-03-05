@@ -4,11 +4,14 @@ import Alert from '@material-ui/lab/Alert'
 import AuthLayout from './AuthLayout.jsx'
 
 export default function ResetLayout(props) {
-  let { title, message, severity = 'error' } = props
-  title = title ? `Recycl | ${title}` : 'Recycl'
+  const { title, message, severity = 'error' } = props
 
   return (
-    <AuthLayout title={title} backButtonText="На Главную" backButtonTo="/">
+    <AuthLayout
+      title={title ? `${title} | Recycl` : 'Recycl'}
+      backButtonText="На Главную"
+      backButtonTo="/"
+    >
       <Grid
         container
         alignItems="center"
