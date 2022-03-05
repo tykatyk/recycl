@@ -1,6 +1,6 @@
 import React from 'react'
 import dbConnect from '../../../lib/db/connection'
-import ConfirmEmailPage from '../../../client/auth/ConfirmEmailPage.jsx'
+import ConfirmEmailPage from '../../../components/auth/ConfirmEmailPage.jsx'
 import { User } from '../../../lib/db/models'
 
 export default function ConfirmEmail(props) {
