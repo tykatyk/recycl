@@ -17,6 +17,7 @@ import { CheckboxWithLabel } from 'formik-material-ui'
 import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './removalFormStyles'
 import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
 import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
 import {
   CREATE_REMOVAL_APPLICATION,
@@ -24,6 +25,7 @@ import {
   UPDATE_REMOVAL_APPLICATION,
 } from '../../lib/graphql/queries/removalApplication'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
+import { GET_PHONE } from '../../lib/graphql/queries/user'
 import { getInitialValues, getNormalizedValues } from './removalFormConfig.js'
 import { removalApplicationSchema } from '../../lib/validation'
 
@@ -35,13 +37,17 @@ export default function RemovalForm(props) {
   const classes = useStyles()
   const theme = useTheme()
   const router = useRouter()
-  const { id } = router.query
+  const { data: session } = useSession()
+  const { id: userId } = session
+  const { id: applicationId } = router.query
   const [backendError, setBackendError] = useState(null)
   const {
     loading: gettingWasteTypes,
     data: wasteTypesData,
     error: wasteTypesError,
   } = useQuery(GET_WASTE_TYPES)
+
+  const { data: phoneData } = useQuery(GET_PHONE, { variables: { id: userId } })
 
   const [
     getRemovalApplication,
@@ -78,7 +84,9 @@ export default function RemovalForm(props) {
   const updateHandler = (values, setSubmitting) => {
     setSubmitting(true)
     const normalizedValues = getNormalizedValues(values)
-    updateMutation({ variables: { id: id, newValues: normalizedValues } })
+    updateMutation({
+      variables: { id: applicationId, newValues: normalizedValues },
+    })
       .then((data) => {})
       .catch((err) => {
         setBackendError('Возникла ошибка при сохранении заявки')
@@ -113,7 +121,7 @@ export default function RemovalForm(props) {
         initialValues={initialValues}
         validationSchema={removalApplicationSchema}
         onSubmit={(values, { setSubmitting }) => {
-          if (id) {
+          if (applicationId) {
             updateHandler(values, setSubmitting)
           } else {
             createHandler(values, setSubmitting)
@@ -122,19 +130,30 @@ export default function RemovalForm(props) {
       >
         {({ isSubmitting, values, setFieldValue }) => {
           useEffect(() => {
-            if (id && !called) getRemovalApplication({ variables: { id } })
-            if (applicationData && wasteTypesData) {
-              fields.forEach((field) =>
+            if (applicationId && !called)
+              getRemovalApplication({ variables: { applicationId } })
+            if (applicationData) {
+              fields.forEach((field) => {
+                if (field === 'wasteType') return
                 setFieldValue(
                   field,
-                  field === 'wasteType'
-                    ? applicationData.getRemovalApplication[field]['_id']
-                    : applicationData.getRemovalApplication[field],
+                  applicationData.getRemovalApplication[field],
                   false
                 )
-              )
+              })
             }
-          }, [id, applicationData, wasteTypesData])
+          }, [applicationId, applicationData])
+
+          useEffect(() => {
+            if (
+              !applicationId &&
+              phoneData &&
+              phoneData.getPhone &&
+              phoneData.getPhone.phone
+            ) {
+              setFieldValue('contactPhone', phoneData.getPhone.phone, false)
+            }
+          }, [applicationId, phoneData])
 
           const shouldDisable =
             gettingApplication || gettingWasteTypes || isSubmitting
@@ -149,7 +168,7 @@ export default function RemovalForm(props) {
               >
                 <Grid item xs={12} className={classes.sectionTitle}>
                   <Typography gutterBottom variant="h4">
-                    Заявка на сдачу отходов
+                    Сдать отходы
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -191,6 +210,19 @@ export default function RemovalForm(props) {
                         <InputAdornment position="end">Кг</InputAdornment>
                       ),
                     }}
+                    helperText="*Обязательное поле"
+                    disabled={shouldDisable}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    component={TextFieldFormik}
+                    label="Контактный телефон"
+                    color="secondary"
+                    type="tel"
+                    fullWidth
+                    name="contactPhone"
+                    variant="outlined"
                     helperText="*Обязательное поле"
                     disabled={shouldDisable}
                   />

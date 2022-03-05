@@ -3,6 +3,7 @@ export function getInitialValues() {
     wasteLocation: null,
     wasteType: '',
     quantity: '',
+    contactPhone: '',
     comment: '',
     passDocumet: false,
     notificationCities: [],
