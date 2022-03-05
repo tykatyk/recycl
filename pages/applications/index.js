@@ -6,7 +6,7 @@ export default function Index(props) {
   const { city, wasteType } = props
 
   if (city && wasteType) {
-    return <IndexPage />
+    return <IndexPage city={city} wasteType={wasteType} />
   }
 
   return <AppliicationsOnMap />

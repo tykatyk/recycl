@@ -11,6 +11,7 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
 import DataGridFooter from '../uiParts/DataGridFooter.jsx'
 import DataGridNoRowsOverlay from '../uiParts/DataGridNoRowsOverlay.jsx'
 import DataGridErrorOverlay from '../uiParts/DataGridErrorOverlay.jsx'
+import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser.jsx'
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATIONS } from '../../lib/graphql/queries/removalApplication'
@@ -33,24 +34,19 @@ const columns = [
   {
     field: 'wasteType',
     headerName: 'Тип',
-    width: 150,
+    width: 200,
   },
   {
     field: 'wasteLocation',
     headerName: 'Местоположение',
-    width: 232,
+    width: 332,
   },
   {
     field: 'quantity',
-    headerName: 'Количество',
+    headerName: 'Количество, кг',
     width: 150,
     headerAlign: 'center',
     align: 'center',
-  },
-  {
-    field: 'expires',
-    headerName: 'До',
-    width: 110,
   },
 ]
 
@@ -59,7 +55,15 @@ export default function Index(props) {
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(10)
   const [backendError, setBackendError] = useState(null)
-  const { loading, error, data } = useQuery(GET_REMOVAL_APPLICATIONS)
+  const { city, wasteType } = props
+  const { loading, error, data } = useQuery(GET_REMOVAL_APPLICATIONS, {
+    variables: {
+      queryParams: {
+        city,
+        wasteType,
+      },
+    },
+  })
 
   const handlePageChange = (_, newPage) => setPage(newPage)
   const handlePageSizeChange = (event) => {
@@ -67,31 +71,46 @@ export default function Index(props) {
     setPage(0)
   }
   let rows = []
-
+  let title = 'Заявки на вывоз'
+  let titleCity = ''
+  let titleWasteType = ''
+  let header = `${title} отходов`
   if (loading) return <PageLoadingCircle />
 
-  if (!error && data.getRemovalApplications) {
+  if (
+    data &&
+    data.getRemovalApplications &&
+    data.getRemovalApplications.length > 0
+  ) {
+    titleCity = data.getRemovalApplications[0].wasteLocation.description
+    const parts = titleCity.split(',')
+    titleCity = parts[0] || titleCity
+
+    titleWasteType = data.getRemovalApplications[0].wasteType.name
+
+    if (titleCity && titleWasteType) {
+      title = `${titleWasteType} в городе ${titleCity}`
+      header = title
+    }
+
+    titleWasteType = data.getRemovalApplications[0].wasteType
+
     //ToDo: Refactor returned data, so that data contain objects in needed form
-    //so that to avoid mapping
+    //to avoid mapping
     rows = data.getRemovalApplications.map((item) => {
       const newItem = {}
-      newItem.id = item.document['_id']
-      newItem.wasteType = item.document.wasteType.name
-      newItem.wasteLocation = item.document.wasteLocation.description
-      newItem.quantity = item.document.quantity
-      newItem.messageCount = item.messageCount
-      const expires = new Date()
-      newItem.expires = expires.toLocaleString('ru-RU', {
-        day: '2-digit',
-        month: 'short',
-      })
+      newItem.id = item['_id']
+      newItem.wasteType = item.wasteType.name
+      newItem.wasteLocation = item.wasteLocation.description
+      newItem.quantity = item.quantity
+
       return newItem
     })
   }
 
   return (
-    <>
-      <Layout title="Заявки на вывоз | Recycl">
+    <RedirectUnathenticatedUser>
+      <Layout title={`${title} | Recycl`}>
         <Grid
           container
           direction="column"
@@ -101,7 +120,7 @@ export default function Index(props) {
           }}
         >
           <Typography gutterBottom variant="h4">
-            Заявки на вывоз отходов
+            {header}
           </Typography>
           <div style={{ width: '100%' }}>
             <DataGrid
@@ -147,6 +166,6 @@ export default function Index(props) {
           setBackendError(null)
         }}
       />
-    </>
+    </RedirectUnathenticatedUser>
   )
 }
