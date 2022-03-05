@@ -175,7 +175,7 @@ export default function removalApplications(props) {
                 }}
                 components={{
                   Footer: (props) => {
-                    return <DataGridFooter {...props} />
+                    return <DataGridFooter showDeleteButton={true} {...props} />
                   },
                   Pagination: TablePagination,
                   NoRowsOverlay: DataGridNoRowsOverlay,
