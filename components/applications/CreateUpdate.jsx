@@ -7,7 +7,7 @@ import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser.js
 export default function RemovalApplication(props) {
   return (
     <RedirectUnathenticatedUser>
-      <Layout title="Recycl | Removal Application">
+      <Layout title="Создать (обновить) заявку на вывоз отходов | Recycl">
         <Grid
           container
           direction="column"
