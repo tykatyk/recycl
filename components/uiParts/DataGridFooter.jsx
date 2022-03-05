@@ -3,6 +3,7 @@ import { Button, TablePagination } from '@material-ui/core'
 
 export default function DataGridFooter(props) {
   const {
+    showDeleteButton = false,
     deleting = false,
     selected = [],
     deleteHandler = () => {},
@@ -21,13 +22,16 @@ export default function DataGridFooter(props) {
         padding: '0.5em',
       }}
     >
-      <Button
-        color="secondary"
-        disabled={deleting || selected.length < 1}
-        onClick={(event) => deleteHandler(event)}
-      >
-        Удалить отмеченные
-      </Button>
+      {showDeleteButton && (
+        <Button
+          color="secondary"
+          disabled={deleting || selected.length < 1}
+          onClick={(event) => deleteHandler(event)}
+        >
+          Удалить отмеченные
+        </Button>
+      )}
+
       <TablePagination
         component="div"
         count={numRows}
