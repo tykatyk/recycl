@@ -1,5 +1,6 @@
 import React from 'react'
-import { Snackbar, makeStyles } from '@material-ui/core'
+import { Snackbar, IconButton, makeStyles } from '@material-ui/core'
+import CloseIcon from '@material-ui/icons/Close'
 import MuiAlert from '@material-ui/lab/Alert'
 
 function Alert(props) {
@@ -25,6 +26,16 @@ export default function Snackbars(props) {
         autoHideDuration={4000}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        action={
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="secondary"
+            onClick={handleClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
       >
         <Alert onClose={handleClose} severity={severity}>
           {message}
