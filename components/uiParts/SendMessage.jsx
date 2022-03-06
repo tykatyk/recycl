@@ -1,6 +1,5 @@
 import { React, useState } from 'react'
 import {
-  TextField,
   Box,
   Typography,
   Button,
@@ -8,15 +7,14 @@ import {
   makeStyles,
   useTheme,
 } from '@material-ui/core'
-
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import * as yup from 'yup'
-
 import TextFieldFormik from './formInputs/TextFieldFormik.jsx'
 import Snackbars from './Snackbars.jsx'
 import { Formik, Form, Field } from 'formik'
 import { useMutation } from '@apollo/client'
 import { CREATE_MESSAGE } from '../../lib/graphql/queries/message'
-import { useRouter } from 'next/router'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,15 +25,27 @@ const useStyles = makeStyles((theme) => ({
       border: 'none',
     },
   },
+  relativePosition: {
+    position: 'relative',
+  },
+  shim: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
 }))
 
 export default function SendMessage() {
   const classes = useStyles()
   const theme = useTheme()
+  const { status } = useSession()
   const router = useRouter()
   const { id } = router.query
   const limit = 1000
 
+  const [createMessageMutation, { loading }] = useMutation(CREATE_MESSAGE)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const [severity, setSeverity] = useState('')
   const [message, setMessage] = useState('')
@@ -60,6 +70,18 @@ export default function SendMessage() {
         setSubmitting(false)
       })
   }
+
+  const handleClick = (e) => {
+    if (status != 'authenticated') {
+      router.push({
+        pathname: '/auth/login',
+        query: {
+          from: router.asPath,
+        },
+      })
+    }
+  }
+
   return (
     <Box>
       <Snackbars
@@ -95,14 +117,24 @@ export default function SendMessage() {
 
           return (
             <Form className={classes.root}>
+              <Box className={classes.relativePosition}>
                 <Field
                   component={TextFieldFormik}
                   multiline
-                  rows={3}
+                  rows={4}
                   variant="outlined"
                   fullWidth
                   name="message"
+                  disabled={status !== 'authenticated'}
                 />
+                {status !== 'authenticated' && (
+                  <div
+                    className={classes.shim}
+                    onClick={(e) => {
+                      handleClick(e)
+                    }}
+                  ></div>
+                )}
               </Box>
               <Box mb={3}>
                 <Typography variant="body2" style={{ color: '#bab8b8' }}>
