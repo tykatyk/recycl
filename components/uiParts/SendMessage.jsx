@@ -5,6 +5,7 @@ import {
   Typography,
   Button,
   CircularProgress,
+  makeStyles,
   useTheme,
 } from '@material-ui/core'
 
@@ -12,15 +13,21 @@ import * as yup from 'yup'
 
 import TextFieldFormik from './formInputs/TextFieldFormik.jsx'
 import Snackbars from './Snackbars.jsx'
-
 import { Formik, Form, Field } from 'formik'
-import removalFormStyles from '../removalApplicationPage/removalFormStyles'
-
 import { useMutation } from '@apollo/client'
 import { CREATE_MESSAGE } from '../../lib/graphql/queries/message'
 import { useRouter } from 'next/router'
 
-const useStyles = removalFormStyles
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > fieldset': {
+      margin: 0,
+      marginBottom: theme.spacing(5),
+      padding: 0,
+      border: 'none',
+    },
+  },
+}))
 
 export default function SendMessage() {
   const classes = useStyles()
@@ -74,8 +81,7 @@ export default function SendMessage() {
       >
         {({ isSubmitting, values }) => {
           return (
-            <Form className={classes.formRoot}>
-              <Box mb={3}>
+            <Form className={classes.root}>
                 <Field
                   component={TextFieldFormik}
                   multiline
