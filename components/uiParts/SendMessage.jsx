@@ -34,6 +34,7 @@ export default function SendMessage() {
   const theme = useTheme()
   const router = useRouter()
   const { id } = router.query
+  const limit = 1000
 
   const [notificationOpen, setNotificationOpen] = useState(false)
   const [severity, setSeverity] = useState('')
@@ -84,7 +85,14 @@ export default function SendMessage() {
           submitHandler(values, setSubmitting, resetForm)
         }}
       >
-        {({ isSubmitting, values }) => {
+        {({ isSubmitting, values, setFieldValue }) => {
+          let availableSymbols = limit - values.message.length
+          availableSymbols = availableSymbols >= 0 ? availableSymbols : 0
+
+          if (values.message.length > limit) {
+            setFieldValue('message', values.message.substring(0, limit), false)
+          }
+
           return (
             <Form className={classes.root}>
                 <Field
@@ -96,7 +104,11 @@ export default function SendMessage() {
                   name="message"
                 />
               </Box>
-
+              <Box mb={3}>
+                <Typography variant="body2" style={{ color: '#bab8b8' }}>
+                  Осталось: {availableSymbols}
+                </Typography>
+              </Box>
               <Box>
                 <Button
                   variant="contained"
