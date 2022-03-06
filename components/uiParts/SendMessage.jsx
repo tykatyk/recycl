@@ -35,9 +35,9 @@ export default function SendMessage() {
   const router = useRouter()
   const { id } = router.query
 
-  const [createMessageMutation, { data, loading, error }] =
-    useMutation(CREATE_MESSAGE)
-  const { showNotification, setShowNotification } = useState(!!data)
+  const [notificationOpen, setNotificationOpen] = useState(false)
+  const [severity, setSeverity] = useState('')
+  const [message, setMessage] = useState('')
 
   const submitHandler = (values, setSubmitting, resetForm) => {
     createMessageMutation({
@@ -45,25 +45,30 @@ export default function SendMessage() {
       fetchPolicy: 'no-cache',
     })
       .then((data) => {
-        setSubmitting(false)
+        setSeverity('success')
+        setMessage('Сообщение отправлено')
+        setNotificationOpen(true)
         resetForm({ values: '' })
       })
-      .catch((err) => {
-        //ToDo
+      .catch((error) => {
+        setSeverity('error')
+        setMessage('Ошибка при отправке сообщения')
+        setNotificationOpen(true)
+      })
+      .finally(() => {
+        setSubmitting(false)
       })
   }
   return (
-    <Box p={3} style={{ background: theme.palette.primary.main }}>
-      {data && (
-        <Snackbars
-          open={showNotification}
-          onClose={() => {
-            setShowNotification(false)
-          }}
-          message="Сообщение отправлено"
-          severity="success"
-        />
-      )}
+    <Box>
+      <Snackbars
+        open={notificationOpen}
+        handleClose={() => {
+          setNotificationOpen(false)
+        }}
+        message={message}
+        severity={severity}
+      />
       <Typography variant="h6" gutterBottom>
         Написать сообщение
       </Typography>
