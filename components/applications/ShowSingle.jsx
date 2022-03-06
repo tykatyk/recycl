@@ -1,7 +1,6 @@
 import React from 'react'
 import { Paper, Grid, Typography, makeStyles } from '@material-ui/core'
 import Layout from '../layouts/Layout.jsx'
-import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser.jsx'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
 import { useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATION } from '../../lib/graphql/queries/removalApplication'
@@ -24,21 +23,19 @@ export default function ShowSingle(props) {
   }
 
   return (
-    <RedirectUnathenticatedUser>
-      <Layout title="Заявка на вывоз | Recycl">
-        <Grid
-          container
-          direction="column"
-          style={{
-            maxWidth: '750px',
-            margin: '0 auto',
-            padding: '16px',
-          }}
-        >
-          {content}
-        </Grid>
-      </Layout>
-    </RedirectUnathenticatedUser>
+    <Layout title="Заявка на вывоз | Recycl">
+      <Grid
+        container
+        direction="column"
+        style={{
+          maxWidth: '750px',
+          margin: '0 auto',
+          padding: '16px',
+        }}
+      >
+        {content}
+      </Grid>
+    </Layout>
   )
 }
 
