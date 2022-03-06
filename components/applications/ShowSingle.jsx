@@ -2,6 +2,7 @@ import React from 'react'
 import { Paper, Grid, Typography, makeStyles } from '@material-ui/core'
 import Layout from '../layouts/Layout.jsx'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
+import SendMessage from '../uiParts/SendMessage.jsx'
 import { useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATION } from '../../lib/graphql/queries/removalApplication'
 
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 function ShowData(props) {
   const { applicationData } = props
   const classes = useStyles()
-  console.log(applicationData)
+
   return (
     <Grid container spacing={2} direction="column" item xs>
       <Grid item xs>
@@ -105,6 +106,11 @@ function ShowData(props) {
           </Paper>
         </Grid>
       )}
+      <Grid item xs>
+        <Paper className={classes.paper}>
+          <SendMessage />
+        </Paper>
+      </Grid>
     </Grid>
   )
 }
