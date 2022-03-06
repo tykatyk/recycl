@@ -53,7 +53,7 @@ function ShowData(props) {
     <Grid container spacing={2} direction="column" item xs>
       <Grid item xs>
         <Paper className={classes.paper}>
-          <Typography variant="body2" gutterBottom>
+          <Typography variant="h6" gutterBottom>
             Местоположение отходов
           </Typography>
           <Typography>{applicationData.wasteLocation.description}</Typography>
@@ -61,7 +61,7 @@ function ShowData(props) {
       </Grid>
       <Grid item xs>
         <Paper className={classes.paper}>
-          <Typography variant="body2" gutterBottom>
+          <Typography variant="h6" gutterBottom>
             Тип отходов
           </Typography>
           <Typography>{applicationData.wasteType.name}</Typography>
@@ -69,7 +69,7 @@ function ShowData(props) {
       </Grid>
       <Grid item xs>
         <Paper className={classes.paper}>
-          <Typography variant="body2" gutterBottom>
+          <Typography variant="h6" gutterBottom>
             Количество, кг.
           </Typography>
           <Typography>{applicationData.quantity}</Typography>
@@ -77,7 +77,7 @@ function ShowData(props) {
       </Grid>
       <Grid item xs>
         <Paper className={classes.paper}>
-          <Typography variant="body2" gutterBottom>
+          <Typography variant="h6" gutterBottom>
             Документ о передаче отходов на переработку
           </Typography>
           {applicationData.passDocument ? (
@@ -89,7 +89,7 @@ function ShowData(props) {
       </Grid>
       <Grid item xs>
         <Paper className={classes.paper}>
-          <Typography variant="body2" gutterBottom>
+          <Typography variant="h6" gutterBottom>
             Контактный телефон
           </Typography>
           <Typography>{applicationData.userId.phone}</Typography>
@@ -98,7 +98,7 @@ function ShowData(props) {
       {applicationData.wasteLocation.comment && (
         <Grid item xs>
           <Paper className={classes.paper}>
-            <Typography variant="body2" gutterBottom>
+            <Typography variant="h6" gutterBottom>
               Примечание
             </Typography>
             <Typography>{applicationData.comment}</Typography>
