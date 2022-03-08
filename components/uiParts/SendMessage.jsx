@@ -28,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
   relativePosition: {
     position: 'relative',
   },
+  remainedSymbols: {
+    color: theme.palette.grey['400'],
+  },
   shim: {
     position: 'absolute',
     left: 0,
@@ -137,7 +140,7 @@ export default function SendMessage() {
                 )}
               </Box>
               <Box mb={3}>
-                <Typography variant="body2" style={{ color: '#bab8b8' }}>
+                <Typography variant="body2" className={classes.remainedSymbols}>
                   Осталось: {availableSymbols}
                 </Typography>
               </Box>
