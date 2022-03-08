@@ -1,134 +1,169 @@
 import React, { useState } from 'react'
 import {
   Grid,
-  Button,
   Typography,
+  Checkbox,
   TablePagination,
   makeStyles,
 } from '@material-ui/core'
-import MailIcon from '@material-ui/icons/Mail'
-
-import Link from './Link.jsx'
-import Layout from './Layout.jsx'
-import RemovalForm from './removalApplication/RemovalForm.jsx'
-import DataGridFooter from './DataGridFooter.jsx'
-
-import { DataGrid } from '@mui/x-data-grid'
+import clsx from 'clsx'
+import Layout from './layouts/Layout.jsx'
+import DataGridFooter from './uiParts/DataGridFooter.jsx'
 import { useQuery, useMutation } from '@apollo/client'
-import { GET_MESSAGES_BY_APPLICATION } from '../lib/graphql/queries'
+import { GET_MESSAGES } from '../lib/graphql/queries/message'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
-      outline: 'none',
-    },
-    '& .MuiDataGrid-columnSeparator': {
-      visibility: 'hidden',
+    maxWidth: 1024,
+    '& > :last-child': {
+      borderBottom: 'none',
     },
   },
+  header: {
+    padding: theme.spacing(2),
+  },
   row: {
-    '&:hover': {
-      cursor: 'pointer',
-    },
+    padding: theme.spacing(2),
+    borderBottom: '1px solid #fff',
+    cursor: 'pointer',
+  },
+  paper: {
+    background: theme.palette.background.paper,
   },
 }))
 
-const columns = [
-  {
-    field: 'from',
-    headerName: 'От',
-    width: 150,
-  },
-  {
-    field: 'message',
-    headerName: 'Сообщение',
-    width: 332,
-  },
-  {
-    field: 'isRead',
-    headerName: '',
-    width: 150,
-    headerAlign: 'center',
-    align: 'center',
-    renderCell: (params) => {
-      if (params.row.messageCount > 0) {
-        return <MailIcon />
-      }
-      return ''
-    },
-  },
-]
-
 export default function Messages() {
   const classes = useStyles()
-  const [selected, setSelected] = useState([])
-  const { loading, error, data } = useQuery(GET_MESSAGES_BY_APPLICATION)
+  const [checked, setChecked] = useState([0])
 
+  const handleToggle = (value) => {
+    const currentIndex = checked.indexOf(value)
+    const newChecked = [...checked]
+
+    if (currentIndex === -1) {
+      newChecked.push(value)
+    } else {
+      newChecked.splice(currentIndex, 1)
+    }
+
+    setChecked(newChecked)
+  }
+
+  const { loading, error, data } = useQuery(GET_MESSAGES)
+  const messages =
+    data && data.getMessages && data.getMessages.length > 0
+      ? data.getMessages
+      : null
   /*const [
     deleteMutation,
     { loading: deleting, error: deleteError, data: deleteData },
   ] = useMutation(DELETE_MESSAGES)*/
 
-  const clickHandler = function (event) {
-    if (selected.length < 1) return
-    deleteMutation({
-      variables: { ids: selected },
-      refetchQueries: [{ query: GET_MESSAGES_BY_APPLICATION }],
-    })
+  // const clickHandler = function (event) {
+  //   if (selected.length < 1) return
+  //   deleteMutation({
+  //     variables: { ids: selected },
+  //     refetchQueries: [{ query: GET_MESSAGES_BY_APPLICATION }],
+  //   })
+  // }
+
+  // if (loading) return <Typography>Идет загрузка данных</Typography>
+
+  // if (error) {
+  //   return <Typography>Возникла ошибка при загрузке данных</Typography>
+  // }
+
+  const Header = function () {
+    return (
+      <Grid
+        className={classes.header}
+        alignItems="center"
+        container
+        item
+        xs={12}
+      >
+        <Grid item xs={1}>
+          <Checkbox />
+        </Grid>
+        <Grid item xs={3}>
+          <Typography variant="body2" color="textSecondary">
+            От
+          </Typography>
+        </Grid>
+        <Grid item xs={8}>
+          <Typography variant="body2" color="textSecondary">
+            Сообщение
+          </Typography>
+        </Grid>
+      </Grid>
+    )
   }
 
-  if (loading) return <Typography>Идет загрузка данных</Typography>
+  const MessageRow = function (props) {
+    const { id, from, text, subject } = props
+    return (
+      <Grid
+        className={clsx(classes.paper, classes.row)}
+        container
+        item
+        xs={12}
+        alignItems="center"
+      >
+        <Grid item xs={1}>
+          <Checkbox
+            checked={checked.indexOf(id) !== -1}
+            tabIndex={-1}
+            disableRipple
+            onChange={() => {
+              handleToggle(id)
+            }}
+          />
+        </Grid>
+        <Grid item xs={3} zeroMinWidth>
+          <Typography variant="body2" color="textSecondary" noWrap>
+            {from}
+          </Typography>
+        </Grid>
 
-  if (error) {
-    return <Typography>Возникла ошибка при загрузке данных</Typography>
+        <Grid container item xs={8} zeroMinWidth>
+          <Grid item xs={12}>
+            <Typography variant="body2" color="textSecondary" noWrap>
+              {subject}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} zeroMinWidth>
+            <Typography noWrap>{text}</Typography>
+          </Grid>
+        </Grid>
+      </Grid>
+    )
   }
 
-  const rows = data.getRemovalApplications.map((item) => {
-    const newItem = {}
-    newItem.id = item['_id']
-    newItem.from = item.wasteType.name
-    newItem.message = {
-      wasteType: item.wasteType.name,
-      text: item.text,
+  const MessageList = function (props) {
+    const { messages } = props
+    if (messages) {
+      return messages.map((message) => {
+        return (
+          <MessageRow
+            key={message['_id']}
+            id={message['_id']}
+            from={message.sender.name}
+            text={message.text}
+            isViewed={message.isViewed}
+            subject={`${message.ad.wasteType.name} в городе ${message.ad.wasteLocation.description}`}
+          />
+        )
+      })
     }
-    newItem.isRead = item.isRead
-    return newItem
-  })
+
+    return null
+  }
 
   return (
-    <Layout>
-      <Grid
-        container
-        direction="column"
-        style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '16px',
-        }}
-      >
-        <Typography gutterBottom variant="h4">
-          Сообщения
-        </Typography>
-        <div style={{ width: '100%' }}>
-          <DataGrid
-            classes={{ root: classes.root, row: classes.row }}
-            autoHeight
-            rows={rows}
-            columns={columns}
-            autoPageSize
-            checkboxSelection
-            disableSelectionOnClick
-            onCellClick={(params, event) => {}}
-            onSelectionModelChange={(params) => {
-              setSelected(params)
-            }}
-            components={{
-              Footer: DataGridFooter,
-              Pagination: TablePagination,
-            }}
-            componentsProps={{ footer: { clickHandler, deleting, selected } }}
-          />
-        </div>
+    <Layout title="Мои сообщения | Recycl">
+      <Grid className={classes.root} container direction="column">
+        <Header />
+        <MessageList messages={messages} />
       </Grid>
     </Layout>
   )
