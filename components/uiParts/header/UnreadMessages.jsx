@@ -17,7 +17,7 @@ export default function UnreadMessages() {
 
   if (loading) {
     return (
-      <IconButton href="#">
+      <IconButton href="/my/messages">
         <Badge badgeContent={0} color="secondary">
           <MailIcon
             aria-label="incoming messages"
@@ -32,7 +32,7 @@ export default function UnreadMessages() {
 
   return (
     <>
-      <IconButton href="#">
+      <IconButton href="/my/messages">
         <Badge
           badgeContent={
             data && data.getNumberOfUnreadMessages
