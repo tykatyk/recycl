@@ -40,14 +40,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function SendMessage() {
+export default function SendMessage(props) {
   const classes = useStyles()
   const theme = useTheme()
-  const { status } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const { id } = router.query
   const limit = 1000
-
+  const { receiver } = props
   const [createMessageMutation, { loading }] = useMutation(CREATE_MESSAGE)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const [severity, setSeverity] = useState('')
@@ -55,7 +55,9 @@ export default function SendMessage() {
 
   const submitHandler = (values, setSubmitting, resetForm) => {
     createMessageMutation({
-      variables: { message: values.message, aplId: id },
+      variables: {
+        message: { text: values.message, ad: id, sender: session.id, receiver },
+      },
       fetchPolicy: 'no-cache',
     })
       .then((data) => {

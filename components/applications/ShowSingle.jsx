@@ -108,7 +108,7 @@ function ShowData(props) {
       )}
       <Grid item xs>
         <Paper className={classes.paper}>
-          <SendMessage />
+          <SendMessage receiver={applicationData.user['_id']} />
         </Paper>
       </Grid>
     </Grid>
