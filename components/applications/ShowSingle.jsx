@@ -93,7 +93,7 @@ function ShowData(props) {
           <Typography variant="h6" gutterBottom>
             Контактный телефон
           </Typography>
-          <Typography>{applicationData.userId.phone}</Typography>
+          <Typography>{applicationData.user.phone}</Typography>
         </Paper>
       </Grid>
       {applicationData.wasteLocation.comment && (
