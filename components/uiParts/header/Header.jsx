@@ -7,7 +7,7 @@ import {
   useTheme,
 } from '@material-ui/core'
 import UserMenu from './UserMenu.jsx'
-import UnreadMessages from './UnreadMessages.jsx'
+import UnreadDialogsCounter from './UnreadDialogsCounter.jsx'
 import UserAvatar from './UserAvatar.jsx'
 import DesktopNavigation from './DesktopNavigation.jsx'
 import MobileNavigation from './MobileNavigation.jsx'
@@ -103,7 +103,7 @@ export default function Header() {
             {status === 'authenticated' && (
               <div className={classes.gutter}>
                 <CreateButton />
-                <UnreadMessages />
+                <UnreadDialogsCounter />
               </div>
             )}
             <UserAvatar handleMenu={handleMenu} />

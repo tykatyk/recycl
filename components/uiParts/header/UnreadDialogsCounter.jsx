@@ -5,7 +5,7 @@ import { useQuery } from '@apollo/client'
 import Snackbar from '../Snackbars.jsx'
 import { GET_UNREAD_DIALOGS_IDS } from '../../../lib/graphql/queries/message'
 
-export default function UnreadMessages(props) {
+export default function UnreadDialogsCounter(props) {
   const { data, error, refetch } = useQuery(GET_UNREAD_DIALOGS_IDS)
   const [backendError, setBackendError] = useState(null)
   const { shownDialog } = props
