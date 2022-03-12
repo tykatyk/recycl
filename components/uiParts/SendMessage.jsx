@@ -169,7 +169,7 @@ export default function SendMessage(props) {
                     <CircularProgress
                       size={24}
                       style={{
-                        color: theme.palette.secondary.main,
+                        color: theme.palette.primary.main,
                         marginLeft: '1em',
                       }}
                     />
