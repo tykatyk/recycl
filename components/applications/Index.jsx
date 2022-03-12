@@ -77,6 +77,7 @@ export default function Index(props) {
   let header = `${title} отходов`
   if (loading) return <PageLoadingCircle />
 
+  //ToDo: Add no data overlay
   if (
     data &&
     data.getRemovalApplications &&
