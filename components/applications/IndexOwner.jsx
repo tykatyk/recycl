@@ -104,7 +104,7 @@ export default function removalApplications(props) {
   let rows = []
 
   if (loading) return <PageLoadingCircle />
-
+  // ToDo: Add error overlay and no data overlay
   if (status === 'unauthenticated') {
     Router.push({
       pathname: '/auth/login',
@@ -168,7 +168,7 @@ export default function removalApplications(props) {
                     return
                   }
                   if (params.field !== '__check__')
-                    Router.push(`/removal/application/${params.id}`)
+                    Router.push(`/applications/${params.id}`)
                 }}
                 onSelectionModelChange={(params) => {
                   setSelected(params)
