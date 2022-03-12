@@ -184,7 +184,7 @@ export default function RemovalApplicationsPage() {
   return (
     <MapLayout title="Сдать отходы | Recycl">
       <Wrapper
-        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}
         render={render}
         libraries={['places', 'geocoder']}
       >

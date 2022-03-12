@@ -56,7 +56,7 @@ export default function PlacesAutocomplete(props) {
   if (typeof window !== 'undefined' && !window.google && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
       loadScript(
-        `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`,
+        `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}&libraries=places`,
         document.querySelector('head'),
         'google-maps'
       )
