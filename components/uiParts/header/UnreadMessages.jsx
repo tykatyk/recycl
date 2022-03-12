@@ -3,7 +3,7 @@ import { IconButton, Badge } from '@material-ui/core'
 import MailIcon from '@material-ui/icons/Mail'
 import { useQuery } from '@apollo/client'
 import Snackbar from '../Snackbars.jsx'
-import { GET_NUMBER_OF_UNREAD_MESSAGES } from '../../../lib/graphql/queries/message'
+import { GET_UNREAD_DIALOGS_IDS } from '../../../lib/graphql/queries/message'
 
 export default function UnreadMessages() {
   const { loading, data, error } = useQuery(GET_NUMBER_OF_UNREAD_MESSAGES)
@@ -35,8 +35,8 @@ export default function UnreadMessages() {
       <IconButton href="/my/messages">
         <Badge
           badgeContent={
-            data && data.getNumberOfUnreadMessages
-              ? data.getNumberOfUnreadMessages
+            data && data.getUnreadDialogsIDs
+              ? data.getUnreadDialogsIDs.length
               : 0
           }
           color="secondary"
