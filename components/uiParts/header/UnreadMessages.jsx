@@ -8,6 +8,7 @@ import { GET_UNREAD_DIALOGS_IDS } from '../../../lib/graphql/queries/message'
 export default function UnreadMessages(props) {
   const { data, error, refetch } = useQuery(GET_UNREAD_DIALOGS_IDS)
   const [backendError, setBackendError] = useState(null)
+  const { shownDialog } = props
 
   useEffect(() => {
     if (error) {
@@ -15,20 +16,9 @@ export default function UnreadMessages(props) {
     }
   }, [error])
 
-  if (loading) {
-    return (
-      <IconButton href="/my/messages">
-        <Badge badgeContent={0} color="secondary">
-          <MailIcon
-            aria-label="incoming messages"
-            aria-controls="menu-appbar"
-            aria-haspopup="false"
-            color="inherit"
-          />
-        </Badge>
-      </IconButton>
-    )
-  }
+  useEffect(() => {
+    if (shownDialog) refetch()
+  }, [shownDialog])
 
   return (
     <>
