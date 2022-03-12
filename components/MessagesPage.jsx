@@ -13,9 +13,11 @@ import clsx from 'clsx'
 import Layout from './layouts/Layout.jsx'
 import DataGridFooter from './uiParts/DataGridFooter.jsx'
 import PageLoadingCirlce from './uiParts/PageLoadingCircle.jsx'
+import RedirectUnathenticatedUser from './uiParts/RedirectUnathenticatedUser.jsx'
 import { useQuery, useMutation } from '@apollo/client'
-import { GET_MESSAGES } from '../lib/graphql/queries/message'
-import { DELETE_MESSAGES } from '../lib/graphql/queries/message'
+import { GET_DIALOGS } from '../lib/graphql/queries/message'
+import { DELETE_DIALOGS } from '../lib/graphql/queries/message'
+import { useSession } from 'next-auth/react'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,15 +46,20 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     color: theme.palette.secondary.main,
   },
+  unreadMessage: {
+    color: theme.palette.secondary.main,
+    fontWeight: 'bold',
+  },
 }))
 
-export default function Messages() {
+export default function MessagesPage() {
   const classes = useStyles()
   const [checked, setChecked] = useState([])
   const [headerChecked, setHeaderChecked] = useState(false)
   const [currentData, setCurrentData] = useState(null)
-  const { loading, error, data } = useQuery(GET_MESSAGES)
-  const [deleteMutation] = useMutation(DELETE_MESSAGES)
+  const { data: session } = useSession()
+  const { loading, error, data } = useQuery(GET_DIALOGS)
+  const [deleteMutation] = useMutation(DELETE_DIALOGS)
 
   const handleToggle = (value) => {
     const currentIndex = checked.indexOf(value)
@@ -85,7 +92,7 @@ export default function Messages() {
     if (checked.length < 1) return
     deleteMutation({
       variables: { ids: checked },
-      refetchQueries: [{ query: GET_MESSAGES }],
+      refetchQueries: [{ query: GET_DIALOGS }],
     })
     let newData = [...currentData]
     newData.splice
@@ -96,8 +103,8 @@ export default function Messages() {
   }
 
   useEffect(() => {
-    if (data && data.getMessages && data.getMessages.length > 0) {
-      setCurrentData(data.getMessages)
+    if (data && data.getDialogs && data.getDialogs.length > 0) {
+      setCurrentData(data.getDialogs)
     }
   }, [data])
 
@@ -145,7 +152,7 @@ export default function Messages() {
         <>
           <Grid item xs={3}>
             <Typography variant="body2" color="textSecondary">
-              От
+              Пользователь
             </Typography>
           </Grid>
           <Grid item xs={8}>
@@ -174,7 +181,7 @@ export default function Messages() {
   }
 
   const MessageRow = function (props) {
-    const { id, from, text, subject } = props
+    const { id, viewed, username, senderId, text, subject } = props
     return (
       <Grid
         className={clsx(classes.paper, classes.row)}
@@ -195,7 +202,7 @@ export default function Messages() {
         </Grid>
         <Grid item xs={3} zeroMinWidth>
           <Typography variant="body2" color="textSecondary" noWrap>
-            {from}
+            {username}
           </Typography>
         </Grid>
 
@@ -206,7 +213,19 @@ export default function Messages() {
             </Typography>
           </Grid>
           <Grid item xs={12} zeroMinWidth>
-            <Typography noWrap>{text}</Typography>
+            <Typography
+              noWrap
+              color={
+                !viewed && senderId != session.id
+                  ? 'secondary'
+                  : 'textSecondary'
+              }
+              className={clsx({
+                [classes.unreadMessage]: !viewed && senderId != session.id,
+              })}
+            >
+              {text}{' '}
+            </Typography>
           </Grid>
         </Grid>
       </Grid>
@@ -215,15 +234,22 @@ export default function Messages() {
 
   const MessageList = function (props) {
     const { messages } = props
+
+    const thisUserId = session.id
     if (messages) {
       return messages.map((message) => {
         return (
           <MessageRow
             key={message['_id']}
             id={message['_id']}
-            from={message.sender.name}
+            username={
+              thisUserId == message.sender._id
+                ? message.receiver.name
+                : message.sender.name
+            }
+            senderId={message.sender._id}
             text={message.text}
-            isViewed={message.isViewed}
+            viewed={message.viewed}
             subject={`${message.ad.wasteType.name} в городе ${message.ad.wasteLocation.description}`}
           />
         )
@@ -242,10 +268,12 @@ export default function Messages() {
   if (currentData) content = <Data messages={currentData} />
 
   return (
-    <Layout title="Мои сообщения | Recycl">
-      <Grid className={classes.root} container direction="column">
-        {content}
-      </Grid>
-    </Layout>
+    <RedirectUnathenticatedUser>
+      <Layout title="Мои сообщения | Recycl">
+        <Grid className={classes.root} container direction="column">
+          {content}
+        </Grid>
+      </Layout>
+    </RedirectUnathenticatedUser>
   )
 }
