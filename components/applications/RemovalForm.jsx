@@ -71,9 +71,9 @@ export default function RemovalForm(props) {
       fetchPolicy: 'no-cache',
     })
       .then((data) => {
-        router.push('/removal/application')
+        router.push('/my/applications')
       })
-      .catch((err) => {
+      .catch((error) => {
         setBackendError('Возникла ошибка при создании заявки')
       })
       .finally(() => {
