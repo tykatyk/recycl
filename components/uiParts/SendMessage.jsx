@@ -54,6 +54,14 @@ export default function SendMessage(props) {
   const [message, setMessage] = useState('')
 
   const submitHandler = (values, setSubmitting, resetForm) => {
+    const sender = session.id
+    if (sender == receiver) {
+      setSeverity('error')
+      setMessage('Нельзя отправлять сообщения самому себе')
+      setNotificationOpen(true)
+      setSubmitting(false)
+      return
+    }
     createMessageMutation({
       variables: {
         message: { text: values.message, ad: id, sender: session.id, receiver },
