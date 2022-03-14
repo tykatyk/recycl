@@ -8,10 +8,10 @@ import {
   TablePagination,
   makeStyles,
 } from '@material-ui/core'
+import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
 import clsx from 'clsx'
 import Layout from './layouts/Layout.jsx'
-import DataGridFooter from './uiParts/DataGridFooter.jsx'
 import PageLoadingCirlce from './uiParts/PageLoadingCircle.jsx'
 import RedirectUnathenticatedUser from './uiParts/RedirectUnathenticatedUser.jsx'
 import { useQuery, useMutation } from '@apollo/client'
@@ -22,12 +22,14 @@ import { useSession } from 'next-auth/react'
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 1024,
-    '& > :last-child': {
-      borderBottom: 'none',
-    },
   },
   header: {
     padding: theme.spacing(2),
+  },
+  messageList: {
+    '& > :last-child': {
+      borderBottom: 'none',
+    },
   },
   row: {
     padding: theme.spacing(2),
@@ -42,6 +44,11 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
   },
+  error: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   noDataText: {
     marginTop: theme.spacing(1),
     color: theme.palette.secondary.main,
@@ -52,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function MessagesPage() {
+export default function DialogsPage() {
   const classes = useStyles()
   const [checked, setChecked] = useState([])
   const [headerChecked, setHeaderChecked] = useState(false)
@@ -60,8 +67,41 @@ export default function MessagesPage() {
   const { data: session } = useSession()
   const { loading, error, data } = useQuery(GET_DIALOGS)
   const [deleteMutation] = useMutation(DELETE_DIALOGS)
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(2)
+  const [numRows, setNumRows] = useState(0)
 
-  const handleToggle = (value) => {
+  const dataIsValid = () => {
+    if (
+      data &&
+      data.getDialogs &&
+      data.getDialogs.dialogs &&
+      data.getDialogs.dialogs.length > 0
+    ) {
+      return true
+    }
+    return false
+  }
+
+  const getDataToShow = () => {
+    if (dataIsValid()) {
+      const startIndex = page * pageSize
+      const endIndex = (page + 1) * pageSize
+      const dataToProcess = data.getDialogs.dialogs
+      const dataToShow = dataToProcess.slice(startIndex, endIndex)
+      return dataToShow
+    }
+    return null
+  }
+
+  const handlePageChange = (_, newPage) => {
+    setPage(newPage)
+  }
+  const handlePageSizeChange = (event) => {
+    setPageSize(parseInt(event.target.value, 10))
+    setPage(0)
+  }
+  const handleCheckboxToggle = (value) => {
     const currentIndex = checked.indexOf(value)
     const newChecked = [...checked]
 
@@ -79,11 +119,14 @@ export default function MessagesPage() {
       setChecked([])
       setHeaderChecked(false)
     } else {
-      setChecked(
-        currentData.map((message) => {
-          return message['_id']
-        })
-      )
+      if (currentData) {
+        setChecked(
+          currentData.map((message) => {
+            return message['_id']
+          })
+        )
+      }
+
       setHeaderChecked(true)
     }
   }
@@ -103,19 +146,22 @@ export default function MessagesPage() {
   }
 
   useEffect(() => {
-    if (data && data.getDialogs && data.getDialogs.length > 0) {
-      setCurrentData(data.getDialogs)
-    }
+    const dataToShow = getDataToShow()
+    setCurrentData(dataToShow)
+  }, [data, page, pageSize])
+
+  useEffect(() => {
+    if (dataIsValid()) setNumRows(data.getDialogs.dialogs.length)
   }, [data])
 
-  const Loading = () => {
-    return <PageLoadingCirlce />
-  }
   const Error = () => {
     return (
-      <Typography align="center" color="error">
-        Ошибка при загрузке данных
-      </Typography>
+      <Box className={classes.error}>
+        <ErrorIcon color="secondary" fontSize="large" />
+        <Typography align="center" color="error">
+          Ошибка при загрузке данных
+        </Typography>
+      </Box>
     )
   }
   const NoData = () => {
@@ -133,6 +179,13 @@ export default function MessagesPage() {
       <Grid className={classes.root} container direction="column">
         <Header showDelete={headerChecked} />
         <MessageList messages={messages} />
+        <Footer
+          page={page}
+          pageSize={pageSize}
+          numRows={numRows}
+          handlePageChange={handlePageChange}
+          handlePageSizeChange={handlePageSizeChange}
+        />
       </Grid>
     )
   }
@@ -180,6 +233,27 @@ export default function MessagesPage() {
     )
   }
 
+  const Footer = function (props) {
+    const {
+      numRows = 0,
+      page = 0,
+      pageSize = 25,
+      handlePageChange = () => {},
+      handlePageSizeChange = () => {},
+    } = props
+    return (
+      <TablePagination
+        component="div"
+        count={numRows}
+        page={page}
+        rowsPerPage={pageSize}
+        rowsPerPageOptions={[1, 2, 3]}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handlePageSizeChange}
+      />
+    )
+  }
+
   const MessageRow = function (props) {
     const { id, viewed, username, senderId, text, subject } = props
     return (
@@ -196,7 +270,7 @@ export default function MessagesPage() {
             tabIndex={-1}
             disableRipple
             onChange={() => {
-              handleToggle(id)
+              handleCheckboxToggle(id)
             }}
           />
         </Grid>
@@ -216,9 +290,7 @@ export default function MessagesPage() {
             <Typography
               noWrap
               color={
-                !viewed && senderId != session.id
-                  ? 'secondary'
-                  : 'textSecondary'
+                !viewed && senderId != session.id ? 'secondary' : 'inherit'
               }
               className={clsx({
                 [classes.unreadMessage]: !viewed && senderId != session.id,
@@ -237,32 +309,36 @@ export default function MessagesPage() {
 
     const thisUserId = session.id
     if (messages) {
-      return messages.map((message) => {
-        return (
-          <MessageRow
-            key={message['_id']}
-            id={message['_id']}
-            username={
-              thisUserId == message.sender._id
-                ? message.receiver.name
-                : message.sender.name
-            }
-            senderId={message.sender._id}
-            text={message.text}
-            viewed={message.viewed}
-            subject={`${message.ad.wasteType.name} в городе ${message.ad.wasteLocation.description}`}
-          />
-        )
-      })
+      return (
+        <Grid item xs={12} className={classes.messageList}>
+          {messages.map((message) => {
+            return (
+              <MessageRow
+                key={message['_id']}
+                id={message['_id']}
+                username={
+                  thisUserId == message.sender._id
+                    ? message.receiver.name
+                    : message.sender.name
+                }
+                senderId={message.sender._id}
+                text={message.text}
+                viewed={message.viewed}
+                subject={`${message.ad.wasteType.name} в городе ${message.ad.wasteLocation.description}`}
+              />
+            )
+          })}
+        </Grid>
+      )
     }
 
     return null
   }
   let content = null
 
-  if (loading) content = <Loading />
+  if (loading) content = <PageLoadingCirlce />
   if (error) content = <Error />
-  if (data && data.getMessages && data.getMessages.length === 0) {
+  if (!error && !loading && !currentData) {
     content = <NoData />
   }
   if (currentData) content = <Data messages={currentData} />
