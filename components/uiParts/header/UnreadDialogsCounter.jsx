@@ -22,7 +22,7 @@ export default function UnreadDialogsCounter(props) {
 
   return (
     <>
-      <IconButton href="/my/messages">
+      <IconButton href="/my/dialogs">
         <Badge
           badgeContent={
             data && data.getUnreadDialogsIDs
