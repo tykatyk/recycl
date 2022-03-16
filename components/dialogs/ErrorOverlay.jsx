@@ -15,7 +15,7 @@ export default function ErrorOverlay() {
 
   return (
     <Box className={classes.root}>
-      <ErrorIcon color="secondary" fontSize="large" />
+      <ErrorIcon color="error" fontSize="large" />
       <Typography align="center" color="error">
         Ошибка при загрузке данных
       </Typography>
