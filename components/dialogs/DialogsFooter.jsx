@@ -8,6 +8,7 @@ export default function DialogsFooter(props) {
     pageSize = 25,
     handlePageChange = () => {},
     handlePageSizeChange = () => {},
+    handleNextPageButtonClick = () => {},
   } = props
   return (
     <TablePagination
@@ -17,6 +18,8 @@ export default function DialogsFooter(props) {
       rowsPerPage={pageSize}
       onPageChange={handlePageChange}
       onRowsPerPageChange={handlePageSizeChange}
+      nextIconButtonProps={{ onClick: handleNextPageButtonClick }}
+      rowsPerPageOptions={[1, 2, 3]}
     />
   )
 }

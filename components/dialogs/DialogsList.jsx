@@ -21,21 +21,22 @@ export default function DialogsList(props) {
     return (
       <Grid item xs={12} className={classes.root}>
         {dialogs.map((dialog) => {
-          const messageId = dialog['_id']
+          const dialogId = dialog._id
+          const firstMessage = dialog.messages[0]
           return (
             <DialogsRow
-              key={messageId}
-              id={messageId}
+              key={dialogId}
+              id={dialogId}
               username={
-                thisUserId == dialog.sender._id
-                  ? dialog.receiver.name
-                  : dialog.sender.name
+                thisUserId == firstMessage.sender._id
+                  ? firstMessage.receiver.name
+                  : firstMessage.sender.name
               }
-              senderId={dialog.sender._id}
-              text={dialog.text}
-              viewed={dialog.viewed}
-              subject={`${dialog.ad.wasteType.name} в городе ${dialog.ad.wasteLocation.description}`}
-              checked={checkedRows.indexOf(messageId) !== -1}
+              senderId={firstMessage.sender._id}
+              text={firstMessage.text}
+              viewed={firstMessage.viewed}
+              subject={`${firstMessage.ad.wasteType.name} в городе ${firstMessage.ad.wasteLocation.description}`}
+              checked={checkedRows.indexOf(dialogId) !== -1}
               handleRowToggle={handleRowToggle}
             />
           )

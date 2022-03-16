@@ -23,11 +23,13 @@ export default function DialogsPage() {
   const [checkedRows, setCheckedRows] = useState([])
   const [headerChecked, setHeaderChecked] = useState(false)
   const [currentData, setCurrentData] = useState(null)
-  const { loading, error, data } = useQuery(GET_DIALOGS)
   const [deleteMutation] = useMutation(DELETE_DIALOGS)
   const [page, setPage] = useState(0)
-  const [pageSize, setPageSize] = useState(25)
+  const [pageSize, setPageSize] = useState(1)
   const [numRows, setNumRows] = useState(0)
+  const { loading, error, data, fetchMore } = useQuery(GET_DIALOGS, {
+    variables: { offset: null, limit: pageSize },
+  })
 
   const dataIsValid = () => {
     if (
@@ -58,6 +60,28 @@ export default function DialogsPage() {
   const handlePageSizeChange = (event) => {
     setPageSize(parseInt(event.target.value, 10))
     setPage(0)
+  }
+
+  const handleFetchMore = () => {
+    let lastMessageId = null
+    if (!dataIsValid()) return
+    if ((page + 1) * pageSize >= data.getDialogs.totalCount) return
+
+    const lastDialogIndex = data.getDialogs.dialogs.length - 1
+    const lastDialog = data.getDialogs.dialogs[lastDialogIndex]
+    lastMessageId = lastDialog.messages[0]._id
+    return fetchMore({
+      variables: {
+        offset: lastMessageId,
+        limit: pageSize,
+      },
+    })
+  }
+
+  const handleNextPageButtonClick = () => {
+    handleFetchMore().then(() => {
+      setPage(page + 1)
+    })
   }
   const handleRowToggle = (value) => {
     const currentIndex = checkedRows.indexOf(value)
@@ -105,12 +129,16 @@ export default function DialogsPage() {
   }
 
   useEffect(() => {
+    handleFetchMore()
+  }, [pageSize])
+
+  useEffect(() => {
     const dataToShow = getDataToShow()
     setCurrentData(dataToShow)
   }, [data, page, pageSize])
 
   useEffect(() => {
-    if (dataIsValid()) setNumRows(data.getDialogs.dialogs.length)
+    if (dataIsValid()) setNumRows(data.getDialogs.totalCount)
   }, [data])
 
   useEffect(() => {
@@ -138,6 +166,7 @@ export default function DialogsPage() {
           numRows={numRows}
           handlePageChange={handlePageChange}
           handlePageSizeChange={handlePageSizeChange}
+          handleNextPageButtonClick={handleNextPageButtonClick}
         />
       </Grid>
     )
