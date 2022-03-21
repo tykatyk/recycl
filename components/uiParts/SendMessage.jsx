@@ -5,7 +5,6 @@ import {
   Button,
   CircularProgress,
   makeStyles,
-  useTheme,
 } from '@material-ui/core'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
@@ -43,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
 export default function SendMessage(props) {
   const classes = useStyles()
   const theme = useTheme()
-  const { data: session, status } = useSession()
   const router = useRouter()
   const { id } = router.query
   const limit = 1000
@@ -168,8 +166,8 @@ export default function SendMessage(props) {
                   {isSubmitting && (
                     <CircularProgress
                       size={24}
+                      color="secondary"
                       style={{
-                        color: theme.palette.primary.main,
                         marginLeft: '1em',
                       }}
                     />
