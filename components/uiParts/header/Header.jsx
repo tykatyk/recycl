@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function Header() {
+export default function Header(props) {
   const classes = useStyles()
   const theme = useTheme()
   const [anchorEl, setAnchorEl] = useState(null)
@@ -47,7 +47,8 @@ export default function Header() {
     drawerOpen: false,
   })
   const { mobileView, drawerOpen } = state
-  const { data: session, status } = useSession()
+  const { status } = useSession()
+  const { numViewed, setNumViewed } = props
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -103,7 +104,10 @@ export default function Header() {
             {status === 'authenticated' && (
               <div className={classes.gutter}>
                 <CreateButton />
-                <UnreadDialogsCounter />
+                <UnreadDialogsCounter
+                  numViewed={numViewed}
+                  setNumViewed={setNumViewed}
+                />
               </div>
             )}
             <UserAvatar handleMenu={handleMenu} />

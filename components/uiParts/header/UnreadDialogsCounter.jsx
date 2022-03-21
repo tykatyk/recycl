@@ -8,7 +8,7 @@ import { GET_UNREAD_DIALOGS_IDS } from '../../../lib/graphql/queries/message'
 export default function UnreadDialogsCounter(props) {
   const { data, error, refetch } = useQuery(GET_UNREAD_DIALOGS_IDS)
   const [backendError, setBackendError] = useState(null)
-  const { shownDialog } = props
+  const { numViewed = 0, setNumViewed } = props
 
   useEffect(() => {
     if (error) {
@@ -16,9 +16,13 @@ export default function UnreadDialogsCounter(props) {
     }
   }, [error])
 
-  useEffect(() => {
-    if (shownDialog) refetch()
-  }, [shownDialog])
+  useEffect(async () => {
+    if (numViewed) {
+      await refetch()
+      console.log('here')
+      setNumViewed(0)
+    }
+  }, [numViewed])
 
   return (
     <>
