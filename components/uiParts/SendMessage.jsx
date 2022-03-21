@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SendMessage(props) {
   const classes = useStyles()
-  const theme = useTheme()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const { id } = router.query
   const limit = 1000
@@ -53,18 +53,31 @@ export default function SendMessage(props) {
 
   const submitHandler = (values, setSubmitting, resetForm) => {
     const sender = session.id
-    if (sender == receiver) {
+    if (sender == receiver._id) {
       setSeverity('error')
       setMessage('Нельзя отправлять сообщения самому себе')
       setNotificationOpen(true)
       setSubmitting(false)
       return
     }
+
+    //dialogInitiatorId and dialogReceiverId are needed
+    //to separetely delete dialogs by sender and receiver of messages
+    //so that the other user can still see dialogs messages
     createMessageMutation({
       variables: {
-        message: { text: values.message, ad: id, sender: session.id, receiver },
+        message: {
+          text: values.message,
+          ad: id,
+          senderId: session.id,
+          senderName: session.user.name,
+          receiverId: receiver._id,
+          receiverName: receiver.name,
+          dialogId: session.id.concat(id), //concatenate sender id and ad id
+          dialogInitiatorId: session.id,
+          dialogReceiverId: receiver._id,
+        },
       },
-      fetchPolicy: 'no-cache',
     })
       .then((data) => {
         setSeverity('success')

@@ -11,7 +11,6 @@ export default function ShowSingle(props) {
   const { loading, data, error } = useQuery(GET_REMOVAL_APPLICATION, {
     variables: { id },
   })
-
   let content = null
 
   if (loading) return <PageLoadingCircle />
@@ -108,7 +107,12 @@ function ShowData(props) {
       )}
       <Grid item xs>
         <Paper className={classes.paper}>
-          <SendMessage receiver={applicationData.user['_id']} />
+          <SendMessage
+            receiver={{
+              _id: applicationData.user['_id'],
+              name: applicationData.user.name,
+            }}
+          />
         </Paper>
       </Grid>
     </Grid>
