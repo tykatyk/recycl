@@ -78,6 +78,7 @@ export default function SendMessage(props) {
           dialogReceiverId: receiver._id,
         },
       },
+      fetchPolicy: 'no-cache',
     })
       .then((data) => {
         setSeverity('success')
