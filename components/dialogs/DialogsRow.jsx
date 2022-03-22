@@ -25,7 +25,8 @@ export default function DialogsRow(props) {
   const { data: session } = useSession()
 
   const {
-    id,
+    messageId,
+    dialogId,
     viewed,
     username,
     senderId,
@@ -45,7 +46,7 @@ export default function DialogsRow(props) {
           tabIndex={-1}
           disableRipple
           onChange={() => {
-            handleRowToggle(id)
+            handleRowToggle(dialogId)
           }}
         />
       </Grid>

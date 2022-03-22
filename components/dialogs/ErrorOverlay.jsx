@@ -10,14 +10,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function ErrorOverlay() {
+export default function ErrorOverlay(props) {
   const classes = useStyles()
 
+  const { message = 'Ошибка при загрузке данных' } = props
   return (
     <Box className={classes.root}>
       <ErrorIcon color="error" fontSize="large" />
       <Typography align="center" color="error">
-        Ошибка при загрузке данных
+        {message}
       </Typography>
     </Box>
   )
