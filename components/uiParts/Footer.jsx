@@ -35,6 +35,16 @@ export default function Footer() {
           <Link
             color="inherit"
             underline="none"
+            href="/supportus"
+            className={classes.link}
+          >
+            Поддержать проект
+          </Link>
+        </Typography>
+        <Typography variant="body2" color="textSecondary" align="center">
+          <Link
+            color="inherit"
+            underline="none"
             className={classes.link}
             href={`${process.env.NEXT_PUBLIC_URL}`}
           >
