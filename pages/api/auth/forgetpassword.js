@@ -1,46 +1,25 @@
 import { emailSchema } from '../../../lib/validation'
 import dbConnect from '../../../lib/db/connection'
 import { User } from '../../../lib/db/models'
-import mapErrors from '../../../lib/mapErrors'
 import sendEmail from '../../../lib/sendEmail'
 import { checkCaptcha } from '../../../lib/checkCaptcha'
+import {
+  errorResponse,
+  captchaNotPassedResponse,
+} from '../../../lib/helpers/responses'
 
 export default async function forgetPasswordHandler(req, res) {
   //check if request data is correct before processing further
   const { email, recaptcha } = req.body
 
   const captchaPassed = await checkCaptcha(recaptcha)
-
-  if (!captchaPassed) {
-    res.status(401).json({
-      error: {
-        type: 'perForm',
-        message: 'Пожалуйста, подтвердите что вы не робот',
-      },
-    })
-    return
-  }
+  if (!captchaPassed) return captchaNotPassedResponse(res)
 
   try {
     await emailSchema.validate({ email }, { abortEarly: false })
   } catch (error) {
     console.log(error)
-    let mappedErrors = mapErrors(error)
-    if (mappedErrors) {
-      return res.status(422).json({
-        error: {
-          type: 'perField',
-          message: mappedErrors,
-        },
-      })
-    } else {
-      return res.status(500).json({
-        error: {
-          type: 'perForm',
-          message: 'Возникла ошибка при проверке данных формы',
-        },
-      })
-    }
+    return errorResponse(error, res)
   }
 
   //check if a user exists

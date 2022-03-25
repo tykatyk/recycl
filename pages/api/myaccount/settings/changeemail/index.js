@@ -3,10 +3,10 @@ import mail from '@sendgrid/mail'
 mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../../../lib/db/connection'
 import { User } from '../../../../../lib/db/models'
-import mapErrors from '../../../../../lib/mapErrors'
 import sendEmail from '../../../../../lib/sendEmail'
 import { getSession } from 'next-auth/react'
 import { compare } from 'bcrypt'
+import { errorResponse } from '../../../lib/helpers/responses'
 
 const userNotFound = function (res) {
   return res.status(401).json({
@@ -27,22 +27,8 @@ export default async function changeEmailHandler(req, res) {
   try {
     await changeEmailSchema.validate(req.body, { abortEarly: false })
   } catch (error) {
-    const mappedErrors = mapErrors(error)
-    if (mappedErrors) {
-      return res.status(422).json({
-        error: {
-          type: 'perField',
-          message: mappedErrors,
-        },
-      })
-    } else {
-      return res.status(500).json({
-        error: {
-          type: 'perForm',
-          message: 'Возникла ошибка при проверке данных формы',
-        },
-      })
-    }
+    console.log(error)
+    return errorResponse(error, res)
   }
 
   //check if a user exists
