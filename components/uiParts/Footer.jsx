@@ -45,6 +45,16 @@ export default function Footer() {
           <Link
             color="inherit"
             underline="none"
+            href="/contactus"
+            className={classes.link}
+          >
+            Связаться с нами
+          </Link>
+        </Typography>
+        <Typography variant="body2" color="textSecondary" align="center">
+          <Link
+            color="inherit"
+            underline="none"
             className={classes.link}
             href={`${process.env.NEXT_PUBLIC_URL}`}
           >
