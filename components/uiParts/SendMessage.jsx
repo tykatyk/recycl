@@ -143,7 +143,7 @@ export default function SendMessage(props) {
                 <Field
                   component={TextFieldFormik}
                   multiline
-                  rows={4}
+                  rows={5}
                   variant="outlined"
                   fullWidth
                   name="message"
