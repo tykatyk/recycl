@@ -5,7 +5,7 @@ export default function DialogsFooter(props) {
   const {
     numRows = 0,
     page = 0,
-    pageSize = 25,
+    pageSize = process.env.NEXT_PUBLIC_DEFAULT_PAGINATION_SIZE,
     handlePageChange = () => {},
     handlePageSizeChange = () => {},
     handleNextPageButtonClick = () => {},
@@ -21,7 +21,6 @@ export default function DialogsFooter(props) {
       onRowsPerPageChange={handlePageSizeChange}
       nextIconButtonProps={{ onClick: handleNextPageButtonClick }}
       backIconButtonProps={{ onClick: handlePreviousPageButtonClick }}
-      rowsPerPageOptions={[1, 2, 3]}
     />
   )
 }
