@@ -18,6 +18,7 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import { signIn } from 'next-auth/react'
 import { loginSchema } from '../../lib/validation'
 import AuthLayout from '../layouts/AuthLayout.jsx'
+import showErrorMessages from '../../lib/helpers/showErrorMessages'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -70,19 +71,11 @@ export default function SignIn() {
                   redirect: false,
                 })
                   .then((response) => {
-                    if (response.error) {
-                      let error = JSON.parse(response.error)
-                      if (error.type === 'perField') {
-                        setErrors(error.message)
-                        return
-                      }
-                      if (error.type === 'perForm') {
-                        setBackendError(error.message)
-                        return
-                      }
-                      setBackendError(
-                        'Неизвестная ошибка при обработке ответа сервера'
-                      )
+                    return response.json()
+                  })
+                  .then((data) => {
+                    if (data.error) {
+                      showErrorMessages(data.error, setErrors, setBackendError)
                       return
                     }
 

@@ -18,6 +18,7 @@ import Link from '../uiParts/Link.jsx'
 import { GET_ROLE_ID } from '../../lib/graphql/queries/userRole'
 import { useQuery } from '@apollo/client'
 import { registerSchema } from '../../lib/validation'
+import showErrorMessages from '../../lib/helpers/showErrorMessages'
 import AuthLayout from '../layouts/AuthLayout.jsx'
 import ReCAPTCHA from 'react-google-recaptcha'
 
@@ -112,18 +113,7 @@ export default function SignUp() {
                 })
                 .then((data) => {
                   if (data.error) {
-                    if (data.error.type === 'perField') {
-                      setErrors(data.error.message)
-                      return
-                    }
-                    if (data.error.type === 'perForm') {
-                      setBackendError(data.error.message)
-                      return
-                    }
-
-                    setBackendError(
-                      'Неизвестная ошибка при обработке ответа сервера'
-                    )
+                    showErrorMessages(data.error, setErrors, setNotification)
                     return
                   }
                   resetForm()

@@ -13,6 +13,7 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import AuthLayout from '../layouts/AuthLayout.jsx'
 import { emailSchema } from '../../lib/validation'
 import ReCAPTCHA from 'react-google-recaptcha'
+import showErrorMessages from '../../lib/helpers/showErrorMessages'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -105,18 +106,7 @@ export default function ForgetPasswordPage() {
                 })
                 .then((data) => {
                   if (data.error) {
-                    const error = data.error
-                    if (error.type === 'perField') {
-                      setErrors(error.message)
-                      return
-                    }
-                    if (error.type === 'perForm') {
-                      setBackendError(error.message)
-                      return
-                    }
-                    setBackendError(
-                      'Неизвестная ошибка при обработке ответа сервера'
-                    )
+                    showErrorMessages(data.error, setErrors, setNotification)
                     return
                   }
                   resetForm()

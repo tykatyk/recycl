@@ -13,6 +13,7 @@ import Snackbar from '../uiParts/Snackbars.jsx'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import { passwordSchema } from '../../lib/validation'
 import AuthLayout from '../layouts/AuthLayout.jsx'
+import showErrorMessages from '../../lib/helpers/showErrorMessages'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -74,10 +75,9 @@ export default function ResetPasswordForm({ token }) {
                   })
                   .then((data) => {
                     if (data.error) {
-                      if (data.error.type === 'perField') {
-                        setErrors(data.error.message)
-                        return
-                      }
+                      showErrorMessages(data.error, setErrors, setNotification)
+                      return
+                    }
                     setSeverity('success')
                     setNotification('Пароль успешно изменен')
                   })
