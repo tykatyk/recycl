@@ -45,8 +45,7 @@ export default function ChangePasswordForm() {
   const { data: session } = useSession()
   const [id, setId] = useState('')
   const [severity, setSeverity] = useState('error')
-  const [successMessage, setSuccessMessage] = useState(null)
-  const [backendError, setBackendError] = useState(null)
+  const [notification, setNotification] = useState('')
   const [updatePassword, { data: updateData }] = useMutation(UPDATE_PASSWORD)
 
   useEffect(() => {
@@ -79,7 +78,7 @@ export default function ChangePasswordForm() {
               setErrors(error.graphQLErrors[0].extensions.detailedMessages)
             } else {
               setSeverity('error')
-              setBackendError('Возникла ошибка при сохранении данных')
+              setNotification('Возникла ошибка при сохранении данных')
             }
           } finally {
             setSubmitting(false)
@@ -90,7 +89,7 @@ export default function ChangePasswordForm() {
           useEffect(() => {
             if (updateData && updateData.updatePassword) {
               setSeverity('success')
-              setSuccessMessage('Данные успешно обновлены')
+              setNotification('Данные успешно обновлены')
               resetForm()
             }
           }, [updateData])
@@ -140,11 +139,10 @@ export default function ChangePasswordForm() {
 
       <Snackbar
         severity={severity}
-        open={!!backendError || !!successMessage}
-        message={backendError || successMessage}
+        open={!!notification}
+        message={notification}
         handleClose={() => {
-          setBackendError(null)
-          setSuccessMessage(null)
+          setNotification('')
         }}
       />
     </Box>

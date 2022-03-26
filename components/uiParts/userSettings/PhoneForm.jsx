@@ -47,17 +47,16 @@ export default function PhoneForm() {
   const { data: session } = useSession()
   const [id, setId] = useState('')
   const [severity, setSeverity] = useState('error')
-  const [successMessage, setSuccessMessage] = useState(null)
-  const [backendError, setBackendError] = useState(null)
+  const [notification, setNotification] = useState('')
   const [updatePhone, { data: updateData }] = useMutation(UPDATE_PHONE)
   const { data, error, loading } = useQuery(GET_PHONE, {
-    variables: { id },
+    variables: { id }, //ToDo should be refactored since user is available in appolo context
   })
 
   useEffect(() => {
     if (updateData && updateData.updatePhone) {
       setSeverity('success')
-      setSuccessMessage('Данные успешно обновлены')
+      setNotification('Данные успешно обновлены')
     }
   }, [updateData])
 
@@ -103,7 +102,7 @@ export default function PhoneForm() {
               setErrors(error.graphQLErrors[0].extensions.detailedMessages)
             } else {
               setSeverity('error')
-              setBackendError('Возникла ошибка при сохранении данных')
+              setNotification('Возникла ошибка при сохранении данных')
             }
           } finally {
             setSubmitting(false)
@@ -147,11 +146,10 @@ export default function PhoneForm() {
 
       <Snackbar
         severity={severity}
-        open={!!backendError || !!successMessage}
-        message={backendError || successMessage}
+        open={!!notification}
+        message={notification}
         handleClose={() => {
-          setBackendError(null)
-          setSuccessMessage(null)
+          setNotification('')
         }}
       />
     </Box>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Typography,
   Button,
@@ -36,8 +36,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ForgetPasswordPage() {
   const classes = useStyles()
   const theme = useTheme()
-  const [backendError, setBackendError] = useState(null)
-  const [successMessage, setSuccessMessage] = useState(null)
+  const [notification, setNotification] = useState('')
   const [severity, setSeverity] = useState('error')
   const [recaptcha, setRecaptcha] = useState(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
@@ -50,16 +49,6 @@ export default function ForgetPasswordPage() {
   const handleExpire = () => {
     setRecaptcha(null)
   }
-
-  useEffect(() => {
-    if (backendError) {
-      setSeverity('error')
-      setBackendError(backendError)
-    } else if (successMessage) {
-      setSeverity('success')
-      setSuccessMessage(successMessage)
-    }
-  }, [backendError, successMessage])
 
   return (
     <>
@@ -132,10 +121,10 @@ export default function ForgetPasswordPage() {
                   }
                   resetForm()
                   setSeverity('success')
-                  setSuccessMessage(data.message)
+                  setNotification(data.message)
                 })
                 .catch((error) => {
-                  setBackendError('Неизвестная ошибка')
+                  setNotification('Неизвестная ошибка')
                 })
                 .finally(() => {
                   if (recaptchaRef && recaptchaRef.current) {
@@ -194,11 +183,10 @@ export default function ForgetPasswordPage() {
 
       <Snackbar
         severity={severity}
-        open={!!backendError || !!successMessage}
-        message={backendError || successMessage}
+        open={!!notification}
+        message={notification}
         handleClose={() => {
-          setBackendError(null)
-          setSuccessMessage(null)
+          setNotification('')
         }}
       />
     </>

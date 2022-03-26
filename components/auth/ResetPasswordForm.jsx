@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Button,
@@ -36,18 +36,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ResetPasswordForm({ token }) {
   const classes = useStyles()
-  const [backendError, setBackendError] = useState(null)
-  const [successMessage, setSuccessMessage] = useState(null)
+  const [notification, setNotification] = useState('')
   const [severity, setSeverity] = useState('error')
-  useEffect(() => {
-    if (backendError) {
-      setSeverity('error')
-      setBackendError(backendError)
-    } else if (successMessage) {
-      setSeverity('success')
-      setSuccessMessage(successMessage)
-    }
-  }, [backendError, successMessage])
 
   return (
     <>
@@ -68,9 +58,7 @@ export default function ResetPasswordForm({ token }) {
               validationSchema={passwordSchema}
               onSubmit={(values, { setSubmitting, setErrors }) => {
                 setSubmitting(true)
-                console.log(
-                  JSON.stringify({ password: values.password, token })
-                )
+
                 fetch('/api/auth/restorepassword/', {
                   method: 'POST',
                   body: JSON.stringify({
@@ -90,22 +78,11 @@ export default function ResetPasswordForm({ token }) {
                         setErrors(data.error.message)
                         return
                       }
-                      if (data.error.type === 'perForm') {
-                        setBackendError(data.error.message)
-                        return
-                      }
-
-                      setBackendError(
-                        'Неизвестная ошибка при обработке ответа сервера'
-                      )
-                      return
-                    } else {
-                      setSeverity('success')
-                      setSuccessMessage('Пароль успешно изменен')
-                    }
+                    setSeverity('success')
+                    setNotification('Пароль успешно изменен')
                   })
                   .catch((error) => {
-                    setBackendError('Неизвестная ошибка')
+                    setNotification('Неизвестная ошибка')
                   })
                   .finally(() => {
                     setSubmitting(false)
@@ -156,11 +133,10 @@ export default function ResetPasswordForm({ token }) {
         </Container>
         <Snackbar
           severity={severity}
-          open={!!backendError || !!successMessage}
-          message={backendError || successMessage}
+          open={!!notification}
+          message={notification}
           handleClose={() => {
-            setBackendError(null)
-            setSuccessMessage(null)
+            setNotification('')
           }}
         />
       </AuthLayout>

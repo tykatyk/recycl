@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Avatar,
   Button,
@@ -43,8 +43,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUp() {
   const classes = useStyles()
   const theme = useTheme()
-  const [backendError, setBackendError] = useState(null)
-  const [successMessage, setSuccessMessage] = useState(null)
+  const [notification, setNotification] = useState('')
   const [severity, setSeverity] = useState('error')
   const { loading, data, error } = useQuery(GET_ROLE_ID, {
     variables: { roleName: 'user' },
@@ -60,16 +59,6 @@ export default function SignUp() {
   const handleExpire = () => {
     setRecaptcha(null)
   }
-
-  useEffect(() => {
-    if (backendError) {
-      setSeverity('error')
-      setBackendError(backendError)
-    } else if (successMessage) {
-      setSeverity('success')
-      setSuccessMessage(successMessage)
-    }
-  }, [backendError, successMessage])
 
   if (loading) return <PageLoadingCircle />
 
@@ -139,10 +128,10 @@ export default function SignUp() {
                   }
                   resetForm()
                   setSeverity('success')
-                  setSuccessMessage(data.message)
+                  setNotification(data.message)
                 })
                 .catch((error) => {
-                  setBackendError('Неизвестная ошибка')
+                  setNotification('Неизвестная ошибка')
                 })
                 .finally(() => {
                   if (recaptchaRef && recaptchaRef.current) {
@@ -245,11 +234,10 @@ export default function SignUp() {
       </AuthLayout>
       <Snackbar
         severity={severity}
-        open={!!backendError || !!successMessage}
-        message={backendError || successMessage}
+        open={!!notification}
+        message={notification}
         handleClose={() => {
-          setBackendError(null)
-          setSuccessMessage(null)
+          setNotification('')
         }}
       />
     </>

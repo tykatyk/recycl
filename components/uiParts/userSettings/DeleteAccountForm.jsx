@@ -44,8 +44,7 @@ export default function DeleteAccountForm() {
   const classes = useStyles()
   const { data: session } = useSession()
   const [severity, setSeverity] = useState('error')
-  const [successMessage, setSuccessMessage] = useState(null)
-  const [backendError, setBackendError] = useState(null)
+  const [notification, setNotification] = useState('')
   const [deleteUser] = useMutation(DELETE_USER)
   const message = `Удаление аккаунта приведет к удалению всех ваших данных.
   Это действие нельзя отменить. Вы действительно хотите продолжить?`
@@ -72,7 +71,7 @@ export default function DeleteAccountForm() {
               setErrors(error.graphQLErrors[0].extensions.detailedMessages)
             } else {
               setSeverity('error')
-              setBackendError('Возникла ошибка при удалении пользователя')
+              setNotification('Возникла ошибка при удалении пользователя')
             }
           } finally {
             setSubmitting(false)
@@ -118,11 +117,10 @@ export default function DeleteAccountForm() {
 
       <Snackbar
         severity={severity}
-        open={!!backendError || !!successMessage}
-        message={backendError || successMessage}
+        open={!!notification}
+        message={notification}
         handleClose={() => {
-          setBackendError(null)
-          setSuccessMessage(null)
+          setNotification('')
         }}
       />
     </Box>

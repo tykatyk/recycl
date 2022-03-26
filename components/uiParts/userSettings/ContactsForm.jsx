@@ -59,8 +59,7 @@ export default function ContactsForm() {
   const { data: session } = useSession()
   const [id, setId] = useState('')
   const [severity, setSeverity] = useState('error')
-  const [backendError, setBackendError] = useState(null)
-  const [successMessage, setSuccessMessage] = useState(null)
+  const [notification, setNotification] = useState('')
 
   const [updateContacts, { data: updateData }] =
     useMutation(UPDATE_USER_CONTACTS)
@@ -71,7 +70,7 @@ export default function ContactsForm() {
   useEffect(() => {
     if (updateData && updateData.updateUserContacts) {
       setSeverity('success')
-      setSuccessMessage('Данные успешно обновлены')
+      setNotification('Данные успешно обновлены')
     }
   }, [updateData])
 
@@ -126,7 +125,7 @@ export default function ContactsForm() {
               setErrors(error.graphQLErrors[0].extensions.detailedMessages)
             } else {
               setSeverity('error')
-              setBackendError('Возникла ошибка при сохранении данных')
+              setNotification('Возникла ошибка при сохранении данных')
             }
           } finally {
             setSubmitting(false)
@@ -189,11 +188,10 @@ export default function ContactsForm() {
 
       <Snackbar
         severity={severity}
-        open={!!backendError || !!successMessage}
-        message={backendError || successMessage}
+        open={!!notification}
+        message={notification}
         handleClose={() => {
-          setBackendError(null)
-          setSuccessMessage(null)
+          setNotification('')
         }}
       />
     </Box>

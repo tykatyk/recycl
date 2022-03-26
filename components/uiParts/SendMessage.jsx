@@ -47,7 +47,7 @@ export default function SendMessage(props) {
   const limit = 1000
   const { receiver } = props
   const [createMessageMutation, { loading }] = useMutation(CREATE_MESSAGE)
-  const [notificationOpen, setNotificationOpen] = useState(false)
+  const [notification, setNotification] = useState('')
   const [severity, setSeverity] = useState('')
   const [message, setMessage] = useState('')
 
@@ -55,8 +55,7 @@ export default function SendMessage(props) {
     const sender = session.id
     if (sender == receiver._id) {
       setSeverity('error')
-      setMessage('Нельзя отправлять сообщения самому себе')
-      setNotificationOpen(true)
+      setNotification('Нельзя отправлять сообщения самому себе')
       setSubmitting(false)
       return
     }
@@ -82,14 +81,12 @@ export default function SendMessage(props) {
     })
       .then((data) => {
         setSeverity('success')
-        setMessage('Сообщение отправлено')
-        setNotificationOpen(true)
+        setNotification('Сообщение отправлено')
         resetForm({ values: '' })
       })
       .catch((error) => {
         setSeverity('error')
-        setMessage('Ошибка при отправке сообщения')
-        setNotificationOpen(true)
+        setNotification('Ошибка при отправке сообщения')
       })
       .finally(() => {
         setSubmitting(false)
@@ -110,11 +107,11 @@ export default function SendMessage(props) {
   return (
     <Box>
       <Snackbars
-        open={notificationOpen}
+        open={!!notification}
         handleClose={() => {
-          setNotificationOpen(false)
+          setNotification('')
         }}
-        message={message}
+        message={notification}
         severity={severity}
       />
       <Typography variant="h6" gutterBottom>

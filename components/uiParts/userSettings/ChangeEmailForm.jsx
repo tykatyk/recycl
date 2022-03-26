@@ -40,8 +40,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ChangeEmailForm() {
   const classes = useStyles()
   const [severity, setSeverity] = useState('error')
-  const [successMessage, setSuccessMessage] = useState(null)
-  const [backendError, setBackendError] = useState(null)
+  const [notification, setNotification] = useState('')
 
   return (
     <Box className={classes.box}>
@@ -73,22 +72,21 @@ export default function ChangeEmailForm() {
                 }
                 setSeverity('error')
                 if (error.type === 'perForm') {
-                  setBackendError(error.message)
+                  setNotification(error.message)
                   return
                 }
-                setBackendError(
+                setNotification(
                   'Неизвестная ошибка при обработке ответа сервера'
                 )
                 return
               } else {
                 setSeverity('success')
-                setSuccessMessage(data.message)
+                setNotification(data.message)
               }
             })
             .catch((error) => {
-              console.log(error)
               setSeverity('error')
-              setBackendError('Неизвестная ошибка')
+              setNotification('Неизвестная ошибка')
             })
           setSubmitting(false)
         }}
@@ -137,11 +135,10 @@ export default function ChangeEmailForm() {
 
       <Snackbar
         severity={severity}
-        open={!!backendError || !!successMessage}
-        message={backendError || successMessage}
+        open={!!notification}
+        message={notification}
         handleClose={() => {
-          setBackendError(null)
-          setSuccessMessage(null)
+          setNotification('')
         }}
       />
     </Box>
