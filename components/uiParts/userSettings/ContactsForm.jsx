@@ -64,7 +64,7 @@ export default function ContactsForm() {
   const [updateContacts, { data: updateData }] =
     useMutation(UPDATE_USER_CONTACTS)
   const { data, error, loading } = useQuery(GET_USER_CONTACTS, {
-    variables: { id },
+    variables: { id }, //ToDo: should be refactored since user is available in appolo context
   })
 
   useEffect(() => {
