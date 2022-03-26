@@ -43,14 +43,9 @@ const useStyles = makeStyles((theme) => ({
 export default function ChangePasswordForm() {
   const classes = useStyles()
   const { data: session } = useSession()
-  const [id, setId] = useState('')
   const [severity, setSeverity] = useState('error')
   const [notification, setNotification] = useState('')
   const [updatePassword, { data: updateData }] = useMutation(UPDATE_PASSWORD)
-
-  useEffect(() => {
-    if (session) setId(session.id)
-  }, [session])
 
   return (
     <Box className={classes.box}>
