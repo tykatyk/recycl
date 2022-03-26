@@ -14,6 +14,7 @@ import Snackbars from './Snackbars.jsx'
 import { Formik, Form, Field } from 'formik'
 import { useMutation } from '@apollo/client'
 import { CREATE_MESSAGE } from '../../lib/graphql/queries/message'
+import whitespaceRegex from '../../lib/validation/regularExpressions'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -169,8 +170,8 @@ export default function SendMessage(props) {
                   color="secondary"
                   type="submit"
                   disabled={
-                    values.message.replace(/^\s+/, '').replace(/\s+$/, '') ===
-                      '' || loading
+                    values.message.replace(whitespaceRegex, '') === '' ||
+                    loading
                   }
                 >
                   Отправить
