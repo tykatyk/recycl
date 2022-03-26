@@ -226,9 +226,7 @@ export default function SignUp() {
         severity={severity}
         open={!!notification}
         message={notification}
-        handleClose={() => {
-          setNotification('')
-        }}
+        handleClose={() => setNotification('')}
       />
     </>
   )

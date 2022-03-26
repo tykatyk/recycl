@@ -108,9 +108,7 @@ export default function SendMessage(props) {
     <Box>
       <Snackbars
         open={!!notification}
-        handleClose={() => {
-          setNotification('')
-        }}
+        handleClose={() => setNotification('')}
         message={notification}
         severity={severity}
       />

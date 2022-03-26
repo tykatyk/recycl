@@ -175,9 +175,7 @@ export default function ForgetPasswordPage() {
         severity={severity}
         open={!!notification}
         message={notification}
-        handleClose={() => {
-          setNotification('')
-        }}
+        handleClose={() => setNotification('')}
       />
     </>
   )
