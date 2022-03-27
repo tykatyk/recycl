@@ -15,8 +15,10 @@ const context = ({ req }) => {
     }
     try {
       const user = await User.findById(session.id, { password: 0 })
+
       return { user }
     } catch (error) {
+      console.log(error)
       return { user: null }
     }
   })()
@@ -40,7 +42,7 @@ async function handler(req, res) {
     res.end()
     return false
   }
-  // await dbConnect()
+
   await startServer
   await apolloServer.createHandler({
     path: '/api/g',
