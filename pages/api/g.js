@@ -7,13 +7,13 @@ import { User } from '../../lib/db/models'
 
 const context = ({ req }) => {
   return (async () => {
-    const session = await getSession({ req })
     try {
       await dbConnect()
     } catch (error) {
       throw new Error("Can't connect to the database")
     }
     try {
+      const session = await getSession({ req })
       const user = await User.findById(session.id, { password: 0 })
 
       return { user }
