@@ -5,7 +5,7 @@ export default function DialogsFooter(props) {
   const {
     numRows = 0,
     page = 0,
-    pageSize = process.env.NEXT_PUBLIC_DEFAULT_PAGINATION_SIZE,
+    pageSize = parseInt(process.env.NEXT_PUBLIC_DEFAULT_PAGINATION_SIZE, 10),
     handlePageChange = () => {},
     handlePageSizeChange = () => {},
     handleNextPageButtonClick = () => {},

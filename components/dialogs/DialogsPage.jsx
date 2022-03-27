@@ -27,7 +27,7 @@ export default function DialogsPage() {
   const [deleteMutation] = useMutation(DELETE_DIALOGS)
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(
-    process.env.NEXT_PUBLIC_DEFAULT_PAGINATION_SIZE
+    parseInt(process.env.NEXT_PUBLIC_DEFAULT_PAGINATION_SIZE, 10)
   )
   const [numRows, setNumRows] = useState(0)
   const { loading, error, data, fetchMore } = useQuery(GET_DIALOGS, {
