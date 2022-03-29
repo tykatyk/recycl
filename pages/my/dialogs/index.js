@@ -16,6 +16,10 @@ export async function getServerSideProps(context) {
       mutation: DELETE_STALE_DIALOGS,
       context: {
         headers: {
+          //manually pass cookies to request
+          //since mutate function doesn't include them automatically.
+          //With cookies grapql server can access session and get user instance from it
+          //otherwise session is null and user is undefined
           cookie: context.req.headers.cookie,
         },
       },
