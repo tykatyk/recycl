@@ -153,10 +153,13 @@ export default function DialogsPage() {
       const remainDialogs = []
       dialogs.forEach((elem) => {
         if (
+          //if dialog is not deleted
           checkedRows.map((row) => row.dialogId).indexOf(elem.dialogId) == -1
         ) {
+          //add it to remain dialogs
           remainDialogs.push(elem)
         } else if (!elem.viewed) {
+          //if dialog is deleted and not viewed
           unreadDialogsToDeleteCount++
         }
       })
