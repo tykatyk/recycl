@@ -28,8 +28,8 @@ export async function getServerSideProps(context) {
       res.props.deletedCount = data.deleteStaleDialogs.deletedCount
     })
     .catch((error) => {
-      // console.log('error in indexjs')
-      // console.log(JSON.stringify(error, null, 2))
+      console.log(error)
+      res.props.staleDialogsDeletionError = true
     })
   return res
 }
