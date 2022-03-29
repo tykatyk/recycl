@@ -40,7 +40,7 @@ export default function DialogsRow(props) {
 
   return (
     <Grid className={classes.root} container item xs={12} alignItems="center">
-      <Grid item xs={1}>
+      <Grid item xs={2} sm={1}>
         <Checkbox
           checked={checked}
           tabIndex={-1}
@@ -50,7 +50,7 @@ export default function DialogsRow(props) {
           }}
         />
       </Grid>
-      <Grid item xs={3} zeroMinWidth>
+      <Grid item xs={2} zeroMinWidth>
         <Typography variant="body2" color={textColor} noWrap>
           {username}
         </Typography>

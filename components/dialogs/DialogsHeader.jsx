@@ -21,20 +21,20 @@ export default function DialogsHeader(props) {
 
   if (checked) {
     headerContent = (
-      <Grid item xs={11}>
+      <Grid item xs={10} sm={11}>
         <Button onClick={handleDelete}>Удалить отмеченные</Button>
       </Grid>
     )
   } else {
     headerContent = (
       <>
-        <Grid item xs={3}>
-          <Typography variant="body2" color="textSecondary">
+        <Grid item xs={2}>
+          <Typography variant="body2" color="textSecondary" noWrap>
             Пользователь
           </Typography>
         </Grid>
         <Grid item xs={8}>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2" color="textSecondary" noWrap>
             Сообщение
           </Typography>
         </Grid>
@@ -44,7 +44,7 @@ export default function DialogsHeader(props) {
 
   return (
     <Grid className={classes.header} alignItems="center" container item xs={12}>
-      <Grid item xs={1}>
+      <Grid item xs={2} sm={1}>
         <Checkbox checked={checked} onChange={handleToggle} />
       </Grid>
       {headerContent}
