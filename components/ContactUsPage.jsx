@@ -63,7 +63,7 @@ export default function SupportUsPage() {
       <Container className={classes.container}>
         {!!notification && (
           <Snackbars
-            open="open"
+            open={!!notification}
             handleClose={() => {
               setNotification('')
             }}
