@@ -24,9 +24,8 @@ export async function getServerSideProps(context) {
         },
       },
     })
-    .then((result) => {
-      // console.log('result is')
-      // console.log(result)
+    .then((data) => {
+      res.props.deletedCount = data.deleteStaleDialogs.deletedCount
     })
     .catch((error) => {
       // console.log('error in indexjs')
