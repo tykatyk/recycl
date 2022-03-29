@@ -2,7 +2,6 @@ import React from 'react'
 import Dialogs from '../../../components/dialogs/DialogsPage.jsx'
 import { DELETE_STALE_DIALOGS } from '../../../lib/graphql/queries/message'
 import appoloClient from '../../../lib/appoloClient/appoloClient'
-import { getSession } from 'next-auth/react'
 
 export default function Index() {
   return <Dialogs />
