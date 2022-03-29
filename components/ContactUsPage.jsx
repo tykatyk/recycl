@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Container,
-  CircularProgress,
   useTheme,
 } from '@material-ui/core'
 import Layout from './layouts/Layout.jsx'
@@ -14,6 +13,7 @@ import whitespaceRegex from '../lib/validation/regularExpressions'
 import submitWithCapthca from '../lib/helpers/submitWithCaptcha'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
 import Snackbars from './uiParts/Snackbars.jsx'
+import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import { Formik, Form, Field } from 'formik'
 import ReCAPTCHA from 'react-google-recaptcha'
 
@@ -176,15 +176,7 @@ export default function SupportUsPage() {
                     }
                   >
                     Отправить
-                    {isSubmitting && (
-                      <CircularProgress
-                        size={24}
-                        color="secondary"
-                        style={{
-                          marginLeft: '1em',
-                        }}
-                      />
-                    )}
+                    {isSubmitting && <ButtonSubmittingCircle />}
                   </Button>
                 </Box>
               </Form>

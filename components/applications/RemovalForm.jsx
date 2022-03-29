@@ -13,6 +13,7 @@ import TextFieldDependantFormik from '../uiParts/formInputs/TextFieldDependantFo
 import RemovalPopover from './RemovalPopover.jsx'
 import SelectFormik from '../uiParts/formInputs/SelectFormik.jsx'
 import Snackbar from '../uiParts/Snackbars.jsx'
+import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import { CheckboxWithLabel } from 'formik-material-ui'
 import { Formik, Form, Field } from 'formik'
 import removalFormStyles from './removalFormStyles'
@@ -377,15 +378,7 @@ export default function RemovalForm(props) {
                   disabled={shouldDisable}
                 >
                   Сохранить
-                  {isSubmitting && (
-                    <CircularProgress
-                      size={24}
-                      style={{
-                        color: theme.palette.secondary.main,
-                        marginLeft: '1em',
-                      }}
-                    />
-                  )}
+                  {isSubmitting && <ButtonSubmittingCircle />}
                 </Button>
               </Grid>
             </Form>

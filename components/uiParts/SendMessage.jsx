@@ -1,16 +1,11 @@
 import { React, useState } from 'react'
-import {
-  Box,
-  Typography,
-  Button,
-  CircularProgress,
-  makeStyles,
-} from '@material-ui/core'
+import { Box, Typography, Button, makeStyles } from '@material-ui/core'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import * as yup from 'yup'
 import TextFieldFormik from './formInputs/TextFieldFormik.jsx'
 import Snackbars from './Snackbars.jsx'
+import ButtonSubmittingCircle from './ButtonSubmittingCircle.jsx'
 import { Formik, Form, Field } from 'formik'
 import { useMutation } from '@apollo/client'
 import { CREATE_MESSAGE } from '../../lib/graphql/queries/message'
@@ -172,15 +167,7 @@ export default function SendMessage(props) {
                   }
                 >
                   Отправить
-                  {isSubmitting && (
-                    <CircularProgress
-                      size={24}
-                      color="secondary"
-                      style={{
-                        marginLeft: '1em',
-                      }}
-                    />
-                  )}
+                  {isSubmitting && <ButtonSubmittingCircle />}
                 </Button>
               </Box>
             </Form>
