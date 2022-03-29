@@ -6,6 +6,7 @@ import DialogsList from './DialogsList.jsx'
 import NoDataOverlay from './NoDataOverlay.jsx'
 import ErrorOverlay from './ErrorOverlay.jsx'
 import Layout from '../layouts/Layout.jsx'
+import Snackbars from '../uiParts/Snackbars.jsx'
 import PageLoadingCirlce from '../uiParts/PageLoadingCircle.jsx'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser.jsx'
 import { useApolloClient, useQuery, useMutation } from '@apollo/client'
@@ -24,6 +25,8 @@ export default function DialogsPage() {
   const [numUnreadToDelete, setNumUnreadToDelete] = useState(0)
   const [headerChecked, setHeaderChecked] = useState(false)
   const [currentData, setCurrentData] = useState(null)
+  const [notification, setNotification] = useState('')
+  const [severity, setSeverity] = useState('')
   const [deleteMutation] = useMutation(DELETE_DIALOGS)
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(
@@ -172,7 +175,8 @@ export default function DialogsPage() {
 
       setCheckedRows([])
     } catch (error) {
-      console.log('Error while deleting items')
+      setSeverity('error')
+      setNotification('Ошибка при удалении данных')
     }
   }
 
@@ -202,7 +206,18 @@ export default function DialogsPage() {
   const Data = (props) => {
     const { messages } = props
     return (
-      <Grid className={classes.root} container direction="column">
+      <>
+        {!!notification && (
+          <Snackbars
+            open={!!notification}
+            handleClose={() => {
+              setNotification('')
+              setSeverity('')
+            }}
+            message={notification}
+            severity={severity}
+          />
+        )}
         <DialogsHeader
           checked={headerChecked}
           showDelete={headerChecked}
@@ -223,7 +238,7 @@ export default function DialogsPage() {
           handleNextPageButtonClick={handleNextPageButtonClick}
           handlePreviousPageButtonClick={handlePreviousPageButtonClick}
         />
-      </Grid>
+      </>
     )
   }
 
