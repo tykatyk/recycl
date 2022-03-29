@@ -144,9 +144,19 @@ export default function DialogsPage() {
     if (checkedRows.length < 1) return
     try {
       const ids = checkedRows.map((el) => el.dialogId)
-      await deleteMutation({
+      const result = await deleteMutation({
         variables: { ids },
       })
+
+      if (
+        !result ||
+        !result.some ||
+        !result.data.deleteDialogs ||
+        !result.data.deleteDialogs.deletedCount
+      ) {
+        setCheckedRows([])
+        throw new Error('Unexpected deletion result')
+      }
 
       const dialogs = data.getDialogs.dialogs
       let unreadDialogsToDeleteCount = 0
