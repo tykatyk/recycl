@@ -125,7 +125,7 @@ export default function removalApplications(props) {
         newItem.wasteLocation = item.document.wasteLocation.description
         newItem.quantity = item.document.quantity
         newItem.messageCount = item.messageCount
-        const expires = new Date()
+        const expires = new Date(item.document.expires)
         newItem.expires = expires.toLocaleString('ru-RU', {
           day: '2-digit',
           month: 'short',
