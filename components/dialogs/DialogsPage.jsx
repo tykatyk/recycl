@@ -150,7 +150,7 @@ export default function DialogsPage() {
 
       if (
         !result ||
-        !result.some ||
+        !result.data ||
         !result.data.deleteDialogs ||
         !result.data.deleteDialogs.deletedCount
       ) {
