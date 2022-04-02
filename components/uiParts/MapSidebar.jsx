@@ -71,7 +71,7 @@ export default function MapSidebar(props) {
           <ListItem
             button
             component="a"
-            href="removal/application/create"
+            href="/applications/create"
             key="Подать заявку"
             className={classes.secondaryColor}
           >

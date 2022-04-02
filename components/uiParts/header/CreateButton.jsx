@@ -21,7 +21,7 @@ export default function CreateButton(props) {
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.down('sm'))
   const classes = useStyles()
-  const href = '/removal/application/create'
+  const href = '/applications/create'
 
   if (matches) {
     return (

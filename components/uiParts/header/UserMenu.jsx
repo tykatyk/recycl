@@ -33,11 +33,11 @@ export default function UserMenu(props) {
   const menuItems = [
     {
       text: 'Мои заявки',
-      href: '/removal/application',
+      href: '/my/applications',
     },
     {
       text: 'Настройки',
-      href: '/myaccount/settings',
+      href: '/my/account',
     },
   ]
 
