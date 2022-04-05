@@ -7,7 +7,7 @@ import NoDataOverlay from './NoDataOverlay.jsx'
 import ErrorOverlay from './ErrorOverlay.jsx'
 import Layout from '../layouts/Layout.jsx'
 import Snackbars from '../uiParts/Snackbars.jsx'
-import PageLoadingCirlce from '../uiParts/PageLoadingCircle.jsx'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser.jsx'
 import { useApolloClient, useQuery, useMutation } from '@apollo/client'
 import { GET_DIALOGS } from '../../lib/graphql/queries/message'
@@ -257,7 +257,7 @@ export default function DialogsPage() {
 
   let content = null
 
-  if (loading) content = <PageLoadingCirlce />
+  if (loading) content = <PageLoadingCircle />
   if (error) content = <ErrorOverlay />
   if (!error && !loading && !currentData) {
     content = <NoDataOverlay />
