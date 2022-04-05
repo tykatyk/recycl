@@ -3,10 +3,10 @@ import { IconButton, Badge } from '@material-ui/core'
 import MailIcon from '@material-ui/icons/Mail'
 import { useQuery } from '@apollo/client'
 import Snackbar from '../Snackbars.jsx'
-import { GET_UNREAD_DIALOGS_IDS } from '../../../lib/graphql/queries/message'
+import { GET_UNREAD_DIALOG_IDS } from '../../../lib/graphql/queries/message'
 
 export default function UnreadDialogsCounter(props) {
-  const { data, error, refetch } = useQuery(GET_UNREAD_DIALOGS_IDS)
+  const { data, error, refetch } = useQuery(GET_UNREAD_DIALOG_IDS)
   const [backendError, setBackendError] = useState(null)
   const { numViewed = 0, setNumViewed } = props
 
