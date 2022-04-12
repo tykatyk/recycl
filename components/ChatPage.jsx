@@ -19,6 +19,7 @@ import {
 import SendIcon from '@material-ui/icons/Send'
 import Layout from './layouts/Layout.jsx'
 import clsx from 'clsx'
+import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { useApolloClient, useMutation } from '@apollo/client'
 import RedirectUnathenticatedUser from './uiParts/RedirectUnathenticatedUser.jsx'
@@ -32,9 +33,10 @@ const useStyles = makeStyles({
   },
 
   dialog: {
-    height: '70vh',
+    // height: '70vh',
+    height: 400,
     overflowY: 'auto',
-    position: 'relative', //should be change to absolute
+    position: 'relative', //should be changed to absolute
   },
 
   right: {
@@ -46,6 +48,7 @@ const useStyles = makeStyles({
   message: {
     maxWidth: '85%',
     alignItems: 'flex-start',
+    minHeight: 450,
   },
   fromMe: { alignItems: 'flex-end' },
 })
@@ -62,17 +65,20 @@ export default function ChatPage(props) {
   })
   const thisUserId = session && session.id ? session.id : ''
   const thisUserName = session && session.user ? session.user.name : ''
-  const { dialogId } = props
+  const router = useRouter()
+  const { dialogId } = router.query
+  // const { dialogId } = props
   const client = useApolloClient()
   const [gettingDialog, setGettingDialog] = useState(false)
   const [getDialogError, setGetDialogError] = useState('')
-  const [dialogData, setDialogData] = useState([])
+  const [dialogData, setDialogData] = useState(null)
   const [
     createMessageMutation,
     { loading: creatingMessage, error: createMessageError, data: messageData },
   ] = useMutation(CREATE_MESSAGE)
 
   const dataIsCorrect = () => {
+    // console.log(dialogData)
     if (dialogData && dialogData.getDialog && dialogData.getDialog.length > 0) {
       return true
     }
@@ -80,7 +86,6 @@ export default function ChatPage(props) {
   }
 
   const [initialLoad, setInitialLoad] = useState(true)
-  const scrollOffset = 50 //pixels
   const numItemsToRenderForward = 1
   const numItemsToRenderBackward = 1
   const limit = 1 //num messages to receive when quering database
@@ -97,76 +102,23 @@ export default function ChatPage(props) {
   })
   const [canLoadMore, setCanLoadMore] = useState(true)
   //load initial dialog data
-  useEffect(() => handleScroll(), [])
+  useEffect(() => {
+    if (!dialogId) return
+    loadMoreData()
+  }, [dialogId])
 
   //add additional loaded data to items
   useEffect(() => {
-    if (dataIsCorrect()) {
-      const newItems = [...items]
-      dialogData.getDialog.forEach((item) =>
-        newItems.push({ data: item, height: 0 })
-      )
-      setItems(newItems)
+    if (!dataIsCorrect()) return
 
-      if (dialogData.getDialog.length < limit) setCanLoadMore(false)
-    }
+    const newItems = [...items]
+    dialogData.getDialog.forEach((item) =>
+      newItems.push({ data: item, height: 0 })
+    )
+    setItems(newItems)
+
+    if (dialogData.getDialog.length < limit) setCanLoadMore(false)
   }, [dialogData])
-
-  //This runs after all dom manipulations
-  //Position all rendered elements
-  //and measure new height of runway
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return
-    if (items.length === 0) return
-    let i = anchorEl.index
-    let currentPos = anchorEl.offsetHeight //position from the top of the message container
-    let newRunwayHeight = 0
-    let node
-    let nodeHeight
-
-    while (i <= lastItemToRender) {
-      node = itemsRef[i].current
-      nodeHeight = node.offsetHeight
-      //ToDo maybe add animation when positioning elements
-      node.style.top = currentPos
-      currentPos += nodeHeight
-      if (!items[i].height) {
-        items[i].height = nodeHeight
-        newRunwayHeight += items[i].height
-      }
-      i++
-    }
-
-    //reset index and position
-    i = anchorEl.index
-    currentPos = anchorEl.offsetHeight
-    console.log('items length')
-    console.log(items.length)
-    while (i >= firstItemToRender) {
-      node = itemsRef[i].current
-      console.log(node)
-      nodeHeight = itemsRef[i].current.offsetHeight
-      //ToDo maybe add animation when positioning elements
-      node.style.top = currentPos - nodeHeight
-      currentPos -= nodeHeight
-      if (!items[i].height) {
-        items[i].height = nodeHeight
-        newRunwayHeight += items[i].height
-      }
-      i--
-    }
-
-    newRunwayHeight += runwayHeight
-    setRunwayHeight(newRunwayHeight)
-    const messageContainerNode = messageContainerRef.current
-    messageContainerNode.style.height = newRunwayHeight + 'px'
-    if (initialLoad) {
-      messageContainerNode.scrollTop = newRunwayHeight
-      setInitialLoad(false)
-    } else {
-      messageContainerNode.scrollTop = anchorEl.scrollTop
-    }
-  }, [items])
 
   useEffect(() => {
     if (!dataIsCorrect()) return
@@ -226,7 +178,91 @@ export default function ChatPage(props) {
     }
   }, [dialogData, thisUserId, thisUserName])
 
+  //This runs after all dom manipulations
+  //Position all rendered elements
+  //and measure new height of runway
+  useLayoutEffect(() => {
+    if (items.length === 0) return
+    let i = anchorEl.index
+    //position from the top of the message container
+    let currentPos = anchorEl.scrollTop - anchorEl.offset
+    let newRunwayHeight = 0
+    let node
+    let nodeHeight
+
+    if (initialLoad) {
+      if (messageContainerRef.current.scrollTop == 0 && canLoadMore) {
+        loadMoreData(items[items.length - 1].data._id) //ToDo set offset
+        return
+      }
+
+      i = 0 //maybe shouldn't set i, since anchor index is already 0
+      currentPos = 0
+
+      if (!canLoadMore) {
+        setInitialLoad(false)
+        //scroll to bottom
+        messageContainerRef.current.scrollTop =
+          messageContainerRef.current.offsetHeight
+        return
+      }
+      /*
+      //this counting can be done once
+      while (
+        i < items.length &&
+        currentPos < messageContainerRef.current.offsetHeight
+      ) {
+        node = nodesRef.current[i]
+        currentPos += node.offsetHeight
+        i++ //index of last visible item in message container
+      }
+
+      if (
+        items.length <
+        i + numItemsToRenderForward + numItemsToRenderBackward
+      ) {
+        loadMoreData(items[items.length - 1].data._id) //ToDo: set offset, change limit
+      }*/
+
+      return
+    }
+
+    while (i <= lastItemToRender) {
+      node = nodesRef.current[i]
+      nodeHeight = node.offsetHeight
+      //ToDo maybe add animation when positioning elements
+      node.style.top = currentPos
+      currentPos -= nodeHeight
+      if (!items[i].height) {
+        items[i].height = nodeHeight
+        newRunwayHeight += items[i].height
+      }
+      i++
+    }
+
+    //reset index and position
+    i = anchorEl.index
+    currentPos = anchorEl.offsetHeight
+
+    while (i >= firstItemToRender) {
+      node = nodesRef.current[i]
+      nodeHeight = nodesRef.current[i].offsetHeight
+      //ToDo maybe add animation when positioning elements
+      node.style.top = currentPos + nodeHeight
+      currentPos += nodeHeight
+      if (!items[i].height) {
+        items[i].height = nodeHeight
+        newRunwayHeight += items[i].height
+      }
+      i--
+    }
+
+    newRunwayHeight += runwayHeight
+    setRunwayHeight(newRunwayHeight)
+  }, [items, canLoadMore])
+
   const handleClick = (e) => {
+    if (!dialogId) return //ToDo: handle errror
     createMessageMutation({
       variables: {
         message: {
@@ -242,89 +278,120 @@ export default function ChatPage(props) {
 
   //ToDo: scroll to the end of message container on initial load
   const handleScroll = async (e) => {
-    if (typeof window === 'undefined') return
+    // if (typeof window === 'undefined') return
     if (gettingDialog) return
 
     const currScroll = messageContainerRef.current
       ? messageContainerRef.current.scrollTop
       : 0
-    let newAnchorScrollTop = anchorEl.scrollTop
-    let newAnchorIndex = anchorEl.index
-    let newAnchorOffset = 0
+    let prevScroll = anchorEl.scrollTop
+    let anchorIndex = anchorEl.index
+    let anchorOffset = anchorEl.offset
 
-    const delta = currScroll - newAnchorScrollTop
-    const offset = items.length ? items[items.length - 1]._id : '' //offset in items to load
+    const delta = currScroll - prevScroll
+    const offset = items.length ? items[items.length - 1].data._id : '' //offset in items to load
+    //console.log(delta)
 
-    if (items.length === 0 && canLoadMore) {
-      const numLoaded = await loadMoreData(offset)
-      setLastItemToRender(numLoaded)
-      if (numLoaded < limit) setCanLoadMore(false)
-    } else if (delta === 0) return
+    //we are at the top of the dialog and want to load more messages
+    console.log(!initialLoad)
+    if (
+      canLoadMore &&
+      items.length > 0 &&
+      messageContainerRef.current.scrollTop == 0 //ToDo potential problem
+    ) {
+      const numNewMessages = await loadMoreData(offset)
 
-    //scroll forward
-    if (delta > 0) {
-      while (
-        newAnchorIndex < items.length - 1 &&
-        newAnchorScrollTop < currScroll
-      ) {
-        newAnchorScrollTop += items[newAnchorIndex++].height
-      }
       setFirstItemToRender(
-        newAnchorIndex - numItemsToRenderBackward >= 0
-          ? newAnchorIndex - numItemsToRenderBackward
+        anchorIndex - numItemsToRenderForward >= 0
+          ? anchorIndex - numItemsToRenderForward
           : 0
       )
       setLastItemToRender(
-        newAnchorIndex + numItemsToRenderForward <= items.length - 1
-          ? newAnchorIndex + numItemsToRenderForward
+        anchorIndex + numItemsToRenderBackward <=
+          items.length + numNewMessages - 1
+          ? anchorIndex + numItemsToRenderBackward
+          : items.length + numNewMessages - 1
+      )
+    }
+
+    let anchorTop = anchorEl.scrollTop - anchorEl.offset - delta
+
+    //scroll forward
+    if (delta > 0) {
+      while (anchorIndex < items.length - 1 && anchorTop < currScroll) {
+        anchorTop += items[anchorIndex++].height
+      }
+
+      if (anchorIndex > items.length - 1) anchorIndex--
+
+      if (anchorTop > currScroll) {
+        anchorOffset = items[anchorIndex].height - (anchorTop - currScroll)
+      } else {
+        anchorOffset = 0
+      }
+
+      setFirstItemToRender(
+        anchorIndex - numItemsToRenderBackward >= 0
+          ? anchorIndex - numItemsToRenderBackward
+          : 0
+      )
+      setLastItemToRender(
+        anchorIndex + numItemsToRenderForward <= items.length - 1
+          ? anchorIndex + numItemsToRenderForward
           : items.length - 1
       )
     }
     //scroll backward
     if (delta < 0) {
-      while (newAnchorIndex >= 0 && newAnchorScrollTop > currScroll) {
-        newAnchorScrollTop -= items[newAnchorIndex--].height
+      anchorTop += items[anchorIndex].height
+
+      while (anchorIndex >= 0 && anchorTop > currScroll) {
+        anchorTop -= items[anchorIndex--].height
+      }
+      if (anchorIndex < 0) anchorIndex = 0
+      if (anchorTop < currScroll) {
+        anchorOffset = currScroll - anchorTop
+      } else {
+        anchorOffset = 0
       }
 
-      let numNewMessages = 0
-
-      if (newAnchorScrollTop > currScrollTop) {
-        //loadMoreData
-        numNewMessages = await loadMoreData(offset)
-      }
       setFirstItemToRender(
-        newAnchorIndex - numItemsToRenderForward >= 0
-          ? newAnchorIndex - numItemsToRenderForward
+        anchorIndex - numItemsToRenderForward >= 0
+          ? anchorIndex - numItemsToRenderForward
           : 0
       )
       setLastItemToRender(
-        newAnchorIndex + numItemsToRenderBackward <=
-          items.length + numNewMessages - 1
-          ? newAnchorIndex + numItemsToRenderBackward
-          : items.length + numNewMessages - 1
+        anchorIndex + numItemsToRenderBackward <= items.length - 1
+          ? anchorIndex + numItemsToRenderBackward
+          : items.length - 1
       )
     }
     setAnchorEl({
-      index: newAnchorIndex,
-      offset: newAnchorOffset, //ToDo: offset is not set correctly here
-      scrollTop: newAnchorScrollTop,
+      index: anchorIndex,
+      offset: anchorOffset, //ToDo: offset is not set correctly here
+      scrollTop: currScroll,
     })
   }
 
-  const loadMoreData = async function (offset) {
+  const loadMoreData = async function (offset = '') {
     setGettingDialog(true)
-    client
+    return client
       .query({
         query: GET_DIALOG,
         variables: {
           id: dialogId,
-          offset: offset,
+          offset,
           limit,
         },
       })
       .then((result) => {
         setDialogData(result.data)
-        return result.data.getDialog.length
+        const numLoaded = result.data.getDialog.length
+
+        if (initialLoad) setLastItemToRender(numLoaded + items.length - 1)
+        if (canLoadMore && numLoaded < limit) setCanLoadMore(false)
+
+        return numLoaded
       })
       .catch((error) => {
         setGetDialogError(true)
@@ -339,12 +406,14 @@ export default function ChatPage(props) {
   let content = null
   if (gettingDialog) content = <PageLoadingCircle />
   if (getDialogError) content = <ErrorOverlay /> //ToDo: Add incorrect data error
-  if (dataIsCorrect()) {
-    let i = firstItemToRender
+  if (items.length > 0) {
+    let i = lastItemToRender
     const itemsToRender = []
-    while (i <= lastItemToRender) {
+    // console.log('items')
+    // console.log(items)
+    while (i >= firstItemToRender) {
       itemsToRender.push(items[i])
-      i++
+      i--
     }
     content = (
       <Grid container component={Paper} className={classes.chatSection}>
@@ -352,18 +421,8 @@ export default function ChatPage(props) {
           <List
             className={classes.dialog}
             ref={messageContainerRef}
-            onScroll={() => handleScroll(e)}
+            onScroll={(e) => handleScroll(e)}
           >
-            {canLoadMore && (
-              <ListItem
-                key="scrollOffset"
-                style={{
-                  height: `${scrollOffset}px`,
-                  position: 'absolute',
-                  top: `-${scrollOffset}px`,
-                }}
-              />
-            )}
             {itemsToRender.map((item, index) => {
               const message = item.data
               const refIndex = index + firstItemToRender
@@ -390,12 +449,12 @@ export default function ChatPage(props) {
               }
               return (
                 <ListItem
-                  ref={(el) => (itemsRef.current[refIndex] = el)}
+                  ref={(el) => (nodesRef.current[refIndex] = el)}
                   key={message._id}
                   className={clsx({
                     [classes.right]: message.senderId !== thisUserId,
                   })}
-                  style={{ position: 'absolute' }}
+                  // style={{ position: 'absolute' }}
                 >
                   <Grid
                     container
@@ -412,21 +471,6 @@ export default function ChatPage(props) {
                 </ListItem>
               )
             })}
-
-            <ListItem key="2">
-              <Grid
-                container
-                direction="column"
-                className={clsx(classes.message)}
-              >
-                <Grid item>
-                  <ListItemText primary="Hey, Iam Good! What about you ?"></ListItemText>
-                </Grid>
-                <Grid item>
-                  <ListItemText secondary="09:31"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
           </List>
           <Divider />
           <Grid container style={{ alignItems: 'center', padding: '20px' }}>
