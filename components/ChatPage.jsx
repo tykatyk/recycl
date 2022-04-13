@@ -191,7 +191,11 @@ export default function ChatPage(props) {
     let nodeHeight
 
     if (initialLoad) {
-      if (messageContainerRef.current.scrollTop == 0 && canLoadMore) {
+      if (
+        messageContainerRef.current.scrollHeight <=
+          messageContainerRef.current.offsetHeight &&
+        canLoadMore
+      ) {
         loadMoreData(items[items.length - 1].data._id) //ToDo set offset
         return
       }
