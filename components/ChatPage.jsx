@@ -203,10 +203,10 @@ export default function ChatPage(props) {
         setInitialLoad(false)
         //scroll to bottom
         messageContainerRef.current.scrollTop =
-          messageContainerRef.current.offsetHeight
+          messageContainerRef.current.scrollHeight
         return
       }
-      /*
+
       //this counting can be done once
       while (
         i < items.length &&
@@ -222,7 +222,13 @@ export default function ChatPage(props) {
         i + numItemsToRenderForward + numItemsToRenderBackward
       ) {
         loadMoreData(items[items.length - 1].data._id) //ToDo: set offset, change limit
-      }*/
+        return
+      }
+
+      setInitialLoad(false)
+      //scroll to bottom
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight
 
       return
     }
@@ -280,7 +286,6 @@ export default function ChatPage(props) {
   const handleScroll = async (e) => {
     // if (typeof window === 'undefined') return
     if (gettingDialog) return
-
     const currScroll = messageContainerRef.current
       ? messageContainerRef.current.scrollTop
       : 0
