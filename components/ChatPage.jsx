@@ -302,13 +302,17 @@ export default function ChatPage(props) {
     //console.log(delta)
 
     //we are at the top of the dialog and want to load more messages
-    console.log(!initialLoad)
     if (
       canLoadMore &&
       items.length > 0 &&
       messageContainerRef.current.scrollTop == 0 //ToDo potential problem
     ) {
       const numNewMessages = await loadMoreData(offset)
+      setAnchorEl({
+        index: 0,
+        offset: 0,
+        scrollTop: 0,
+      })
 
       setFirstItemToRender(
         anchorIndex - numItemsToRenderForward >= 0
@@ -321,6 +325,7 @@ export default function ChatPage(props) {
           ? anchorIndex + numItemsToRenderBackward
           : items.length + numNewMessages - 1
       )
+      return
     }
 
     let anchorTop = anchorEl.scrollTop - anchorEl.offset - delta
