@@ -51,6 +51,12 @@ const useStyles = makeStyles({
     minHeight: 450,
   },
   fromMe: { alignItems: 'flex-end' },
+  runway: {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    padding: 0,
+  },
 })
 
 export default function ChatPage(props) {
@@ -90,6 +96,7 @@ export default function ChatPage(props) {
   const numItemsToRenderBackward = 1
   const limit = 1 //num messages to receive when quering database
   const messageContainerRef = useRef()
+  const runwayRef = useRef()
   const nodesRef = useRef([])
   const [items, setItems] = useState([])
   const [runwayHeight, setRunwayHeight] = useState(0)
@@ -438,6 +445,12 @@ export default function ChatPage(props) {
             ref={messageContainerRef}
             onScroll={(e) => handleScroll(e)}
           >
+            <ListItem
+              key="runway"
+              className={classes.runway}
+              style={{ transform: `translateY(${runwayHeight}px)` }}
+              ref={runwayRef}
+            />
             {itemsToRender.map((item, index) => {
               const message = item.data
               const refIndex = index + firstItemToRender
