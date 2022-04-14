@@ -387,7 +387,8 @@ export default function ChatPage(props) {
     })
   }
 
-  const loadMoreData = async function (offset = '') {
+  const loadMoreData = async function (offset = '', count = limit) {
+    if (!canLoadMore) return
     setGettingDialog(true)
     return client
       .query({
@@ -395,7 +396,7 @@ export default function ChatPage(props) {
         variables: {
           id: dialogId,
           offset,
-          limit,
+          limit: count,
         },
       })
       .then((result) => {
@@ -403,14 +404,14 @@ export default function ChatPage(props) {
         const numLoaded = result.data.getDialog.length
 
         if (initialLoad) setLastItemToRender(numLoaded + items.length - 1)
-        if (canLoadMore && numLoaded < limit) setCanLoadMore(false)
+        if (canLoadMore && numLoaded < count) setCanLoadMore(false)
 
         return numLoaded
       })
       .catch((error) => {
         setGetDialogError(true)
         console.log('error in loading data')
-        console.log(error)
+        console.log(JSON.stringify(error, null, 2))
         return 0
         //ToDo handle error
       })
