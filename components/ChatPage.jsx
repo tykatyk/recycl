@@ -101,7 +101,7 @@ export default function ChatPage(props) {
   const [items, setItems] = useState([])
   const [runwayHeight, setRunwayHeight] = useState(0)
   const [firstItemToRender, setFirstItemToRender] = useState(0)
-  const [lastItemToRender, setLastItemToRender] = useState(0)
+  const [lastItemToRender, setLastItemToRender] = useState(-1)
   const [anchorEl, setAnchorEl] = useState({
     index: 0,
     offset: 0,
@@ -188,16 +188,40 @@ export default function ChatPage(props) {
   //This runs after all dom manipulations
   //Position all rendered elements
   //and measure new height of runway
+  // useEffect(() => {
   useLayoutEffect(() => {
     if (items.length === 0) return
-    let i = anchorEl.index
+    // let i = anchorEl.index
+    let i = firstItemToRender
     //position from the top of the message container
-    let currentPos = anchorEl.scrollTop - anchorEl.offset
-    let newRunwayHeight = 0
+    // let currentPos = anchorEl.scrollTop - anchorEl.offset
+    let currentPos = 0
+    // let newRunwayHeight = 0
+    let newRunwayHeight = runwayHeight
     let node
     let nodeHeight
+    while (i <= lastItemToRender) {
+      node = nodesRef.current[i]
+      nodeHeight = nodesRef.current[i].offsetHeight
+      //ToDo maybe add animation when positioning elements
+      // node.style.top = currentPos + nodeHeight
+      if (i <= anchorEl.index) currentPos += nodeHeight
 
+      if (!items[i].height) {
+        items[i].height = nodeHeight
+        newRunwayHeight += items[i].height
+      }
+      i++
+    }
+
+    const newScroll = currentPos + anchorEl.offset
+
+    setRunwayHeight(newRunwayHeight)
+
+    messageContainerRef.current.scrollTop = newScroll
     if (initialLoad) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight
       if (
         messageContainerRef.current.scrollHeight <=
           messageContainerRef.current.offsetHeight &&
@@ -212,14 +236,11 @@ export default function ChatPage(props) {
 
       if (!canLoadMore) {
         setInitialLoad(false)
-        //scroll to bottom
-        messageContainerRef.current.scrollTop =
-          messageContainerRef.current.scrollHeight
         return
       }
 
       //this counting can be done once
-      while (
+      /* while (
         i < items.length &&
         currentPos < messageContainerRef.current.offsetHeight
       ) {
@@ -234,49 +255,12 @@ export default function ChatPage(props) {
       ) {
         loadMoreData(items[items.length - 1].data._id) //ToDo: set offset, change limit
         return
-      }
+      }*/
 
       setInitialLoad(false)
-      //scroll to bottom
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight
-
       return
     }
-
-    while (i <= lastItemToRender) {
-      node = nodesRef.current[i]
-      nodeHeight = node.offsetHeight
-      //ToDo maybe add animation when positioning elements
-      node.style.top = currentPos
-      currentPos -= nodeHeight
-      if (!items[i].height) {
-        items[i].height = nodeHeight
-        newRunwayHeight += items[i].height
-      }
-      i++
-    }
-
-    //reset index and position
-    i = anchorEl.index
-    currentPos = anchorEl.offsetHeight
-
-    while (i >= firstItemToRender) {
-      node = nodesRef.current[i]
-      nodeHeight = nodesRef.current[i].offsetHeight
-      //ToDo maybe add animation when positioning elements
-      node.style.top = currentPos + nodeHeight
-      currentPos += nodeHeight
-      if (!items[i].height) {
-        items[i].height = nodeHeight
-        newRunwayHeight += items[i].height
-      }
-      i--
-    }
-
-    newRunwayHeight += runwayHeight
-    setRunwayHeight(newRunwayHeight)
-  }, [items, canLoadMore])
+  }, [firstItemToRender, lastItemToRender, items])
 
   const handleClick = (e) => {
     if (!dialogId) return //ToDo: handle errror
@@ -310,26 +294,29 @@ export default function ChatPage(props) {
 
     //we are at the top of the dialog and want to load more messages
     if (
-      canLoadMore &&
+      messageContainerRef.current.scrollTop == 0 && //ToDo potential problem
       items.length > 0 &&
-      messageContainerRef.current.scrollTop == 0 //ToDo potential problem
+      canLoadMore
     ) {
-      const numNewMessages = await loadMoreData(offset)
+      anchorIndex = items.length > 0 ? items.length - 1 : 0
+
       setAnchorEl({
-        index: 0,
+        index: anchorIndex,
         offset: 0,
         scrollTop: 0,
       })
 
+      const numNewMessages = await loadMoreData(offset)
+
       setFirstItemToRender(
-        anchorIndex - numItemsToRenderForward >= 0
-          ? anchorIndex - numItemsToRenderForward
+        anchorIndex - numItemsToRenderBackward >= 0
+          ? anchorIndex - numItemsToRenderBackward
           : 0
       )
       setLastItemToRender(
-        anchorIndex + numItemsToRenderBackward <=
+        anchorIndex + numItemsToRenderForward <=
           items.length + numNewMessages - 1
-          ? anchorIndex + numItemsToRenderBackward
+          ? anchorIndex + numItemsToRenderForward
           : items.length + numNewMessages - 1
       )
       return
