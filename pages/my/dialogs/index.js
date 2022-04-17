@@ -23,8 +23,8 @@ export async function getServerSideProps(context) {
         },
       },
     })
-    .then((data) => {
-      res.props.deletedCount = data.deleteStaleDialogs.deletedCount
+    .then((result) => {
+      res.props.deletedCount = result.data.deleteStaleDialogs.deletedCount
     })
     .catch((error) => {
       console.log(error)
