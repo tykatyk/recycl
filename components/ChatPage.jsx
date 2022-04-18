@@ -27,16 +27,17 @@ import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import ErrorOverlay from './dialogs/ErrorOverlay.jsx'
 import { CREATE_MESSAGE, GET_DIALOG } from '../lib/graphql/queries/message'
 
+const messageContainerHeight = 400
+
 const useStyles = makeStyles({
   chatSection: {
     width: '100%',
   },
 
   dialog: {
-    // height: '70vh',
-    height: 400,
+    height: messageContainerHeight,
     overflowY: 'auto',
-    position: 'relative', //should be changed to absolute
+    position: 'relative',
   },
 
   right: {
@@ -104,8 +105,9 @@ export default function ChatPage(props) {
   const [lastItemToRender, setLastItemToRender] = useState(-1)
   const [anchorEl, setAnchorEl] = useState({
     index: 0,
-    offset: 0,
-    scrollTop: 0,
+    //ToDo: maybe rename
+    offset: 0, //num pixels of anchor element which are above visible area of message container
+    scrollTop: 0, //current scroll position
   })
   const [canLoadMore, setCanLoadMore] = useState(true)
   //load initial dialog data
@@ -114,7 +116,7 @@ export default function ChatPage(props) {
     loadMoreData()
   }, [dialogId])
 
-  //add additional loaded data to items
+  //add additional loaded data to items to display them
   useEffect(() => {
     if (!dataIsCorrect()) return
 
@@ -131,6 +133,7 @@ export default function ChatPage(props) {
     if (!dataIsCorrect()) return
 
     const firstMessage = dialogData.getDialog[0]
+    //dialogReceiverId and dialogInitiatorId are the same in each message which belongs to this dialog
     const dialogReceiverId = firstMessage.dialogReceiverId
     const dialogInitiatorId = firstMessage.dialogInitiatorId
 
@@ -322,9 +325,10 @@ export default function ChatPage(props) {
       return
     }
 
+    //current top position of previous anchor
     let anchorTop = anchorEl.scrollTop - anchorEl.offset - delta
 
-    //scroll forward
+    //scroll down
     if (delta > 0) {
       while (anchorIndex < items.length - 1 && anchorTop < currScroll) {
         anchorTop += items[anchorIndex++].height
@@ -349,7 +353,7 @@ export default function ChatPage(props) {
           : items.length - 1
       )
     }
-    //scroll backward
+    //scroll up
     if (delta < 0) {
       anchorTop += items[anchorIndex].height
 
@@ -469,7 +473,7 @@ export default function ChatPage(props) {
                   className={clsx({
                     [classes.right]: message.senderId !== thisUserId,
                   })}
-                  // style={{ position: 'absolute' }}
+                  style={{ position: 'absolute' }}
                 >
                   <Grid
                     container
