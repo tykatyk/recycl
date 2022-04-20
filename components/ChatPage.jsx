@@ -194,34 +194,62 @@ export default function ChatPage(props) {
   // useEffect(() => {
   useLayoutEffect(() => {
     if (items.length === 0) return
-    // let i = anchorEl.index
-    let i = firstItemToRender
+
+    let i
     //position from the top of the message container
-    // let currentPos = anchorEl.scrollTop - anchorEl.offset
-    let currentPos = 0
-    // let newRunwayHeight = 0
+    let currentPos
     let newRunwayHeight = runwayHeight
+    let newScroll = 0
     let node
     let nodeHeight
-    while (i <= lastItemToRender) {
-      node = nodesRef.current[i]
-      nodeHeight = nodesRef.current[i].offsetHeight
-      //ToDo maybe add animation when positioning elements
-      // node.style.top = currentPos + nodeHeight
-      if (i <= anchorEl.index) currentPos += nodeHeight
+    console.log('f ' + firstItemToRender)
+    console.log('l ' + lastItemToRender)
+    console.log(items)
+    if (!items[lastItemToRender].height) {
+      i = lastItemToRender
+      currentPos = 0
 
-      if (!items[i].height) {
-        items[i].height = nodeHeight
-        newRunwayHeight += items[i].height
+      while (i >= firstItemToRender) {
+        node = nodesRef.current[i]
+        nodeHeight = nodesRef.current[i].offsetHeight
+        //ToDo maybe add animation when positioning elements
+        node.style.top = `${currentPos}px`
+        if (i > anchorEl.index) {
+          newScroll += nodeHeight
+        }
+
+        if (!items[i].height) {
+          items[i].height = nodeHeight
+          newRunwayHeight += items[i].height
+        }
+        currentPos += nodeHeight
+        i--
       }
-      i++
-    }
+      messageContainerRef.current.scrollTop = newScroll
+    } else {
+      console.log('here')
+      i = anchorEl.index
+      currentPos = anchorEl.scrollTop - anchorEl.offset
 
-    const newScroll = currentPos + anchorEl.offset
+      while (i >= firstItemToRender) {
+        node = nodesRef.current[i]
+        nodeHeight = nodesRef.current[i].offsetHeight
+        //ToDo maybe add animation when positioning elements
+        node.style.top = `${currentPos}px`
+        if (i <= anchorEl.index) currentPos += nodeHeight
+
+        if (!items[i].height) {
+          items[i].height = nodeHeight
+          newRunwayHeight += items[i].height
+        }
+        i--
+      }
+      newScroll = currentPos + anchorEl.offset
+      messageContainerRef.current.scrollTop = newScroll
+    }
 
     setRunwayHeight(newRunwayHeight)
 
-    messageContainerRef.current.scrollTop = newScroll
     if (initialLoad) {
       messageContainerRef.current.scrollTop =
         messageContainerRef.current.scrollHeight
@@ -230,40 +258,13 @@ export default function ChatPage(props) {
           messageContainerRef.current.offsetHeight &&
         canLoadMore
       ) {
-        loadMoreData(items[items.length - 1].data._id) //ToDo set offset
+        loadMoreData(items[items.length - 1].data._id)
         return
       }
-
-      i = 0 //maybe shouldn't set i, since anchor index is already 0
-      currentPos = 0
-
-      if (!canLoadMore) {
-        setInitialLoad(false)
-        return
-      }
-
-      //this counting can be done once
-      /* while (
-        i < items.length &&
-        currentPos < messageContainerRef.current.offsetHeight
-      ) {
-        node = nodesRef.current[i]
-        currentPos += node.offsetHeight
-        i++ //index of last visible item in message container
-      }
-
-      if (
-        items.length <
-        i + numItemsToRenderForward + numItemsToRenderBackward
-      ) {
-        loadMoreData(items[items.length - 1].data._id) //ToDo: set offset, change limit
-        return
-      }*/
 
       setInitialLoad(false)
-      return
     }
-  }, [firstItemToRender, lastItemToRender, items])
+  }, [firstItemToRender, lastItemToRender])
 
   const handleClick = (e) => {
     if (!dialogId) return //ToDo: handle errror
@@ -290,7 +291,8 @@ export default function ChatPage(props) {
     let prevScroll = anchorEl.scrollTop
     let anchorIndex = anchorEl.index
     let anchorOffset = anchorEl.offset
-
+    console.log('anchor index')
+    console.log(anchorIndex)
     const delta = currScroll - prevScroll
     const offset = items.length ? items[items.length - 1].data._id : '' //offset in items to load
     //console.log(delta)
@@ -326,11 +328,15 @@ export default function ChatPage(props) {
     }
 
     //current top position of previous anchor
+    // let anchorTop = anchorEl.scrollTop - anchorEl.offset - delta
     let anchorTop = anchorEl.scrollTop - anchorEl.offset - delta
-
+    console.log('anchorTop')
+    console.log(anchorTop)
     //scroll down
     if (delta > 0) {
-      while (anchorIndex < items.length - 1 && anchorTop < currScroll) {
+      console.log('down')
+
+      while (anchorIndex <= items.length - 1 && anchorTop < currScroll) {
         anchorTop += items[anchorIndex++].height
       }
 
@@ -355,6 +361,7 @@ export default function ChatPage(props) {
     }
     //scroll up
     if (delta < 0) {
+      console.log('up')
       anchorTop += items[anchorIndex].height
 
       while (anchorIndex >= 0 && anchorTop > currScroll) {
@@ -444,7 +451,7 @@ export default function ChatPage(props) {
             />
             {itemsToRender.map((item, index) => {
               const message = item.data
-              const refIndex = index + firstItemToRender
+              const refIndex = lastItemToRender - index
               const now = new Date()
               const currMonth = now.getMonth()
               const currDate = now.getDate()
