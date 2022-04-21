@@ -1,18 +1,16 @@
 import React from 'react'
 import ChatPage from '../../../components/ChatPage.jsx'
 
-// export default function Chat(props) {
-export default function Chat() {
-  // return <ChatPage dialogId={props.dialogId} />
-  return <ChatPage />
+export default function Chat(props) {
+  return <ChatPage dialogId={props.dialogId} />
 }
 
-// export async function getServerSideProps(context) {
-//   const { dialogId } = context.params
+export async function getServerSideProps(context) {
+  const { dialogId } = context.params
 
-//   return {
-//     props: {
-//       dialogId,
-//     },
-//   }
-// }
+  return {
+    props: {
+      dialogId,
+    },
+  }
+}
