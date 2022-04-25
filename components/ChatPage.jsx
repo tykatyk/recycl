@@ -269,21 +269,69 @@ export default function ChatPage(props) {
       ? messageContainerRef.current.scrollTop
       : 0
     if (technicalScroll) {
+      setAnchorEl(calculateAnchoredItem())
       setTechnicalScroll(false)
-      setAnchorEl({
-        index: anchorEl.index,
-        offset: anchorEl.offset,
-        scrollTop: currScroll,
-      })
       return
     }
     let prevScroll = anchorEl.scrollTop
     let anchorIndex = anchorEl.index
-
     let delta = currScroll - prevScroll
-    const lastItemId = items.current.length
-      ? items.current[items.current.length - 1].data._id
-      : '' //offset in items to load
+    const newAnchorEl = calculateAnchoredItem()
+    //we are at the top of the dialog and want to load more messages
+    if (
+      messageContainerRef.current.scrollTop == 0 && //ToDo potential problem
+      canLoadMore
+    ) {
+      setAnchorEl(newAnchorEl)
+
+      //offset in items to load
+      const lastItemId = items.current.length
+        ? items.current[items.current.length - 1].data._id
+        : ''
+      const result = await getMoreData(lastItemId)
+      let numLoaded = result ? result.data.getDialog.length : 0
+
+      fill(
+        anchorIndex - numItemsToRenderBackward,
+        anchorIndex + numItemsToRenderForward + numLoaded
+      )
+      return
+    }
+
+    //position of top edje of the anchor relative to current scroll position
+    // console.log('updated delta ' + delta)
+    //scroll down
+    if (delta > 0) {
+      fill(
+        anchorIndex - numItemsToRenderBackward,
+        anchorIndex + numItemsToRenderForward
+      )
+    } else {
+      //scroll up
+      console.log('up')
+
+      fill(
+        anchorIndex - numItemsToRenderForward,
+        anchorIndex + numItemsToRenderBackward
+      )
+    }
+    console.log('a ' + anchorEl.index)
+    setAnchorEl(newAnchorEl)
+  }
+  const calculateAnchoredItem = () => {
+    const currScroll = messageContainerRef.current
+      ? messageContainerRef.current.scrollTop
+      : 0
+    if (technicalScroll) {
+      return {
+        index: anchorEl.index,
+        offset: anchorEl.offset,
+        scrollTop: currScroll,
+      }
+    }
+    let prevScroll = anchorEl.scrollTop
+    let anchorIndex = anchorEl.index
+    let delta = currScroll - prevScroll
 
     //we are at the top of the dialog and want to load more messages
     if (
@@ -291,34 +339,17 @@ export default function ChatPage(props) {
       canLoadMore
     ) {
       anchorIndex = items.current.length > 0 ? items.current.length - 1 : 0
-
-      setAnchorEl({
+      return {
         index: anchorIndex,
         offset: 0,
         scrollTop: 0,
-      })
-
-      const result = await getMoreData(lastItemId)
-      let numLoaded = 0
-      if (result) numLoaded = result.data.getDialog.length
-      setStartIndex(
-        anchorIndex - numItemsToRenderBackward > 0
-          ? anchorIndex - numItemsToRenderBackward
-          : 0
-      )
-      setEndIndex(
-        anchorIndex + numItemsToRenderForward < items.current.length + numLoaded
-          ? anchorIndex + numItemsToRenderForward
-          : items.current.length - 1 + numLoaded
-      )
-      return
+      }
     }
+
     delta += anchorEl.offset
     console.log('delta ' + delta)
 
-    //position of top edje of the anchor relative to current scroll position
-    // console.log('updated delta ' + delta)
-    //scroll down
+    //calculate position of top edje of the anchor relative to current scroll position
     if (delta > 0) {
       while (
         anchorIndex > 0 &&
@@ -328,46 +359,23 @@ export default function ChatPage(props) {
         delta -= items.current[anchorIndex].height
         anchorIndex--
       }
-
-      if (anchorIndex < 0) anchorIndex = 0
-
-      setStartIndex(
-        anchorIndex - numItemsToRenderBackward > 0
-          ? anchorIndex - numItemsToRenderBackward
-          : 0
-      )
-      setEndIndex(
-        anchorIndex + numItemsToRenderForward < items.current.length
-          ? anchorIndex + numItemsToRenderForward
-          : items.current.length - 1
-      )
-    }
-    //scroll up
-    if (delta <= 0) {
-      console.log('up')
-
+    } else {
       while (anchorIndex < items.current.length - 1 && delta < 0) {
         delta += items.current[anchorIndex + 1].height
         anchorIndex++
       }
-
-      setStartIndex(
-        anchorIndex - numItemsToRenderForward > 0
-          ? anchorIndex - numItemsToRenderForward
-          : 0
-      )
-      setEndIndex(
-        anchorIndex + numItemsToRenderBackward < items.current.length
-          ? anchorIndex + numItemsToRenderBackward
-          : items.current.length - 1
-      )
     }
-    console.log('a ' + anchorEl.index)
-    setAnchorEl({
+
+    return {
       index: anchorIndex,
-      offset: delta, //ToDo: offset is not set correctly here
+      offset: delta,
       scrollTop: currScroll,
-    })
+    }
+  }
+
+  const fill = (start, end) => {
+    setStartIndex(Math.max(start, 0))
+    setEndIndex(Math.min(items.current.length - 1, end))
   }
 
   const getMoreData = async function (offset = '', count = limit) {
