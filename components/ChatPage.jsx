@@ -41,7 +41,7 @@ const useStyles = makeStyles({
   message: {
     maxWidth: '85%',
     alignItems: 'flex-start',
-    minHeight: 450,
+    minHeight: 150,
   },
   fromMe: { alignItems: 'flex-end' },
 })
@@ -62,7 +62,6 @@ export default function ChatPage(props) {
   ] = useMutation(CREATE_MESSAGE)
 
   const dataIsCorrect = (dialogData) => {
-    // console.log(dialogData)
     if (dialogData && dialogData.getDialog && dialogData.getDialog.length > 0) {
       return true
     }
@@ -78,8 +77,8 @@ export default function ChatPage(props) {
   const [canLoadMore, setCanLoadMore] = useState(true)
 
   useEffect(() => {
-    getMoreData()
-  }, [])
+    if (items.length == 0 && dialogId) getMoreData()
+  }, [dialogId])
 
   useEffect(() => {
     if (!messageContainerRef.current) return
@@ -98,18 +97,23 @@ export default function ChatPage(props) {
     } else {
       messageContainerRef.current.scrollTop = currentPos
     }
+  }, [items, anchorIndex])
 
-    console.log('index ' + anchorIndex)
+  useEffect(() => {
+    if (messageContainerRef.current) ensureScroll()
+  })
+
+  const ensureScroll = () => {
     if (
       messageContainerRef.current.scrollHeight <=
         messageContainerRef.current.offsetHeight &&
       canLoadMore
     ) {
       getMoreData(items[0].data._id)
-    } else {
+    } else if (initialLoad) {
       setInitialLoad(false)
     }
-  }, [items, anchorIndex])
+  }
 
   const handleClick = (e) => {
     if (!dialogId || items.length == 0) return //ToDo: handle errror
@@ -176,7 +180,6 @@ export default function ChatPage(props) {
     })
   }
 
-  //ToDo: scroll to the end of message container on initial load
   const handleScroll = async (e) => {
     if (messageContainerRef.current.scrollTop === 0 && canLoadMore) {
       getMoreData(items[0].data._id)
@@ -185,7 +188,8 @@ export default function ChatPage(props) {
   }
 
   const getMoreData = async function (offset = '', count = limit) {
-    if (!dialogId || !canLoadMore) return
+    if (!dialogId || !canLoadMore || loading) return
+
     setLoading(true)
     return client
       .query({
@@ -197,7 +201,10 @@ export default function ChatPage(props) {
         },
       })
       .then((result) => {
-        if (!dataIsCorrect(result.data)) return
+        if (!dataIsCorrect(result.data)) {
+          setCanLoadMore(false)
+          return
+        }
 
         const prevItems = items
         let newItems = []
@@ -207,18 +214,17 @@ export default function ChatPage(props) {
         setItems([...newItems, ...prevItems])
 
         const numLoaded = result.data.getDialog.length
-        setAnchorIndex(numLoaded)
+        if (prevItems.length > 0) setAnchorIndex(numLoaded)
 
-        if (canLoadMore && result.data.getDialog.length < count)
+        if (canLoadMore && result.data.getDialog.length < count) {
           setCanLoadMore(false)
+        }
 
         return result
       })
       .catch((error) => {
-        console.log(error)
         setGetDialogError(true)
         console.log('error in loading data')
-        // console.log(JSON.stringify(error, null, 2))
         return null
         //ToDo handle error
       })
@@ -228,9 +234,6 @@ export default function ChatPage(props) {
   if (loading) content = <PageLoadingCircle />
   if (getDialogError) content = <ErrorOverlay /> //ToDo: Add incorrect data error
   if (items.length > 0) {
-    // console.log('e ' + endIndex)
-    // console.log('s ' + startIndex)
-
     content = (
       <Grid container component={Paper} className={classes.chatSection}>
         <Grid item xs={12}>
