@@ -76,32 +76,49 @@ export default function ChatPage(props) {
   const [anchorIndex, setAnchorIndex] = useState(0)
   const [canLoadMore, setCanLoadMore] = useState(true)
 
-  useEffect(() => {
-    if (items.length == 0 && dialogId) getMoreData()
-  }, [dialogId])
+  const getMoreData = async function (offset = '', count = limit) {
+    if (!dialogId || !canLoadMore || loading) return
 
-  useEffect(() => {
-    if (!messageContainerRef.current) return
-    let nodeHeight = 0
-    let i = 0
-    let currentPos = 0
+    setLoading(true)
+    return client
+      .query({
+        query: GET_DIALOG,
+        variables: {
+          id: dialogId,
+          offset,
+          limit: count,
+        },
+      })
+      .then((result) => {
+        if (!dataIsCorrect(result.data)) {
+          setCanLoadMore(false)
+          return
+        }
 
-    while (i < anchorIndex) {
-      nodeHeight = nodesRef.current[i].offsetHeight
-      currentPos += nodeHeight
-      i++
-    }
-    if (initialLoad) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight
-    } else {
-      messageContainerRef.current.scrollTop = currentPos
-    }
-  }, [items, anchorIndex])
+        const prevItems = items
+        let newItems = []
+        result.data.getDialog.forEach((item) =>
+          newItems.push({ data: item, height: 0 })
+        )
+        setItems([...newItems, ...prevItems])
 
-  useEffect(() => {
-    if (messageContainerRef.current) ensureScroll()
-  })
+        const numLoaded = result.data.getDialog.length
+        if (prevItems.length > 0) setAnchorIndex(numLoaded)
+
+        if (canLoadMore && result.data.getDialog.length < count) {
+          setCanLoadMore(false)
+        }
+
+        return result
+      })
+      .catch((error) => {
+        setGetDialogError(true)
+        console.log('error in loading data')
+        return null
+        //ToDo handle error
+      })
+      .finally(() => setLoading(false))
+  }
 
   const ensureScroll = () => {
     if (
@@ -113,6 +130,10 @@ export default function ChatPage(props) {
     } else if (initialLoad) {
       setInitialLoad(false)
     }
+  }
+
+  const handleResize = (isLoaded) => {
+    if (isLoaded) ensureScroll()
   }
 
   const handleClick = (e) => {
@@ -187,49 +208,43 @@ export default function ChatPage(props) {
     }
   }
 
-  const getMoreData = async function (offset = '', count = limit) {
-    if (!dialogId || !canLoadMore || loading) return
+  useEffect(() => {
+    let isLoaded = true
+    window.addEventListener('resize', () => handleResize(isLoaded))
 
-    setLoading(true)
-    return client
-      .query({
-        query: GET_DIALOG,
-        variables: {
-          id: dialogId,
-          offset,
-          limit: count,
-        },
-      })
-      .then((result) => {
-        if (!dataIsCorrect(result.data)) {
-          setCanLoadMore(false)
-          return
-        }
+    return () => {
+      isLoaded = false
+      window.removeEventListener('resize', () => handleResize(isLoaded))
+    }
+  }, [])
 
-        const prevItems = items
-        let newItems = []
-        result.data.getDialog.forEach((item) =>
-          newItems.push({ data: item, height: 0 })
-        )
-        setItems([...newItems, ...prevItems])
+  useEffect(() => {
+    if (items.length == 0 && dialogId) getMoreData()
+  }, [dialogId])
 
-        const numLoaded = result.data.getDialog.length
-        if (prevItems.length > 0) setAnchorIndex(numLoaded)
+  useEffect(() => {
+    if (!messageContainerRef.current) return
+    let nodeHeight = 0
+    let i = 0
+    let currentPos = 0
 
-        if (canLoadMore && result.data.getDialog.length < count) {
-          setCanLoadMore(false)
-        }
+    while (i < anchorIndex) {
+      nodeHeight = nodesRef.current[i].offsetHeight
+      currentPos += nodeHeight
+      i++
+    }
+    if (initialLoad) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight
+    } else {
+      messageContainerRef.current.scrollTop = currentPos
+    }
+  }, [items, anchorIndex])
 
-        return result
-      })
-      .catch((error) => {
-        setGetDialogError(true)
-        console.log('error in loading data')
-        return null
-        //ToDo handle error
-      })
-      .finally(() => setLoading(false))
-  }
+  useEffect(() => {
+    if (messageContainerRef.current) ensureScroll()
+  })
+
   let content = null
   if (loading) content = <PageLoadingCircle />
   if (getDialogError) content = <ErrorOverlay /> //ToDo: Add incorrect data error
