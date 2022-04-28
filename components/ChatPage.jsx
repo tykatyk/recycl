@@ -80,7 +80,7 @@ export default function ChatPage(props) {
     if (!dialogId || !canLoadMore || loading) return
 
     setLoading(true)
-    return client
+    const result = await client
       .query({
         query: GET_DIALOG,
         variables: {
@@ -90,34 +90,33 @@ export default function ChatPage(props) {
         },
       })
       .then((result) => {
-        if (!dataIsCorrect(result.data)) {
-          setCanLoadMore(false)
-          return
-        }
-
-        const prevItems = items
-        let newItems = []
-        result.data.getDialog.forEach((item) =>
-          newItems.push({ data: item, height: 0 })
-        )
-        setItems([...newItems, ...prevItems])
-
-        const numLoaded = result.data.getDialog.length
-        if (prevItems.length > 0) setAnchorIndex(numLoaded)
-
-        if (canLoadMore && result.data.getDialog.length < count) {
-          setCanLoadMore(false)
-        }
-
         return result
       })
       .catch((error) => {
         setGetDialogError(true)
-        console.log('error in loading data')
         return null
         //ToDo handle error
       })
       .finally(() => setLoading(false))
+
+    if (!result.data || !dataIsCorrect(result.data)) {
+      setCanLoadMore(false)
+      return
+    }
+
+    const prevItems = items
+    let newItems = []
+    result.data.getDialog.forEach((item) =>
+      newItems.push({ data: item, height: 0 })
+    )
+    setItems([...newItems, ...prevItems])
+
+    const numLoaded = result.data.getDialog.length
+    if (prevItems.length > 0) setAnchorIndex(numLoaded)
+
+    if (canLoadMore && result.data.getDialog.length < count) {
+      setCanLoadMore(false)
+    }
   }
 
   const ensureScroll = () => {
