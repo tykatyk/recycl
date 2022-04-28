@@ -67,6 +67,8 @@ export default function ChatPage(props) {
     }
     return false
   }
+  const [dialogData, setDialogData] = useState(null)
+  const [title, setTitle] = useState('Диалог | Recycl')
 
   const limit = 1 //num messages to receive when quering database
   const messageContainerRef = useRef()
@@ -136,52 +138,7 @@ export default function ChatPage(props) {
   }
 
   const handleClick = (e) => {
-    if (!dialogId || items.length == 0) return //ToDo: handle errror
-
-    const firstMessage = items[0].data
-    //dialogReceiverId and dialogInitiatorId are the same in each message which belongs to this dialog
-    let dialogReceiverId = firstMessage.dialogReceiverId
-    let dialogInitiatorId = firstMessage.dialogInitiatorId
-    let receiverId
-    let receiverName
-    let ad
-
-    if (!dialogReceiverId && !dialogInitiatorId) {
-      //ToDo: set error state
-      console.log('Required params are not present')
-      return
-    }
-
-    receiverId =
-      firstMessage.receiverId === thisUserId
-        ? firstMessage.senderId
-        : firstMessage.receiverId
-
-    receiverName =
-      firstMessage.receiverName === thisUserName
-        ? firstMessage.senderName
-        : firstMessage.receiverName
-
-    ad = firstMessage.ad
-
-    if (dialogReceiverId && dialogInitiatorId) return
-
-    if (!dialogInitiatorId) {
-      if (dialogReceiverId === firstMessage.receiverId) {
-        dialogInitiatorId = firstMessage.senderId
-      } else {
-        dialogInitiatorId = firstMessage.receiverId
-      }
-      return
-    }
-
-    if (!dialogReceiverId) {
-      if (dialogInitiatorId === firstMessage.receiverId) {
-        dialogReceiverId = firstMessage.senderId
-      } else {
-        dialogReceiverId = firstMessage.receiverId
-      }
-    }
+    if (!dialogData) return //ToDo: handle errror
 
     createMessageMutation({
       variables: {
@@ -238,11 +195,83 @@ export default function ChatPage(props) {
     } else {
       messageContainerRef.current.scrollTop = currentPos
     }
+
+    if (!dialogData) {
+      const firstMessage = items[0].data
+      //dialogReceiverId and dialogInitiatorId are the same in each message which belongs to this dialog
+      let dialogReceiverId = firstMessage.dialogReceiverId
+      let dialogInitiatorId = firstMessage.dialogInitiatorId
+      let receiverId
+      let receiverName
+      let ad
+
+      if (!dialogReceiverId && !dialogInitiatorId) {
+        //ToDo: set error state
+        console.log('Required params are not present')
+        return
+      }
+
+      receiverId =
+        firstMessage.receiverId === thisUserId
+          ? firstMessage.senderId
+          : firstMessage.receiverId
+
+      receiverName =
+        firstMessage.receiverName === thisUserName
+          ? firstMessage.senderName
+          : firstMessage.receiverName
+
+      ad = firstMessage.ad
+
+      if (dialogReceiverId && dialogInitiatorId) {
+        setDialogData({
+          dialogReceiverId,
+          dialogInitiatorId,
+          receiverId,
+          receiverName,
+          ad,
+        })
+        return
+      }
+
+      if (!dialogInitiatorId) {
+        if (dialogReceiverId === firstMessage.receiverId) {
+          dialogInitiatorId = firstMessage.senderId
+        } else {
+          dialogInitiatorId = firstMessage.receiverId
+        }
+        return
+      }
+
+      if (!dialogReceiverId) {
+        if (dialogInitiatorId === firstMessage.receiverId) {
+          dialogReceiverId = firstMessage.senderId
+        } else {
+          dialogReceiverId = firstMessage.receiverId
+        }
+      }
+
+      setDialogData({
+        dialogReceiverId,
+        dialogInitiatorId,
+        receiverId,
+        receiverName,
+        ad,
+      })
+    }
   }, [items, anchorIndex])
 
   useEffect(() => {
     if (messageContainerRef.current) ensureScroll()
   })
+
+  useEffect(() => {
+    if (dialogData) {
+      setTitle(
+        `Диалог с ${dialogData.receiverName} относительно ${dialogData.ad.wasteType.name}`
+      )
+    }
+  }, [dialogData])
 
   let content = null
   if (loading) content = <PageLoadingCircle />
