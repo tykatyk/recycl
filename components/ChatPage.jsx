@@ -16,6 +16,7 @@ import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import { useApolloClient, useMutation } from '@apollo/client'
 import RedirectUnathenticatedUser from './uiParts/RedirectUnathenticatedUser.jsx'
+import Snackbars from './uiParts/Snackbars.jsx'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import ErrorOverlay from './dialogs/ErrorOverlay.jsx'
 import { CREATE_MESSAGE, GET_DIALOG } from '../lib/graphql/queries/message'
@@ -87,7 +88,8 @@ export default function ChatPage(props) {
   const [items, setItems] = useState([])
   const [anchorIndex, setAnchorIndex] = useState(0)
   const [canLoadMore, setCanLoadMore] = useState(true)
-
+  const [severity, setSeverity] = useState('')
+  const [notification, setNotification] = useState('')
   const getMoreData = async function (offset = '', count = limit) {
     if (!dialogId || !canLoadMore || loading) return
 
@@ -288,6 +290,18 @@ export default function ChatPage(props) {
   if (getDialogError) content = <ErrorOverlay /> //ToDo: Add incorrect data error
   if (items.length > 0) {
     content = (
+      <>
+        {!!notification && (
+          <Snackbars
+            open={!!notification}
+            handleClose={() => {
+              setNotification('')
+              setSeverity('')
+            }}
+            message={notification}
+            severity={severity}
+          />
+        )}
         <Grid container component={Paper} className={classes.chatSection}>
           <Grid item xs={12}>
             <List
@@ -367,6 +381,7 @@ export default function ChatPage(props) {
           </Grid>
         </Grid>
       </Grid>
+      </>
     )
   }
 
