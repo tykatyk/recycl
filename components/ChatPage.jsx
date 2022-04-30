@@ -7,7 +7,7 @@ import {
   Paper,
   Grid,
   Divider,
-  TextField,
+  Typography,
   makeStyles,
 } from '@material-ui/core'
 import SendIcon from '@material-ui/icons/Send'
@@ -17,9 +17,14 @@ import { useSession } from 'next-auth/react'
 import { useApolloClient, useMutation } from '@apollo/client'
 import RedirectUnathenticatedUser from './uiParts/RedirectUnathenticatedUser.jsx'
 import Snackbars from './uiParts/Snackbars.jsx'
+import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
+import { Formik, Form, Field } from 'formik'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
+import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import ErrorOverlay from './dialogs/ErrorOverlay.jsx'
 import { CREATE_MESSAGE, GET_DIALOG } from '../lib/graphql/queries/message'
+import { chatSchema } from '../lib/validation'
+import whitespaceRegex from '../lib/validation/regularExpressions'
 
 const messageContainerHeight = 400
 
@@ -51,8 +56,9 @@ const useStyles = makeStyles((theme) => ({
   },
   messageDate: {
     marginRight: theme.spacing(1),
-    alignItems: 'flex-start',
-    minHeight: 150,
+  },
+  remainedSymbols: {
+    marginLeft: theme.spacing(2),
   },
   fromMe: { alignItems: 'flex-end' },
 }))
@@ -82,6 +88,7 @@ export default function ChatPage(props) {
   const [title, setTitle] = useState('Диалог | Recycl')
 
   const limit = 1 //num messages to receive when quering database
+  const charsLeft = 1000
   const messageContainerRef = useRef()
   const nodesRef = useRef([])
   const [initialLoad, setInitialLoad] = useState(true)
@@ -149,9 +156,14 @@ export default function ChatPage(props) {
     if (isLoaded) ensureScroll()
   }
 
-  const handleClick = (e) => {
+  const handleClick = async (values, errors, options) => {
     if (!dialogData) return //ToDo: handle errror
-
+    const { setSubmitting, resetForm, setErrors } = options
+    if (errors) {
+      // setErrors(errors)
+      return
+    }
+    setSubmitting(true)
     createMessageMutation({
       variables: {
         message: {
@@ -160,13 +172,23 @@ export default function ChatPage(props) {
           receiverId,
           receiverName,
           ad,
-          text: e.target.value,
+          text: values.message,
           senderId: thisUserId,
           senderName: thisUserName,
           dialogId,
         },
       },
     })
+      .then((data) => {
+        resetForm()
+      })
+      .catch((error) => {
+        setSeverity('error')
+        setNotification('Не удалось отправить сообщение')
+      })
+      .finally(() => {
+        setSubmitting(false)
+      })
   }
 
   const handleScroll = async (e) => {
@@ -286,7 +308,7 @@ export default function ChatPage(props) {
   }, [dialogData])
 
   let content = null
-  if (loading) content = <PageLoadingCircle />
+  // if (loading) content = <PageLoadingCircle />
   if (getDialogError) content = <ErrorOverlay /> //ToDo: Add incorrect data error
   if (items.length > 0) {
     content = (
@@ -361,26 +383,91 @@ export default function ChatPage(props) {
             </List>
           </Grid>
           <Divider />
-          <Grid container style={{ alignItems: 'center', padding: '20px' }}>
-            <Grid item xs={11}>
-              <TextField
-                id="outlined-basic-email"
-                label="Напишите что-нибудь"
-                fullWidth
-                multiline
-                variant="outlined"
-                rows={4}
-                onChange={(e) => handleClick(e)}
-              />
-            </Grid>
-            <Grid item xs={1} align="right">
-              <Fab color="primary" aria-label="add">
-                <SendIcon />
-              </Fab>
-            </Grid>
+          <Grid container style={{ alignItems: 'center', padding: '16px' }}>
+            <Formik
+              enableReinitialize
+              initialValues={{ message: '' }}
+              validationSchema={chatSchema}
+              validateOnChange={false}
+              validateOnBlur={false}
+              onSubmit={async (
+                values,
+                errors,
+                { setSubmitting, setErrors, resetForm }
+              ) => {
+                const options = {
+                  setSubmitting,
+                  setErrors,
+                  resetForm,
+                }
+                handleClick(values, errors, options)
+              }}
+            >
+              {({ isSubmitting, values, errors, setFieldValue }) => {
+                let availableSymbols = charsLeft - values.message.length
+                availableSymbols = availableSymbols >= 0 ? availableSymbols : 0
+
+                if (values.message.length > charsLeft) {
+                  setFieldValue(
+                    'message',
+                    values.message.substring(0, charsLeft),
+                    false
+                  )
+                }
+
+                return (
+                  <>
+                    <Grid
+                      container
+                      item
+                      xs={12}
+                      style={{ alignItems: 'center' }}
+                    >
+                      <Grid item xs={11}>
+                        <Form>
+                          <Field
+                            component={TextFieldFormik}
+                            multiline
+                            rows={4}
+                            variant="outlined"
+                            fullWidth
+                            name="message"
+                            id="message"
+                            label="Напишите что-нибудь"
+                          />
+                        </Form>
+                      </Grid>
+                      <Grid item xs={1} align="right">
+                        <Fab
+                          color="secondary"
+                          aria-label="send message"
+                          type="submit"
+                          disabled={
+                            values.message.replace(whitespaceRegex, '') ===
+                              '' ||
+                            !!errors.message ||
+                            isSubmitting
+                          }
+                        >
+                          <SendIcon />
+                        </Fab>
+                      </Grid>
+                    </Grid>
+                    <Grid container item xs={12}>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        className={classes.remainedSymbols}
+                      >
+                        Осталось: {availableSymbols}
+                      </Typography>
+                    </Grid>
+                  </>
+                )
+              }}
+            </Formik>
           </Grid>
         </Grid>
-      </Grid>
       </>
     )
   }
