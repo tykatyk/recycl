@@ -22,7 +22,7 @@ import { CREATE_MESSAGE, GET_DIALOG } from '../lib/graphql/queries/message'
 
 const messageContainerHeight = 400
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   chatSection: {
     width: '100%',
   },
@@ -39,12 +39,22 @@ const useStyles = makeStyles({
     },
   },
   message: {
+    width: 'auto',
     maxWidth: '85%',
+  },
+  messageContent: {
+    background: '#747875',
+    borderRadius: '1em',
+    borderTopLeftRadius: 0,
+    padding: theme.spacing(1),
+  },
+  messageDate: {
+    marginRight: theme.spacing(1),
     alignItems: 'flex-start',
     minHeight: 150,
   },
   fromMe: { alignItems: 'flex-end' },
-})
+}))
 
 export default function ChatPage(props) {
   const classes = useStyles()
@@ -278,63 +288,64 @@ export default function ChatPage(props) {
   if (getDialogError) content = <ErrorOverlay /> //ToDo: Add incorrect data error
   if (items.length > 0) {
     content = (
-      <Grid container component={Paper} className={classes.chatSection}>
-        <Grid item xs={12}>
-          <List
-            className={classes.dialog}
-            ref={messageContainerRef}
-            onScroll={(e) => handleScroll(e)}
-          >
-            {items.map((item, index) => {
-              const message = item.data
-              const refIndex = index
-              const now = new Date()
-              const currMonth = now.getMonth()
-              const currDate = now.getDate()
+        <Grid container component={Paper} className={classes.chatSection}>
+          <Grid item xs={12}>
+            <List
+              className={classes.dialog}
+              ref={messageContainerRef}
+              onScroll={(e) => handleScroll(e)}
+            >
+              {items.map((item, index) => {
+                const message = item.data
+                const refIndex = index
+                const now = new Date()
+                const currMonth = now.getMonth()
+                const currDate = now.getDate()
 
-              const creationDate = new Date(message.createdAt)
-              const month = creationDate.getMonth()
-              const date = creationDate.getDate()
-              const hours = creationDate.getHours()
-              const minutes = '0' + creationDate.getMinutes()
+                const creationDate = new Date(message.createdAt)
+                const month = creationDate.getMonth()
+                const date = creationDate.getDate()
+                const hours = creationDate.getHours()
+                const minutes = '0' + creationDate.getMinutes()
 
-              let dateTime
-              if (currDate != date || currMonth != month) {
-                dateTime = `${hours}:${minutes.substring(
-                  minutes.length - 2
-                )}, ${creationDate.toLocaleString('ru-RU', {
-                  day: '2-digit',
-                  month: 'short',
-                })}`
-              } else {
-                dateTime = `${hours}:${minutes.substring(minutes.length - 2)}`
-              }
-              return (
-                <ListItem
-                  ref={(el) => {
-                    nodesRef.current[index] = el
-                  }}
-                  key={message._id}
-                  className={clsx({
-                    [classes.right]: message.senderId !== thisUserId,
-                  })}
-                >
-                  <Grid
-                    container
-                    direction="column"
-                    className={classes.message}
+                let dateTime
+                if (currDate != date || currMonth != month) {
+                  dateTime = `${hours}:${minutes.substring(
+                    minutes.length - 2
+                  )}, ${creationDate.toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: 'short',
+                  })}`
+                } else {
+                  dateTime = `${hours}:${minutes.substring(minutes.length - 2)}`
+                }
+                return (
+                  <ListItem
+                    ref={(el) => {
+                      nodesRef.current[index] = el
+                    }}
+                    key={message._id}
+                    className={clsx({
+                      [classes.right]: message.senderId !== thisUserId,
+                    })}
                   >
-                    <Grid item>
-                      <ListItemText primary={message.text}></ListItemText>
+                    <Grid
+                      container
+                      direction="column"
+                      className={classes.message}
+                    >
+                      <Grid item className={classes.messageContent}>
+                        <ListItemText primary={message.text}></ListItemText>
+                      </Grid>
+                      <Grid item className={classes.messageDate}>
+                        <ListItemText secondary={dateTime}></ListItemText>
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <ListItemText secondary={dateTime}></ListItemText>
-                    </Grid>
-                  </Grid>
-                </ListItem>
-              )
-            })}
-          </List>
+                  </ListItem>
+                )
+              })}
+            </List>
+          </Grid>
           <Divider />
           <Grid container style={{ alignItems: 'center', padding: '20px' }}>
             <Grid item xs={11}>
