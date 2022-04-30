@@ -372,7 +372,7 @@ export default function ChatPage(props) {
 
   return (
     <RedirectUnathenticatedUser>
-      <Layout title="Диалог с ... относительно ... | Recycl">{content}</Layout>
+      <Layout title={title}>{content}</Layout>
     </RedirectUnathenticatedUser>
   )
 }
