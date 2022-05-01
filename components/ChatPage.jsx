@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import {
+  Fade,
   Box,
   Button,
   List,
@@ -7,12 +8,10 @@ import {
   ListItemText,
   Fab,
   Paper,
-  Grid,
-  Divider,
   Typography,
   makeStyles,
 } from '@material-ui/core'
-import SendIcon from '@material-ui/icons/Send'
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
 import Layout from './layouts/Layout.jsx'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
@@ -111,6 +110,8 @@ export default function ChatPage(props) {
   const [canLoadMore, setCanLoadMore] = useState(true)
   const [severity, setSeverity] = useState('')
   const [notification, setNotification] = useState('')
+  const [showScrollBottom, setShowScrollBottom] = useState(false)
+  const [prevScroll, setPrevScroll] = useState(0)
   const getMoreData = async function (offset = '', count = limit) {
     if (!dialogId || !canLoadMore || loading) return
 
@@ -208,10 +209,33 @@ export default function ChatPage(props) {
   }
 
   const handleScroll = async (e) => {
-    if (messageContainerRef.current.scrollTop === 0 && canLoadMore) {
+    const messageContainer = messageContainerRef.current
+    const currScroll = messageContainer.scrollTop
+    if (currScroll === 0 && canLoadMore) {
       getMoreData(items[0].data._id)
       return
     }
+
+    if (
+      messageContainer.scrollHeight -
+        currScroll -
+        messageContainer.clientHeight <
+        1 &&
+      showScrollBottom
+    ) {
+      setShowScrollBottom(false)
+    } else {
+      const delta = currScroll - prevScroll
+      if (delta > messageContainer.scrollHeight && !showScrollBottom)
+        setShowScrollBottom(true)
+    }
+
+    setPrevScroll(currScroll)
+  }
+
+  const handleScrollBottomClick = () => {
+    messageContainerRef.current.scrollTop =
+      messageContainerRef.current.scrollHeight
   }
 
   useEffect(() => {
@@ -402,6 +426,25 @@ export default function ChatPage(props) {
                 )
               })}
             </List>
+            {showScrollBottom && (
+              <Fade in={showScrollBottom}>
+                <Fab
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 36,
+                  }}
+                  color="secondary"
+                  size="small"
+                  aria-label="scroll to bottom"
+                  onClick={() => {
+                    handleScrollBottomClick()
+                  }}
+                >
+                  <ArrowDownwardIcon />
+                </Fab>
+              </Fade>
+            )}
           </Box>
 
           <Box style={{ alignItems: 'center', padding: '16px' }}>
