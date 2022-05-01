@@ -29,8 +29,18 @@ import whitespaceRegex from '../lib/validation/regularExpressions'
 const messageContainerHeight = 400
 
 const useStyles = makeStyles((theme) => ({
-  chatSection: {
+  chat: {
     width: '100%',
+  },
+
+  loading: {
+    position: 'absolute',
+    left: '50%',
+    transform: 'translate(-50%, 0)',
+    color: 'black',
+    background: theme.palette.secondary.main,
+    borderRadius: '8px',
+    padding: 4,
   },
 
   dialog: {
@@ -324,8 +334,17 @@ export default function ChatPage(props) {
             severity={severity}
           />
         )}
-        <Grid container component={Paper} className={classes.chatSection}>
-          <Grid item xs={12}>
+        <Grid container component={Paper} className={classes.chat}>
+          <Grid item xs={12} style={{ position: 'relative' }}>
+            {loading && (
+              <Typography
+                component="span"
+                variant="body2"
+                className={classes.loading}
+              >
+                Загрузка...
+              </Typography>
+            )}
             <List
               className={classes.dialog}
               ref={messageContainerRef}
@@ -333,7 +352,6 @@ export default function ChatPage(props) {
             >
               {items.map((item, index) => {
                 const message = item.data
-                const refIndex = index
                 const now = new Date()
                 const currMonth = now.getMonth()
                 const currDate = now.getDate()
