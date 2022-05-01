@@ -173,22 +173,14 @@ export default function ChatPage(props) {
     if (isLoaded) ensureScroll()
   }
 
-  const handleClick = async (values, errors, options) => {
-    if (!dialogData) return //ToDo: handle errror
-    const { setSubmitting, resetForm, setErrors } = options
-    if (errors) {
-      // setErrors(errors)
-      return
-    }
+  const handleSubmit = async (values, errors, options) => {
+    if (!dialogData || errors.message) return
+    const { setSubmitting, resetForm } = options
     setSubmitting(true)
     createMessageMutation({
       variables: {
         message: {
-          dialogReceiverId,
-          dialogInitiatorId,
-          receiverId,
-          receiverName,
-          ad,
+          ...dialogData,
           text: values.message,
           senderId: thisUserId,
           senderName: thisUserName,
@@ -457,14 +449,13 @@ export default function ChatPage(props) {
               onSubmit={async (
                 values,
                 errors,
-                { setSubmitting, setErrors, resetForm }
+                { setSubmitting, resetForm }
               ) => {
                 const options = {
                   setSubmitting,
-                  setErrors,
                   resetForm,
                 }
-                handleClick(values, errors, options)
+                handleSubmit(values, errors, options)
               }}
             >
               {({ isSubmitting, values, errors, setFieldValue }) => {
