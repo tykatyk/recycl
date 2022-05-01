@@ -318,7 +318,7 @@ export default function ChatPage(props) {
   }, [dialogData])
 
   let content = null
-  // if (loading) content = <PageLoadingCircle />
+  if (items.length == 0 && loading) content = <PageLoadingCircle />
   if (getDialogError) content = <ErrorOverlay /> //ToDo: Add incorrect data error
   if (items.length > 0) {
     content = (
