@@ -125,12 +125,13 @@ export default function ChatPage(props) {
       })
       .catch((error) => {
         setGetDialogError(true)
+        setSeverity('error')
+        setNotification('Ошибка при загрузке данных')
         return null
-        //ToDo handle error
       })
       .finally(() => setLoading(false))
 
-    if (!result.data || !dataIsCorrect(result.data)) {
+    if (!result || !result.data || !dataIsCorrect(result.data)) {
       setCanLoadMore(false)
       return
     }
@@ -152,6 +153,7 @@ export default function ChatPage(props) {
 
   const ensureScroll = () => {
     if (
+      messageContainerRef.current &&
       messageContainerRef.current.scrollHeight <=
         messageContainerRef.current.offsetHeight &&
       canLoadMore
@@ -317,9 +319,10 @@ export default function ChatPage(props) {
     }
   }, [dialogData])
 
+  //ToDo: Add no data overlay
   let content = null
   if (items.length == 0 && loading) content = <PageLoadingCircle />
-  if (getDialogError) content = <ErrorOverlay /> //ToDo: Add incorrect data error
+  if (items.length == 0 && getDialogError) content = <ErrorOverlay />
   if (items.length > 0) {
     content = (
       <>
