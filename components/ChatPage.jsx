@@ -37,9 +37,9 @@ const useStyles = makeStyles((theme) => ({
     position: 'absolute',
     left: '50%',
     transform: 'translate(-50%, 0)',
-    color: 'black',
+    color: theme.palette.grey['900'],
     background: theme.palette.secondary.main,
-    borderRadius: '8px',
+    borderRadius: theme.spacing(1),
     padding: 4,
   },
 
@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: '85%',
   },
   messageContent: {
-    background: '#747875',
+    background: theme.palette.grey['600'],
     borderRadius: '1em',
     borderTopLeftRadius: 0,
     padding: theme.spacing(1),
