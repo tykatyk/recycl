@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import {
+  Box,
+  Button,
   List,
   ListItem,
   ListItemText,
@@ -55,6 +57,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   message: {
+    display: 'flex',
+    flexDirection: 'column',
     width: 'auto',
     maxWidth: '85%',
   },
@@ -337,8 +341,8 @@ export default function ChatPage(props) {
             severity={severity}
           />
         )}
-        <Grid container component={Paper} className={classes.chat}>
-          <Grid item xs={12} style={{ position: 'relative' }}>
+        <Box component={Paper} className={classes.chat}>
+          <Box style={{ position: 'relative', paddingBottom: 56 }}>
             {loading && (
               <Typography
                 component="span"
@@ -386,25 +390,21 @@ export default function ChatPage(props) {
                       [classes.right]: message.senderId !== thisUserId,
                     })}
                   >
-                    <Grid
-                      container
-                      direction="column"
-                      className={classes.message}
-                    >
-                      <Grid item className={classes.messageContent}>
+                    <Box className={classes.message}>
+                      <Box className={classes.messageContent}>
                         <ListItemText primary={message.text}></ListItemText>
-                      </Grid>
-                      <Grid item className={classes.messageDate}>
+                      </Box>
+                      <Box className={classes.messageDate}>
                         <ListItemText secondary={dateTime}></ListItemText>
-                      </Grid>
-                    </Grid>
+                      </Box>
+                    </Box>
                   </ListItem>
                 )
               })}
             </List>
-          </Grid>
-          <Divider />
-          <Grid container style={{ alignItems: 'center', padding: '16px' }}>
+          </Box>
+
+          <Box style={{ alignItems: 'center', padding: '16px' }}>
             <Formik
               enableReinitialize
               initialValues={{ message: '' }}
@@ -438,13 +438,8 @@ export default function ChatPage(props) {
 
                 return (
                   <>
-                    <Grid
-                      container
-                      item
-                      xs={12}
-                      style={{ alignItems: 'center' }}
-                    >
-                      <Grid item xs={11}>
+                    <Box style={{ alignItems: 'center' }}>
+                      <Box>
                         <Form>
                           <Field
                             component={TextFieldFormik}
@@ -457,11 +452,20 @@ export default function ChatPage(props) {
                             label="Напишите что-нибудь"
                           />
                         </Form>
-                      </Grid>
-                      <Grid item xs={1} align="right">
-                        <Fab
+                      </Box>
+                      <Box mb={2}>
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          className={classes.remainedSymbols}
+                        >
+                          Осталось: {availableSymbols}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Button
+                          variant="contained"
                           color="secondary"
-                          aria-label="send message"
                           type="submit"
                           disabled={
                             values.message.replace(whitespaceRegex, '') ===
@@ -470,25 +474,16 @@ export default function ChatPage(props) {
                             isSubmitting
                           }
                         >
-                          <SendIcon />
-                        </Fab>
-                      </Grid>
-                    </Grid>
-                    <Grid container item xs={12}>
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        className={classes.remainedSymbols}
-                      >
-                        Осталось: {availableSymbols}
-                      </Typography>
-                    </Grid>
+                          Отправить
+                        </Button>
+                      </Box>
+                    </Box>
                   </>
                 )
               }}
             </Formik>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </>
     )
   }
