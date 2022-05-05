@@ -288,6 +288,7 @@ export default function ChatPage(props) {
           ? firstMessage.senderName
           : firstMessage.receiverName
 
+      ad = firstMessage.ad._id
 
       setTitle(
         `Диалог с ${receiverName} относительно ${firstMessage.ad.wasteType.name}`
