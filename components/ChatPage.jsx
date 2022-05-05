@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Fade,
   Box,
@@ -173,9 +173,10 @@ export default function ChatPage(props) {
     if (isLoaded) ensureScroll()
   }
 
-  const handleSubmit = async (values, errors, options) => {
-    if (!dialogData || errors.message) return
+  const handleSubmit = async (values, options) => {
+    if (!dialogData) return
     const { setSubmitting, resetForm } = options
+
     setSubmitting(true)
     createMessageMutation({
       variables: {
@@ -446,19 +447,16 @@ export default function ChatPage(props) {
               validationSchema={chatSchema}
               validateOnChange={false}
               validateOnBlur={false}
-              onSubmit={async (
-                values,
-                errors,
-                { setSubmitting, resetForm }
-              ) => {
+              onSubmit={async (values, { setSubmitting, resetForm }) => {
                 const options = {
                   setSubmitting,
                   resetForm,
                 }
-                handleSubmit(values, errors, options)
+                await handleSubmit(values, options)
               }}
             >
-              {({ isSubmitting, values, errors, setFieldValue }) => {
+              {({ isSubmitting, values, errors, setFieldValue, setErrors }) => {
+                if (errors.message) setErrors({})
                 let availableSymbols = charsLeft - values.message.length
                 availableSymbols = availableSymbols >= 0 ? availableSymbols : 0
 
