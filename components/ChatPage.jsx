@@ -288,7 +288,10 @@ export default function ChatPage(props) {
           ? firstMessage.senderName
           : firstMessage.receiverName
 
-      ad = firstMessage.ad
+
+      setTitle(
+        `Диалог с ${receiverName} относительно ${firstMessage.ad.wasteType.name}`
+      )
 
       if (dialogReceiverId && dialogInitiatorId) {
         setDialogData({
@@ -331,14 +334,6 @@ export default function ChatPage(props) {
   useEffect(() => {
     if (messageContainerRef.current) ensureScroll()
   })
-
-  useEffect(() => {
-    if (dialogData) {
-      setTitle(
-        `Диалог с ${dialogData.receiverName} относительно ${dialogData.ad.wasteType.name}`
-      )
-    }
-  }, [dialogData])
 
   //ToDo: Add no data overlay
   let content = null
