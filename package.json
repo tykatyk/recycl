@@ -37,6 +37,7 @@
     "formik-material-ui": "^4.0.0-alpha.1",
     "formik-material-ui-lab": "^1.0.0-alpha.1",
     "graphql": "^15.5.3",
+    "graphql-ws": "^5.8.1",
     "lodash": "^4.17.21",
     "micro": "^9.3.4",
     "mongoose": "^5.13.5",
