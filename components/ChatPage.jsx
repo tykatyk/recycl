@@ -469,48 +469,43 @@ export default function ChatPage(props) {
                 }
 
                 return (
-                  <>
-                    <Box style={{ alignItems: 'center' }}>
-                      <Box>
-                        <Form>
-                          <Field
-                            component={TextFieldFormik}
-                            multiline
-                            rows={4}
-                            variant="outlined"
-                            fullWidth
-                            name="message"
-                            id="message"
-                            label="Напишите что-нибудь"
-                          />
-                        </Form>
-                      </Box>
-                      <Box mb={2}>
-                        <Typography
-                          variant="body2"
-                          color="textSecondary"
-                          className={classes.remainedSymbols}
-                        >
-                          Осталось: {availableSymbols}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          type="submit"
-                          disabled={
-                            values.message.replace(whitespaceRegex, '') ===
-                              '' ||
-                            !!errors.message ||
-                            isSubmitting
-                          }
-                        >
-                          Отправить
-                        </Button>
-                      </Box>
+                  <Form>
+                    <Box>
+                      <Field
+                        component={TextFieldFormik}
+                        multiline
+                        rows={4}
+                        variant="outlined"
+                        fullWidth
+                        name="message"
+                        id="message"
+                        label="Напишите что-нибудь"
+                      />
                     </Box>
-                  </>
+                    <Box mb={2}>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        className={classes.remainedSymbols}
+                      >
+                        Осталось: {availableSymbols}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        type="submit"
+                        disabled={
+                          values.message.replace(whitespaceRegex, '') === '' ||
+                          isSubmitting
+                        }
+                      >
+                        Отправить
+                        {isSubmitting && <ButtonSubmittingCircle />}
+                      </Button>
+                    </Box>
+                  </Form>
                 )
               }}
             </Formik>
