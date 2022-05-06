@@ -18,7 +18,7 @@
     "prop-types": "^15.7.2"
   },
   "dependencies": {
-    "@apollo/client": "^3.4.10",
+    "@apollo/client": "^3.6.2",
     "@fontsource/roboto": "^4.4.5",
     "@googlemaps/google-maps-services-js": "^3.3.6",
     "@googlemaps/react-wrapper": "^1.1.19",
