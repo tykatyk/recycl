@@ -25,8 +25,7 @@ const context = ({ req }) => {
 }
 
 const apolloServer = new ApolloServer({
-  typeDefs,
-  resolvers,
+  csrfPrevention: true,
   context,
 })
 const startServer = apolloServer.start()
