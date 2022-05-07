@@ -4,6 +4,9 @@ import typeDefs from '../../lib/graphql/typeDefs'
 import resolvers from '../../lib/graphql/resolvers'
 import { getSession } from 'next-auth/react'
 import { User } from '../../lib/db/models'
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { WebSocketServer } from 'ws'
+import { useServer } from 'graphql-ws/lib/use/ws'
 
 const context = ({ req }) => {
   return (async () => {
@@ -24,10 +27,33 @@ const context = ({ req }) => {
   })()
 }
 
+const schema = makeExecutableSchema({ typeDefs, resolvers })
+
+const wsServer = new WebSocketServer({
+  port: 4000,
+  path: '/api/g',
+})
+// WebSocketServer start listening.
+const serverCleanup = useServer({ schema }, wsServer)
 const apolloServer = new ApolloServer({
+  schema,
   csrfPrevention: true,
   context,
+  plugins: [
+    // Proper shutdown for the WebSocket server.
+    {
+      async serverWillStart() {
+        console.log('drain')
+        return {
+          async drainServer() {
+            await serverCleanup.dispose()
+          },
+        }
+      },
+    },
+  ],
 })
+
 const startServer = apolloServer.start()
 
 async function handler(req, res) {
