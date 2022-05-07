@@ -15,7 +15,7 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
 import Layout from './layouts/Layout.jsx'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
-import { useApolloClient, useMutation } from '@apollo/client'
+import { useApolloClient, useMutation, useSubscription } from '@apollo/client'
 import RedirectUnathenticatedUser from './uiParts/RedirectUnathenticatedUser.jsx'
 import Snackbars from './uiParts/Snackbars.jsx'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
@@ -23,7 +23,11 @@ import { Formik, Form, Field } from 'formik'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import ErrorOverlay from './dialogs/ErrorOverlay.jsx'
-import { CREATE_MESSAGE, GET_DIALOG } from '../lib/graphql/queries/message'
+import {
+  CREATE_MESSAGE,
+  GET_DIALOG,
+  ON_MESSAGED_ADDED,
+} from '../lib/graphql/queries/message'
 import { chatSchema } from '../lib/validation'
 import whitespaceRegex from '../lib/validation/regularExpressions'
 
@@ -90,6 +94,15 @@ export default function ChatPage(props) {
     createMessageMutation,
     { loading: creatingMessage, error: createMessageError, data: messageData },
   ] = useMutation(CREATE_MESSAGE)
+
+  const { data, loading: subscriptionLoading } = useSubscription(
+    ON_MESSAGED_ADDED,
+    {
+      variables: {
+        userId: thisUserId,
+      },
+    }
+  )
 
   const dataIsCorrect = (dialogData) => {
     if (dialogData && dialogData.getDialog && dialogData.getDialog.length > 0) {
