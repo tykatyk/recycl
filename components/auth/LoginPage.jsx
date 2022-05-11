@@ -72,21 +72,23 @@ export default function SignIn() {
                 })
                   .then((data) => {
                     if (data.error) {
-                      showErrorMessages(data.error, setErrors, setBackendError)
+                      setSubmitting(false)
+                      showErrorMessages(
+                        JSON.parse(data.error),
+                        setErrors,
+                        setBackendError
+                      )
                       return
                     }
 
                     if (router.query && router.query.from) {
                       router.push(router.query.from)
-                      return
+                    } else {
+                      router.push('/')
                     }
-
-                    router.push('/')
                   })
                   .catch((error) => {
                     setBackendError('Неизвестная ошибка')
-                  })
-                  .finally(() => {
                     setSubmitting(false)
                   })
               }}
