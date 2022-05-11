@@ -70,9 +70,6 @@ export default function SignIn() {
                   password: values.password,
                   redirect: false,
                 })
-                  .then((response) => {
-                    return response.json()
-                  })
                   .then((data) => {
                     if (data.error) {
                       showErrorMessages(data.error, setErrors, setBackendError)
