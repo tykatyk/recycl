@@ -17,6 +17,7 @@ const context = ({ req }) => {
     }
     try {
       const session = await getSession({ req })
+      if (!session) return { user: null }
       const user = await User.findById(session.id, { password: 0 })
 
       return { user }
