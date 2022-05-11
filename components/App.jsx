@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { ThemeProvider, CssBaseline } from '@material-ui/core'
 import { ApolloProvider } from '@apollo/client'
-import appoloClient from '../lib/appoloClient/appoloClient'
+import { initializeApollo } from '../lib/appoloClient/appoloClient'
 import { SessionProvider } from 'next-auth/react'
 import theme from '../lib/themeStub'
 import GlobalCss from './uiParts/GlobalCss.jsx'
@@ -18,13 +18,15 @@ export default function App(props) {
     pageProps: { session, ...pageProps },
   } = props
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side')
     if (jssStyles) {
       jssStyles.parentElement.removeChild(jssStyles)
     }
   }, [])
+
+  const appoloClient = useMemo(() => initializeApollo(), [])
 
   return (
     <React.Fragment>
