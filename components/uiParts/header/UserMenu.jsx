@@ -14,8 +14,9 @@ import {
 import Link from '../Link.jsx'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
-import appoloClient from '../../../lib/appoloClient/appoloClient'
+import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 
+const apolloClient = initializeApollo()
 const useStyles = makeStyles({
   link: {
     width: '100%',
@@ -61,7 +62,7 @@ export default function UserMenu(props) {
             await signOut({
               callbackUrl: `${window.location.origin}`,
             })
-          await appoloClient.resetStore()
+          await apolloClient.resetStore()
         }}
         color="inherit"
         underline="none"

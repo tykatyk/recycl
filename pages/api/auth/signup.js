@@ -1,4 +1,4 @@
-import appoloClient from '../../../lib/appoloClient/appoloClient'
+import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 import { hash } from 'bcrypt'
 import {
   CREATE_USER,
@@ -12,6 +12,7 @@ import {
   errorResponse,
   captchaNotPassedResponse,
 } from '../../../lib/helpers/responses'
+const apolloClient = initializeApollo()
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
     //if data is correct, check if user already exists
     let result = null
     try {
-      result = await appoloClient.query({
+      result = await apolloClient.query({
         query: GET_USER_BY_EMAIL,
         variables: { email },
       })
@@ -67,7 +68,7 @@ export default async function handler(req, res) {
       ) {
         //delete this user
         try {
-          await appoloClient.mutate({
+          await apolloClient.mutate({
             mutation: DELETE_NOT_CONFIRMED_USER,
             variables: { id: _id },
           })
@@ -105,7 +106,7 @@ export default async function handler(req, res) {
     //if user doesn't exist, create one
     let user = null
     try {
-      user = await appoloClient.mutate({
+      user = await apolloClient.mutate({
         mutation: CREATE_USER,
         variables: {
           user: {

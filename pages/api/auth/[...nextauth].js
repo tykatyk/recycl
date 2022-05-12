@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import appoloClient from '../../../lib/appoloClient/appoloClient'
+import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 import { compare } from 'bcrypt'
 import {
   GET_USER_BY_EMAIL,
@@ -10,6 +10,7 @@ import {
 import { loginSchema } from '../../../lib/validation'
 import nextAuthDbAdapter from '../../../lib/nextAuthDbAdapter'
 import * as nodeUrl from 'url'
+const apolloClient = initializeApollo()
 
 export default NextAuth({
   session: {
@@ -69,7 +70,7 @@ export default NextAuth({
         //if data is correct, check if user exists
         let result
         try {
-          result = await appoloClient.query({
+          result = await apolloClient.query({
             query: GET_USER_BY_EMAIL,
             variables: { email },
           })
@@ -103,7 +104,7 @@ export default NextAuth({
           new Date(confirmEmailExpires * 1000) >= Date.now()
         ) {
           //delete this user
-          await appoloClient.mutate({
+          await apolloClient.mutate({
             mutation: DELETE_NOT_CONFIRMED_USER,
             variables: { id: _id },
           })

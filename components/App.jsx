@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { ThemeProvider, CssBaseline } from '@material-ui/core'
 import { ApolloProvider } from '@apollo/client'
-import { initializeApollo } from '../lib/appoloClient/appoloClient'
+import { initializeApollo } from '../lib/apolloClient/apolloClient'
 import { SessionProvider } from 'next-auth/react'
 import theme from '../lib/themeStub'
 import GlobalCss from './uiParts/GlobalCss.jsx'
@@ -26,7 +26,7 @@ export default function App(props) {
     }
   }, [])
 
-  const appoloClient = useMemo(() => initializeApollo(), [])
+  const apolloClient = useMemo(() => initializeApollo(), [])
 
   return (
     <React.Fragment>
@@ -34,7 +34,7 @@ export default function App(props) {
         <CssBaseline />
         {globalStyles}
         <SessionProvider session={session}>
-          <ApolloProvider client={appoloClient}>
+          <ApolloProvider client={apolloClient}>
             <Component {...pageProps} />
           </ApolloProvider>
         </SessionProvider>

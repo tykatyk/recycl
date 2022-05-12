@@ -1,7 +1,7 @@
 import React from 'react'
 import Dialogs from '../../../components/dialogs/DialogsPage.jsx'
 import { DELETE_STALE_DIALOGS } from '../../../lib/graphql/queries/message'
-import appoloClient from '../../../lib/appoloClient/appoloClient'
+import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 
 export default function Index() {
   return <Dialogs />
@@ -10,7 +10,8 @@ export default function Index() {
 export async function getServerSideProps(context) {
   const res = { props: {} }
 
-  await appoloClient
+  const apolloClient = initializeApollo()
+  await apolloClient
     .mutate({
       mutation: DELETE_STALE_DIALOGS,
       context: {
