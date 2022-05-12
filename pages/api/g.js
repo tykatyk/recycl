@@ -6,7 +6,6 @@ import { getSession } from 'next-auth/react'
 import { User } from '../../lib/db/models'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { WebSocketServer } from 'ws'
-import { useServer } from 'graphql-ws/lib/use/ws'
 
 const context = ({ req }) => {
   return (async () => {
@@ -30,34 +29,28 @@ const context = ({ req }) => {
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 
-const wsServer = new WebSocketServer({
-  port: 4000,
-  path: '/api/g',
-})
-// WebSocketServer start listening.
-const serverCleanup = useServer({ schema }, wsServer)
+const initializeWebSocketServer = (req, res) => {
+  if (!res.socket.server.wss) {
+    console.log('Starting wss')
+    const wss = new WebSocketServer({ noServer: true })
+    res.socket.server.on('upgrade', function upgrade(request, socket, head) {
+      wss.handleUpgrade(request, socket, head, function done(ws) {
+        wss.emit('connection', ws, request)
+      })
+    })
+    res.socket.server.wss = wss
+  }
+}
+
 const apolloServer = new ApolloServer({
   schema,
   csrfPrevention: true,
   context,
-  plugins: [
-    // Proper shutdown for the WebSocket server.
-    {
-      async serverWillStart() {
-        console.log('drain')
-        return {
-          async drainServer() {
-            await serverCleanup.dispose()
-          },
-        }
-      },
-    },
-  ],
 })
 
 const startServer = apolloServer.start()
 
-async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.setHeader('Access-Control-Allow-Origin', `${process.env.NEXT_PUBLIC_URL}`)
   res.setHeader(
@@ -69,13 +62,14 @@ async function handler(req, res) {
     return false
   }
 
+  initializeWebSocketServer(req, res)
+
   await startServer
   await apolloServer.createHandler({
     path: '/api/g',
   })(req, res)
 }
 
-export default handler
 export const config = {
   api: {
     bodyParser: false,
