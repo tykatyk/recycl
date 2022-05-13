@@ -185,7 +185,7 @@ export default function ChatPage(props) {
   }
 
   const handleResize = (isLoaded) => {
-    if (isLoaded) ensureScroll()
+    if (isLoaded && items.length > 0) ensureScroll()
   }
 
   const handleSubmit = async (values, options) => {
@@ -354,7 +354,7 @@ export default function ChatPage(props) {
   //make sure that message container has scroll bar
   //to enable user to load more data by scrolling
   useEffect(() => {
-    if (messageContainerRef.current) ensureScroll()
+    if (items.length > 0) ensureScroll()
   })
 
   //update unread dialogs counter
