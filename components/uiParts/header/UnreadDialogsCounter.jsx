@@ -19,7 +19,6 @@ export default function UnreadDialogsCounter(props) {
   useEffect(async () => {
     if (numViewed) {
       await refetch()
-      console.log('here')
       setNumViewed(0)
     }
   }, [numViewed])
