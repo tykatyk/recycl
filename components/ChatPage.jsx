@@ -257,7 +257,7 @@ export default function ChatPage(props) {
   }, [])
 
   useEffect(() => {
-    if (items.length == 0 && dialogId) getMoreData()
+    if (dialogId) getMoreData()
   }, [dialogId])
 
   useEffect(() => {
