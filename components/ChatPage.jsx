@@ -27,6 +27,7 @@ import {
   CREATE_MESSAGE,
   GET_DIALOG,
   ON_MESSAGED_ADDED,
+  GET_UNREAD_DIALOG_IDS,
 } from '../lib/graphql/queries/message'
 import { chatSchema } from '../lib/validation'
 import whitespaceRegex from '../lib/validation/regularExpressions'
@@ -89,6 +90,7 @@ export default function ChatPage(props) {
   const client = useApolloClient()
   const [loading, setLoading] = useState(false)
   const [getDialogError, setGetDialogError] = useState('')
+  const [numUnreadUpdated, setNumUnreadUpdated] = useState(false)
 
   const [
     createMessageMutation,
@@ -348,6 +350,15 @@ export default function ChatPage(props) {
   useEffect(() => {
     if (messageContainerRef.current) ensureScroll()
   })
+
+  //update unread dialogs counter
+  useEffect(() => {
+    if (!numUnreadUpdated && dialogData) {
+      client.refetchQueries({ include: [GET_UNREAD_DIALOG_IDS] }).then(() => {
+        setNumUnreadUpdated(true)
+      })
+    }
+  }, [dialogData])
 
   //ToDo: Add no data overlay
   let content = null
