@@ -266,11 +266,14 @@ export default function ChatPage(props) {
     let i = 0
     let currentPos = 0
 
+    //calculate anchor scroll top position
     while (i < anchorIndex) {
       nodeHeight = nodesRef.current[i].offsetHeight
       currentPos += nodeHeight
       i++
     }
+
+    //scroll to desired position
     if (initialLoad) {
       messageContainerRef.current.scrollTop =
         messageContainerRef.current.scrollHeight
@@ -278,6 +281,7 @@ export default function ChatPage(props) {
       messageContainerRef.current.scrollTop = currentPos
     }
 
+    //set dialog data to enable sending messages
     if (!dialogData) {
       const firstMessage = items[0].data
       //dialogReceiverId and dialogInitiatorId are the same in each message which belongs to this dialog
@@ -347,6 +351,8 @@ export default function ChatPage(props) {
     }
   }, [items, anchorIndex])
 
+  //make sure that message container has scroll bar
+  //to enable user to load more data by scrolling
   useEffect(() => {
     if (messageContainerRef.current) ensureScroll()
   })
