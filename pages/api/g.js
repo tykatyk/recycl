@@ -28,8 +28,9 @@ const context = ({ req }) => {
 }
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
-
+let initializing = false
 const initializeWebSocketServer = (req, res) => {
+  initializing = true
   if (!res.socket.server.wss) {
     console.log('Starting wss')
     const wss = new WebSocketServer({ noServer: true })
@@ -40,6 +41,7 @@ const initializeWebSocketServer = (req, res) => {
     })
     res.socket.server.wss = wss
   }
+  initializing = false
 }
 
 const apolloServer = new ApolloServer({
@@ -62,7 +64,7 @@ export default async function handler(req, res) {
     return false
   }
 
-  initializeWebSocketServer(req, res)
+  if (!initializing) initializeWebSocketServer(req, res)
 
   await startServer
   await apolloServer.createHandler({
