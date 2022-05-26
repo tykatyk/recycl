@@ -4,8 +4,6 @@ import typeDefs from '../../lib/graphql/typeDefs'
 import resolvers from '../../lib/graphql/resolvers'
 import { getSession } from 'next-auth/react'
 import { User } from '../../lib/db/models'
-import { makeExecutableSchema } from '@graphql-tools/schema'
-import { WebSocketServer } from 'ws'
 
 const context = ({ req }) => {
   return (async () => {
@@ -27,25 +25,9 @@ const context = ({ req }) => {
   })()
 }
 
-const schema = makeExecutableSchema({ typeDefs, resolvers })
-let initializing = false
-const initializeWebSocketServer = (req, res) => {
-  initializing = true
-  if (!res.socket.server.wss) {
-    console.log('Starting wss')
-    const wss = new WebSocketServer({ noServer: true })
-    res.socket.server.on('upgrade', function upgrade(request, socket, head) {
-      wss.handleUpgrade(request, socket, head, function done(ws) {
-        wss.emit('connection', ws, request)
-      })
-    })
-    res.socket.server.wss = wss
-  }
-  initializing = false
-}
-
 const apolloServer = new ApolloServer({
-  schema,
+  typeDefs,
+  resolvers,
   csrfPrevention: true,
   context,
 })
@@ -63,8 +45,6 @@ export default async function handler(req, res) {
     res.end()
     return false
   }
-
-  if (!initializing) initializeWebSocketServer(req, res)
 
   await startServer
   await apolloServer.createHandler({
