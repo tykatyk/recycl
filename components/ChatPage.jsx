@@ -182,7 +182,7 @@ export default function ChatPage(props) {
     const { setSubmitting, resetForm } = options
 
     setSubmitting(true)
-    createMessageMutation({
+    await createMessageMutation({
       variables: {
         message: {
           ...dialogData,
@@ -463,11 +463,10 @@ export default function ChatPage(props) {
               validateOnChange={false}
               validateOnBlur={false}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
-                const options = {
+                await handleSubmit(values, {
                   setSubmitting,
                   resetForm,
-                }
-                await handleSubmit(values, options)
+                })
               }}
             >
               {({ isSubmitting, values, errors, setFieldValue, setErrors }) => {
