@@ -148,6 +148,8 @@ export default function ChatPage(props) {
     result.data.getDialog.forEach((item) =>
       newItems.push({ data: item, height: 0 })
     )
+
+    newItems.reverse() //ToDo: should be refactored
     setItems([...newItems, ...prevItems])
 
     const numLoaded = result.data.getDialog.length
