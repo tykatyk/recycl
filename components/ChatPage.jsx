@@ -15,7 +15,7 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
 import Layout from './layouts/Layout.jsx'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
-import { useApolloClient, useMutation, useSubscription } from '@apollo/client'
+import { useApolloClient, useMutation } from '@apollo/client'
 import RedirectUnathenticatedUser from './uiParts/RedirectUnathenticatedUser.jsx'
 import Snackbars from './uiParts/Snackbars.jsx'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
@@ -26,7 +26,6 @@ import ErrorOverlay from './dialogs/ErrorOverlay.jsx'
 import {
   CREATE_MESSAGE,
   GET_DIALOG,
-  ON_MESSAGED_ADDED,
   GET_UNREAD_DIALOG_IDS,
 } from '../lib/graphql/queries/message'
 import { chatSchema } from '../lib/validation'
