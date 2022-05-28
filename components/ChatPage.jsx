@@ -91,19 +91,7 @@ export default function ChatPage(props) {
   const [getDialogError, setGetDialogError] = useState('')
   const [numUnreadUpdated, setNumUnreadUpdated] = useState(false)
 
-  const [
-    createMessageMutation,
-    { loading: creatingMessage, error: createMessageError, data: messageData },
-  ] = useMutation(CREATE_MESSAGE)
-
-  const { data, loading: subscriptionLoading } = useSubscription(
-    ON_MESSAGED_ADDED,
-    {
-      variables: {
-        userId: thisUserId,
-      },
-    }
-  )
+  const [createMessageMutation] = useMutation(CREATE_MESSAGE)
 
   const dataIsCorrect = (dialogData) => {
     if (dialogData && dialogData.getDialog && dialogData.getDialog.length > 0) {
