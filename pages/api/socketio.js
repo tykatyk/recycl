@@ -15,6 +15,7 @@ export default async function socketHandler(req, res) {
     res.socket.server.io = io
 
     io.on('connection', (socket) => {
+      console.log('socket client connected')
       socket.join(socket.userId)
 
       socket.on('messageAdded', (msg) => {
