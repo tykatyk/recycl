@@ -36,3 +36,9 @@ export default async function socketHandler(req, res) {
 
   res.end()
 }
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
