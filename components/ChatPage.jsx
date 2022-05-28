@@ -114,7 +114,7 @@ export default function ChatPage(props) {
   const [dialogData, setDialogData] = useState(null)
   const [title, setTitle] = useState('Диалог | Recycl')
 
-  const limit = 1 //num messages to receive when quering database
+  const limit = 50 //number of messages to receive when quering database
   const charsLeft = 1000
   const messageContainerRef = useRef()
   const nodesRef = useRef([])
