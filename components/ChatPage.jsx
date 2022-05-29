@@ -24,6 +24,7 @@ import { Formik, Form, Field } from 'formik'
 import PageLoadingCircle from './uiParts/PageLoadingCircle.jsx'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
 import ErrorOverlay from './dialogs/ErrorOverlay.jsx'
+import NoDataOverlay from './dialogs/NoDataOverlay.jsx'
 import {
   CREATE_MESSAGE,
   GET_DIALOG,
@@ -447,8 +448,7 @@ export default function ChatPage(props) {
     }
   }, [dialogData])
 
-  //ToDo: Add no data overlay
-  let content = null
+  let content = <NoDataOverlay />
   if (items.length == 0 && loading) content = <PageLoadingCircle />
   if (items.length == 0 && getDialogError) content = <ErrorOverlay />
   if (items.length > 0) {
