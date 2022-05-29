@@ -129,7 +129,7 @@ export default function ChatPage(props) {
    *@param {number} limit  number of messages to load when quering database
    *@param {string} offset id of the first message in items array
    */
-  const getMoreData = async function (offset = '', limit = 50) {
+  const getMoreData = async function (offset = '', limit = numMessagesToLoad) {
     if (!dialogId || !canLoadMore || loading) return
 
     setLoading(true)
@@ -172,7 +172,7 @@ export default function ChatPage(props) {
 
     setItems([...newItems, ...items])
 
-    if (canLoadMore && result.data.getDialog.length < count) {
+    if (canLoadMore && result.data.getDialog.length < numMessagesToLoad) {
       setCanLoadMore(false)
     }
   }
