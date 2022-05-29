@@ -119,6 +119,8 @@ export default function ChatPage(props) {
   const [socket, setSocket] = useState(null)
   const [userIsTyping, setUserIsTyping] = useState(false)
   const [newMessage, setNewMessage] = useState(null)
+
+  //ToDo: refactor args names
   const getMoreData = async function (offset = '', count = limit) {
     if (!dialogId || !canLoadMore || loading) return
 
@@ -150,8 +152,8 @@ export default function ChatPage(props) {
 
     const prevItems = items
     let newItems = []
-    result.data.getDialog.forEach((item) =>
-      newItems.push({ data: item, height: 0 })
+    result.data.getDialog.forEach(
+      (item) => newItems.push({ data: item, height: 0 }) //ToDo: delete height property and refactor item object
     )
 
     newItems.reverse() //ToDo: should be refactored
@@ -272,6 +274,7 @@ export default function ChatPage(props) {
     //start webSocket server if it's not already started
     socketInitializer()
 
+    //add resize listener
     let isLoaded = true
     window.addEventListener('resize', () => handleResize(isLoaded))
 
