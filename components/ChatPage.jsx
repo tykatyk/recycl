@@ -119,6 +119,7 @@ export default function ChatPage(props) {
   const [socket, setSocket] = useState(null)
   const [userIsTyping, setUserIsTyping] = useState(false)
   const [newMessage, setNewMessage] = useState(null)
+  const [scrolledToBottom, setScrolledToBottom] = useState(true)
 
   //ToDo: refactor args names
   const getMoreData = async function (offset = '', count = limit) {
@@ -171,21 +172,8 @@ export default function ChatPage(props) {
     }
   }
 
-  const ensureScroll = () => {
-    if (
-      messageContainerRef.current &&
-      messageContainerRef.current.scrollHeight <=
-        messageContainerRef.current.offsetHeight &&
-      canLoadMore
-    ) {
-      getMoreData(items[0].data._id)
-    } else if (initialLoad) {
-      setInitialLoad(false)
-    }
-  }
-
   const handleResize = (isLoaded) => {
-    if (isLoaded && items.length > 0) ensureScroll()
+    if (isLoaded) handleScroll()
   }
 
   const handleSubmit = async (values, options) => {
@@ -218,27 +206,48 @@ export default function ChatPage(props) {
       })
   }
 
-  const handleScroll = async (e) => {
+  const isScrolledToBottom = () => {
     const messageContainer = messageContainerRef.current
     const currScroll = messageContainer.scrollTop
-    if (currScroll === 0 && canLoadMore) {
-      getMoreData(items[0].data._id)
-      return
-    }
-
     if (
       messageContainer.scrollHeight -
         currScroll -
         messageContainer.clientHeight <
-        1 &&
-      showScrollBottom
+      1
     ) {
-      setShowScrollBottom(false)
-    } else {
-      const delta = currScroll - prevScroll
-      if (delta > messageContainer.scrollHeight && !showScrollBottom)
-        setShowScrollBottom(true)
+      return true
     }
+    return false
+  }
+
+  const handleScroll = (e) => {
+    const messageContainer = messageContainerRef.current
+    if (!messageContainer) return
+
+    const currScroll = messageContainer.scrollTop
+    if (currScroll === 0 && canLoadMore) {
+      getMoreData(items[0].data._id)
+      return
+    } else if (initialLoad) {
+      setInitialLoad(false)
+    }
+
+    //check if messageContainer is scrolled to bottom
+    if (isScrolledToBottom()) {
+      if (showScrollBottom) setShowScrollBottom(false)
+      if (newMessage) setNewMessage(null)
+      if (!scrolledToBottom) setScrolledToBottom(true)
+    } else {
+      if (scrolledToBottom) setScrolledToBottom(false)
+      if (
+        messageContainer.scrollHeight - currScroll >
+          2 * messageContainer.offsetHeight &&
+        !showScrollBottom
+      ) {
+        setShowScrollBottom(true)
+      }
+    }
+  }
   const handleScrollBottomClick = () => {
     const messageContainer = messageContainerRef.current
     messageContainer.style.scrollBehavior = 'smooth'
