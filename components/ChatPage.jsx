@@ -8,6 +8,7 @@ import {
   ListItemText,
   Fab,
   Paper,
+  Badge,
   Typography,
   makeStyles,
 } from '@material-ui/core'
@@ -30,6 +31,7 @@ import {
 } from '../lib/graphql/queries/message'
 import { chatSchema } from '../lib/validation'
 import whitespaceRegex from '../lib/validation/regularExpressions'
+import io from 'socket.io-client'
 
 const messageContainerHeight = 400
 
@@ -113,7 +115,9 @@ export default function ChatPage(props) {
   const [severity, setSeverity] = useState('')
   const [notification, setNotification] = useState('')
   const [showScrollBottom, setShowScrollBottom] = useState(false)
-  const [prevScroll, setPrevScroll] = useState(0)
+  const [socket, setSocket] = useState(null)
+  const [userIsTyping, setUserIsTyping] = useState(false)
+  const [newMessage, setNewMessage] = useState(null)
   const getMoreData = async function (offset = '', count = limit) {
     if (!dialogId || !canLoadMore || loading) return
 
@@ -194,6 +198,8 @@ export default function ChatPage(props) {
       },
     })
       .then((data) => {
+        //emit newMessage event after user has sent new message
+        if (socket && data && data.data) socket.emit('messageAdded', data.data)
         resetForm()
       })
       .catch((error) => {
@@ -227,15 +233,34 @@ export default function ChatPage(props) {
         setShowScrollBottom(true)
     }
 
-    setPrevScroll(currScroll)
-  }
+  const socketInitializer = async () => {
+    await fetch('/api/socketio')
+    const newSocket = io({ autoConnect: false })
 
-  const handleScrollBottomClick = () => {
-    messageContainerRef.current.scrollTop =
-      messageContainerRef.current.scrollHeight
+    newSocket.off('newMessage').on('newMessage', (message) => {
+      if (isScrolledToBottom()) {
+        setScrolledToBottom(true)
+      } else {
+        setScrolledToBottom(false)
+      }
+      setNewMessage(message.createMessage)
+
+      setItems((prevItems) => [
+        ...prevItems,
+        { data: message.createMessage, height: 0 },
+      ])
+    })
+
+    newSocket.off('typing').on('typing', () => {
+      setUserIsTyping(true)
+    })
+    setSocket(newSocket)
   }
 
   useEffect(() => {
+    //start webSocket server if it's not already started
+    socketInitializer()
+
     let isLoaded = true
     window.addEventListener('resize', () => handleResize(isLoaded))
 
@@ -246,29 +271,32 @@ export default function ChatPage(props) {
   }, [])
 
   useEffect(() => {
-    if (dialogId) getMoreData()
-  }, [dialogId])
+    if (!session || !socket) return
+    if (!socket.connected) {
+      socket.auth = { userId: session.id }
+      socket.connect()
+    }
+
+    return () => {
+      if (socket && socket.connected) socket.disconnect()
+    }
+  }, [session, socket])
 
   useEffect(() => {
-    if (!messageContainerRef.current) return
-    let nodeHeight = 0
-    let i = 0
-    let currentPos = 0
+    if (!userIsTyping) return
+    let isActive = true
 
-    //calculate anchor scroll top position
-    while (i < anchorIndex) {
-      nodeHeight = nodesRef.current[i].offsetHeight
-      currentPos += nodeHeight
-      i++
-    }
+    setTimeout(() => {
+      if (isActive) {
+        setUserIsTyping(false)
+      }
+    }, 700)
 
-    //scroll to desired position
-    if (initialLoad) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight
-    } else {
-      messageContainerRef.current.scrollTop = currentPos
+    return () => {
+      isActive = false
     }
+  }, [userIsTyping])
+
 
     //set dialog data to enable sending messages
     if (!dialogData) {
@@ -434,6 +462,16 @@ export default function ChatPage(props) {
                 )
               })}
             </List>
+            {userIsTyping && (
+              <Fade
+                in={userIsTyping}
+                style={{ position: 'absolute', bottom: 16, left: 16 }}
+              >
+                <Typography variant="body2" color="textSecondary">
+                  Печатает...
+                </Typography>
+              </Fade>
+            )}
             {showScrollBottom && (
               <Fade in={showScrollBottom}>
                 <Fab
@@ -449,7 +487,18 @@ export default function ChatPage(props) {
                     handleScrollBottomClick()
                   }}
                 >
-                  <ArrowDownwardIcon />
+                  {newMessage ? (
+                    <Badge
+                      color="error"
+                      badgeContent=" "
+                      overlap="circular"
+                      variant="dot"
+                    >
+                      <ArrowDownwardIcon />
+                    </Badge>
+                  ) : (
+                    <ArrowDownwardIcon />
+                  )}
                 </Fab>
               </Fade>
             )}
@@ -483,7 +532,15 @@ export default function ChatPage(props) {
                 }
 
                 return (
-                  <Form>
+                  <Form
+                    onChange={(e) => {
+                      if (socket && dialogData && dialogData.receiverId) {
+                        socket.emit('userIsTyping', {
+                          receiverId: dialogData.receiverId,
+                        })
+                      }
+                    }}
+                  >
                     <Box>
                       <Field
                         component={TextFieldFormik}
