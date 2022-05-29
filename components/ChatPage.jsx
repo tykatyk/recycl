@@ -320,6 +320,12 @@ export default function ChatPage(props) {
     }
   }, [userIsTyping])
 
+  //load initial data
+  useEffect(() => {
+    //ToDo: maybe drop items.length condition
+    if (dialogId && items.length == 0) getMoreData()
+  }, [dialogId])
+
 
     //set dialog data to enable sending messages
     if (!dialogData) {
