@@ -154,7 +154,7 @@ export default function ChatPage(props) {
     const prevItems = items
     let newItems = []
     result.data.getDialog.forEach(
-      (item) => newItems.push({ data: item, height: 0 }) //ToDo: delete height property and refactor item object
+      (item) => newItems.push(item) //ToDo: delete height property and refactor item object
     )
 
     newItems.reverse() //ToDo: should be refactored
@@ -194,6 +194,7 @@ export default function ChatPage(props) {
     })
       .then((data) => {
         //emit newMessage event after user has sent new message
+        //ToDo refactor var names
         if (socket && data && data.data) socket.emit('messageAdded', data.data)
         resetForm()
       })
@@ -226,7 +227,7 @@ export default function ChatPage(props) {
 
     const currScroll = messageContainer.scrollTop
     if (currScroll === 0 && canLoadMore) {
-      getMoreData(items[0].data._id)
+      getMoreData(items[0]._id)
       return
     } else if (initialLoad) {
       setInitialLoad(false)
@@ -267,10 +268,7 @@ export default function ChatPage(props) {
       }
       setNewMessage(message.createMessage)
 
-      setItems((prevItems) => [
-        ...prevItems,
-        { data: message.createMessage, height: 0 },
-      ])
+      setItems((prevItems) => [...prevItems, message.createMessage])
     })
 
     newSocket.off('typing').on('typing', () => {
@@ -331,7 +329,7 @@ export default function ChatPage(props) {
 
     //set dialog data to enable sending messages
     if (!dialogData) {
-      const firstMessage = items[0].data
+      const firstMessage = items[0]
       //dialogReceiverId and dialogInitiatorId are the same in each message which belongs to this dialog
       let dialogReceiverId = firstMessage.dialogReceiverId
       let dialogInitiatorId = firstMessage.dialogInitiatorId
@@ -479,8 +477,7 @@ export default function ChatPage(props) {
               ref={messageContainerRef}
               onScroll={(e) => handleScroll(e)}
             >
-              {items.map((item, index) => {
-                const message = item.data
+              {items.map((message, index) => {
                 const now = new Date()
                 const currMonth = now.getMonth()
                 const currDate = now.getDate()
