@@ -326,6 +326,8 @@ export default function ChatPage(props) {
     if (dialogId && items.length == 0) getMoreData()
   }, [dialogId])
 
+  useEffect(() => {
+    if (items.length === 0) return
 
     //set dialog data to enable sending messages
     if (!dialogData) {
@@ -395,7 +397,7 @@ export default function ChatPage(props) {
         ad,
       })
     }
-  }, [items, anchorIndex])
+  }, [items])
 
   //make sure that message container has scroll bar
   //to enable user to load more data when he scrolls
