@@ -104,7 +104,6 @@ export default function ChatPage(props) {
   const [dialogData, setDialogData] = useState(null)
   const [title, setTitle] = useState('Диалог | Recycl')
 
-  const limit = 50 //number of messages to receive when quering database
   const charsLeft = 1000
   const messageContainerRef = useRef()
   const nodesRef = useRef([])
@@ -121,8 +120,15 @@ export default function ChatPage(props) {
   const [newMessage, setNewMessage] = useState(null)
   const [scrolledToBottom, setScrolledToBottom] = useState(true)
 
-  //ToDo: refactor args names
-  const getMoreData = async function (offset = '', count = limit) {
+  /**
+   * Loads paginated data from database and sets them into the state.
+   *
+   * You don't need to provide offset at initial load
+   * but you have to provide it further or you'll allways retrieve the same data
+   *@param {number} limit  number of messages to load when quering database
+   *@param {string} offset id of the first message in items array
+   */
+  const getMoreData = async function (offset = '', limit = 50) {
     if (!dialogId || !canLoadMore || loading) return
 
     setLoading(true)
@@ -132,7 +138,7 @@ export default function ChatPage(props) {
         variables: {
           id: dialogId,
           offset,
-          limit: count,
+          limit,
         },
       })
       .then((result) => {
