@@ -110,7 +110,7 @@ export default function ChatPage(props) {
   const nodesRef = useRef([])
   const [initialLoad, setInitialLoad] = useState(true)
   const [items, setItems] = useState([])
-  const [anchorIndex, setAnchorIndex] = useState(0) //ToDo: refactor to be a ref
+  const anchorIndex = useRef(0)
   const prevAnchorIndex = useRef(0)
   const [canLoadMore, setCanLoadMore] = useState(true)
   const [severity, setSeverity] = useState('')
@@ -161,7 +161,7 @@ export default function ChatPage(props) {
     setItems([...newItems, ...prevItems])
 
     const numLoaded = result.data.getDialog.length
-    setAnchorIndex(numLoaded)
+    anchorIndex.current = numLoaded
 
     if (prevItems.length > 0 && numLoaded > 0) {
       prevAnchorIndex.current = 0
@@ -406,16 +406,16 @@ export default function ChatPage(props) {
     let currentPos = 0
 
     //calculate anchor scroll top position
-    while (i < anchorIndex) {
+    while (i < anchorIndex.current) {
       nodeHeight = nodesRef.current[i].offsetHeight
       currentPos += nodeHeight
       i++
     }
 
     //scroll to desired position
-    if (anchorIndex !== prevAnchorIndex.current) {
+    if (anchorIndex.current !== prevAnchorIndex.current) {
       messageContainerRef.current.scrollTop = currentPos
-      prevAnchorIndex.current = anchorIndex
+      prevAnchorIndex.current = anchorIndex.current
     } else if (
       initialLoad ||
       (newMessage && newMessage.senderId === thisUserId) ||
