@@ -318,7 +318,6 @@ export default function ChatPage(props) {
 
   //load initial data
   useEffect(() => {
-    //ToDo: maybe drop items.length condition
     if (dialogId && items.length == 0) getMoreData()
   }, [dialogId])
 
