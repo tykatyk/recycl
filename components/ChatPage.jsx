@@ -190,10 +190,10 @@ export default function ChatPage(props) {
         },
       },
     })
-      .then((data) => {
+      .then((result) => {
         //emit newMessage event after user has sent new message
-        //ToDo refactor var names
-        if (socket && data && data.data) socket.emit('messageAdded', data.data)
+        if (socket && result && result.data)
+          socket.emit('messageAdded', result.data)
         resetForm()
       })
       .catch((error) => {
