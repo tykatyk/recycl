@@ -110,7 +110,8 @@ export default function ChatPage(props) {
   const nodesRef = useRef([])
   const [initialLoad, setInitialLoad] = useState(true)
   const [items, setItems] = useState([])
-  const [anchorIndex, setAnchorIndex] = useState(0)
+  const [anchorIndex, setAnchorIndex] = useState(0) //ToDo: refactor to be a ref
+  const prevAnchorIndex = useRef(0)
   const [canLoadMore, setCanLoadMore] = useState(true)
   const [severity, setSeverity] = useState('')
   const [notification, setNotification] = useState('')
@@ -157,7 +158,11 @@ export default function ChatPage(props) {
     setItems([...newItems, ...prevItems])
 
     const numLoaded = result.data.getDialog.length
-    if (prevItems.length > 0) setAnchorIndex(numLoaded)
+    setAnchorIndex(numLoaded)
+
+    if (prevItems.length > 0 && numLoaded > 0) {
+      prevAnchorIndex.current = 0
+    }
 
     if (canLoadMore && result.data.getDialog.length < count) {
       setCanLoadMore(false)
@@ -369,10 +374,41 @@ export default function ChatPage(props) {
   }, [items, anchorIndex])
 
   //make sure that message container has scroll bar
-  //to enable user to load more data by scrolling
+  //to enable user to load more data when he scrolls
   useEffect(() => {
-    if (items.length > 0) ensureScroll()
-  })
+    if (!messageContainerRef.current) return
+    let nodeHeight = 0
+    let i = 0
+    let currentPos = 0
+
+    //calculate anchor scroll top position
+    while (i < anchorIndex) {
+      nodeHeight = nodesRef.current[i].offsetHeight
+      currentPos += nodeHeight
+      i++
+    }
+
+    //scroll to desired position
+    if (anchorIndex !== prevAnchorIndex.current) {
+      messageContainerRef.current.scrollTop = currentPos
+      prevAnchorIndex.current = anchorIndex
+    } else if (
+      initialLoad ||
+      (newMessage && newMessage.senderId === thisUserId) ||
+      (newMessage && newMessage.senderId !== thisUserId && scrolledToBottom)
+    ) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight
+    } else if (
+      newMessage &&
+      newMessage.senderId !== thisUserId &&
+      !scrolledToBottom &&
+      !showScrollBottom
+    ) {
+      setShowScrollBottom(true)
+    }
+    handleScroll()
+  }, [items])
 
   //update unread dialogs counter
   useEffect(() => {
