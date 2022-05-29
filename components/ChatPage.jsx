@@ -209,7 +209,7 @@ export default function ChatPage(props) {
       })
       .catch((error) => {
         setSeverity('error')
-        setNotification('Не удалось отправить сообщение')
+        setNotification('Ошибка при отправке сообщения')
       })
       .finally(() => {
         setSubmitting(false)
