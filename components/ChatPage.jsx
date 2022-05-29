@@ -151,21 +151,19 @@ export default function ChatPage(props) {
       return
     }
 
-    const prevItems = items
-    let newItems = []
+    const numLoaded = result.data.getDialog.length
 
+    anchorIndex.current = numLoaded
+    if (items.length > 0 && numLoaded > 0) {
+      prevAnchorIndex.current = 0
+    }
+
+    let newItems = []
     for (let i = result.data.getDialog.length - 1; i >= 0; i--) {
       newItems.push(result.data.getDialog[i])
     }
 
-    setItems([...newItems, ...prevItems])
-
-    const numLoaded = result.data.getDialog.length
-    anchorIndex.current = numLoaded
-
-    if (prevItems.length > 0 && numLoaded > 0) {
-      prevAnchorIndex.current = 0
-    }
+    setItems([...newItems, ...items])
 
     if (canLoadMore && result.data.getDialog.length < count) {
       setCanLoadMore(false)
