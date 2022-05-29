@@ -237,6 +237,12 @@ export default function ChatPage(props) {
       if (delta > messageContainer.scrollHeight && !showScrollBottom)
         setShowScrollBottom(true)
     }
+  const handleScrollBottomClick = () => {
+    const messageContainer = messageContainerRef.current
+    messageContainer.style.scrollBehavior = 'smooth'
+    messageContainer.scrollTop = messageContainer.scrollHeight
+    messageContainer.style.scrollBehavior = 'auto'
+  }
 
   const socketInitializer = async () => {
     await fetch('/api/socketio')
