@@ -397,6 +397,31 @@ export default function ChatPage(props) {
     }
   }
 
+  const calculateDateTime = (message) => {
+    const now = new Date()
+    const currMonth = now.getMonth()
+    const currDate = now.getDate()
+
+    const creationDate = new Date(message.createdAt)
+    const month = creationDate.getMonth()
+    const date = creationDate.getDate()
+    const hours = creationDate.getHours()
+    const minutes = '0' + creationDate.getMinutes()
+
+    let dateTime
+    if (currDate != date || currMonth != month) {
+      dateTime = `${hours}:${minutes.substring(
+        minutes.length - 2
+      )}, ${creationDate.toLocaleString('ru-RU', {
+        day: '2-digit',
+        month: 'short',
+      })}`
+    } else {
+      dateTime = `${hours}:${minutes.substring(minutes.length - 2)}`
+    }
+    return dateTime
+  }
+
   useEffect(() => {
     //start webSocket server if it's not already started
     socketInitializer()
@@ -507,27 +532,8 @@ export default function ChatPage(props) {
               onScroll={(e) => handleScroll(e)}
             >
               {items.map((message, index) => {
-                const now = new Date()
-                const currMonth = now.getMonth()
-                const currDate = now.getDate()
+                let dateTime = calculateDateTime(message)
 
-                const creationDate = new Date(message.createdAt)
-                const month = creationDate.getMonth()
-                const date = creationDate.getDate()
-                const hours = creationDate.getHours()
-                const minutes = '0' + creationDate.getMinutes()
-
-                let dateTime
-                if (currDate != date || currMonth != month) {
-                  dateTime = `${hours}:${minutes.substring(
-                    minutes.length - 2
-                  )}, ${creationDate.toLocaleString('ru-RU', {
-                    day: '2-digit',
-                    month: 'short',
-                  })}`
-                } else {
-                  dateTime = `${hours}:${minutes.substring(minutes.length - 2)}`
-                }
                 return (
                   <ListItem
                     ref={(el) => {
