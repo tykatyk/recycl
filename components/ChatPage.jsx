@@ -37,11 +37,21 @@ import io from 'socket.io-client'
 const messageContainerHeight = 400
 
 const useStyles = makeStyles((theme) => ({
-  chat: {
+  chatContainer: {
     width: '100%',
   },
 
-  loading: {
+  dialogWrapper: {
+    position: 'relative',
+    paddingBottom: theme.spacing(7),
+  },
+
+  dialog: {
+    height: messageContainerHeight,
+    overflowY: 'auto',
+  },
+
+  loadingIndicator: {
     position: 'absolute',
     left: '50%',
     transform: 'translate(-50%, 0)',
@@ -50,17 +60,15 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: theme.spacing(1),
     padding: 4,
   },
-
-  dialog: {
-    height: messageContainerHeight,
-    overflowY: 'auto',
+  typingIndicator: {
+    position: 'absolute',
+    bottom: theme.spacing(2),
+    left: theme.spacing(2),
   },
-
-  right: {
-    justifyContent: 'flex-end',
-    '& $message': {
-      alignItems: 'flex-end',
-    },
+  newMessageIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    right: theme.spacing(4),
   },
   message: {
     display: 'flex',
@@ -77,10 +85,16 @@ const useStyles = makeStyles((theme) => ({
   messageDate: {
     marginRight: theme.spacing(1),
   },
-  remainedSymbols: {
+  //aligns messages sent by the other user to the right
+  right: {
+    justifyContent: 'flex-end',
+    '& $message': {
+      alignItems: 'flex-end',
+    },
+  },
+  remainedSymbolsIndicator: {
     marginLeft: theme.spacing(2),
   },
-  fromMe: { alignItems: 'flex-end' },
 }))
 
 export default function ChatPage(props) {
@@ -466,13 +480,13 @@ export default function ChatPage(props) {
             severity={severity}
           />
         )}
-        <Box component={Paper} className={classes.chat}>
-          <Box style={{ position: 'relative', paddingBottom: 56 }}>
+        <Box component={Paper} className={classes.chatContainer}>
+          <Box className={classes.dialogWrapper}>
             {loading && (
               <Typography
                 component="span"
                 variant="body2"
-                className={classes.loading}
+                className={classes.loadingIndicator}
               >
                 Загрузка...
               </Typography>
@@ -527,23 +541,18 @@ export default function ChatPage(props) {
               })}
             </List>
             {userIsTyping && (
-              <Fade
-                in={userIsTyping}
-                style={{ position: 'absolute', bottom: 16, left: 16 }}
-              >
+              <Fade in={userIsTyping} className={classes.typingIndicator}>
                 <Typography variant="body2" color="textSecondary">
                   Печатает...
                 </Typography>
               </Fade>
             )}
             {showScrollBottom && (
-              <Fade in={showScrollBottom}>
+              <Fade
+                in={showScrollBottom}
+                className={classes.newMessageIndicator}
+              >
                 <Fab
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    right: 36,
-                  }}
                   color="secondary"
                   size="small"
                   aria-label="scroll to bottom"
@@ -621,7 +630,7 @@ export default function ChatPage(props) {
                       <Typography
                         variant="body2"
                         color="textSecondary"
-                        className={classes.remainedSymbols}
+                        className={classes.remainedSymbolsIndicator}
                       >
                         Осталось: {availableSymbols}
                       </Typography>
