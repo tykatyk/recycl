@@ -103,9 +103,9 @@ export default function ChatPage(props) {
   const thisUserId = session && session.id ? session.id : ''
   const thisUserName = session && session.user ? session.user.name : ''
   const { dialogId } = props
-  const client = useApolloClient()
+  const apolloClient = useApolloClient()
   const [loading, setLoading] = useState(false)
-  const [getDialogError, setGetDialogError] = useState('')
+  const [messagesError, setMessagesError] = useState('') //Shows if error occurred while getting
   const [numUnreadUpdated, setNumUnreadUpdated] = useState(false)
 
   const [createMessageMutation] = useMutation(CREATE_MESSAGE)
@@ -119,7 +119,7 @@ export default function ChatPage(props) {
   const [dialogData, setDialogData] = useState(null)
   const [title, setTitle] = useState('Диалог | Recycl')
 
-  const charsLeft = 1000
+  const remainedSymbols = 1000 //Max number of symbols in a message.
   const messageContainerRef = useRef()
   const nodesRef = useRef([])
   const [initialLoad, setInitialLoad] = useState(true)
@@ -147,7 +147,7 @@ export default function ChatPage(props) {
     if (!dialogId || !canLoadMore || loading) return
 
     setLoading(true)
-    const result = await client
+    const result = await apolloClient
       .query({
         query: GET_DIALOG,
         variables: {
@@ -160,7 +160,7 @@ export default function ChatPage(props) {
         return result
       })
       .catch((error) => {
-        setGetDialogError(true)
+        setMessagesError(true)
         setSeverity('error')
         setNotification('Ошибка при загрузке данных')
         return null
@@ -456,15 +456,13 @@ export default function ChatPage(props) {
   //update unread dialogs counter
   useEffect(() => {
     if (!numUnreadUpdated && dialogData) {
-      client.refetchQueries({ include: [GET_UNREAD_DIALOG_IDS] }).then(() => {
-        setNumUnreadUpdated(true)
-      })
+      apolloClient
     }
   }, [dialogData])
 
   let content = <NoDataOverlay />
   if (items.length == 0 && loading) content = <PageLoadingCircle />
-  if (items.length == 0 && getDialogError) content = <ErrorOverlay />
+  if (items.length == 0 && messagesError) content = <ErrorOverlay />
   if (items.length > 0) {
     //ToDo: refactor inline styles in jsx
     content = (
@@ -593,13 +591,13 @@ export default function ChatPage(props) {
             >
               {({ isSubmitting, values, errors, setFieldValue, setErrors }) => {
                 if (errors.message) setErrors({})
-                let availableSymbols = charsLeft - values.message.length
+                let availableSymbols = remainedSymbols - values.message.length
                 availableSymbols = availableSymbols >= 0 ? availableSymbols : 0
 
-                if (values.message.length > charsLeft) {
+                if (values.message.length > remainedSymbols) {
                   setFieldValue(
                     'message',
-                    values.message.substring(0, charsLeft),
+                    values.message.substring(0, remainedSymbols),
                     false
                   )
                 }
