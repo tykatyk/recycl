@@ -34,6 +34,7 @@ const apolloServer = new ApolloServer({
 
 const startServer = apolloServer.start()
 
+//ToDo: make graphql server to be run on separate server, not on Nextjs server
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.setHeader('Access-Control-Allow-Origin', `${process.env.NEXT_PUBLIC_URL}`)
