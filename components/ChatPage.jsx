@@ -104,10 +104,9 @@ export default function ChatPage(props) {
   const thisUserName = session && session.user ? session.user.name : ''
   const { dialogId } = props
   const apolloClient = useApolloClient()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false) //Shows if data is loading
   const [messagesError, setMessagesError] = useState('') //Shows if error occurred while getting
   const [numUnreadUpdated, setNumUnreadUpdated] = useState(false)
-
   const [createMessageMutation] = useMutation(CREATE_MESSAGE)
 
   const dataIsCorrect = (dialogData) => {
@@ -118,21 +117,23 @@ export default function ChatPage(props) {
   }
   const [dialogData, setDialogData] = useState(null)
   const [title, setTitle] = useState('Диалог | Recycl')
-
+  const numMessagesToLoad = 50 //Number of messages to load when querying the database.
   const remainedSymbols = 1000 //Max number of symbols in a message.
   const messageContainerRef = useRef()
-  const nodesRef = useRef([])
+  const nodesRef = useRef([]) //Dom nodes of rendered messages.
+  //initialLoad is true untill loaded message data is not enogh for the message container to have vertical scrollbar.
+  //As soon as the message container can be vertically scrolled this state is set to false.
   const [initialLoad, setInitialLoad] = useState(true)
-  const [items, setItems] = useState([])
-  const anchorIndex = useRef(0)
+  const [items, setItems] = useState([]) //Loaded message data.
+  const anchorIndex = useRef(0) //Index of the topmost message visisble in the message container.
   const prevAnchorIndex = useRef(0)
-  const [canLoadMore, setCanLoadMore] = useState(true)
-  const [severity, setSeverity] = useState('')
+  const [canLoadMore, setCanLoadMore] = useState(true) //Shows if there is additional data in the database that can be loaded.
+  const [severity, setSeverity] = useState('') //Notification severity.
   const [notification, setNotification] = useState('')
-  const [showScrollBottom, setShowScrollBottom] = useState(false)
+  const [showScrollBottom, setShowScrollBottom] = useState(false) //Whether to show a button to scroll to the bottom of the message container.
   const [socket, setSocket] = useState(null)
   const [userIsTyping, setUserIsTyping] = useState(false)
-  const [newMessage, setNewMessage] = useState(null)
+  const [newMessage, setNewMessage] = useState(null) //New message received from the other user.
   const [scrolledToBottom, setScrolledToBottom] = useState(true)
 
   /**
@@ -296,6 +297,106 @@ export default function ChatPage(props) {
     setSocket(newSocket)
   }
 
+  const dialogDataInitializer = () => {
+    if (items.length === 0) return
+
+    const firstMessage = items[0]
+    //dialogReceiverId and dialogInitiatorId are the same in each message which belongs to this dialog
+    let dialogReceiverId = firstMessage.dialogReceiverId
+    let dialogInitiatorId = firstMessage.dialogInitiatorId
+    let receiverId
+    let receiverName
+    let ad
+
+    if (!dialogReceiverId && !dialogInitiatorId) {
+      console.log('Required params are not present')
+      setSeverity('error')
+      setNotification('Неизвестная ошибка')
+      return
+    }
+
+    receiverId =
+      firstMessage.receiverId === thisUserId
+        ? firstMessage.senderId
+        : firstMessage.receiverId
+
+    receiverName =
+      firstMessage.receiverName === thisUserName
+        ? firstMessage.senderName
+        : firstMessage.receiverName
+
+    ad = firstMessage.ad._id
+
+    if (dialogReceiverId && dialogInitiatorId) {
+      setDialogData({
+        dialogReceiverId,
+        dialogInitiatorId,
+        receiverId,
+        receiverName,
+        ad,
+      })
+      return
+    }
+
+    if (!dialogInitiatorId) {
+      if (dialogReceiverId === firstMessage.receiverId) {
+        dialogInitiatorId = firstMessage.senderId
+      } else {
+        dialogInitiatorId = firstMessage.receiverId
+      }
+      return
+    }
+
+    if (!dialogReceiverId) {
+      if (dialogInitiatorId === firstMessage.receiverId) {
+        dialogReceiverId = firstMessage.senderId
+      } else {
+        dialogReceiverId = firstMessage.receiverId
+      }
+    }
+
+    setDialogData({
+      dialogReceiverId,
+      dialogInitiatorId,
+      receiverId,
+      receiverName,
+      ad,
+    })
+  }
+
+  const setDesiredScrollPos = () => {
+    let nodeHeight = 0
+    let i = 0
+    let currentPos = 0
+
+    //calculate anchor's element scroll top position
+    while (i < anchorIndex.current) {
+      nodeHeight = nodesRef.current[i].offsetHeight
+      currentPos += nodeHeight
+      i++
+    }
+
+    //scroll to desired position
+    if (anchorIndex.current !== prevAnchorIndex.current) {
+      messageContainerRef.current.scrollTop = currentPos
+      prevAnchorIndex.current = anchorIndex.current
+    } else if (
+      initialLoad ||
+      (newMessage && newMessage.senderId === thisUserId) ||
+      (newMessage && newMessage.senderId !== thisUserId && scrolledToBottom)
+    ) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight
+    } else if (
+      newMessage &&
+      newMessage.senderId !== thisUserId &&
+      !scrolledToBottom &&
+      !showScrollBottom
+    ) {
+      setShowScrollBottom(true)
+    }
+  }
+
   useEffect(() => {
     //start webSocket server if it's not already started
     socketInitializer()
@@ -337,126 +438,37 @@ export default function ChatPage(props) {
     }
   }, [userIsTyping])
 
-  //load initial data
+  //start loading message data after getting id of the dialog
   useEffect(() => {
     if (dialogId && items.length == 0) getMoreData()
   }, [dialogId])
 
   useEffect(() => {
-    if (items.length === 0) return
-
     //set dialog data to enable sending messages
-    if (!dialogData) {
-      const firstMessage = items[0]
-      //dialogReceiverId and dialogInitiatorId are the same in each message which belongs to this dialog
-      let dialogReceiverId = firstMessage.dialogReceiverId
-      let dialogInitiatorId = firstMessage.dialogInitiatorId
-      let receiverId
-      let receiverName
-      let ad
+    if (!dialogData) dialogDataInitializer()
 
-      if (!dialogReceiverId && !dialogInitiatorId) {
-        console.log('Required params are not present')
-        setSeverity('error')
-        setNotification('Неизвестная ошибка')
-        return
-      }
-
-      receiverId =
-        firstMessage.receiverId === thisUserId
-          ? firstMessage.senderId
-          : firstMessage.receiverId
-
-      receiverName =
-        firstMessage.receiverName === thisUserName
-          ? firstMessage.senderName
-          : firstMessage.receiverName
-
-      ad = firstMessage.ad._id
-
-      setTitle(
-        `Диалог с ${receiverName} относительно ${firstMessage.ad.wasteType.name}`
-      )
-
-      if (dialogReceiverId && dialogInitiatorId) {
-        setDialogData({
-          dialogReceiverId,
-          dialogInitiatorId,
-          receiverId,
-          receiverName,
-          ad,
-        })
-        return
-      }
-
-      if (!dialogInitiatorId) {
-        if (dialogReceiverId === firstMessage.receiverId) {
-          dialogInitiatorId = firstMessage.senderId
-        } else {
-          dialogInitiatorId = firstMessage.receiverId
-        }
-        return
-      }
-
-      if (!dialogReceiverId) {
-        if (dialogInitiatorId === firstMessage.receiverId) {
-          dialogReceiverId = firstMessage.senderId
-        } else {
-          dialogReceiverId = firstMessage.receiverId
-        }
-      }
-
-      setDialogData({
-        dialogReceiverId,
-        dialogInitiatorId,
-        receiverId,
-        receiverName,
-        ad,
-      })
-    }
-  }, [items])
-
-  //make sure that message container has scroll bar
-  //to enable user to load more data when he scrolls
-  useEffect(() => {
+    //make sure that message container has vertical scroll bar
+    //to enable user to scroll up to load more data
     if (!messageContainerRef.current) return
-    let nodeHeight = 0
-    let i = 0
-    let currentPos = 0
-
-    //calculate anchor scroll top position
-    while (i < anchorIndex.current) {
-      nodeHeight = nodesRef.current[i].offsetHeight
-      currentPos += nodeHeight
-      i++
-    }
-
-    //scroll to desired position
-    if (anchorIndex.current !== prevAnchorIndex.current) {
-      messageContainerRef.current.scrollTop = currentPos
-      prevAnchorIndex.current = anchorIndex.current
-    } else if (
-      initialLoad ||
-      (newMessage && newMessage.senderId === thisUserId) ||
-      (newMessage && newMessage.senderId !== thisUserId && scrolledToBottom)
-    ) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight
-    } else if (
-      newMessage &&
-      newMessage.senderId !== thisUserId &&
-      !scrolledToBottom &&
-      !showScrollBottom
-    ) {
-      setShowScrollBottom(true)
-    }
+    setDesiredScrollPos()
     handleScroll()
   }, [items])
 
-  //update unread dialogs counter
   useEffect(() => {
+    //update counter of unread dialogs in the header
     if (!numUnreadUpdated && dialogData) {
       apolloClient
+        .refetchQueries({ include: [GET_UNREAD_DIALOG_IDS] })
+        .then(() => {
+          setNumUnreadUpdated(true)
+        })
+    }
+    //Update title
+    if (dialogData) {
+      const firstMessage = items[0]
+      setTitle(
+        `Диалог с ${dialogData.receiverName} относительно ${firstMessage.ad.wasteType.name}`
+      )
     }
   }, [dialogData])
 
