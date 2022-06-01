@@ -424,7 +424,7 @@ export default function ChatPage(props) {
 
   useEffect(() => {
     //start webSocket server if it's not already started
-    socketInitializer()
+    if (!socket) socketInitializer()
 
     //add resize listener
     let isLoaded = true
@@ -438,10 +438,9 @@ export default function ChatPage(props) {
 
   useEffect(() => {
     if (!session || !socket) return
-    if (!socket.connected) {
-      socket.auth = { userId: session.id }
-      socket.connect()
-    }
+
+    socket.auth = { userId: session.id }
+    socket.connect()
 
     return () => {
       if (socket && socket.connected) socket.disconnect()
