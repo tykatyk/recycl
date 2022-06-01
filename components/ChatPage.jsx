@@ -12,7 +12,10 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core'
+import { InView } from 'react-intersection-observer'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
+import CheckIcon from '@material-ui/icons/Check'
+import DoneAllIcon from '@material-ui/icons/DoneAll'
 import Layout from './layouts/Layout.jsx'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
@@ -27,6 +30,7 @@ import ErrorOverlay from './dialogs/ErrorOverlay.jsx'
 import NoDataOverlay from './dialogs/NoDataOverlay.jsx'
 import {
   CREATE_MESSAGE,
+  UPDATE_MESSAGE,
   GET_DIALOG,
   GET_UNREAD_DIALOG_IDS,
 } from '../lib/graphql/queries/message'
@@ -62,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
   typingIndicator: {
     position: 'absolute',
-    bottom: theme.spacing(2),
+    bottom: theme.spacing(1),
     left: theme.spacing(2),
   },
   newMessageIndicator: {
@@ -70,6 +74,7 @@ const useStyles = makeStyles((theme) => ({
     bottom: 0,
     right: theme.spacing(4),
   },
+  checkmark: { color: '#adce5d' },
   message: {
     display: 'flex',
     flexDirection: 'column',
@@ -82,8 +87,16 @@ const useStyles = makeStyles((theme) => ({
     borderTopLeftRadius: 0,
     padding: theme.spacing(1),
   },
-  messageDate: {
+  messageInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
+
+    '& > :first-child': {
+      marginRight: 4,
+    },
   },
   //aligns messages sent by the other user to the right
   right: {
@@ -108,6 +121,7 @@ export default function ChatPage(props) {
   const [messagesError, setMessagesError] = useState('') //Shows if error occurred while getting
   const [numUnreadUpdated, setNumUnreadUpdated] = useState(false)
   const [createMessageMutation] = useMutation(CREATE_MESSAGE)
+  const [updateMessageMutation] = useMutation(UPDATE_MESSAGE)
 
   const dataIsCorrect = (dialogData) => {
     if (dialogData && dialogData.getDialog && dialogData.getDialog.length > 0) {
@@ -288,12 +302,33 @@ export default function ChatPage(props) {
         setScrolledToBottom(false)
       }
       setNewMessage(message.createMessage)
-
       setItems((prevItems) => [...prevItems, message.createMessage])
     })
 
     newSocket.off('typing').on('typing', () => {
       setUserIsTyping(true)
+    })
+
+    newSocket.off('viewedMessage').on('viewed', (id) => {
+      setItems((prevItems) => {
+        const newItems = [...prevItems]
+        let updatedItem
+        let index
+
+        for (let i = newItems.length - 1; i >= 0; i--) {
+          if (newItems[i]._id === id) {
+            updatedItem = { ...newItems[i] }
+            index = i
+            break
+          }
+        }
+
+        if (!updatedItem) return prevItems
+
+        updatedItem.viewed = true
+        newItems[index] = updatedItem
+        return newItems
+      })
     })
     setSocket(newSocket)
   }
@@ -542,20 +577,77 @@ export default function ChatPage(props) {
                       [classes.right]: message.senderId !== thisUserId,
                     })}
                   >
-                    <Box className={classes.message}>
+                    <InView
+                      as="div"
+                      onChange={(inView, entry) => {
+                        if (
+                          inView &&
+                          message.receiverId === thisUserId &&
+                          !message.viewed
+                        ) {
+                          const id = items[index]._id
+                          updateMessageMutation({
+                            variables: { id, payload: { viewed: true } },
+                          })
+                            .then((result) => {
+                              if (
+                                !result.data ||
+                                !result.data.updateMessage ||
+                                !result.data.updateMessage._id
+                              ) {
+                                return
+                              }
+                              const newItems = [...items]
+                              const updatedItem = { ...newItems[index] }
+                              updatedItem.viewed = true
+                              newItems[index] = updatedItem
+                              setItems(newItems)
+                              socket.emit('viewedMessage', {
+                                receiverId: dialogData.receiverId,
+                                messageId: result.data.updateMessage._id,
+                              })
+                            })
+                            .catch((error) => {})
+                        }
+                      }}
+                      className={classes.message}
+                    >
                       <Box className={classes.messageContent}>
                         <ListItemText primary={message.text}></ListItemText>
                       </Box>
-                      <Box className={classes.messageDate}>
+                      <Box className={classes.messageInfo}>
                         <ListItemText secondary={dateTime}></ListItemText>
+                        {message.senderId === thisUserId && (
+                          <ListItemText
+                            secondary={
+                              message.viewed ? (
+                                <DoneAllIcon
+                                  fontSize="small"
+                                  className={classes.checkmark}
+                                />
+                              ) : (
+                                <CheckIcon
+                                  fontSize="small"
+                                  className={classes.checkmark}
+                                />
+                              )
+                            }
+                          ></ListItemText>
+                        )}
                       </Box>
-                    </Box>
+                    </InView>
                   </ListItem>
                 )
               })}
             </List>
             {userIsTyping && (
-              <Fade in={userIsTyping} className={classes.typingIndicator}>
+              <Fade
+                in={userIsTyping}
+                className={clsx({
+                  [classes.typingIndicator]: true,
+                  [classes.messageContent]: true,
+                })}
+              >
                 <Typography variant="body2" color="textSecondary">
                   Печатает...
                 </Typography>
