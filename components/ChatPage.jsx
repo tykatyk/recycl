@@ -269,6 +269,7 @@ export default function ChatPage(props) {
       }
     }
   }
+
   const handleScrollBottomClick = () => {
     const messageContainer = messageContainerRef.current
     messageContainer.style.scrollBehavior = 'smooth'
@@ -309,7 +310,6 @@ export default function ChatPage(props) {
     let ad
 
     if (!dialogReceiverId && !dialogInitiatorId) {
-      console.log('Required params are not present')
       setSeverity('error')
       setNotification('Неизвестная ошибка')
       return
@@ -500,7 +500,6 @@ export default function ChatPage(props) {
   if (items.length == 0 && loading) content = <PageLoadingCircle />
   if (items.length == 0 && messagesError) content = <ErrorOverlay />
   if (items.length > 0) {
-    //ToDo: refactor inline styles in jsx
     content = (
       <>
         {!!notification && (
@@ -531,7 +530,7 @@ export default function ChatPage(props) {
               onScroll={(e) => handleScroll(e)}
             >
               {items.map((message, index) => {
-                let dateTime = calculateDateTime(message)
+                const dateTime = calculateDateTime(message)
 
                 return (
                   <ListItem
