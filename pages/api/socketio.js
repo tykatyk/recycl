@@ -24,6 +24,10 @@ export default async function socketHandler(req, res) {
           .emit('newMessage', msg)
       })
 
+      socket.on('viewedMessage', (data) => {
+        io.to(data.receiverId).emit('viewed', data.messageId)
+      })
+
       socket.on('userIsTyping', ({ receiverId }) => {
         socket.to(receiverId).emit('typing')
       })
