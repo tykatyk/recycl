@@ -37,6 +37,7 @@
     "formik-material-ui": "^4.0.0-alpha.1",
     "formik-material-ui-lab": "^1.0.0-alpha.1",
     "graphql": "^15.5.3",
+    "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "mongoose": "^5.13.5",
     "next": "^11.1.0",
