@@ -7,7 +7,7 @@ const useStyles = makeStyles({
     fontFamily: 'inherit',
     fontWeight: 'bold',
     lineHeight: '1.334',
-    letterSpacing: '0em',
+    letterSpacing: 0,
     color: '#adce5d',
   },
 })
