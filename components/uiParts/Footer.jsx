@@ -1,6 +1,14 @@
 import React from 'react'
-import { Container, Typography, makeStyles } from '@material-ui/core'
+import {
+  Container,
+  Grid,
+  List,
+  ListItem,
+  Typography,
+  makeStyles,
+} from '@material-ui/core'
 import Link from './Link.jsx'
+import Logo from './header/Logo.jsx'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,6 +26,10 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: 0,
     },
   },
+  title: {
+    padding: `0 ${theme.spacing(2)}px `,
+    fontWeight: 'bold',
+  },
   link: {
     '&:hover': {
       color: '#adce5d',
@@ -31,36 +43,124 @@ export default function Footer() {
   return (
     <footer className={classes.root}>
       <Container component="div" className={classes.container}>
-        <Typography variant="body2" color="textSecondary" align="center">
-          <Link
-            color="inherit"
-            underline="none"
-            href="/supportus"
-            className={classes.link}
+        <Grid container component="nav">
+          <Grid
+            container
+            direction="column"
+            item
+            xs={12}
+            sm={3}
+            style={{ paddingLeft: 16, paddingRight: 16, paddingBottom: 24 }}
           >
-            Поддержать проект
-          </Link>
-        </Typography>
-        <Typography variant="body2" color="textSecondary" align="center">
-          <Link
-            color="inherit"
-            underline="none"
-            href="/contactus"
-            className={classes.link}
+            <Logo />
+          </Grid>
+          <Grid
+            container
+            direction="column"
+            item
+            xs={12}
+            sm={3}
+            style={{ paddingBottom: 24 }}
           >
-            Связаться с нами
-          </Link>
-        </Typography>
-        <Typography variant="body2" color="textSecondary" align="center">
-          <Link
-            color="inherit"
-            underline="none"
-            className={classes.link}
-            href={`${process.env.NEXT_PUBLIC_URL}`}
+            <Typography
+              component="h5"
+              variant="overline"
+              className={classes.title}
+            >
+              Компания
+            </Typography>
+            <List style={{ padding: 0 }}>
+              <ListItem dense>
+                <Link
+                  color="textSecondary"
+                  underline="none"
+                  href="/about-us"
+                  className={classes.link}
+                >
+                  О нас
+                </Link>
+              </ListItem>
+              <ListItem dense>
+                <Link
+                  color="textSecondary"
+                  underline="none"
+                  href="/contact-us"
+                  className={classes.link}
+                >
+                  Связаться с нами
+                </Link>
+              </ListItem>
+              <ListItem dense>
+                <Link
+                  color="textSecondary"
+                  underline="none"
+                  href="/support-us"
+                  className={classes.link}
+                >
+                  Поддержать проект
+                </Link>
+              </ListItem>
+            </List>
+          </Grid>
+          <Grid
+            container
+            direction="column"
+            item
+            xs={12}
+            sm={3}
+            style={{ paddingBottom: 24 }}
           >
-            {`Recycl ${new Date().getFullYear()} ©`}
-          </Link>
-        </Typography>
+            <Typography
+              variant="overline"
+              component="h5"
+              className={classes.title}
+            >
+              Пользователям
+            </Typography>
+            <List style={{ padding: 0 }}>
+              <ListItem dense>
+                <Link
+                  color="textSecondary"
+                  underline="none"
+                  href="/terms-of-service"
+                  className={classes.link}
+                >
+                  Условия использования
+                </Link>
+              </ListItem>
+              <ListItem dense>
+                <Link
+                  color="textSecondary"
+                  underline="none"
+                  href="/privacy-policy"
+                  className={classes.link}
+                >
+                  Политика приватности
+                </Link>
+              </ListItem>
+              <ListItem dense>
+                <Link
+                  color="textSecondary"
+                  underline="none"
+                  href="/cookie-policy"
+                  className={classes.link}
+                >
+                  Политика Cookie
+                </Link>
+              </ListItem>
+            </List>
+          </Grid>
+          <Grid container direction="column" item xs={12} sm={3}>
+            <Typography
+              variant="caption"
+              color="textSecondary"
+              style={{ paddingLeft: 16, paddingRight: 16 }}
+            >
+              {`Использование материалов сайта возможно только с разрешения правообладателя Recycl World
+              Company © ${new Date().getFullYear()}`}
+            </Typography>
+          </Grid>
+        </Grid>
       </Container>
     </footer>
   )
