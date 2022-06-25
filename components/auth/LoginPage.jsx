@@ -110,6 +110,11 @@ export default function SignIn() {
                     setBackendError('Неизвестная ошибка')
                     setSubmitting(false)
                   })
+                  .finally(() => {
+                    if (recaptchaRef && recaptchaRef.current) {
+                      recaptchaRef.current.reset()
+                    }
+                  })
               }}
             >
               {({ isSubmitting }) => {
@@ -185,7 +190,8 @@ export default function SignIn() {
                 )
               }}
             </Formik>
-            <Grid container>
+
+            <Grid container style={{ marginBottom: theme.spacing(4) }}>
               <Grid item xs>
                 <Link
                   href="/auth/forgetpassword"
