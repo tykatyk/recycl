@@ -11,6 +11,7 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 const globalStyles = <GlobalCss />
+import CookieConsentPopup from './uiParts/CookieConsentPopup.jsx'
 
 export default function App(props) {
   const {
@@ -36,6 +37,7 @@ export default function App(props) {
         <SessionProvider session={session}>
           <ApolloProvider client={apolloClient}>
             <Component {...pageProps} />
+            <CookieConsentPopup />
           </ApolloProvider>
         </SessionProvider>
       </ThemeProvider>
