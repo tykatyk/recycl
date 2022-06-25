@@ -88,7 +88,7 @@ export default function SupportUsPage() {
               recaptchaRef,
               showRecaptcha,
               values,
-              endpointUrl: '/api/contactus',
+              endpointUrl: '/api/contact-us',
               setRecaptcha,
               setShowRecaptcha,
               setSubmitting,
