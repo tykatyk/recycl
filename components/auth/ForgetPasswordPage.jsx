@@ -47,10 +47,6 @@ export default function ForgetPasswordPage() {
     setRecaptcha(token)
   }
 
-  const handleExpire = () => {
-    setRecaptcha(null)
-  }
-
   return (
     <>
       <AuthLayout title="Recycl | Forget password">
@@ -165,7 +161,6 @@ export default function ForgetPasswordPage() {
               ref={recaptchaRef}
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
               onChange={handleChange}
-              onExpired={handleExpire}
             />
           </div>
         </Container>

@@ -57,10 +57,6 @@ export default function SignUp() {
     setRecaptcha(token)
   }
 
-  const handleExpire = () => {
-    setRecaptcha(null)
-  }
-
   if (loading) return <PageLoadingCircle />
 
   if (error) {
@@ -217,7 +213,6 @@ export default function SignUp() {
               ref={recaptchaRef}
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
               onChange={handleChange}
-              onExpired={handleExpire}
             />
           </div>
         </Container>

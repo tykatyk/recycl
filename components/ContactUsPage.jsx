@@ -54,10 +54,6 @@ export default function SupportUsPage() {
     setRecaptcha(token)
   }
 
-  const handleExpire = () => {
-    setRecaptcha(null)
-  }
-
   return (
     <Layout title="Связаться с нами | Recycl">
       <Container className={classes.container}>
@@ -194,7 +190,6 @@ export default function SupportUsPage() {
             ref={recaptchaRef}
             sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
             onChange={handleChange}
-            onExpired={handleExpire}
           />
         </div>
       </Container>

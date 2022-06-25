@@ -46,9 +46,6 @@ export default function UserLocation(props) {
     setRecaptcha(token)
   }
 
-  const handleExpire = () => {
-    setRecaptcha(null)
-  }
   const classes = useStyles()
   const { setCenter, setLocationError } = props
 
@@ -151,7 +148,6 @@ export default function UserLocation(props) {
           ref={recaptchaRef}
           sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
           onChange={handleChange}
-          onExpired={handleExpire}
         />
       </div>
       {!!backendError && (
