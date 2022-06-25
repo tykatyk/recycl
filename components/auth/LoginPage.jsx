@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 import {
   Avatar,
@@ -17,8 +17,9 @@ import Snackbar from '../uiParts/Snackbars.jsx'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import { signIn } from 'next-auth/react'
 import { loginSchema } from '../../lib/validation'
-import AuthLayout from '../layouts/AuthLayout.jsx'
 import showErrorMessages from '../../lib/helpers/showErrorMessages'
+import AuthLayout from '../layouts/AuthLayout.jsx'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -44,6 +45,13 @@ export default function SignIn() {
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
   const router = useRouter()
+  const [recaptcha, setRecaptcha] = useState(null)
+  const [showRecaptcha, setShowRecaptcha] = useState(false)
+  const recaptchaRef = useRef(null)
+
+  const handleChange = (token) => {
+    setRecaptcha(token)
+  }
 
   return (
     <>
@@ -64,6 +72,17 @@ export default function SignIn() {
               validationSchema={loginSchema}
               onSubmit={(values, { setSubmitting, setErrors }) => {
                 setSubmitting(true)
+
+                if (!showRecaptcha) {
+                  setShowRecaptcha(true)
+                  setSubmitting(false)
+                  return
+                }
+
+                if (!recaptcha) {
+                  setSubmitting(false)
+                  return
+                }
 
                 signIn('credentials', {
                   email: values.email,
@@ -186,6 +205,19 @@ export default function SignIn() {
                 </Link>
               </Grid>
             </Grid>
+            <div
+              style={{
+                display: showRecaptcha ? 'flex' : 'none',
+                justifyContent: 'center',
+                margin: theme.spacing(2, 0),
+              }}
+            >
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                onChange={handleChange}
+              />
+            </div>
           </div>
         </Container>
       </AuthLayout>
