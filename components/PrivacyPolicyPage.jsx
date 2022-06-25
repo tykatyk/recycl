@@ -569,7 +569,7 @@ export default function PrivacyPolicyPage() {
               редакція Політики конфіденційності завжди знаходиться на сторінці
               за адресою{' '}
               <Link
-                href={`${process.env.NEXT_PUBLIC_URL}/privacy-policy`}
+                href={`${process.env.NEXT_PUBLIC_URL}privacy-policy`}
                 className={classes.link}
               >{`${process.env.NEXT_PUBLIC_URL}/privacy-policy`}</Link>
               .
