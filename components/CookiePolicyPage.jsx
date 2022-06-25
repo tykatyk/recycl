@@ -32,10 +32,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 'bold',
     color: '#adce5d',
   },
-  h3: {
-    fontWeight: 'bold',
-    color: '#adce5d',
-  },
   section: {
     marginBottom: '3rem',
   },
@@ -90,6 +86,15 @@ const technicalCookies = [
     purpose: 'Зберігає інформацію про поточну сесію користувача',
     type: 'Постійна',
     storageTime: '1 місяць',
+  },
+]
+
+const operationalCookies = [
+  {
+    name: 'cookieConsent',
+    purpose: 'Вказує чи погодились ви з використанням cookie',
+    type: 'Постійна',
+    storageTime: '31 день',
   },
 ]
 
@@ -209,6 +214,36 @@ export default function CookiePolicyPage() {
               <li>aутентифікаційні cookies</li>
               <li>технічні cookies, необхідні певним ІТ-системам</li>
             </ul>
+            <TableContainer
+              component={Paper}
+              className={classes.tableContainer}
+            >
+              <Table
+                className={classes.table}
+                aria-label="Види операційних cookies"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Назва</TableCell>
+                    <TableCell>Призначення</TableCell>
+                    <TableCell>Тип</TableCell>
+                    <TableCell>Час зберігання</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {operationalCookies.map((row) => (
+                    <TableRow key={row.name}>
+                      <TableCell component="th" scope="row">
+                        {row.name}
+                      </TableCell>
+                      <TableCell>{row.purpose}</TableCell>
+                      <TableCell>{row.type}</TableCell>
+                      <TableCell>{row.storageTime}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
             <Typography gutterBottom className={classes.subtitle}>
               <strong>Аутентифікаційні cookies</strong>
             </Typography>
@@ -291,7 +326,7 @@ export default function CookiePolicyPage() {
             <Typography gutterBottom className={classes.subtitle}>
               <strong>СТОРОННІ COOKIES</strong>
             </Typography>
-            <Typography paraggraph>
+            <Typography paragraph>
               Деякі з наших сторінок відображають вміст від зовнішніх
               постачальників контенту, напр. Google. Щоб переглянути контент
               зовнішніх постачальників, спершу потрібно прийняти їхні положення
