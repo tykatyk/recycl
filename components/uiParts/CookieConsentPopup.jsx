@@ -1,12 +1,10 @@
-import React from 'react'
-import { makeStyles, Typography, Button } from '@material-ui/core'
-import Link from './uiParts/Link.jsx'
+import React, { useState, useEffect } from 'react'
+import { makeStyles, Typography, Button, Grow } from '@material-ui/core'
+import Link from './Link.jsx'
+import Cookies from 'js-cookie'
 
 const useStyles = makeStyles((theme) => ({
   link: {
-    fontSize: '1rem',
-    lineHeight: '1.5',
-    letterSpacing: '0.00938em',
     color: '#adce5d',
     '&:hover': {
       textDecoration: 'underline',
@@ -14,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   },
   termsPopup: {
     padding: theme.spacing(4),
-    background: '#6f0595',
+    background: '#6f0595;',
     position: 'fixed',
     bottom: 0,
     left: 0,
@@ -36,32 +34,46 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CookieConsentPopup() {
   const classes = useStyles()
+  const [showCookieConsent, setShowCookieConsent] = useState(false)
+  const handleClick = () => {
+    Cookies.set('cookieConsent', 'agreed', { expires: 31, sameSite: 'Lax' })
+    setShowCookieConsent(false)
+  }
+  useEffect(() => {
+    let cookieConsentAgreed = Cookies.get('cookieConsent')
+    if (!cookieConsentAgreed) setShowCookieConsent(true)
+  }, [Cookies.get('cookieConsent')])
 
-  return (
-    <div container className={classes.termsPopup}>
-      <div>
-        <Typography>
-          Мы используем файлы cookie для улучшения качества работы.
-        </Typography>
-        <Typography>
-          Пользуясь сайтом, вы соглашаетесь с{' '}
-          <Link
-            href="/privacy-policy"
-            className={classes.link}
-            style={{ color: '#0feb5b' }}
-          >
-            Политикой приватности
-          </Link>
-          .
-        </Typography>
+  if (showCookieConsent) {
+    return (
+      <div className={classes.termsPopup}>
+        <div>
+          <Typography>
+            Мы используем файлы cookie для улучшения качества работы.
+          </Typography>
+          <Typography>
+            Пользуясь сайтом, вы соглашаетесь с{' '}
+            <Link
+              href="/privacy-policy"
+              className={classes.link}
+              style={{ color: '#0feb5b' }}
+            >
+              Политикой приватности
+            </Link>
+            .
+          </Typography>
+        </div>
+        <Button
+          variant="contained"
+          color="secondary"
+          className={classes.termsButton}
+          onClick={() => handleClick()}
+        >
+          OK
+        </Button>
       </div>
-      <Button
-        variant="contained"
-        color="secondary"
-        className={classes.termsButton}
-      >
-        OK
-      </Button>
-    </div>
-  )
+    )
+  }
+
+  return null
 }
