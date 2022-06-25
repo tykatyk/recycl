@@ -13,7 +13,7 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import AuthLayout from '../layouts/AuthLayout.jsx'
 import { emailSchema } from '../../lib/validation'
 import ReCAPTCHA from 'react-google-recaptcha'
-import showErrorMessages from '../../lib/helpers/showErrorMessages'
+import submitWithCapthca from '../lib/helpers/submitWithCaptcha'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -75,51 +75,25 @@ export default function ForgetPasswordPage() {
               email: '',
             }}
             validationSchema={emailSchema}
-            onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-              setSubmitting(true)
-              if (!showRecaptcha) {
-                setShowRecaptcha(true)
-                setSubmitting(false)
-                return
+            onSubmit={async (
+              values,
+              { setSubmitting, setErrors, resetForm }
+            ) => {
+              const options = {
+                recaptcha,
+                recaptchaRef,
+                showRecaptcha,
+                values,
+                endpointUrl: '/api/forgetpassword',
+                setRecaptcha,
+                setShowRecaptcha,
+                setSubmitting,
+                setNotification,
+                setErrors,
+                setSeverity,
+                resetForm,
               }
-
-              if (!recaptcha) {
-                setSubmitting(false)
-                return
-              }
-
-              const merged = { ...values, ...{ recaptcha: recaptcha } }
-
-              fetch('/api/auth/forgetpassword', {
-                method: 'POST',
-                body: JSON.stringify(merged),
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              })
-                .then((response) => {
-                  return response.json()
-                })
-                .then((data) => {
-                  if (data.error) {
-                    showErrorMessages(data.error, setErrors, setNotification)
-                    return
-                  }
-                  resetForm()
-                  setSeverity('success')
-                  setNotification(data.message)
-                })
-                .catch((error) => {
-                  setNotification('Неизвестная ошибка')
-                })
-                .finally(() => {
-                  if (recaptchaRef && recaptchaRef.current) {
-                    recaptchaRef.current.reset()
-                    setShowRecaptcha(false)
-                    setRecaptcha(null)
-                    setSubmitting(false)
-                  }
-                })
+              await submitWithCapthca(options)
             }}
           >
             {({ isSubmitting }) => {

@@ -18,9 +18,9 @@ import Link from '../uiParts/Link.jsx'
 import { GET_ROLE_ID } from '../../lib/graphql/queries/userRole'
 import { useQuery } from '@apollo/client'
 import { registerSchema } from '../../lib/validation'
-import showErrorMessages from '../../lib/helpers/showErrorMessages'
 import AuthLayout from '../layouts/AuthLayout.jsx'
 import ReCAPTCHA from 'react-google-recaptcha'
+import submitWithCapthca from '../../lib/helpers/submitWithCaptcha'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,51 +83,25 @@ export default function SignUp() {
               confirmPassword: '',
             }}
             validationSchema={registerSchema}
-            onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-              setSubmitting(true)
-              if (!showRecaptcha) {
-                setShowRecaptcha(true)
-                setSubmitting(false)
-                return
+            onSubmit={async (
+              values,
+              { setSubmitting, setErrors, resetForm }
+            ) => {
+              const options = {
+                recaptcha,
+                recaptchaRef,
+                showRecaptcha,
+                values,
+                endpointUrl: '/api/auth/signup/',
+                setRecaptcha,
+                setShowRecaptcha,
+                setSubmitting,
+                setNotification,
+                setErrors,
+                setSeverity,
+                resetForm,
               }
-
-              if (!recaptcha) {
-                setSubmitting(false)
-                return
-              }
-
-              const merged = { ...values, ...{ recaptcha: recaptcha } }
-
-              fetch('/api/auth/signup/', {
-                method: 'POST',
-                body: JSON.stringify(merged),
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              })
-                .then((response) => {
-                  return response.json()
-                })
-                .then((data) => {
-                  if (data.error) {
-                    showErrorMessages(data.error, setErrors, setNotification)
-                    return
-                  }
-                  resetForm()
-                  setSeverity('success')
-                  setNotification(data.message)
-                })
-                .catch((error) => {
-                  setNotification('Неизвестная ошибка')
-                })
-                .finally(() => {
-                  if (recaptchaRef && recaptchaRef.current) {
-                    recaptchaRef.current.reset()
-                    setShowRecaptcha(false)
-                    setRecaptcha(null)
-                    setSubmitting(false)
-                  }
-                })
+              await submitWithCapthca(options)
             }}
           >
             {({ isSubmitting }) => {
