@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(4),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
@@ -158,18 +157,28 @@ export default function SignUp() {
                     Зарегистрироваться
                     {isSubmitting && <ButtonSubmittingCircle />}
                   </Button>
+                </Form>
+              )
+            }}
+          </Formik>
 
-                  <Grid container style={{ justifyContent: 'flex-end' }}>
-                    <Grid item>
-                      <Link
-                        href="/auth/login"
-                        variant="body2"
-                        style={{ color: `${theme.palette.text.secondary}` }}
-                      >
-                        Уже есть аккаунт?
-                      </Link>
-                    </Grid>
-                  </Grid>
+          <Grid
+            container
+            style={{
+              marginBottom: theme.spacing(4),
+              justifyContent: 'flex-end',
+            }}
+          >
+            <Grid item>
+              <Link
+                href="/auth/login"
+                variant="body2"
+                style={{ color: `${theme.palette.text.secondary}` }}
+              >
+                Уже есть аккаунт?
+              </Link>
+            </Grid>
+          </Grid>
           <div
             style={{
               display: showRecaptcha ? 'flex' : 'none',
