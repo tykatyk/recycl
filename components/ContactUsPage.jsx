@@ -82,7 +82,7 @@ export default function SupportUsPage() {
             message: '',
           }}
           validationSchema={contactUsSchema}
-          onSubmit={async (values, { setSubmitting, setErrors, resetForm }) => {
+          onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
             const options = {
               recaptcha,
               recaptchaRef,
@@ -97,7 +97,7 @@ export default function SupportUsPage() {
               setSeverity,
               resetForm,
             }
-            await submitWithCapthca(options)
+            submitWithCapthca(options)
           }}
         >
           {({ isSubmitting, values, setFieldValue }) => {

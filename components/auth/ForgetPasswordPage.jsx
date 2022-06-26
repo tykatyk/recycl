@@ -75,10 +75,7 @@ export default function ForgetPasswordPage() {
               email: '',
             }}
             validationSchema={emailSchema}
-            onSubmit={async (
-              values,
-              { setSubmitting, setErrors, resetForm }
-            ) => {
+            onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
               const options = {
                 recaptcha,
                 recaptchaRef,
@@ -93,7 +90,7 @@ export default function ForgetPasswordPage() {
                 setSeverity,
                 resetForm,
               }
-              await submitWithCapthca(options)
+              submitWithCapthca(options)
             }}
           >
             {({ isSubmitting }) => {

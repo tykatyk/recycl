@@ -83,10 +83,7 @@ export default function SignUp() {
               confirmPassword: '',
             }}
             validationSchema={registerSchema}
-            onSubmit={async (
-              values,
-              { setSubmitting, setErrors, resetForm }
-            ) => {
+            onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
               const options = {
                 recaptcha,
                 recaptchaRef,
@@ -101,7 +98,7 @@ export default function SignUp() {
                 setSeverity,
                 resetForm,
               }
-              await submitWithCapthca(options)
+              submitWithCapthca(options)
             }}
           >
             {({ isSubmitting }) => {
