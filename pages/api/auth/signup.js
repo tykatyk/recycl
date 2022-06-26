@@ -140,7 +140,7 @@ export default async function handler(req, res) {
         date: new Date().getFullYear(),
       }
       const frontendMessage =
-        'Для завершения регистрации перейдите по ссылке, которая отправлена на ваш почтовый ящик'
+        'Для завершения регистрации перейдите по ссылке из письма, которое отправлено на ваш почтовый ящик'
 
       return await sendEmail(res, {
         to: email,
