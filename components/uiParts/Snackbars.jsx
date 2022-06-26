@@ -23,7 +23,6 @@ export default function Snackbars(props) {
     <div className={classes.root}>
       <Snackbar
         open={open}
-        autoHideDuration={4000}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         action={
