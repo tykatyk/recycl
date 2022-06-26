@@ -170,15 +170,11 @@ export default function SignUp() {
                       </Link>
                     </Grid>
                   </Grid>
-                </Form>
-              )
-            }}
-          </Formik>
           <div
             style={{
               display: showRecaptcha ? 'flex' : 'none',
               justifyContent: 'center',
-              margin: theme.spacing(2, 0),
+              marginBottom: theme.spacing(4),
             }}
           >
             <ReCAPTCHA
