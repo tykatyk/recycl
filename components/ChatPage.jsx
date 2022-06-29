@@ -170,6 +170,7 @@ export default function ChatPage(props) {
           offset,
           limit,
         },
+        fetchPolicy: 'network-only',
       })
       .then((result) => {
         return result
@@ -532,7 +533,7 @@ export default function ChatPage(props) {
   }, [dialogData])
 
   let content = <NoDataOverlay />
-  if (items.length == 0 && loading) content = <PageLoadingCircle />
+  if ((items.length == 0 && loading) || !socket) content = <PageLoadingCircle />
   if (items.length == 0 && messagesError) content = <ErrorOverlay />
   if (items.length > 0) {
     content = (
