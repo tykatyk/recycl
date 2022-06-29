@@ -6,7 +6,9 @@ import Snackbar from '../Snackbars.jsx'
 import { GET_UNREAD_DIALOG_IDS } from '../../../lib/graphql/queries/message'
 
 export default function UnreadDialogsCounter(props) {
-  const { data, error, refetch } = useQuery(GET_UNREAD_DIALOG_IDS)
+  const { data, error, refetch } = useQuery(GET_UNREAD_DIALOG_IDS, {
+    pollInterval: 2000,
+  })
   const [backendError, setBackendError] = useState(null)
   const { numViewed = 0, setNumViewed } = props
 
