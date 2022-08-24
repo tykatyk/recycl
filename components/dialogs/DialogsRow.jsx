@@ -45,7 +45,7 @@ export default function DialogsRow(props) {
     if (e.type === 'click' || e.key === 'Enter') {
       let ref = e.target != null ? e.target : e.srcElement
       if (!ref || ref.nodeName === 'INPUT') return
-      router.push(`dialogs/${dialogId}`)
+      router.push(`/my/dialogs/${dialogId}`)
     }
   }
 
