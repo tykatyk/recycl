@@ -9,12 +9,11 @@ export default function RedirectUnathenticatedUser(props) {
   const router = useRouter()
 
   if (status === 'loading') return <PageLoadingCircle />
-
   if (status === 'unauthenticated') {
     router.push({
       pathname: '/auth/login',
       query: {
-        from: router.asPath,
+        from: `${process.env.NEXT_PUBLIC_URL}${router.asPath}`,
       },
     })
     return null
