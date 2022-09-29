@@ -142,6 +142,7 @@ export default async function handler(req, res) {
       const frontendMessage =
         'Для завершения регистрации перейдите по ссылке из письма, которое отправлено на ваш почтовый ящик'
 
+      //ToDo: Maybe don't return to frontend since response may contain sensetive data
       return await sendEmail(res, {
         to: email,
         frontendMessage,
