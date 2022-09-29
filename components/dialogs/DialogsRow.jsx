@@ -28,7 +28,6 @@ export default function DialogsRow(props) {
   const router = useRouter()
 
   const {
-    messageId,
     dialogId,
     viewed,
     username,
