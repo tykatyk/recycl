@@ -138,7 +138,12 @@ export default function ChatPage(props) {
   //initialLoad is true untill loaded message data is not enogh for the message container to have vertical scrollbar.
   //As soon as the message container can be vertically scrolled this state is set to false.
   const [initialLoad, setInitialLoad] = useState(true)
-  const [items, setItems] = useState([]) //Loaded message data.
+  const [items, _setItems] = useState([]) //Loaded message data.
+  const itemsRef = useRef(items)
+  const setItems = (data) => {
+    itemsRef.current = data
+    _setItems(data)
+  }
   const anchorIndex = useRef(0) //Index of the topmost message visisble in the message container.
   const prevAnchorIndex = useRef(0)
   const canLoadMore = useRef(true) //Shows if there is additional data in the database that can be loaded.
@@ -193,7 +198,7 @@ export default function ChatPage(props) {
     const numLoaded = result.data.getDialog.length
 
     anchorIndex.current = numLoaded
-    if (items.length > 0 && numLoaded > 0) {
+    if (itemsRef.current.length > 0 && numLoaded > 0) {
       prevAnchorIndex.current = 0
     }
 
@@ -264,7 +269,7 @@ export default function ChatPage(props) {
 
     const currScroll = messageContainer.scrollTop
     if (currScroll === 0 && canLoadMore.current) {
-      getMoreData(items[0]._id)
+      getMoreData(itemsRef.current[0]._id)
       return
     } else if (initialLoad) {
       setInitialLoad(false)
@@ -330,6 +335,8 @@ export default function ChatPage(props) {
 
         updatedItem.viewed = true
         newItems[index] = updatedItem
+        itemsRef.current = newItems
+        _setItems(newItems)
         return newItems
       })
     })
