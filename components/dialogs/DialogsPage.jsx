@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Grid, makeStyles } from '@material-ui/core'
 import DialogsHeader from './DialogsHeader.jsx'
 import DialogsFooter from './DialogsFooter.jsx'
 import DialogsList from './DialogsList.jsx'
 import NoDataOverlay from './NoDataOverlay.jsx'
 import ErrorOverlay from './ErrorOverlay.jsx'
+import ChatPage from '../ChatPage.jsx'
 import Layout from '../layouts/Layout.jsx'
 import Snackbars from '../uiParts/Snackbars.jsx'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser.jsx'
-import { useApolloClient, useQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { GET_DIALOGS } from '../../lib/graphql/queries/message'
 import { DELETE_DIALOGS } from '../../lib/graphql/queries/message'
+import { useRouter } from 'next/router'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,21 +26,27 @@ export default function DialogsPage() {
   const [checkedRows, setCheckedRows] = useState([])
   const [numUnreadToDelete, setNumUnreadToDelete] = useState(0)
   const [headerChecked, setHeaderChecked] = useState(false)
-  const [currentData, setCurrentData] = useState(null)
   const [notification, setNotification] = useState('')
   const [severity, setSeverity] = useState('')
   const [deleteMutation] = useMutation(DELETE_DIALOGS)
+  const [numRows, setNumRows] = useState(0)
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(
-    parseInt(process.env.NEXT_PUBLIC_DEFAULT_PAGINATION_SIZE, 10)
+    // parseInt(process.env.NEXT_PUBLIC_DEFAULT_PAGINATION_SIZE, 10)
+    1
   )
-  const [numRows, setNumRows] = useState(0)
-  const { loading, error, data, fetchMore } = useQuery(GET_DIALOGS, {
-    variables: { offset: null, limit: pageSize },
-  })
-  const client = useApolloClient()
-  const cache = client.cache
+  const navigation = useRef('')
+  const prevDialogId = useRef(null)
 
+  const [loadDialogs, { loading, error, data, refetch }] = useLazyQuery(
+    GET_DIALOGS,
+    {
+      variables: { offset: 0, limit: pageSize },
+      fetchPolicy: 'network-only',
+    }
+  )
+
+  const router = useRouter()
   const dataIsValid = () => {
     if (
       data &&
@@ -51,103 +59,54 @@ export default function DialogsPage() {
     return false
   }
 
-  const getDataToShow = () => {
-    if (dataIsValid()) {
-      const startIndex = page * pageSize
-      const dataToProcess = data.getDialogs.dialogs
-
-      if (startIndex > dataToProcess.length - 1) {
-        setPage(page - 1 > 0 ? page - 1 : 0)
-        return null
-      }
-      const endIndex = (page + 1) * pageSize
-      const dataToShow = dataToProcess.slice(startIndex, endIndex)
-      return dataToShow
-    }
-    return null
-  }
-
   const handlePageChange = (_, newPage) => {
     setPage(newPage)
   }
-  const handlePageSizeChange = (event) => {
+  const handlePageSizeChange = async (event) => {
     setPageSize(parseInt(event.target.value, 10))
     setPage(0)
   }
 
-  const handleFetchMore = async () => {
-    if (!dataIsValid()) return
-    let lastMessageId = null
-    const lastDialogIndex = data.getDialogs.dialogs.length - 1
-    const lastDialog = data.getDialogs.dialogs[lastDialogIndex]
-    lastMessageId = lastDialog._id
-    return await fetchMore({
-      variables: {
-        offset: lastMessageId,
-        limit: pageSize,
-      },
+  const handleFetch = async (offset = 0) => {
+    // if (!dataIsValid()) return
+    await loadDialogs({
+      variables: { offset, limit: pageSize },
     })
   }
 
   const needLoadMore = () => {
     if (!dataIsValid()) return false
 
-    const totalLoaded = data.getDialogs.dialogs.length
+    const numDialogsOnCurrentPage = data.getDialogs.dialogs.length
     const totalCount = data.getDialogs.totalCount
 
-    if (totalCount > totalLoaded) return true
+    if (totalCount > page * pageSize + numDialogsOnCurrentPage) return true
     return false
   }
 
-  const handleNextPageButtonClick = async () => {
-    if (needLoadMore()) await handleFetchMore()
-    setPage(page + 1)
-  }
-
-  const handlePreviousPageButtonClick = () => {
-    setPage(page - 1)
-  }
-
-  const handleRowToggle = (dialogId) => {
-    const currentIndex = checkedRows.map((el) => el.dialogId).indexOf(dialogId)
-    const newCheckedRows = [...checkedRows]
-    const item = currentData.filter((el) => el.dialogId === dialogId)[0]
-
-    if (currentIndex === -1) {
-      newCheckedRows.push(item)
-    } else {
-      newCheckedRows.splice(currentIndex, 1)
-    }
-
-    setCheckedRows(newCheckedRows)
-    if (!headerChecked) setHeaderChecked(true)
-  }
-
-  const handleHeaderToggle = () => {
-    if (headerChecked) {
-      setCheckedRows([])
-      setHeaderChecked(false)
-    } else {
-      if (currentData) {
-        let checkedDialogs = []
-        currentData.forEach((item) => {
-          checkedDialogs.push(item)
-        })
-        setCheckedRows(checkedDialogs)
-      }
-
-      setHeaderChecked(true)
+  const getNextDialogs = async () => {
+    if (needLoadMore()) {
+      //ToDo: Maybe needLoadMore function is not needed
+      navigation.current = 'forward'
+      await handleFetch((page + 1) * pageSize)
     }
   }
 
-  const handleDelete = async (event) => {
+  const getPreviousDialogs = async () => {
+    navigation.current = 'backward'
+    await handleFetch(Math.max((page - 1) * pageSize), 0)
+  }
+
+  const deleteDialogs = async () => {
     if (checkedRows.length < 1) return
+    //ids of dialogs to to delete
+    const ids = checkedRows.map((el) => el.dialogId)
+    //delete dialogs from database
     try {
-      const ids = checkedRows.map((el) => el.dialogId)
       const result = await deleteMutation({
         variables: { ids },
       })
-
+      console.log(result)
       if (
         !result ||
         !result.data ||
@@ -157,64 +116,109 @@ export default function DialogsPage() {
         setCheckedRows([])
         throw new Error('Unexpected deletion result')
       }
-
-      const dialogs = data.getDialogs.dialogs
-      let unreadDialogsToDeleteCount = 0
-      const remainDialogs = []
-      dialogs.forEach((elem) => {
-        if (
-          //if dialog is not deleted
-          checkedRows.map((row) => row.dialogId).indexOf(elem.dialogId) == -1
-        ) {
-          //add it to remain dialogs
-          remainDialogs.push(elem)
-        } else if (!elem.viewed) {
-          //if dialog is deleted and not viewed
-          unreadDialogsToDeleteCount++
-        }
-      })
-      setNumUnreadToDelete(unreadDialogsToDeleteCount)
-
-      cache.evict({ id: 'ROOT_QUERY', fieldName: 'getDialogs' })
-      client.writeQuery({
-        query: GET_DIALOGS,
-        data: {
-          getDialogs: {
-            dialogs: remainDialogs,
-            totalCount: numRows - checkedRows.length,
-          },
-        },
-      })
-
-      setCheckedRows([])
     } catch (error) {
       setSeverity('error')
       setNotification('Ошибка при удалении данных')
     }
+
+    //update counter of unread dialogs
+    const dialogs = data.getDialogs.dialogs
+    let unreadDialogsToDeleteCounter = 0
+    dialogs.forEach((elem) => {
+      if (ids.indexOf(elem.dialogId) != -1 && !elem.viewed) {
+        //increment counter to update notification counter for unread dialogs
+        unreadDialogsToDeleteCounter++
+      }
+    })
+    if (unreadDialogsToDeleteCounter > 0)
+      setNumUnreadToDelete(unreadDialogsToDeleteCounter)
+
+    //uncheck header if it's checked
+    if (headerChecked) setHeaderChecked(false)
+    //uncheck deleted rows
+    setCheckedRows([])
+    //load new data
+    await handleFetch(page * pageSize)
   }
 
-  useEffect(async () => {
-    if (needLoadMore()) {
-      await handleFetchMore()
-    } else {
-      setCurrentData(getDataToShow())
-    }
-  }, [pageSize, page])
+  const toggleRow = (dialogId) => {
+    const currentRowIndex = checkedRows
+      .map((el) => el.dialogId)
+      .indexOf(dialogId)
+    const newCheckedRows = [...checkedRows]
 
-  useEffect(() => {
-    if (!dataIsValid()) {
-      setCurrentData(null)
+    //if current row is not selected
+    if (currentRowIndex === -1) {
+      const currentRow = data.getDialogs.dialogs.filter(
+        (el) => el.dialogId === dialogId
+      )[0]
+      //add it to selected rows
+      newCheckedRows.push(currentRow)
+    } else {
+      //else remove it from selected rows
+      newCheckedRows.splice(currentRowIndex, 1)
+    }
+
+    setCheckedRows(newCheckedRows)
+    if (!headerChecked) setHeaderChecked(true)
+  }
+
+  const toggleHeader = () => {
+    if (headerChecked) {
+      setCheckedRows([])
+      setHeaderChecked(false)
       return
     }
-    if (data.getDialogs.totalCount !== numRows) {
+
+    if (!dataIsValid()) return
+
+    const checkedDialogs = []
+    data.getDialogs.dialogs.forEach((item) => {
+      checkedDialogs.push(item)
+    })
+    setCheckedRows(checkedDialogs)
+    setHeaderChecked(true)
+  }
+
+  //load initial dialog data at page loads
+  useEffect(async () => await handleFetch(0), [])
+
+  //update numRows and page after data is updated
+  useEffect(() => {
+    if (dataIsValid()) {
       setNumRows(data.getDialogs.totalCount)
+
+      if (navigation.current == 'forward') {
+        navigation.current = ''
+        setPage(page + 1)
+      }
+      if (navigation.current == 'backward') {
+        navigation.current = ''
+        setPage(Math.max(page - 1, 0))
+      }
+      return
     }
-    setCurrentData(getDataToShow())
+
+    if (data && data.getDialogs && data.getDialogs.totalCount) {
+      setNumRows(0)
+      handleFetch(Math.max(page - 1, 0))
+    }
   }, [data])
 
   useEffect(() => {
     if (headerChecked && checkedRows.length < 1) setHeaderChecked(false)
   }, [checkedRows])
+
+  useEffect(async () => {
+    await handleFetch(0)
+  }, [pageSize])
+
+  useEffect(async () => {
+    if (prevDialogId.current && !router.query.dialogId) {
+      refetch()
+    }
+    prevDialogId.current = router.query.dialogId
+  }, [router.query.dialogId])
 
   const Data = (props) => {
     const { messages } = props
@@ -234,13 +238,13 @@ export default function DialogsPage() {
         <DialogsHeader
           checked={headerChecked}
           showDelete={headerChecked}
-          handleToggle={handleHeaderToggle}
-          handleDelete={handleDelete}
+          handleToggle={toggleHeader}
+          handleDelete={deleteDialogs}
         />
         <DialogsList
           messages={messages}
           checkedRows={checkedRows}
-          handleRowToggle={handleRowToggle}
+          handleRowToggle={toggleRow}
         />
         <DialogsFooter
           page={page}
@@ -248,33 +252,39 @@ export default function DialogsPage() {
           numRows={numRows}
           handlePageChange={handlePageChange}
           handlePageSizeChange={handlePageSizeChange}
-          handleNextPageButtonClick={handleNextPageButtonClick}
-          handlePreviousPageButtonClick={handlePreviousPageButtonClick}
+          handleNextPageButtonClick={getNextDialogs}
+          handlePreviousPageButtonClick={getPreviousDialogs}
         />
       </>
     )
   }
 
-  let content = null
+  if (router.query.dialogId) {
+    return <ChatPage dialogId={router.query.dialogId[0]} />
+  } else {
+    let content = null
 
-  if (loading) content = <PageLoadingCircle />
-  if (error) content = <ErrorOverlay />
-  if (!error && !loading && !currentData) {
-    content = <NoDataOverlay />
+    if (loading) content = <PageLoadingCircle />
+    if (error) content = <ErrorOverlay />
+    if (!error && !loading && !dataIsValid()) {
+      content = <NoDataOverlay />
+    }
+    if (dataIsValid()) {
+      content = <Data messages={data.getDialogs.dialogs} />
+    }
+
+    return (
+      <RedirectUnathenticatedUser>
+        <Layout
+          title="Мои сообщения | Recycl"
+          numViewed={numUnreadToDelete}
+          setNumViewed={setNumUnreadToDelete}
+        >
+          <Grid className={classes.root} container direction="column">
+            {content}
+          </Grid>
+        </Layout>
+      </RedirectUnathenticatedUser>
+    )
   }
-  if (currentData) content = <Data messages={currentData} />
-
-  return (
-    <RedirectUnathenticatedUser>
-      <Layout
-        title="Мои сообщения | Recycl"
-        numViewed={numUnreadToDelete}
-        setNumViewed={setNumUnreadToDelete}
-      >
-        <Grid className={classes.root} container direction="column">
-          {content}
-        </Grid>
-      </Layout>
-    </RedirectUnathenticatedUser>
-  )
 }
