@@ -347,7 +347,6 @@ export default function ChatPage(props) {
     if (items.length === 0) return
 
     const firstMessage = items[0]
-    //dialogReceiverId and dialogInitiatorId are the same in each message which belongs to this dialog
     let dialogReceiverId = firstMessage.dialogReceiverId
     let dialogInitiatorId = firstMessage.dialogInitiatorId
     let receiverId
