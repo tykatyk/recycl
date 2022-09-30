@@ -123,8 +123,8 @@ export default function ChatPage(props) {
   const [createMessageMutation] = useMutation(CREATE_MESSAGE)
   const [updateMessageMutation] = useMutation(UPDATE_MESSAGE)
 
-  const dataIsCorrect = (dialogData) => {
-    if (dialogData && dialogData.getDialog && dialogData.getDialog.length > 0) {
+  const dataIsCorrect = (data) => {
+    if (data && data.getDialog && data.getDialog.length > 0) {
       return true
     }
     return false
