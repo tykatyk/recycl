@@ -141,7 +141,7 @@ export default function ChatPage(props) {
   const [items, setItems] = useState([]) //Loaded message data.
   const anchorIndex = useRef(0) //Index of the topmost message visisble in the message container.
   const prevAnchorIndex = useRef(0)
-  const [canLoadMore, setCanLoadMore] = useState(true) //Shows if there is additional data in the database that can be loaded.
+  const canLoadMore = useRef(true) //Shows if there is additional data in the database that can be loaded.
   const [severity, setSeverity] = useState('') //Notification severity.
   const [notification, setNotification] = useState('')
   const [showScrollBottom, setShowScrollBottom] = useState(false) //Whether to show a button to scroll to the bottom of the message container.
@@ -159,7 +159,7 @@ export default function ChatPage(props) {
    *@param {string} offset id of the first message in items array
    */
   const getMoreData = async function (offset = '', limit = numMessagesToLoad) {
-    if (!dialogId || !canLoadMore || loading) return
+    if (!dialogId || !canLoadMore.current || loading) return
 
     setLoading(true)
     const result = await apolloClient
@@ -182,9 +182,11 @@ export default function ChatPage(props) {
         return null
       })
       .finally(() => setLoading(false))
-
-    if (!result || !result.data || !dataIsCorrect(result.data)) {
-      setCanLoadMore(false)
+    if (
+      canLoadMore.current &&
+      (!result || !result.data || !dataIsCorrect(result.data))
+    ) {
+      canLoadMore.current = false
       return
     }
 
@@ -202,8 +204,8 @@ export default function ChatPage(props) {
 
     setItems([...newItems, ...items])
 
-    if (canLoadMore && result.data.getDialog.length < numMessagesToLoad) {
-      setCanLoadMore(false)
+    if (canLoadMore.current && numLoaded < numMessagesToLoad) {
+      canLoadMore.current = false
     }
   }
 
@@ -261,7 +263,7 @@ export default function ChatPage(props) {
     if (!messageContainer) return
 
     const currScroll = messageContainer.scrollTop
-    if (currScroll === 0 && canLoadMore) {
+    if (currScroll === 0 && canLoadMore.current) {
       getMoreData(items[0]._id)
       return
     } else if (initialLoad) {
