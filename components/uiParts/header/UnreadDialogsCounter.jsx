@@ -5,25 +5,17 @@ import { useQuery } from '@apollo/client'
 import Snackbar from '../Snackbars.jsx'
 import { GET_UNREAD_DIALOG_IDS } from '../../../lib/graphql/queries/message'
 
-export default function UnreadDialogsCounter(props) {
-  const { data, error, refetch } = useQuery(GET_UNREAD_DIALOG_IDS, {
+export default function UnreadDialogsCounter() {
+  const { data, error } = useQuery(GET_UNREAD_DIALOG_IDS, {
     pollInterval: 2000,
   })
   const [backendError, setBackendError] = useState(null)
-  const { numViewed = 0, setNumViewed } = props
 
   useEffect(() => {
     if (error) {
       setBackendError('Не могу получить число непрочитанных сообщений')
     }
   }, [error])
-
-  useEffect(async () => {
-    if (numViewed) {
-      await refetch()
-      setNumViewed(0)
-    }
-  }, [numViewed])
 
   return (
     <>

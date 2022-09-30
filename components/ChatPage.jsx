@@ -119,7 +119,6 @@ export default function ChatPage(props) {
   const apolloClient = useApolloClient()
   const [loading, setLoading] = useState(false) //Shows if data is loading
   const [messagesError, setMessagesError] = useState('') //Shows if error occurred while getting
-  const [numUnreadUpdated, setNumUnreadUpdated] = useState(false)
   const [createMessageMutation] = useMutation(CREATE_MESSAGE)
   const [updateMessageMutation] = useMutation(UPDATE_MESSAGE)
 
@@ -523,14 +522,6 @@ export default function ChatPage(props) {
   }, [items])
 
   useEffect(() => {
-    //update counter of unread dialogs in the header
-    if (!numUnreadUpdated && dialogData) {
-      apolloClient
-        .refetchQueries({ include: [GET_UNREAD_DIALOG_IDS] })
-        .then(() => {
-          setNumUnreadUpdated(true)
-        })
-    }
     //Update title
     if (dialogData) {
       const firstMessage = items[0]

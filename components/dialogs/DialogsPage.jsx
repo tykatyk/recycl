@@ -24,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
 export default function DialogsPage() {
   const classes = useStyles()
   const [checkedRows, setCheckedRows] = useState([])
-  const [numUnreadToDelete, setNumUnreadToDelete] = useState(0)
   const [headerChecked, setHeaderChecked] = useState(false)
   const [notification, setNotification] = useState('')
   const [severity, setSeverity] = useState('')
@@ -120,18 +119,6 @@ export default function DialogsPage() {
       setSeverity('error')
       setNotification('Ошибка при удалении данных')
     }
-
-    //update counter of unread dialogs
-    const dialogs = data.getDialogs.dialogs
-    let unreadDialogsToDeleteCounter = 0
-    dialogs.forEach((elem) => {
-      if (ids.indexOf(elem.dialogId) != -1 && !elem.viewed) {
-        //increment counter to update notification counter for unread dialogs
-        unreadDialogsToDeleteCounter++
-      }
-    })
-    if (unreadDialogsToDeleteCounter > 0)
-      setNumUnreadToDelete(unreadDialogsToDeleteCounter)
 
     //uncheck header if it's checked
     if (headerChecked) setHeaderChecked(false)
@@ -275,11 +262,7 @@ export default function DialogsPage() {
 
     return (
       <RedirectUnathenticatedUser>
-        <Layout
-          title="Мои сообщения | Recycl"
-          numViewed={numUnreadToDelete}
-          setNumViewed={setNumUnreadToDelete}
-        >
+        <Layout title="Мои сообщения | Recycl">
           <Grid className={classes.root} container direction="column">
             {content}
           </Grid>
