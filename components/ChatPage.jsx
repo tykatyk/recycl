@@ -203,7 +203,7 @@ export default function ChatPage(props) {
     }
 
     let newItems = []
-    for (let i = result.data.getDialog.length - 1; i >= 0; i--) {
+    for (let i = numLoaded - 1; i >= 0; i--) {
       newItems.push(result.data.getDialog[i])
     }
 
