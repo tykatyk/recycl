@@ -778,7 +778,9 @@ export default function ChatPage(props) {
 
   return (
     <RedirectUnathenticatedUser>
-      <Layout title={title}>{content}</Layout>
+      <Layout title={title} currentDialogId={dialogId}>
+        {content}
+      </Layout>
     </RedirectUnathenticatedUser>
   )
 }

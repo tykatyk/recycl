@@ -5,8 +5,10 @@ import { useQuery } from '@apollo/client'
 import Snackbar from '../Snackbars.jsx'
 import { GET_UNREAD_DIALOG_IDS } from '../../../lib/graphql/queries/message'
 
-export default function UnreadDialogsCounter() {
+export default function UnreadDialogsCounter(props) {
+  const { currentDialogId } = props
   const { data, error } = useQuery(GET_UNREAD_DIALOG_IDS, {
+    variables: currentDialogId,
     pollInterval: 2000,
   })
   const [backendError, setBackendError] = useState(null)

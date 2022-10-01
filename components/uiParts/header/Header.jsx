@@ -48,7 +48,7 @@ export default function Header(props) {
   })
   const { mobileView, drawerOpen } = state
   const { status } = useSession()
-  const { numViewed, setNumViewed } = props
+  const { currentDialogId } = props
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -104,10 +104,7 @@ export default function Header(props) {
             {status === 'authenticated' && (
               <div className={classes.gutter}>
                 <CreateButton />
-                <UnreadDialogsCounter
-                  numViewed={numViewed}
-                  setNumViewed={setNumViewed}
-                />
+                <UnreadDialogsCounter currentDialogId={currentDialogId} />
               </div>
             )}
             <UserAvatar handleMenu={handleMenu} />

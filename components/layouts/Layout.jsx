@@ -12,14 +12,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function Layout({ children, title, numViewed, setNumViewed }) {
+export default function Layout({ children, title, currentDialogId }) {
   const classes = useStyles()
 
   return (
     <>
       <Head title={title} />
       <Wrapper>
-        <Header numViewed={numViewed} setNumViewed={setNumViewed} />
+        <Header currentDialogId={currentDialogId} />
         <Container className={classes.root} component="div" maxWidth="md">
           <main>{children}</main>
         </Container>
