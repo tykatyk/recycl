@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: '85%',
   },
   messageContent: {
-    background: theme.palette.grey['600'],
+    background: '#78909c',
     borderRadius: '1em',
     borderTopLeftRadius: 0,
     padding: theme.spacing(1),
@@ -93,16 +93,15 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: 'wrap',
     paddingLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
-
-    '& > :first-child': {
-      marginRight: 4,
-    },
   },
   //aligns messages sent by the other user to the right
   right: {
     justifyContent: 'flex-end',
     '& $message': {
       alignItems: 'flex-end',
+    },
+    '& $messageContent': {
+      background: '#5c6bc0',
     },
   },
   remainedSymbolsIndicator: {
