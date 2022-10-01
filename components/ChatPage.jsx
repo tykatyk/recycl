@@ -74,7 +74,7 @@ const useStyles = makeStyles((theme) => ({
     bottom: 0,
     right: theme.spacing(4),
   },
-  checkmark: { color: '#adce5d' },
+  checkmark: { color: '#adce5d', marginLeft: theme.spacing(1) },
   message: {
     display: 'flex',
     flexDirection: 'column',
@@ -616,24 +616,36 @@ export default function ChatPage(props) {
                         <ListItemText primary={message.text}></ListItemText>
                       </Box>
                       <Box className={classes.messageInfo}>
-                        <ListItemText secondary={dateTime}></ListItemText>
-                        {message.senderId === thisUserId && (
-                          <ListItemText
-                            secondary={
-                              message.viewed ? (
+                        <ListItemText
+                          style={{
+                            textAlign: 'right',
+                          }}
+                          secondaryTypographyProps={{
+                            style: {
+                              display: 'flex',
+                            },
+                          }}
+                          secondary={
+                            message.senderId === thisUserId &&
+                            (message.viewed ? (
+                              <>
+                                <span>{`${dateTime}`}</span>
                                 <DoneAllIcon
                                   fontSize="small"
                                   className={classes.checkmark}
                                 />
-                              ) : (
+                              </>
+                            ) : (
+                              <>
+                                <span>{`${dateTime}`}</span>
                                 <CheckIcon
                                   fontSize="small"
                                   className={classes.checkmark}
                                 />
-                              )
-                            }
-                          ></ListItemText>
-                        )}
+                              </>
+                            ))
+                          }
+                        ></ListItemText>
                       </Box>
                     </InView>
                   </ListItem>
