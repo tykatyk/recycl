@@ -7,7 +7,7 @@ import {
   GET_USER_BY_EMAIL,
   DELETE_NOT_CONFIRMED_USER,
 } from '../../../lib/graphql/queries/user'
-import { loginSchema } from '../../../lib/validation'
+import { loginSchema } from '../../../lib/validation/index.mjs'
 import nextAuthDbAdapter from '../../../lib/nextAuthDbAdapter'
 import * as nodeUrl from 'url'
 const apolloClient = initializeApollo()
