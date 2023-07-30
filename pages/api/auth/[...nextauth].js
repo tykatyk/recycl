@@ -8,7 +8,7 @@ import {
   DELETE_NOT_CONFIRMED_USER,
 } from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation/index.mjs'
-import nextAuthDbAdapter from '../../../lib/nextAuthDbAdapter'
+import nextAuthDbAdapter from '../../../lib/helpers/nextAuthDbAdapter'
 import * as nodeUrl from 'url'
 const apolloClient = initializeApollo()
 

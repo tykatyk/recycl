@@ -6,8 +6,8 @@ import {
   GET_USER_BY_EMAIL,
 } from '../../../lib/graphql/queries/user'
 import { registerSchema } from '../../../lib/validation'
-import { checkCaptcha } from '../../../lib/checkCaptcha'
-import sendEmail from '../../../lib/sendEmail'
+import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
+import sendEmail from '../../../lib/helpers/sendEmail'
 import {
   errorResponse,
   captchaNotPassedResponse,

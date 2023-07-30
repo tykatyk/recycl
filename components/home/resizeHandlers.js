@@ -1,4 +1,4 @@
-import isMobile from '../../lib/detectMobile'
+import isMobile from '../../lib/helpers/detectMobile'
 
 export const setSplashMinHeight = (isLoaded, options, stateHandler) => {
   if (!isLoaded) return

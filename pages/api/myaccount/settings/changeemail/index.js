@@ -3,7 +3,7 @@ import mail from '@sendgrid/mail'
 mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../../../lib/db/connection'
 import { User } from '../../../../../lib/db/models'
-import sendEmail from '../../../../../lib/sendEmail'
+import sendEmail from '../../../../../lib/helpers/sendEmail'
 import { getSession } from 'next-auth/react'
 import { compare } from 'bcrypt'
 import { errorResponse } from '../../../lib/helpers/responses'

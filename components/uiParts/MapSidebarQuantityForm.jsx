@@ -3,7 +3,7 @@ import { TextField, Button, Typography, makeStyles } from '@material-ui/core'
 import { Formik, Form, ErrorMessage } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle.jsx'
 import { quantitySchema } from '../../lib/validation'
-import mapErrors from '../../lib/mapErrors'
+import mapErrors from '../../lib/helpers/mapErrors'
 
 const useStyles = makeStyles((theme) => ({
   root: {
