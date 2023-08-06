@@ -1,5 +1,5 @@
-import dbConnect from '../../lib/db/connection.mjs'
-import removalApplicationModel from '../../lib/db/models/removalApplication.mjs'
+import dbConnect from '../../lib/db/connection'
+import removalApplicationModel from '../../lib/db/models/removalApplication'
 import lockfile from 'proper-lockfile'
 import { writeFile } from 'node:fs'
 

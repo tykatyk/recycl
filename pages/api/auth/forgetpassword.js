@@ -1,6 +1,6 @@
 import { emailSchema } from '../../../lib/validation'
-import dbConnect from '../../../lib/db/connection.mjs'
-import { User } from '../../../lib/db/models.mjs'
+import dbConnect from '../../../lib/db/connection'
+import { User } from '../../../lib/db/models'
 import sendEmail from '../../../lib/helpers/sendEmail'
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
 import {

@@ -1,9 +1,9 @@
 import { ApolloServer } from 'apollo-server-micro'
-import dbConnect from '../../lib/db/connection.mjs'
+import dbConnect from '../../lib/db/connection'
 import typeDefs from '../../lib/graphql/typeDefs'
 import resolvers from '../../lib/graphql/resolvers'
 import { getSession } from 'next-auth/react'
-import { User } from '../../lib/db/models.mjs'
+import { User } from '../../lib/db/models'
 
 const context = ({ req }) => {
   return (async () => {
