@@ -13,7 +13,7 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import AuthLayout from '../layouts/AuthLayout.jsx'
 import { emailSchema } from '../../lib/validation'
 import ReCAPTCHA from 'react-google-recaptcha'
-import submitWithCapthca from '../lib/helpers/submitWithCaptcha'
+import submitWithCapthca from '../../lib/helpers/submitWithCaptcha'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,7 +81,7 @@ export default function ForgetPasswordPage() {
                 recaptchaRef,
                 showRecaptcha,
                 values,
-                endpointUrl: '/api/forgetpassword',
+                endpointUrl: '/api/auth/forgetpassword',
                 setRecaptcha,
                 setShowRecaptcha,
                 setSubmitting,
