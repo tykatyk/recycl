@@ -33,8 +33,12 @@ export default function UserMenu(props) {
 
   const menuItems = [
     {
-      text: 'Мои заявки',
+      text: 'Сдать отходы',
       href: '/my/applications',
+    },
+    {
+      text: 'Собрать отходы',
+      href: '/my/events',
     },
     {
       text: 'Настройки',
