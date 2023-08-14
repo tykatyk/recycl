@@ -1,8 +1,8 @@
 import React from 'react'
 import { Grid } from '@material-ui/core'
-import Layout from '../layouts/Layout.jsx'
-import RemovalForm from './RemovalForm.jsx'
-import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser.jsx'
+import Layout from '../layouts/Layout'
+import RemovalForm from './RemovalForm'
+import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 
 export default function RemovalApplication(props) {
   return (
