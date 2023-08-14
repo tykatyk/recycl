@@ -77,7 +77,7 @@ const columns = [
   },
 ]
 
-export default function removalApplications(props) {
+export default function RemovalApplications(props) {
   const classes = useStyles()
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
