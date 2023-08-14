@@ -35,7 +35,7 @@ export default function RemovalApplicationsPage() {
   const classes = useStyles()
 
   useEffect(() => {
-    if (visibleRect.length == 0) return
+    if (!getApplications || visibleRect.length == 0) return
 
     getApplications({
       variables: {
@@ -43,16 +43,7 @@ export default function RemovalApplicationsPage() {
         wasteTypes: selectedValue,
       },
     })
-  }, [visibleRect])
-
-  useEffect(() => {
-    getApplications({
-      variables: {
-        visibleRect: visibleRect,
-        wasteTypes: selectedValue,
-      },
-    })
-  }, [selectedValue])
+  }, [visibleRect, selectedValue, getApplications])
 
   useEffect(() => {
     if (
