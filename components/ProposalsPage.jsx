@@ -62,8 +62,8 @@ export default function ProposalsPage() {
       const markersToShow = data.getRemovalApplicationsForMap.map(
         (element, index) => {
           const coords = {}
-          coords.lat = element.wasteLocation.position.coordinates[1]
-          coords.lng = element.wasteLocation.position.coordinates[0]
+          coords.lat = element.wasteLocation[1]
+          coords.lng = element.wasteLocation[0]
           return <Marker key={index} position={coords} />
         }
       )
