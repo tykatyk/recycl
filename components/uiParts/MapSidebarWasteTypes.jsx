@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MapSidebarWasteTypes(props) {
   const { loading, data, error } = useQuery(GET_WASTE_TYPES)
-  const { open, onClick, selectedValue, handleChange } = props
+  const { open, onClick, checked, handleChange } = props
   const classes = useStyles()
 
   return (
@@ -72,7 +72,7 @@ export default function MapSidebarWasteTypes(props) {
                     onClick={handleChange(item['_id'])}
                   >
                     <Radio
-                      checked={selectedValue === item['_id']}
+                      checked={checked === item['_id']}
                       value={item['_id']}
                       name="waste-type"
                       inputProps={{ 'aria-label': item.name }}

@@ -25,7 +25,7 @@ export default function ProposalsPage() {
   const [zoom, setZoom] = useState(11)
   const [locationError, setLocationError] = useState(false)
   const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
-  const [checked, setChecked] = useState([])
+  const [checked, setChecked] = useState('')
   const [visibleRect, setVisibleRect] = useState([])
   const [getApplications, { loading, error, data }] = useLazyQuery(
     GET_REMOVAL_APPLICATIONS_FOR_MAP
@@ -74,15 +74,7 @@ export default function ProposalsPage() {
   }, [data])
 
   const handleChange = (value) => () => {
-    const currentIndex = checked.indexOf(value)
-    const newChecked = [...checked]
-
-    if (currentIndex === -1) {
-      newChecked.push(value)
-    } else {
-      newChecked.splice(currentIndex, 1)
-    }
-    setChecked(newChecked)
+    setChecked(value)
   }
 
   const handleWasteTypeToggle = () => {
