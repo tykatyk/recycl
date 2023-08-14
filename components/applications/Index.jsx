@@ -139,7 +139,7 @@ export default function Index(props) {
                 Router.push(`/applications/${params.id}`)
               }}
               components={{
-                Footer: (props) => {
+                Footer: function Footer(props) {
                   return <DataGridFooter {...props} />
                 },
                 Pagination: TablePagination,
