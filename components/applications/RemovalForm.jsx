@@ -15,7 +15,7 @@ import SelectFormik from '../uiParts/formInputs/SelectFormik.jsx'
 import Snackbar from '../uiParts/Snackbars.jsx'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
 import { CheckboxWithLabel } from 'formik-material-ui'
-import { Formik, Form, Field } from 'formik'
+import { Formik, Form, Field, useFormikContext } from 'formik'
 import removalFormStyles from './removalFormStyles'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
@@ -115,6 +115,250 @@ export default function RemovalForm(props) {
     )
   }
 
+  const RemovalForm = () => {
+    const { setFieldValue, isSubmitting, values } = useFormikContext()
+    const shouldDisable =
+      gettingApplication || gettingWasteTypes || isSubmitting
+
+    useEffect(() => {
+      if (!setFieldValue) return
+      if (applicationId && !called)
+        getRemovalApplication({ variables: { applicationId } })
+      if (applicationData) {
+        fields.forEach((field) => {
+          if (field === 'wasteType') return
+          setFieldValue(
+            field,
+            applicationData.getRemovalApplication[field],
+            false
+          )
+        })
+      }
+    }, [applicationId, applicationData, setFieldValue])
+
+    useEffect(() => {
+      if (
+        !applicationId &&
+        phoneData &&
+        phoneData.getPhone &&
+        phoneData.getPhone.phone
+      ) {
+        setFieldValue('contactPhone', phoneData.getPhone.phone, false)
+      }
+    }, [applicationId, phoneData])
+    return (
+      <Form className={classes.formRoot}>
+        <Grid
+          item
+          container
+          component="fieldset"
+          className={classes.gridContainer}
+        >
+          <Grid item xs={12} className={classes.sectionTitle}>
+            <Typography gutterBottom variant="h4">
+              Сдать отходы
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              id="wasteLocation"
+              name="wasteLocation"
+              variant="outlined"
+              fullWidth
+              component={PlacesAutocomplete}
+              label="Местоположение отходов"
+              helperText="*Обязательное поле"
+              disabled={shouldDisable}
+            />
+          </Grid>
+          <Grid item xs={12} className={classes.gridContainer}>
+            <SelectFormik
+              error={wasteTypesError}
+              loading={gettingWasteTypes}
+              data={wasteTypesData ? wasteTypesData.getWasteTypes : undefined}
+              name={'wasteType'}
+              label={'Тип отходов'}
+              helperText={'*Обязательное поле'}
+              disabled={shouldDisable}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              component={TextFieldFormik}
+              label="Количество"
+              color="secondary"
+              type="number"
+              fullWidth
+              name="quantity"
+              variant="outlined"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">Кг</InputAdornment>
+                ),
+              }}
+              helperText="*Обязательное поле"
+              disabled={shouldDisable}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              component={TextFieldFormik}
+              label="Контактный телефон"
+              color="secondary"
+              type="tel"
+              fullWidth
+              name="contactPhone"
+              variant="outlined"
+              helperText="*Обязательное поле"
+              disabled={shouldDisable}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              component={TextFieldFormik}
+              multiline
+              rows={3}
+              variant="outlined"
+              fullWidth
+              name="comment"
+              label="Примечание"
+              disabled={shouldDisable}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              component={CheckboxWithLabel}
+              type="checkbox"
+              name="passDocumet"
+              Label={{
+                label: 'Нужен документ о передаче отходов на переработку',
+              }}
+              disabled={shouldDisable}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid
+          item
+          container
+          component="fieldset"
+          className={classes.gridContainer}
+        >
+          <Grid item xs={12} className={classes.sectionTitle}>
+            <Typography gutterBottom variant="h4">
+              Параметры уведомлений
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={11}>
+                <Field
+                  component={CheckboxWithLabel}
+                  type="checkbox"
+                  name="notificationRadiusCheckbox"
+                  Label={{
+                    label:
+                      'Получать уведомления о приеме отходов из заявки в радиусе:',
+                  }}
+                  disabled={shouldDisable}
+                ></Field>
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={11}>
+                <Field
+                  component={TextFieldDependantFormik}
+                  data-master="notificationRadiusCheckbox"
+                  disabled={!values.notificationRadiusCheckbox || shouldDisable}
+                  name="notificationRadius"
+                  variant="outlined"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">Км</InputAdornment>
+                    ),
+                  }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  fullWidth
+                />
+              </Grid>
+              <Grid
+                item
+                xs={1}
+                container
+                alignItems="center"
+                justifyContent="center"
+              >
+                <RemovalPopover id="notificationRadiusPopover">
+                  <Typography variant="body2" style={{ maxWidth: '20em' }}>
+                    Выберите эту опцию если, например, в вашем населенном пункте
+                    нет пунктов приема отходов указанных в заявке
+                  </Typography>
+                </RemovalPopover>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={11}>
+                <Field
+                  component={CheckboxWithLabel}
+                  type="checkbox"
+                  name="notificationCitiesCheckbox"
+                  Label={{
+                    label:
+                      'Получать уведомления независимо от радиуса для следующих населенных пунктов:',
+                  }}
+                  disabled={shouldDisable}
+                />
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={11}>
+                <Field
+                  name="notificationCities"
+                  data-master="notificationCitiesCheckbox"
+                  variant="outlined"
+                  multiple
+                  component={PlacesAutocomplete}
+                  disabled={!values.notificationCitiesCheckbox || shouldDisable}
+                  fullWidth
+                />
+              </Grid>
+              <Grid
+                item
+                xs={1}
+                container
+                alignItems="center"
+                justifyContent="center"
+              >
+                <RemovalPopover id="notificationCitiesPopover">
+                  <Typography variant="body2" style={{ maxWidth: '20em' }}>
+                    Выберите эту опцию если вы часто бываете в определенных
+                    населенных пунктах и можете сдать отходы там
+                  </Typography>
+                </RemovalPopover>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={12} component="fieldset">
+          <Button
+            variant="contained"
+            color="secondary"
+            type="submit"
+            disabled={shouldDisable}
+          >
+            Сохранить
+            {isSubmitting && <ButtonSubmittingCircle />}
+          </Button>
+        </Grid>
+      </Form>
+    )
+  }
+
   return (
     <>
       <Formik
@@ -129,261 +373,7 @@ export default function RemovalForm(props) {
           }
         }}
       >
-        {({ isSubmitting, values, setFieldValue }) => {
-          useEffect(() => {
-            if (applicationId && !called)
-              getRemovalApplication({ variables: { applicationId } })
-            if (applicationData) {
-              fields.forEach((field) => {
-                if (field === 'wasteType') return
-                setFieldValue(
-                  field,
-                  applicationData.getRemovalApplication[field],
-                  false
-                )
-              })
-            }
-          }, [applicationId, applicationData])
-
-          useEffect(() => {
-            if (
-              !applicationId &&
-              phoneData &&
-              phoneData.getPhone &&
-              phoneData.getPhone.phone
-            ) {
-              setFieldValue('contactPhone', phoneData.getPhone.phone, false)
-            }
-          }, [applicationId, phoneData])
-
-          const shouldDisable =
-            gettingApplication || gettingWasteTypes || isSubmitting
-
-          return (
-            <Form className={classes.formRoot}>
-              <Grid
-                item
-                container
-                component="fieldset"
-                className={classes.gridContainer}
-              >
-                <Grid item xs={12} className={classes.sectionTitle}>
-                  <Typography gutterBottom variant="h4">
-                    Сдать отходы
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    id="wasteLocation"
-                    name="wasteLocation"
-                    variant="outlined"
-                    fullWidth
-                    component={PlacesAutocomplete}
-                    label="Местоположение отходов"
-                    helperText="*Обязательное поле"
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid item xs={12} className={classes.gridContainer}>
-                  <SelectFormik
-                    error={wasteTypesError}
-                    loading={gettingWasteTypes}
-                    data={
-                      wasteTypesData ? wasteTypesData.getWasteTypes : undefined
-                    }
-                    name={'wasteType'}
-                    label={'Тип отходов'}
-                    helperText={'*Обязательное поле'}
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    component={TextFieldFormik}
-                    label="Количество"
-                    color="secondary"
-                    type="number"
-                    fullWidth
-                    name="quantity"
-                    variant="outlined"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">Кг</InputAdornment>
-                      ),
-                    }}
-                    helperText="*Обязательное поле"
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    component={TextFieldFormik}
-                    label="Контактный телефон"
-                    color="secondary"
-                    type="tel"
-                    fullWidth
-                    name="contactPhone"
-                    variant="outlined"
-                    helperText="*Обязательное поле"
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    component={TextFieldFormik}
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                    fullWidth
-                    name="comment"
-                    label="Примечание"
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    component={CheckboxWithLabel}
-                    type="checkbox"
-                    name="passDocumet"
-                    Label={{
-                      label: 'Нужен документ о передаче отходов на переработку',
-                    }}
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid
-                item
-                container
-                component="fieldset"
-                className={classes.gridContainer}
-              >
-                <Grid item xs={12} className={classes.sectionTitle}>
-                  <Typography gutterBottom variant="h4">
-                    Параметры уведомлений
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={11}>
-                      <Field
-                        component={CheckboxWithLabel}
-                        type="checkbox"
-                        name="notificationRadiusCheckbox"
-                        Label={{
-                          label:
-                            'Получать уведомления о приеме отходов из заявки в радиусе:',
-                        }}
-                        disabled={shouldDisable}
-                      ></Field>
-                    </Grid>
-                  </Grid>
-                  <Grid container>
-                    <Grid item xs={11}>
-                      <Field
-                        component={TextFieldDependantFormik}
-                        data-master="notificationRadiusCheckbox"
-                        disabled={
-                          !values.notificationRadiusCheckbox || shouldDisable
-                        }
-                        name="notificationRadius"
-                        variant="outlined"
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">Км</InputAdornment>
-                          ),
-                        }}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid
-                      item
-                      xs={1}
-                      container
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <RemovalPopover id="notificationRadiusPopover">
-                        <Typography
-                          variant="body2"
-                          style={{ maxWidth: '20em' }}
-                        >
-                          Выберите эту опцию если, например, в вашем населенном
-                          пункте нет пунктов приема отходов указанных в заявке
-                        </Typography>
-                      </RemovalPopover>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={11}>
-                      <Field
-                        component={CheckboxWithLabel}
-                        type="checkbox"
-                        name="notificationCitiesCheckbox"
-                        Label={{
-                          label:
-                            'Получать уведомления независимо от радиуса для следующих населенных пунктов:',
-                        }}
-                        disabled={shouldDisable}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container>
-                    <Grid item xs={11}>
-                      <Field
-                        name="notificationCities"
-                        data-master="notificationCitiesCheckbox"
-                        variant="outlined"
-                        multiple
-                        component={PlacesAutocomplete}
-                        disabled={
-                          !values.notificationCitiesCheckbox || shouldDisable
-                        }
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid
-                      item
-                      xs={1}
-                      container
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <RemovalPopover id="notificationCitiesPopover">
-                        <Typography
-                          variant="body2"
-                          style={{ maxWidth: '20em' }}
-                        >
-                          Выберите эту опцию если вы часто бываете в
-                          определенных населенных пунктах и може сдать отходы
-                          там
-                        </Typography>
-                      </RemovalPopover>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} component="fieldset">
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  type="submit"
-                  disabled={shouldDisable}
-                >
-                  Сохранить
-                  {isSubmitting && <ButtonSubmittingCircle />}
-                </Button>
-              </Grid>
-            </Form>
-          )
-        }}
+        <RemovalForm />
       </Formik>
       <Snackbar
         severity="error"
