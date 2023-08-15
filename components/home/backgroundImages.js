@@ -1,4 +1,4 @@
-export default {
+const images = {
   smallPortrait: 'images/homeBackground/smallPortrait.jpg',
   mediumPortrait: 'images/homeBackground/mediumPortrait.jpg',
   largePortrait: 'images/homeBackground/largePortrait.jpg',
@@ -7,3 +7,5 @@ export default {
   mediumLandscape: 'images/homeBackground/mediumLandscape.jpg',
   xLargeLandscape: 'images/homeBackground/xLargeLandscape.jpg',
 }
+
+export default images
