@@ -56,7 +56,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PrivacyPolicyPage() {
   const classes = useStyles()
-
+  //Strings which contain apostrophes or quotes are placed insede
+  //curly braces to properly escape these characters
   return (
     <Layout title="Политика приватности | Recycl">
       <Container className={classes.container}>
@@ -177,12 +178,13 @@ export default function PrivacyPolicyPage() {
               Користувача на Сайті.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>3.3</span> Користувачі несуть
+              <span className={classes.subtitle}>3.3</span>
+              {`Користувачі несуть
               відповідальність за всю інформацію, що розміщується ними на сайті
               та в загальнодоступних облікових записах соціальних мереж.
               Користувач повинен усвідомити всі ризики, пов'язані з тим, що він
               оприлюднює адресу або інформацію про точне місце свого
-              розташування.
+              розташування.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>3.4</span> Інформація в
@@ -191,16 +193,18 @@ export default function PrivacyPolicyPage() {
               характеру, необхідну для спілкування користувачів між собою.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>3.5</span> Інформація, що
+              <span className={classes.subtitle}>3.5</span>
+              {`Інформація, що
               необхідна для реклами та просування: в процесі роботи Сайту
               Компанія може збирати особисту інформацію, щодо участі
               користувачів у маркетингових акціях, організованих на Сайті, або
               на сторонніх сайтах Компанією. Компанія може також обробляти
               інформацію пов'язану з ефективністю рекламних кампаній, в тому
-              числі перегляди оголошень на Сайті, та на сайтах третіх осіб.
+              числі перегляди оголошень на Сайті, та на сайтах третіх осіб.`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>3.6</span> Інформація, що
+              <span className={classes.subtitle}>3.6</span>
+              {`Інформація, що
               необхідна для обслуговування користувачів: при зверненні до
               відділу обслуговування користувачів, Компанія, при необхідності,
               може збирати особисту інформацію, необхідну для виконання запиту
@@ -213,7 +217,7 @@ export default function PrivacyPolicyPage() {
               зокрема, у формі відгуків, залишених Користувачами. Компанія може
               також обробляти відгуки в якості даних, що стосуються Користувача
               – автора відгуку, та Користувача, відносно якого було залишено
-              відгук.
+              відгук.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>3.7</span> Інформація веб-сайту
@@ -287,10 +291,11 @@ export default function PrivacyPolicyPage() {
               сервісу на Сайті;
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.1.4</span> зв'язку з
+              <span className={classes.subtitle}>4.1.4</span>
+              {`зв'язку з
               користувачами, в тому числі з питань сервісу, обслуговування та
               дозволених маркетингових комунікацій через будь-які доступні
-              канали зв'язку;
+              канали зв'язку;`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>4.1.5</span> забезпечення
@@ -415,9 +420,10 @@ export default function PrivacyPolicyPage() {
               8. ЯК ЗМІНИТИ АБО ВИДАЛИТИ ПЕРСОНАЛЬНІ ДАНІ
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>8.1</span> Розміщена інформація
+              <span className={classes.subtitle}>8.1</span>
+              {`Розміщена інформація
               може бути змінена або видалена в особистому кабінеті користувача
-              (пункт "Настройки") на веб-сторінці Сайту.
+              (пункт "Настройки") на веб-сторінці Сайту.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>8.2</span> Якщо Ваш обліковий
@@ -507,23 +513,26 @@ export default function PrivacyPolicyPage() {
               отримувати зміст таких персональних даних;
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>9.5</span> пред'являти
+              <span className={classes.subtitle}>9.5</span>
+              {`пред'являти
               вмотивовану вимогу власнику персональних даних із запереченням
-              проти обробки персональних даних;
+              проти обробки персональних даних;`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>9.6</span> пред'являти
+              <span className={classes.subtitle}>9.6</span>
+              {`пред'являти
               вмотивовану вимогу щодо зміни або знищення персональних даних
               власником та/або розпорядником персональних даних, якщо ці дані
-              обробляються незаконно чи є недостовірними;
+              обробляються незаконно чи є недостовірними;`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>9.7</span> на захист
+              <span className={classes.subtitle}>9.7</span>
+              {`на захист
               персональних даних від незаконної обробки та випадкової втрати,
               знищення, пошкодження у зв'язку з умисним приховуванням,
               ненаданням чи несвоєчасним їх наданням, а також на захист від
               надання відомостей, що є недостовірними чи ганьблять честь,
-              гідність та ділову репутацію;
+              гідність та ділову репутацію;`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>9.8</span> звертатися зі
@@ -575,12 +584,13 @@ export default function PrivacyPolicyPage() {
               .
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>10.2</span> У разі якщо
+              <span className={classes.subtitle}>10.2</span>
+              {`У разі якщо
               Компанією були внесені будь-які зміни в Політику Конфіденційності,
               з якими Користувач не згоден, він зобов'язаний припинити
               використання сервісів Сайту. Факт продовження використання Сайту є
               підтвердженням згоди і прийняття Користувачем відповідної редакції
-              Політики Конфіденційності.
+              Політики Конфіденційності.`}
             </Typography>
           </section>
         </article>

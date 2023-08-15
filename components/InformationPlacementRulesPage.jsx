@@ -59,6 +59,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function InformationPlacementRulesPage() {
   const classes = useStyles()
+  //Strings which contain apostrophes or quotes are placed insede
+  //curly braces to properly escape these characters
 
   return (
     <Layout title="Правила размещения информации | Recycl">
@@ -110,11 +112,11 @@ export default function InformationPlacementRulesPage() {
               прийому/збору таких Відходів.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>1.3</span> Розміщуючи
-              інформацію про Сировину, що підлягає обов'язковій сертифікації в
-              Україні, або про види діяльності, що підлягають ліцензуванню,
-              Користувач несе відповідальність за наявність у нього дозвільних
-              документів.
+              <span className={classes.subtitle}>1.3</span>
+              {`Розміщуючи інформацію про Сировину, що підлягає обов'язковій
+              сертифікації в Україні, або про види діяльності, що підлягають
+              ліцензуванню, Користувач несе відповідальність за наявність у
+              нього дозвільних документів.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>1.4</span> У разі обґрунтованих
@@ -161,11 +163,12 @@ export default function InformationPlacementRulesPage() {
               трансліті;
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>2.1.6</span> оформлення
+              <span className={classes.subtitle}>2.1.6</span>
+              {`оформлення
               Оголошень вводить покупця в оману (наявність та місце розташування
               Відходів чи пунктів прийому/збору Відходів неактуальні; зображення
               та опис Відходів не відповідають дійсності; інформація містить
-              суб'єктивну думку чи аргументи без підстави тощо).
+              суб'єктивну думку чи аргументи без підстави тощо).`}
             </Typography>
           </section>
           <section className={classes.section}>
@@ -190,13 +193,14 @@ export default function InformationPlacementRulesPage() {
               банківську таємницю;
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>3.1.2</span> інформацію, яка не
+              <span className={classes.subtitle}>3.1.2</span>
+              {`інформацію, яка не
               відповідає тематиці Сайту і не пов'язана з веденням господарської
               діяльності, а також про діяльність громадських організацій,
-              благодійність тощо;
+              благодійність тощо;`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>3.1.3</span> інформацію, що
+              <span className={classes.subtitle}>3.1.3</span>інформацію, що
               порушує права інтелектуальної власності третіх осіб (авторське
               право, права на знаки для товарів і послуг, патентне право,
               комерційну таємницю тощо), в тому числі використання торгових
@@ -285,7 +289,8 @@ export default function InformationPlacementRulesPage() {
               війни, заперечення тимчасової окупації частини території України;
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>3.1.18</span> інформацію, що
+              <span className={classes.subtitle}>3.1.18</span>
+              {`інформацію, що
               глорифікує: символіку, що використовується (лась) під час збройної
               агресії Російської Федерації проти України; осіб, які здійснювали
               збройну агресію Російської Федерації проти України, представників
@@ -299,7 +304,7 @@ export default function InformationPlacementRulesPage() {
               Федерації самопроголошених органів, які узурпували виконання
               владних функцій на тимчасово окупованих територіях України, у тому
               числі шляхом їх визначення як "повстанці", "ополченці", "ввічливі
-              військові люди" тощо;
+              військові люди" тощо;`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>3.1.19</span> інформацію, що

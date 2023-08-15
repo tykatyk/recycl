@@ -49,7 +49,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function TermsOfServicePage() {
   const classes = useStyles()
-
+  //Strings which contain apostrophes or quotes are placed insede
+  //curly braces to properly escape these characters
   return (
     <Layout title="Соглашение пользователя | Recycl">
       <Container className={classes.container}>
@@ -139,29 +140,30 @@ export default function TermsOfServicePage() {
               <span className={classes.subtitle}>
                 Політика конфіденційності
               </span>{' '}
-              - умови роботи з конфіденційною інформацією на Сайті, які є
-              невід'ємною частиною цієї Угоди і розміщена за посиланням:{' '}
+              {`- умови роботи з конфіденційною інформацією на Сайті, які є
+              невід'ємною частиною цієї Угоди і розміщена за посиланням: `}
               <Link href="/privacy-policy" className={classes.link}>
                 https://recycl.com/privacy-policy
               </Link>
               .
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>Сайт</span> - сукупність
+              <span className={classes.subtitle}>Сайт</span>
+              {` - сукупність
               програмних та апаратних засобів, результат комп'ютерного
               програмування у вигляді онлайн сервісу Recycl, який розміщений в
-              мережі Інтернет за адресою{' '}
+              мережі Інтернет за адресою `}
               <Link
                 href={`${process.env.NEXT_PUBLIC_URL}`}
                 className={classes.link}
               >
                 https://recycl.com
               </Link>{' '}
-              і належить ПП «Recycl World Company» (ідентифікаційний код
+              {`і належить ПП «Recycl World Company» (ідентифікаційний код
               юридичної особи 12345678). Зміст Сайту захищено авторським правом,
               законодавством про товарні знаки, а також іншими правами,
               пов'язаними з інтелектуальною власністю, і законодавством про
-              недобросовісну конкуренцію.
+              недобросовісну конкуренцію.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>Сировина</span> – промислові
@@ -171,9 +173,9 @@ export default function TermsOfServicePage() {
               <span className={classes.subtitle}>
                 Правила розміщення інформації на Сайті
               </span>
-              - вимоги, яких повинні дотримуватися Користувачі, щоб мати
+              {` - вимоги, яких повинні дотримуватися Користувачі, щоб мати
               можливість розміщувати Оголошення на Сайті. Дані правила є
-              невід'ємною частиною Угоди і розміщені за посиланням.
+              невід'ємною частиною Угоди і розміщені за посиланням.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>Розміщення Оголошення</span> -
@@ -195,9 +197,9 @@ export default function TermsOfServicePage() {
               <Link href="/terms-of-service" className={classes.link}>
                 https://recycl.com/terms-of-service
               </Link>
-              . Під дію цієї Угоди підпадають всі існуючі (функціонуючі) на
+              {`. Під дію цієї Угоди підпадають всі існуючі (функціонуючі) на
               даний момент послуги (Сервіси) Сайту, а також будь-які їх подальші
-              модифікації і ті, які з'являються в подальшому.
+              модифікації і ті, які з'являються в подальшому.`}
             </Typography>
           </section>
           <section className={classes.section}>
@@ -253,12 +255,13 @@ export default function TermsOfServicePage() {
               className={classes.h2}
               id="rights-and-obligations-of-site-administration"
             >
-              3. ПРАВА ТА ОБОВ'ЯЗКИ АДМІНІСТРАЦІЇ САЙТУ
+              {`3. ПРАВА ТА ОБОВ'ЯЗКИ АДМІНІСТРАЦІЇ САЙТУ`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>3.1</span> Адміністрація Сайту
+              <span className={classes.subtitle}>3.1</span>
+              {`Адміністрація Сайту
               зобов'язується забезпечити можливість отримання Користувачем
-              Сервісів в порядку, визначеному цією Угодою.
+              Сервісів в порядку, визначеному цією Угодою.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>3.2</span> Адміністрація Сайту
@@ -285,11 +288,12 @@ export default function TermsOfServicePage() {
               повідомлень.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>3.5</span> Адміністрація Сайту
+              <span className={classes.subtitle}>3.5</span>
+              {`Адміністрація Сайту
               зобов'язується надавати Користувачу можливість отримання
               консультацій служби підтримки у разі зазначення Користувачем
               ідентифікаційних даних. Обсяг консультацій обмежується конкретними
-              питаннями, пов'язаними з наданням Послуг.
+              питаннями, пов'язаними з наданням Послуг.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>3.6</span> Адміністрація Сайту
@@ -369,7 +373,7 @@ export default function TermsOfServicePage() {
               className={classes.h2}
               id="rights-and-obligations-of-site-user"
             >
-              4. ПРАВА ТА ОБОВ'ЯЗКИ КОРИСТУВАЧА
+              {`4. ПРАВА ТА ОБОВ'ЯЗКИ КОРИСТУВАЧА`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>4.1</span> Під час реєстрації
@@ -385,24 +389,27 @@ export default function TermsOfServicePage() {
               припинити надання йому Послуг.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.3</span> Користувач
+              <span className={classes.subtitle}>4.3</span>
+              {`Користувач
               зобов'язується використовувати Сайт тільки в законних цілях,
               дотримуватися чинного законодавства України, а також прав та
-              законних інтересів Власника Сайту.
+              законних інтересів Власника Сайту.`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.4</span> Користувач не має
+              <span className={classes.subtitle}>4.4</span>
+              {`Користувач не має
               права вчиняти дій, що впливають на нормальну роботу Сайту і є його
               несумлінним використанням. Користувач зобов'язується не
               використовувати будь-які пристрої, програми, процедури, алгоритми
               і методи, автоматичні пристрої або еквівалентні ручні процеси для
-              доступу, придбання, копіювання або відстеження змісту Сайту.
+              доступу, придбання, копіювання або відстеження змісту Сайту.`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.5</span> Користувач
+              <span className={classes.subtitle}>4.5</span>
+              {`Користувач
               зобов'язується не здійснювати дій, спрямованих на отримання
               доступу до чужого особистого профілю/Облікового запису шляхом
-              підбору логіна і пароля, злому або інших дій.
+              підбору логіна і пароля, злому або інших дій.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>4.6</span> Користувач не має
@@ -414,7 +421,8 @@ export default function TermsOfServicePage() {
               Користувач.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.7</span> У разі порушення
+              <span className={classes.subtitle}>4.7</span>
+              {`У разі порушення
               безпеки або несанкціонованого використання Облікового запису
               Користувача, він повинен негайно повідомити про це Адміністрацію
               Сайту. Адміністрація Сайту не несе відповідальності за будь-які
@@ -423,17 +431,18 @@ export default function TermsOfServicePage() {
               Обліковий запис іншого Користувача без спеціального дозволу і
               згоди власника цього Облікового запису і пароля. Адміністрація
               Сайту не несе відповідальності за будь-які збитки чи шкоду, що
-              виникли внаслідок невиконання Користувачем цих зобов'язань.
+              виникли внаслідок невиконання Користувачем цих зобов'язань.`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.8</span> Користувач
+              <span className={classes.subtitle}>4.8</span>
+              {`Користувач
               зобов'язується не використовувати самостійно або із залученням
               третіх осіб можливості Сайту з метою, які можуть бути
               кваліфіковані як порушення прав третіх осіб на об'єкти
               інтелектуальної власності, недобросовісна конкуренція, інше
               порушення чинного законодавства України. Користувач не має права
               використовувати інформацію Сайту для особистих некомерційних
-              цілей. Копіювання інформації з сайту забороняється.
+              цілей. Копіювання інформації з сайту забороняється.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>4.9</span> Користувачі
@@ -442,18 +451,21 @@ export default function TermsOfServicePage() {
               інтелектуальної власності.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.10</span> Користувач
+              <span className={classes.subtitle}>4.10</span>
+              {`Користувач
               зобов'язується надати за запитом від Адміністрації Сайту додаткову
               інформацію, яка має безпосереднє відношення до надання Сервісів
-              (послуг).
+              (послуг).`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.11</span> Користувач
+              <span className={classes.subtitle}>4.11</span>
+              {`Користувач
               зобов'язується дотримуватися майнових та немайнових прав авторів
-              та інших правовласників при використанні Сайту.
+              та інших правовласників при використанні Сайту.`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>4.12</span> Користувачі Сайту
+              <span className={classes.subtitle}>4.12</span>
+              {`Користувачі Сайту
               зобов'язуються не допускати в адресу і щодо інших користувачів,
               Адміністрації та представників Сайту виразів і висловлювань у
               брутальній, образливій формі, проявляти агресію і застосовувати в
@@ -462,7 +474,7 @@ export default function TermsOfServicePage() {
               перерахованих вище дій, такого Користувачеві виставляється
               попередження. При наявності зафіксованого порушення два і більше
               рази, Адміністрація Сайту має право обмежити доступ такого
-              Користувача до Сайту.
+              Користувача до Сайту.`}
             </Typography>
           </section>
           <section className={classes.section}>
@@ -488,18 +500,19 @@ export default function TermsOfServicePage() {
               </Link>
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>5.2</span> Адміністрація Сайту
+              <span className={classes.subtitle}>5.2</span>`Адміністрація Сайту
               не проводить обов'язкову перевірку інформації і Контенту (в тому
               числі в оголошеннях), яка розміщується Користувачами на Сайті і не
               несе відповідальності за відповідність такої інформації чинному
-              законодавству України.
+              законодавству України.`
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>5.3</span> Адміністрація Сайту
+              <span className={classes.subtitle}>5.3</span>
+              {`Адміністрація Сайту
               не несе відповідальності за помилки, неточності, упущення, які
               були допущені при реєстрації або розміщенні інформації
               Користувачем, а також будь-які матеріальні або нематеріальні
-              збитки, що виникли в зв'язку з цим (включаючи упущену вигоду).
+              збитки, що виникли в зв'язку з цим (включаючи упущену вигоду).`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>5.4</span> Адміністрація Сайту
@@ -520,7 +533,8 @@ export default function TermsOfServicePage() {
               Контент.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>5.6</span> У разі виникнення в
+              <span className={classes.subtitle}>5.6</span>
+              {`У разі виникнення в
               зв'язку з розміщенням Користувачем Контенту та/або будь-якої
               інформації, рекламних матеріалів, та/або змістом рекламних
               матеріалів (відповідністю змісту реклами вимогам чинного
@@ -531,7 +545,7 @@ export default function TermsOfServicePage() {
               самостійно без залучення Адміністрації Сайту, а також
               зобов'язується компенсувати Власнику Сайту в повному обсязі
               збитки, витрати, включаючи штрафні санкції, викликані порушенням
-              ним умов цієї Угоди.
+              ним умов цієї Угоди.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>5.7</span> Вся розміщена
@@ -556,7 +570,8 @@ export default function TermsOfServicePage() {
               6. ВІДПОВІДАЛЬНІСТЬ. ОБМЕЖЕННЯ ВІДПОВІДАЛЬНОСТІ
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>6.1</span> Адміністрація Сайту
+              <span className={classes.subtitle}>6.1</span>
+              {`Адміністрація Сайту
               не несе відповідальності за будь-які помилки, упущення,
               переривання, дефекти і затримки в обробці або передачі даних, збої
               в лініях зв'язку, знищення будь-якого обладнання, неправомірний
@@ -569,7 +584,7 @@ export default function TermsOfServicePage() {
               пошти або скриптів з технічних причин, за нормальне функціонування
               і доступність окремих сегментів мережі Інтернет та мереж
               операторів електрозв'язку, задіяних при здійсненні доступу
-              Користувача до Сервісів.
+              Користувача до Сервісів.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>6.2</span> Послуги на Сайті
@@ -578,17 +593,19 @@ export default function TermsOfServicePage() {
               Користувачем інформації на Сайті.
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>6.3</span> Адміністрація Сайту
+              <span className={classes.subtitle}>6.3</span>
+              {`Адміністрація Сайту
               не несе відповідальності за відповідність Сервісу цілком або його
               частин очікуванням Користувача, безпомилкове та безперебійне
               надання Сервісів, припинення доступу Користувача до Сервісів, а
               також за збереження логіна і пароля Користувача, що забезпечують
               доступ до Сервісів, з причин, пов'язаних з технічними збоями
               апаратного або програмного забезпечення Сайту, і не відшкодовує
-              Користувачу будь-які пов'язані з цим збитки.
+              Користувачу будь-які пов'язані з цим збитки.`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>6.4</span> Адміністрація Сайту
+              <span className={classes.subtitle}>6.4</span>
+              {`Адміністрація Сайту
               не несе відповідальності перед Користувачем за обмеження доступу
               до Сервісів, за припинення доступу до Сервісів, якщо ці обмеження
               і припинення виникли внаслідок обставин непереборної сили, що
@@ -600,23 +617,25 @@ export default function TermsOfServicePage() {
               країни, акти державних органів і/або органів місцевого
               самоврядування, внесення змін до законодавства України, аварії на
               мережах загального користування, зміни умов доступу до
-              лінійно-кабельним засобів зв'язку та інше.
+              лінійно-кабельним засобів зв'язку та інше.`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>6.5</span> Адміністрація Сайту
+              <span className={classes.subtitle}>6.5</span>
+              {`Адміністрація Сайту
               не несе відповідальності перед Користувачем або будь-якими третіми
               особами за будь-які прямі та/або непрямі збитки, включаючи упущену
               вигоду або втрачені дані, шкоду честі, гідності або діловій
               репутації, понесені у зв'язку з використанням ним Сервісів, або
               неможливості його використання або несанкціонованого доступу
-              третіх осіб до комунікацій Користувача.
+              третіх осіб до комунікацій Користувача.`}
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>6.6</span> Адміністрація Сайту
+              <span className={classes.subtitle}>6.6</span>
+              {`Адміністрація Сайту
               не несе відповідальності за будь-які збитки електронним пристроям
               Користувача або іншої особи, будь-якого іншого обладнання або
               програмного забезпечення, викликаний або пов'язаний з
-              використанням Користувачем Сервісів.
+              використанням Користувачем Сервісів.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>6.7</span> Адміністрація Сайту
@@ -644,8 +663,8 @@ export default function TermsOfServicePage() {
             </Typography>
             <ul className={classes.list}>
               <li>
-                отримання обов'язкових до виконання рішень компетентних
-                державних органів України;
+                {`отримання обов'язкових до виконання рішень компетентних
+                державних органів України;`}
               </li>
               <li>
                 вимог власників прав інтелектуальної власності, у т.ч., але не
@@ -671,9 +690,10 @@ export default function TermsOfServicePage() {
               </li>
             </ul>
             <Typography paragraph>
-              <span className={classes.subtitle}>6.10</span> Адміністрація Сайту
+              <span className={classes.subtitle}>6.10</span>
+              {`Адміністрація Сайту
               не несе відповідальність за дії систем переказів, платіжних систем
-              і за затримки пов'язані з їх роботою.
+              і за затримки пов'язані з їх роботою.`}
             </Typography>
           </section>
           <section className={classes.section}>
@@ -687,7 +707,8 @@ export default function TermsOfServicePage() {
               7. ІНТЕЛЕКТУАЛЬНА ВЛАСНІСТЬ
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>7.1</span> Сукупність програм,
+              <span className={classes.subtitle}>7.1</span>
+              {`Сукупність програм,
               даних, торгових марок, об'єктів авторського права, і інших
               об'єктів, що використовуються на Сайті при наданні Сервісів, є
               інтелектуальною власністю його законних правовласників і
@@ -699,7 +720,7 @@ export default function TermsOfServicePage() {
               без дозволу Адміністрації Сайту чи іншого законного правовласника
               є незаконним і може стати причиною судового розгляду і притягнення
               порушників до цивільно-правової, адміністративної та кримінальної
-              відповідальності відповідно до законодавства України.
+              відповідальності відповідно до законодавства України.`}
             </Typography>
           </section>
           <section className={classes.section}>
