@@ -6,7 +6,9 @@ import {
   makeStyles,
   TablePagination,
 } from '@material-ui/core'
+import Link from '../uiParts/Link'
 import MailIcon from '@material-ui/icons/Mail'
+import CreateIcon from '@material-ui/icons/Create'
 import Layout from '../layouts/Layout'
 import Snackbar from '../uiParts/Snackbars'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
@@ -44,19 +46,19 @@ const columns = [
   {
     field: 'wasteLocation',
     headerName: 'Местоположение',
-    width: 232,
+    width: 150,
   },
   {
     field: 'quantity',
     headerName: 'Количество',
-    width: 150,
+    width: 152,
     headerAlign: 'center',
     align: 'center',
   },
   {
     field: 'messageCount',
     headerName: 'Сообщения',
-    width: 150,
+    width: 120,
     headerAlign: 'center',
     align: 'center',
     renderCell: (params) => {
@@ -74,6 +76,20 @@ const columns = [
     field: 'expires',
     headerName: 'До',
     width: 110,
+  },
+  {
+    field: 'edit',
+    headerName: 'Редактировать',
+    width: 140,
+    headerAlign: 'center',
+    align: 'center',
+    renderCell: (params) => {
+      return (
+        <Link href={params.row.edit}>
+          <CreateIcon color="secondary" />
+        </Link>
+      )
+    },
   },
 ]
 
@@ -130,6 +146,7 @@ export default function RemovalApplications(props) {
           day: '2-digit',
           month: 'short',
         })
+        newItem.edit = `/my/applications/edit/${item.document['_id']}`
         return newItem
       })
     }
