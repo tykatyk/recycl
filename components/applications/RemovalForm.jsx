@@ -121,9 +121,8 @@ export default function RemovalForm(props) {
       gettingApplication || gettingWasteTypes || isSubmitting
 
     useEffect(() => {
-      if (!setFieldValue) return
       if (applicationId && !called)
-        getRemovalApplication({ variables: { applicationId } })
+        getRemovalApplication({ variables: { id: applicationId } })
       if (applicationData) {
         fields.forEach((field) => {
           if (field === 'wasteType') return
@@ -134,10 +133,9 @@ export default function RemovalForm(props) {
           )
         })
       }
-    }, [applicationId, applicationData, setFieldValue])
+    }, [])
 
     useEffect(() => {
-      if (!setFieldValue) return
       if (
         !applicationId &&
         phoneData &&
@@ -146,7 +144,7 @@ export default function RemovalForm(props) {
       ) {
         setFieldValue('contactPhone', phoneData.getPhone.phone, false)
       }
-    }, [applicationId, phoneData, setFieldValue])
+    }, [])
     return (
       <Form className={classes.formRoot}>
         <Grid
