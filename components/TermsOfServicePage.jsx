@@ -1,7 +1,7 @@
 import React from 'react'
 import { makeStyles, Typography, Container, useTheme } from '@material-ui/core'
-import Layout from './layouts/Layout.jsx'
-import Link from './uiParts/Link.jsx'
+import Layout from './layouts/Layout'
+import Link from './uiParts/Link'
 
 const useStyles = makeStyles((theme) => ({
   container: {

@@ -1,8 +1,8 @@
 import React from 'react'
 import { Paper, Grid, Typography, makeStyles } from '@material-ui/core'
-import Layout from '../layouts/Layout.jsx'
-import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
-import SendMessage from '../uiParts/SendMessage.jsx'
+import Layout from '../layouts/Layout'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle'
+import SendMessage from '../uiParts/SendMessage'
 import { useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATION } from '../../lib/graphql/queries/removalApplication'
 
