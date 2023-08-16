@@ -13,16 +13,15 @@ import cardsContent from './cardsContent'
 import homePageStyles from './styles'
 import { handleResize } from './resizeHandlers'
 const useStyles = homePageStyles
-
+const options = {
+  portraitMode: true,
+  landscapeHeight: 0,
+  portraitHeight: 0,
+  minHeight: 0,
+}
 export default function HomePage() {
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.down('sm'))
-  const options = {
-    portraitMode: true,
-    landscapeHeight: 0,
-    portraitHeight: 0,
-    minHeight: 0,
-  }
 
   const [splashMinHeight, setSplashMinHeight] = useState(0)
 
