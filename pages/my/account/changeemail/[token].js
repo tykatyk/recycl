@@ -1,5 +1,5 @@
 import React from 'react'
-import ChangeEmailPage from '../../../../client/uiParts/userSettings/ChangeEmailPage'
+import ChangeEmailPage from '../../../../components/uiParts/userSettings/ChangeEmailPage'
 import dbConnect from '../../../../lib/db/connection'
 import { User } from '../../../../lib/db/models'
 

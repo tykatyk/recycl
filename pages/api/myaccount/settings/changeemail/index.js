@@ -6,7 +6,7 @@ import { User } from '../../../../../lib/db/models'
 import sendEmail from '../../../../../lib/helpers/sendEmail'
 import { getSession } from 'next-auth/react'
 import { compare } from 'bcrypt'
-import { errorResponse } from '../../../lib/helpers/responses'
+import { errorResponse } from '../../../../../lib/helpers/responses'
 
 const userNotFound = function (res) {
   return res.status(401).json({
