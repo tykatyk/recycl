@@ -40,7 +40,7 @@ const Listbox = forwardRef((props, ref) => {
     const sources = getSources()
 
     setImageSources(sources)
-  }, [theme.palette.type])
+  }, [theme.palette.type, getSources])
 
   return (
     <div ref={ref}>

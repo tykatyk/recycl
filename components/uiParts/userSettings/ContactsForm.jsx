@@ -9,12 +9,12 @@ import {
   useTheme,
 } from '@material-ui/core'
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline'
-import { Formik, Form, Field } from 'formik'
-import Snackbar from '../Snackbars.jsx'
-import PlacesAutocomplete from '../formInputs/PlacesAutocomplete.jsx'
-import TextFieldFormik from '../formInputs/TextFieldFormik.jsx'
-import ButtonSubmittingCircle from '../ButtonSubmittingCircle.jsx'
-import PageLoadingCircle from '../PageLoadingCircle.jsx'
+import { Formik, Form, Field, useFormikContext } from 'formik'
+import Snackbar from '../Snackbars'
+import PlacesAutocomplete from '../formInputs/PlacesAutocomplete'
+import TextFieldFormik from '../formInputs/TextFieldFormik'
+import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
+import PageLoadingCircle from '../PageLoadingCircle'
 import { contactsSchema } from '../../../lib/validation'
 import {
   GET_USER_CONTACTS,
@@ -78,6 +78,60 @@ export default function ContactsForm() {
     if (session) setId(session.id)
   }, [session])
 
+  const ContactsForm = () => {
+    const { isSubmitting, setFieldValue } = useFormikContext()
+    useEffect(() => {
+      if (!data || !data.getUserContacts) return
+
+      setFieldValue('username', data.getUserContacts.name, false)
+
+      const locationToShow = data.getUserContacts.location
+        ? data.getUserContacts.location
+        : null
+
+      setFieldValue('location', locationToShow, false)
+    }, [data])
+
+    return (
+      <Form className={classes.form} noValidate autoComplete="off">
+        <Field
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="username"
+          label="Имя или название организации"
+          name="username"
+          component={TextFieldFormik}
+          className={classes.field}
+        />
+        <Field
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          id="location"
+          label="Город"
+          name="location"
+          component={PlacesAutocomplete}
+          className={classes.field}
+          backgroundColor={theme.palette.grey['800']}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="secondary"
+          className={classes.submit}
+          disabled={isSubmitting}
+          style={{ width: 'auto' }}
+        >
+          Сохранить
+          {isSubmitting && <ButtonSubmittingCircle />}
+        </Button>
+      </Form>
+    )
+  }
+
   if (loading)
     return (
       <Box className={classes.alternativeBox}>
@@ -132,58 +186,7 @@ export default function ContactsForm() {
           }
         }}
       >
-        {({ isSubmitting, setFieldValue }) => {
-          useEffect(() => {
-            if (!data || !data.getUserContacts) return
-
-            setFieldValue('username', data.getUserContacts.name, false)
-
-            const locationToShow = data.getUserContacts.location
-              ? data.getUserContacts.location
-              : null
-
-            setFieldValue('location', locationToShow, false)
-          }, [data])
-
-          return (
-            <Form className={classes.form} noValidate autoComplete="off">
-              <Field
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="username"
-                label="Имя или название организации"
-                name="username"
-                component={TextFieldFormik}
-                className={classes.field}
-              />
-              <Field
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                id="location"
-                label="Город"
-                name="location"
-                component={PlacesAutocomplete}
-                className={classes.field}
-                backgroundColor={theme.palette.grey['800']}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="secondary"
-                className={classes.submit}
-                disabled={isSubmitting}
-                style={{ width: 'auto' }}
-              >
-                Сохранить
-                {isSubmitting && <ButtonSubmittingCircle />}
-              </Button>
-            </Form>
-          )
-        }}
+        <ContactsForm />
       </Formik>
 
       <Snackbar
