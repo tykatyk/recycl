@@ -42,16 +42,7 @@ export default function ProposalsPage() {
         wasteTypes: checked,
       },
     })
-  }, [visibleRect])
-
-  useEffect(() => {
-    getApplications({
-      variables: {
-        visibleRect: visibleRect,
-        wasteTypes: checked,
-      },
-    })
-  }, [checked])
+  }, [visibleRect, checked, getApplications])
 
   useEffect(() => {
     if (

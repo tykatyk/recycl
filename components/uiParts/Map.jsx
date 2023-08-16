@@ -23,7 +23,7 @@ const MapContainer = (props) => {
         })
       )
     }
-  }, [ref, map])
+  }, [ref, map, center, zoom])
 
   useEffect(() => {
     if (map) {
