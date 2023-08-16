@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Grid, makeStyles } from '@material-ui/core'
 import DialogsHeader from './DialogsHeader'
 import DialogsFooter from './DialogsFooter'
@@ -58,17 +58,6 @@ export default function DialogsPage() {
   )
 
   const router = useRouter()
-  const dataIsValid = () => {
-    if (
-      data &&
-      data.getDialogs &&
-      data.getDialogs.dialogs &&
-      data.getDialogs.dialogs.length > 0
-    ) {
-      return true
-    }
-    return false
-  }
 
   const handlePageChange = (_, newPage) => {
     setPage(newPage)
@@ -78,12 +67,15 @@ export default function DialogsPage() {
     setPage(0)
   }
 
-  const handleFetch = async (offset = 0) => {
-    // if (!dataIsValid()) return
-    await loadDialogs({
-      variables: { offset, limit: pageSize },
-    })
-  }
+  const handleFetch = useCallback(
+    async function (offset = 0) {
+      // if (!dataIsValid()) return
+      await loadDialogs({
+        variables: { offset, limit: pageSize },
+      })
+    },
+    [pageSize, loadDialogs]
+  )
 
   const needLoadMore = () => {
     if (!dataIsValid()) return false
