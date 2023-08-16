@@ -35,7 +35,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const QuantityForm = () => {
+const QuantityForm = (props) => {
+  const { min, max } = props
   const {
     isSubmitting,
     handleChange,
@@ -150,7 +151,7 @@ export default function MapSidebarQuantityForm(props) {
           })
       }}
     >
-      <QuantityForm />
+      <QuantityForm min={min} max={max} />
     </Formik>
   )
 }
