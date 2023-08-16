@@ -1,5 +1,5 @@
 import React from 'react'
-import ResetPasswordPage from '../../../components/auth/ResetPasswordPage.jsx'
+import ResetPasswordPage from '../../../components/auth/ResetPasswordPage'
 
 export default function Reset(props) {
   const { token } = props

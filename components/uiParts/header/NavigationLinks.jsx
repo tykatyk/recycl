@@ -6,7 +6,7 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core'
-import Link from '../Link.jsx'
+import Link from '../Link'
 
 const useStyles = makeStyles((theme) => ({
   navLinks: {

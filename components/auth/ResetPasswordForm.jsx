@@ -8,11 +8,11 @@ import {
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
 import RotateLeftSharpIcon from '@material-ui/icons/RotateLeftSharp'
-import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik.jsx'
-import Snackbar from '../uiParts/Snackbars.jsx'
-import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle.jsx'
+import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
+import Snackbar from '../uiParts/Snackbars'
+import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { passwordSchema } from '../../lib/validation'
-import AuthLayout from '../layouts/AuthLayout.jsx'
+import AuthLayout from '../layouts/AuthLayout'
 import showErrorMessages from '../../lib/helpers/showErrorMessages'
 
 const useStyles = makeStyles((theme) => ({

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Grid } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
-import AuthLayout from './AuthLayout.jsx'
+import AuthLayout from './AuthLayout'
 
 export default function ResetLayout(props) {
   const { title, message, severity = 'error' } = props

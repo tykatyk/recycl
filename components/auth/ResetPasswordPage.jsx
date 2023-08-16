@@ -1,10 +1,10 @@
 import React from 'react'
 import { GET_USER_BY_TOKEN } from '../../lib/graphql/queries/user'
 import { useQuery } from '@apollo/client'
-import PageLoadingCircle from '../uiParts/PageLoadingCircle.jsx'
-import Head from '../uiParts/Head.jsx'
-import ResetLayout from '../layouts/ResetLayout.jsx'
-import ResetPasswordForm from './ResetPasswordForm.jsx'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle'
+import Head from '../uiParts/Head'
+import ResetLayout from '../layouts/ResetLayout'
+import ResetPasswordForm from './ResetPasswordForm'
 
 export default function ResetPasswordPage({ token }) {
   const { loading, error, data } = useQuery(GET_USER_BY_TOKEN, {

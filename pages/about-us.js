@@ -1,5 +1,5 @@
 import React from 'react'
-import AboutUsPage from '../components/AboutUsPage.jsx'
+import AboutUsPage from '../components/AboutUsPage'
 
 export default function AboutUs() {
   return <AboutUsPage />

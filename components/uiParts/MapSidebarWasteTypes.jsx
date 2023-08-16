@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core'
 import { useQuery } from '@apollo/client'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
-import PageLoadingCircle from './PageLoadingCircle.jsx'
+import PageLoadingCircle from './PageLoadingCircle'
 import BlurOnIcon from '@material-ui/icons/BlurOn'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'

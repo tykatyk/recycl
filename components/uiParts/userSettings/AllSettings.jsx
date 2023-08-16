@@ -8,13 +8,13 @@ import {
 import MuiAccordion from '@material-ui/core/Accordion'
 import MuiAccordionSummary from '@material-ui/core/AccordionSummary'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import RedirectUnathenticatedUser from '../RedirectUnathenticatedUser.jsx'
-import Layout from '../../layouts/Layout.jsx'
-import ContactsForm from './ContactsForm.jsx'
-import PhoneForm from './PhoneForm.jsx'
-import ChangePasswordForm from './ChangePasswordForm.jsx'
-import ChangeEmailForm from './ChangeEmailForm.jsx'
-import DeleteAccountForm from './DeleteAccountForm.jsx'
+import RedirectUnathenticatedUser from '../RedirectUnathenticatedUser'
+import Layout from '../../layouts/Layout'
+import ContactsForm from './ContactsForm'
+import PhoneForm from './PhoneForm'
+import ChangePasswordForm from './ChangePasswordForm'
+import ChangeEmailForm from './ChangeEmailForm'
+import DeleteAccountForm from './DeleteAccountForm'
 
 const Accordion = withStyles((theme) => ({
   root: {

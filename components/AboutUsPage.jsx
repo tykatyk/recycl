@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { makeStyles, Container, useTheme } from '@material-ui/core'
-import Layout from './layouts/Layout.jsx'
+import Layout from './layouts/Layout'
 import { Formik, Form, Field } from 'formik'
 
 const useStyles = makeStyles((theme) => ({

@@ -5,13 +5,13 @@ import { ApolloProvider } from '@apollo/client'
 import { initializeApollo } from '../lib/apolloClient/apolloClient'
 import { SessionProvider } from 'next-auth/react'
 import theme from '../lib/helpers/themeStub'
-import GlobalCss from './uiParts/GlobalCss.jsx'
+import GlobalCss from './uiParts/GlobalCss'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 const globalStyles = <GlobalCss />
-import CookieConsentPopup from './uiParts/CookieConsentPopup.jsx'
+import CookieConsentPopup from './uiParts/CookieConsentPopup'
 
 export default function App(props) {
   const {

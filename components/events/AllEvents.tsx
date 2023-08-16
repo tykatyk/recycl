@@ -29,8 +29,8 @@ import {
   DELETE_REMOVAL_APPLICATIONS,
 } from '../../lib/graphql/queries/removalApplication.js'
 import Router from 'next/router'
-import { active, inactive } from './data.ts'
-import Events from './Events.tsx'
+import { active, inactive } from './data'
+import Events from './Events'
 
 const useStyles = makeStyles((theme) => ({
   root: {

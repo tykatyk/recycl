@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core'
-import PageLoadingCircle from './PageLoadingCircle.jsx'
+import PageLoadingCircle from './PageLoadingCircle'
 
 const useStyles = makeStyles((theme) => ({
   mapContainer: {

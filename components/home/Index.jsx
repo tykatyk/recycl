@@ -8,7 +8,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@material-ui/core'
-import HomeLayout from '../layouts/HomeLayout.jsx'
+import HomeLayout from '../layouts/HomeLayout'
 import cardsContent from './cardsContent'
 import homePageStyles from './styles'
 import { handleResize } from './resizeHandlers'

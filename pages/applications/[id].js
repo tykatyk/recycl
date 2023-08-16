@@ -1,5 +1,5 @@
 import React from 'react'
-import ShowSingle from '../../components/applications/ShowSingle.jsx'
+import ShowSingle from '../../components/applications/ShowSingle'
 
 export default function updateRemovalApplication(props) {
   const { id } = props //removal application id

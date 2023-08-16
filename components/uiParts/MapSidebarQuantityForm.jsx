@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { TextField, Button, Typography, makeStyles } from '@material-ui/core'
 import { Formik, Form, ErrorMessage, useFormikContext } from 'formik'
-import ButtonSubmittingCircle from './ButtonSubmittingCircle.jsx'
+import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import { quantitySchema } from '../../lib/validation'
 import mapErrors from '../../lib/helpers/mapErrors'
 

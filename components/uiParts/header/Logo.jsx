@@ -1,6 +1,6 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core'
-import Link from '../Link.jsx'
+import Link from '../Link'
 const useStyles = makeStyles({
   root: {
     fontSize: '1.5rem',

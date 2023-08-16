@@ -6,12 +6,12 @@ import {
   makeStyles,
   useTheme,
 } from '@material-ui/core'
-import UserMenu from './UserMenu.jsx'
-import UnreadDialogsCounter from './UnreadDialogsCounter.jsx'
-import UserAvatar from './UserAvatar.jsx'
-import DesktopNavigation from './DesktopNavigation.jsx'
-import MobileNavigation from './MobileNavigation.jsx'
-import CreateButton from './CreateButton.jsx'
+import UserMenu from './UserMenu'
+import UnreadDialogsCounter from './UnreadDialogsCounter'
+import UserAvatar from './UserAvatar'
+import DesktopNavigation from './DesktopNavigation'
+import MobileNavigation from './MobileNavigation'
+import CreateButton from './CreateButton'
 import { useSession } from 'next-auth/react'
 
 const useStyles = makeStyles((theme) => ({

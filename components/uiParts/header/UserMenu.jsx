@@ -11,7 +11,7 @@ import {
   useTheme,
   makeStyles,
 } from '@material-ui/core'
-import Link from '../Link.jsx'
+import Link from '../Link'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'

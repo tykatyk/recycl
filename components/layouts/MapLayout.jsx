@@ -1,7 +1,7 @@
 import React from 'react'
-import Wrapper from '../uiParts/Wrapper.jsx'
-import Header from '../uiParts/header/Header.jsx'
-import Head from '../uiParts/Head.jsx'
+import Wrapper from '../uiParts/Wrapper'
+import Header from '../uiParts/header/Header'
+import Head from '../uiParts/Head'
 
 export default function MapLayout({ children, title }) {
   return (

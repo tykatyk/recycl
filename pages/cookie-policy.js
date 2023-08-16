@@ -1,5 +1,5 @@
 import React from 'react'
-import CookiePolicyPage from '../components/CookiePolicyPage.jsx'
+import CookiePolicyPage from '../components/CookiePolicyPage'
 
 export default function CookiePolicy() {
   return <CookiePolicyPage />

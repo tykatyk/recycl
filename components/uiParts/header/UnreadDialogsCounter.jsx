@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { IconButton, Badge } from '@material-ui/core'
 import MailIcon from '@material-ui/icons/Mail'
 import { useQuery } from '@apollo/client'
-import Snackbar from '../Snackbars.jsx'
+import Snackbar from '../Snackbars'
 import { GET_UNREAD_DIALOG_IDS } from '../../../lib/graphql/queries/message'
 
 export default function UnreadDialogsCounter(props) {

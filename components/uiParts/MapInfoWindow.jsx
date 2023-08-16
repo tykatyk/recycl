@@ -1,6 +1,6 @@
 import React from 'react'
 import { Typography, Divider, makeStyles } from '@material-ui/core'
-import Link from './Link.jsx'
+import Link from './Link'
 
 const useStyles = makeStyles((theme) => ({
   root: {

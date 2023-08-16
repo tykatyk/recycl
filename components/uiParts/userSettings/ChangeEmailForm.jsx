@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Button, Box, makeStyles } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
-import Snackbar from '../Snackbars.jsx'
-import TextFieldFormik from '../formInputs/TextFieldFormik.jsx'
-import ButtonSubmittingCircle from '../ButtonSubmittingCircle.jsx'
+import Snackbar from '../Snackbars'
+import TextFieldFormik from '../formInputs/TextFieldFormik'
+import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
 import { loginSchema as changeEmailSchema } from '../../../lib/validation'
 
 const useStyles = makeStyles((theme) => ({

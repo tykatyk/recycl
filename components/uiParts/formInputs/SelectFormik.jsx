@@ -1,6 +1,6 @@
 import React from 'react'
 import { MenuItem, Button } from '@material-ui/core'
-import TextFieldFormik from './TextFieldFormik.jsx'
+import TextFieldFormik from './TextFieldFormik'
 import { Field } from 'formik'
 
 export default function SelectFormik(props) {

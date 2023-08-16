@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { makeStyles, Typography, Button, Grow } from '@material-ui/core'
-import Link from './Link.jsx'
+import Link from './Link'
 import Cookies from 'js-cookie'
 
 const useStyles = makeStyles((theme) => ({

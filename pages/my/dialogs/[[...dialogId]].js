@@ -1,5 +1,5 @@
 import React from 'react'
-import Dialogs from '../../../components/dialogs/DialogsPage.jsx'
+import Dialogs from '../../../components/dialogs/DialogsPage'
 import { DELETE_STALE_DIALOGS } from '../../../lib/graphql/queries/message'
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 

@@ -1,6 +1,6 @@
 import React from 'react'
-import IndexPage from '../../components/applications/Index.jsx'
-import AppliicationsOnMap from '../../components/applications/ApplicationsOnMap.jsx'
+import IndexPage from '../../components/applications/Index'
+import AppliicationsOnMap from '../../components/applications/ApplicationsOnMap'
 
 export default function Index(props) {
   const { city, wasteType } = props

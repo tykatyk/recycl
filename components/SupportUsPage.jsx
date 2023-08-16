@@ -1,6 +1,6 @@
 import React from 'react'
 import { makeStyles, Typography, Box, Paper } from '@material-ui/core'
-import Layout from './layouts/Layout.jsx'
+import Layout from './layouts/Layout'
 
 const useStyles = makeStyles((theme) => ({
   root: {

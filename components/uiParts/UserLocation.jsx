@@ -7,9 +7,9 @@ import {
   Typography,
 } from '@material-ui/core'
 import { Formik, Form, Field } from 'formik'
-import ButtonSubmittingCircle from './ButtonSubmittingCircle.jsx'
-import PlacesAutocomplete from './formInputs/PlacesAutocomplete.jsx'
-import Snackbar from './Snackbars.jsx'
+import ButtonSubmittingCircle from './ButtonSubmittingCircle'
+import PlacesAutocomplete from './formInputs/PlacesAutocomplete'
+import Snackbar from './Snackbars'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { userLocationSchema } from '../../lib/validation'
 

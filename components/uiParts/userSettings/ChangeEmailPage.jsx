@@ -1,5 +1,5 @@
 import React from 'react'
-import ResetLayout from '../../layouts/ResetLayout.jsx'
+import ResetLayout from '../../layouts/ResetLayout'
 
 export default function ChangeEmailPage({ urlIsValid }) {
   const title = 'Смена email'

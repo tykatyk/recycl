@@ -11,7 +11,7 @@ import {
 import { fieldToTextField } from 'formik-material-ui'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
-import Listbox from './Listbox.jsx'
+import Listbox from './Listbox'
 
 function loadScript(src, position, id) {
   if (!position) return

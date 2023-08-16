@@ -7,8 +7,8 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core'
-import Link from './Link.jsx'
-import Logo from './header/Logo.jsx'
+import Link from './Link'
+import Logo from './header/Logo'
 
 const useStyles = makeStyles((theme) => ({
   root: {

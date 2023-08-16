@@ -1,7 +1,7 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core'
-import NavigationLinks from './NavigationLinks.jsx'
-import Logo from './Logo.jsx'
+import NavigationLinks from './NavigationLinks'
+import Logo from './Logo'
 
 const useStyles = makeStyles({
   wrapper: {

@@ -7,13 +7,13 @@ import {
   Container,
   useTheme,
 } from '@material-ui/core'
-import Layout from './layouts/Layout.jsx'
+import Layout from './layouts/Layout'
 import { contactUsSchema } from '../lib/validation'
 import whitespaceRegex from '../lib/validation/regularExpressions'
 import submitWithCapthca from '../lib/helpers/submitWithCaptcha'
-import TextFieldFormik from './uiParts/formInputs/TextFieldFormik.jsx'
-import Snackbars from './uiParts/Snackbars.jsx'
-import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle.jsx'
+import TextFieldFormik from './uiParts/formInputs/TextFieldFormik'
+import Snackbars from './uiParts/Snackbars'
+import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import ReCAPTCHA from 'react-google-recaptcha'
 

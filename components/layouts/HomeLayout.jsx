@@ -1,8 +1,8 @@
 import React from 'react'
-import Wrapper from '../uiParts/Wrapper.jsx'
-import Header from '../uiParts/header/Header.jsx'
-import Footer from '../uiParts/Footer.jsx'
-import Head from '../uiParts/Head.jsx'
+import Wrapper from '../uiParts/Wrapper'
+import Header from '../uiParts/header/Header'
+import Footer from '../uiParts/Footer'
+import Head from '../uiParts/Head'
 
 export default function Layout({ children, title }) {
   return (

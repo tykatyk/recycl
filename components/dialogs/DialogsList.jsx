@@ -1,6 +1,6 @@
 import React from 'react'
 import { Grid, makeStyles } from '@material-ui/core'
-import DialogsRow from './DialogsRow.jsx'
+import DialogsRow from './DialogsRow'
 import { useSession } from 'next-auth/react'
 
 const useStyles = makeStyles((theme) => ({
