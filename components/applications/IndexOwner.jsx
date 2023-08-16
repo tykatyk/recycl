@@ -61,7 +61,7 @@ const columns = [
     width: 120,
     headerAlign: 'center',
     align: 'center',
-    renderCell: (params) => {
+    renderCell: function MessageCountCell(params) {
       if (params.row.messageCount > 0) {
         return (
           <Badge badgeContent={params.row.messageCount} color="secondary">
@@ -83,7 +83,7 @@ const columns = [
     width: 140,
     headerAlign: 'center',
     align: 'center',
-    renderCell: (params) => {
+    renderCell: function EditCell(params) {
       return (
         <Link href={params.row.edit}>
           <CreateIcon color="secondary" />
