@@ -60,6 +60,8 @@ Link.propTypes = {
   prefetch: PropTypes.bool,
 }
 
-export default React.forwardRef((props, ref) => (
+const AdaptedLink = React.forwardRef((props, ref) => (
   <Link {...props} innerRef={ref} />
 ))
+AdaptedLink.displayName = 'AdaptedLink'
+export default AdaptedLink

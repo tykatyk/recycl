@@ -19,8 +19,8 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'right',
   },
 }))
-let Listbox = null
-export default Listbox = forwardRef((props, ref) => {
+
+const Listbox = forwardRef((props, ref) => {
   const { children, ...other } = props
   const theme = useTheme()
 
@@ -61,3 +61,5 @@ export default Listbox = forwardRef((props, ref) => {
     </div>
   )
 })
+Listbox.displayName = 'Listbox'
+export default Listbox
