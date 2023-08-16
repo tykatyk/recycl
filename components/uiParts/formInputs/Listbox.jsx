@@ -1,6 +1,7 @@
 import React, { useState, useEffect, forwardRef, useCallback } from 'react'
 import Divider from '@material-ui/core/Divider'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
+import Image from 'next/image'
 
 const googleLogoOnWhite =
   '/images/poweredByGoogle/powered_by_google_on_white.png'
@@ -47,7 +48,10 @@ const Listbox = forwardRef((props, ref) => {
       <ul {...other}>{children}</ul>
       <Divider />
       <div className={classes.googleLogo}>
-        <img
+        <Image
+          layout="responsive"
+          width={144}
+          height={18}
           srcSet={imageSources}
           sizes="(min-resolution: 2dppx) 288px, 144px"
           src={
