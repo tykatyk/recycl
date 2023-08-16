@@ -500,11 +500,12 @@ export default function TermsOfServicePage() {
               </Link>
             </Typography>
             <Typography paragraph>
-              <span className={classes.subtitle}>5.2</span>`Адміністрація Сайту
+              <span className={classes.subtitle}>5.2</span>
+              {`Адміністрація Сайту
               не проводить обов'язкову перевірку інформації і Контенту (в тому
               числі в оголошеннях), яка розміщується Користувачами на Сайті і не
               несе відповідальності за відповідність такої інформації чинному
-              законодавству України.`
+              законодавству України.`}
             </Typography>
             <Typography paragraph>
               <span className={classes.subtitle}>5.3</span>
