@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { Avatar, Button, Box, Typography, makeStyles } from '@material-ui/core'
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline'
-import { Formik, Form, Field } from 'formik'
+import { Formik, Form, Field, useFormikContext } from 'formik'
 import Snackbar from '../Snackbars'
 import TextFieldFormik from '../formInputs/TextFieldFormik'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
@@ -64,6 +64,41 @@ export default function PhoneForm() {
     if (session) setId(session.id)
   }, [session])
 
+  const PhoneForm = () => {
+    const { isSubmitting, setFieldValue } = useFormikContext()
+    useEffect(() => {
+      if (!data || !data.getPhone || !data.getPhone.phone) return
+      setFieldValue('phone', data.getPhone.phone, false)
+    }, [data])
+
+    return (
+      <Form className={classes.form} noValidate autoComplete="off">
+        <Field
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          id="phone"
+          label="Номер телефона"
+          name="phone"
+          component={TextFieldFormik}
+          className={classes.field}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="secondary"
+          className={classes.submit}
+          disabled={isSubmitting}
+          style={{ width: 'auto' }}
+        >
+          Сохранить
+          {isSubmitting && <ButtonSubmittingCircle />}
+        </Button>
+      </Form>
+    )
+  }
+
   if (loading)
     return (
       <Box className={classes.alternativeBox}>
@@ -109,39 +144,7 @@ export default function PhoneForm() {
           }
         }}
       >
-        {({ isSubmitting, setFieldValue }) => {
-          useEffect(() => {
-            if (!data || !data.getPhone || !data.getPhone.phone) return
-            setFieldValue('phone', data.getPhone.phone, false)
-          }, [data])
-
-          return (
-            <Form className={classes.form} noValidate autoComplete="off">
-              <Field
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                id="phone"
-                label="Номер телефона"
-                name="phone"
-                component={TextFieldFormik}
-                className={classes.field}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="secondary"
-                className={classes.submit}
-                disabled={isSubmitting}
-                style={{ width: 'auto' }}
-              >
-                Сохранить
-                {isSubmitting && <ButtonSubmittingCircle />}
-              </Button>
-            </Form>
-          )
-        }}
+        <PhoneForm />
       </Formik>
 
       <Snackbar
