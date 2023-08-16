@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import {
   Fade,
   Box,
@@ -161,60 +161,66 @@ export default function ChatPage(props) {
    *@param {number} limit  number of messages to load when quering database
    *@param {string} offset id of the first message in items array
    */
-  const getMoreData = async function (offset = '', limit = numMessagesToLoad) {
-    if (!dialogId || !canLoadMore.current || loading) return
+  const getMoreData = useCallback(
+    async (offset = '', limit = numMessagesToLoad) => {
+      if (!dialogId || !canLoadMore.current || loading) return
 
-    setLoading(true)
-    const result = await apolloClient
-      .query({
-        query: GET_DIALOG,
-        variables: {
-          id: dialogId,
-          offset,
-          limit,
-        },
-        fetchPolicy: 'network-only',
-      })
-      .then((result) => {
-        return result
-      })
-      .catch((error) => {
-        setMessagesError(true)
-        setSeverity('error')
-        setNotification('Ошибка при загрузке данных')
-        return null
-      })
-      .finally(() => setLoading(false))
-    if (
-      canLoadMore.current &&
-      (!result || !result.data || !dataIsCorrect(result.data))
-    ) {
-      canLoadMore.current = false
-      return
-    }
+      setLoading(true)
+      const result = await apolloClient
+        .query({
+          query: GET_DIALOG,
+          variables: {
+            id: dialogId,
+            offset,
+            limit,
+          },
+          fetchPolicy: 'network-only',
+        })
+        .then((result) => {
+          return result
+        })
+        .catch((error) => {
+          setMessagesError(true)
+          setSeverity('error')
+          setNotification('Ошибка при загрузке данных')
+          return null
+        })
+        .finally(() => setLoading(false))
+      if (
+        canLoadMore.current &&
+        (!result || !result.data || !dataIsCorrect(result.data))
+      ) {
+        canLoadMore.current = false
+        return
+      }
 
-    const numLoaded = result.data.getDialog.length
+      const numLoaded = result.data.getDialog.length
 
-    anchorIndex.current = numLoaded
-    if (itemsRef.current.length > 0 && numLoaded > 0) {
-      prevAnchorIndex.current = 0
-    }
+      anchorIndex.current = numLoaded
+      if (itemsRef.current.length > 0 && numLoaded > 0) {
+        prevAnchorIndex.current = 0
+      }
 
-    let newItems = []
-    for (let i = numLoaded - 1; i >= 0; i--) {
-      newItems.push(result.data.getDialog[i])
-    }
+      let newItems = []
+      for (let i = numLoaded - 1; i >= 0; i--) {
+        newItems.push(result.data.getDialog[i])
+      }
 
-    setItems([...newItems, ...items])
+      setItems([...newItems, ...items])
 
-    if (canLoadMore.current && numLoaded < numMessagesToLoad) {
-      canLoadMore.current = false
-    }
-  }
+      if (canLoadMore.current && numLoaded < numMessagesToLoad) {
+        canLoadMore.current = false
+      }
+    },
+    [dialogId, canLoadMore, anchorIndex, apolloClient, loading, itemsRef, items]
+  )
 
-  const handleResize = (isLoaded) => {
-    if (isLoaded) handleScroll()
-  }
+  const handleResize = useCallback(
+    (isLoaded) => {
+      if (isLoaded) handleScroll()
+    },
+    [handleScroll]
+  )
 
   const handleSubmit = async (values, options) => {
     if (!dialogData) return
@@ -261,34 +267,45 @@ export default function ChatPage(props) {
     return false
   }
 
-  const handleScroll = (e) => {
-    const messageContainer = messageContainerRef.current
-    if (!messageContainer) return
+  const handleScroll = useCallback(
+    (e) => {
+      const messageContainer = messageContainerRef.current
+      if (!messageContainer) return
 
-    const currScroll = messageContainer.scrollTop
-    if (currScroll === 0 && canLoadMore.current) {
-      getMoreData(itemsRef.current[0]._id)
-      return
-    } else if (initialLoad) {
-      setInitialLoad(false)
-    }
-
-    //check if messageContainer is scrolled to bottom
-    if (isScrolledToBottom()) {
-      if (showScrollBottom) setShowScrollBottom(false)
-      if (newMessage) setNewMessage(null)
-      if (!scrolledToBottom) setScrolledToBottom(true)
-    } else {
-      if (scrolledToBottom) setScrolledToBottom(false)
-      if (
-        messageContainer.scrollHeight - currScroll >
-          2 * messageContainer.offsetHeight &&
-        !showScrollBottom
-      ) {
-        setShowScrollBottom(true)
+      const currScroll = messageContainer.scrollTop
+      if (currScroll === 0 && canLoadMore.current) {
+        getMoreData(itemsRef.current[0]._id)
+        return
+      } else if (initialLoad) {
+        setInitialLoad(false)
       }
-    }
-  }
+
+      //check if messageContainer is scrolled to bottom
+      if (isScrolledToBottom()) {
+        if (showScrollBottom) setShowScrollBottom(false)
+        if (newMessage) setNewMessage(null)
+        if (!scrolledToBottom) setScrolledToBottom(true)
+      } else {
+        if (scrolledToBottom) setScrolledToBottom(false)
+        if (
+          messageContainer.scrollHeight - currScroll >
+            2 * messageContainer.offsetHeight &&
+          !showScrollBottom
+        ) {
+          setShowScrollBottom(true)
+        }
+      }
+    },
+    [
+      initialLoad,
+      messageContainerRef,
+      getMoreData,
+      canLoadMore,
+      showScrollBottom,
+      newMessage,
+      scrolledToBottom,
+    ]
+  )
 
   const handleScrollBottomClick = () => {
     const messageContainer = messageContainerRef.current
@@ -297,7 +314,7 @@ export default function ChatPage(props) {
     messageContainer.style.scrollBehavior = 'auto'
   }
 
-  const socketInitializer = async () => {
+  const socketInitializer = useCallback(async () => {
     await fetch('/api/socketio')
     const newSocket = io({ autoConnect: false })
 
@@ -339,9 +356,9 @@ export default function ChatPage(props) {
       })
     })
     setSocket(newSocket)
-  }
+  }, [])
 
-  const dialogDataInitializer = () => {
+  const dialogDataInitializer = useCallback(() => {
     if (items.length === 0) return
 
     const firstMessage = items[0]
@@ -403,10 +420,12 @@ export default function ChatPage(props) {
       receiverId,
       receiverName,
       ad,
+      thisUserId,
+      thisUserName,
     })
-  }
+  }, [items, thisUserId, thisUserName])
 
-  const setDesiredScrollPos = () => {
+  const setDesiredScrollPos = useCallback(() => {
     let nodeHeight = 0
     let i = 0
     let currentPos = 0
@@ -437,7 +456,17 @@ export default function ChatPage(props) {
     ) {
       setShowScrollBottom(true)
     }
-  }
+  }, [
+    anchorIndex,
+    nodesRef,
+    prevAnchorIndex,
+    messageContainerRef,
+    initialLoad,
+    newMessage,
+    scrolledToBottom,
+    showScrollBottom,
+    thisUserId,
+  ])
 
   const calculateDateTime = (message) => {
     const now = new Date()

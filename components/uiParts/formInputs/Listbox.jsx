@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from 'react'
+import React, { useState, useEffect, forwardRef, useCallback } from 'react'
 import Divider from '@material-ui/core/Divider'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 
@@ -26,11 +26,11 @@ const Listbox = forwardRef((props, ref) => {
 
   const classes = useStyles()
 
-  const getSources = () => {
+  const getSources = useCallback(() => {
     theme.palette.type === 'light'
       ? `${googleLogoOnWhite} 144w, ${googleLogoOnWhiteHDPI} 288w`
       : `${googleLogoOnNonWhite} 144w, ${googleLogoOnNonWhiteHDPI} 288w`
-  }
+  }, [theme])
 
   const initialSources = getSources()
 
