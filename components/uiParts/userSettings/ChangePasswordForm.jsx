@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { Button, Box, makeStyles } from '@material-ui/core'
-import { Formik, Form, Field } from 'formik'
+import { Formik, Form, Field, useFormikContext } from 'formik'
 import Snackbar from '../Snackbars'
 import TextFieldFormik from '../formInputs/TextFieldFormik'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
@@ -47,6 +47,58 @@ export default function ChangePasswordForm() {
   const [notification, setNotification] = useState('')
   const [updatePassword, { data: updateData }] = useMutation(UPDATE_PASSWORD)
 
+  const PasswordForm = () => {
+    const { isSubmitting, resetForm } = useFormikContext()
+    useEffect(() => {
+      if (updateData && updateData.updatePassword) {
+        setSeverity('success')
+        setNotification('Данные успешно обновлены')
+        resetForm()
+      }
+    }, [resetForm])
+
+    return (
+      <Form className={classes.form} noValidate autoComplete="off">
+        <Field
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="oldPassword"
+          label="Текущий пароль"
+          name="oldPassword"
+          type="password"
+          component={TextFieldFormik}
+          className={classes.field}
+        />
+        <Field
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="newPassword"
+          label="Новый пароль"
+          name="newPassword"
+          type="password"
+          component={TextFieldFormik}
+          className={classes.field}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="secondary"
+          className={classes.submit}
+          disabled={isSubmitting}
+          style={{ width: 'auto' }}
+        >
+          Сохранить
+          {isSubmitting && <ButtonSubmittingCircle />}
+        </Button>
+      </Form>
+    )
+  }
+
   return (
     <Box className={classes.box}>
       <Formik
@@ -80,56 +132,7 @@ export default function ChangePasswordForm() {
           }
         }}
       >
-        {({ isSubmitting, resetForm }) => {
-          useEffect(() => {
-            if (updateData && updateData.updatePassword) {
-              setSeverity('success')
-              setNotification('Данные успешно обновлены')
-              resetForm()
-            }
-          }, [updateData])
-
-          return (
-            <Form className={classes.form} noValidate autoComplete="off">
-              <Field
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="oldPassword"
-                label="Текущий пароль"
-                name="oldPassword"
-                type="password"
-                component={TextFieldFormik}
-                className={classes.field}
-              />
-              <Field
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="newPassword"
-                label="Новый пароль"
-                name="newPassword"
-                type="password"
-                component={TextFieldFormik}
-                className={classes.field}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="secondary"
-                className={classes.submit}
-                disabled={isSubmitting}
-                style={{ width: 'auto' }}
-              >
-                Сохранить
-                {isSubmitting && <ButtonSubmittingCircle />}
-              </Button>
-            </Form>
-          )
-        }}
+        <PasswordForm />
       </Formik>
 
       <Snackbar
