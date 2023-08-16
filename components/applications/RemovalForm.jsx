@@ -133,7 +133,7 @@ export default function RemovalForm(props) {
           )
         })
       }
-    }, [])
+    }, [setFieldValue])
 
     useEffect(() => {
       if (
@@ -144,7 +144,7 @@ export default function RemovalForm(props) {
       ) {
         setFieldValue('contactPhone', phoneData.getPhone.phone, false)
       }
-    }, [])
+    }, [setFieldValue])
     return (
       <Form className={classes.formRoot}>
         <Grid

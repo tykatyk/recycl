@@ -505,7 +505,7 @@ export default function ChatPage(props) {
       isLoaded = false
       window.removeEventListener('resize', () => handleResize(isLoaded))
     }
-  }, [])
+  }, [handleResize, socket, socketInitializer])
 
   useEffect(() => {
     if (!session || !socket) return
@@ -536,7 +536,7 @@ export default function ChatPage(props) {
   //start loading message data after getting id of the dialog
   useEffect(() => {
     if (dialogId && items.length == 0) getMoreData()
-  }, [dialogId])
+  }, [dialogId, getMoreData, items])
 
   useEffect(() => {
     //set dialog data to enable sending messages
@@ -547,7 +547,13 @@ export default function ChatPage(props) {
     if (!messageContainerRef.current) return
     setDesiredScrollPos()
     handleScroll()
-  }, [items])
+  }, [
+    items,
+    dialogData,
+    dialogDataInitializer,
+    handleScroll,
+    setDesiredScrollPos,
+  ])
 
   useEffect(() => {
     //Update title
@@ -557,7 +563,7 @@ export default function ChatPage(props) {
         `Диалог с ${dialogData.receiverName} относительно ${firstMessage.ad.wasteType.name}`
       )
     }
-  }, [dialogData])
+  }, [dialogData, items])
 
   let content = <NoDataOverlay />
   if ((items.length == 0 && loading) || !socket) content = <PageLoadingCircle />

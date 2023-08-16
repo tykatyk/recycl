@@ -41,6 +41,7 @@ export default function PlacesAutocomplete(props) {
   const {
     form: { setFieldValue, handleBlur, setFieldTouched, values },
     field: { name },
+    multiple,
   } = props
 
   const { label, variant, value, error, helperText, disabled } =
@@ -91,7 +92,7 @@ export default function PlacesAutocomplete(props) {
     if (!autocompleteService.current) return undefined
 
     if (inputValue === '') {
-      setOptions(value ? (props.multiple ? value : [value]) : [])
+      setOptions(value ? (multiple ? value : [value]) : [])
       return undefined
     }
 
@@ -102,7 +103,7 @@ export default function PlacesAutocomplete(props) {
           let newOptions = []
 
           if (value) {
-            newOptions = props.multiple ? value : [value]
+            newOptions = multiple ? value : [value]
           }
 
           if (results) {
@@ -117,7 +118,7 @@ export default function PlacesAutocomplete(props) {
     return () => {
       active = false
     }
-  }, [value, inputValue, fetch])
+  }, [value, inputValue, fetch, multiple, sessionToken, shouldOpen])
 
   const masterField = props['data-master']
 
@@ -127,7 +128,7 @@ export default function PlacesAutocomplete(props) {
     if (masterField && !values[masterField]) {
       setOptions([])
 
-      if (props.multiple) {
+      if (multiple) {
         setFieldValue(name, [], false)
       } else {
         setFieldValue(name, '', false)
@@ -136,7 +137,7 @@ export default function PlacesAutocomplete(props) {
       setFieldTouched(name, false, false)
       setKey(new Date().getTime())
     }
-  }, [values[masterField]])
+  }, [masterField, values, name, multiple, setFieldTouched, setFieldValue])
 
   return (
     <Autocomplete
@@ -161,7 +162,7 @@ export default function PlacesAutocomplete(props) {
       filterOptions={(x) => x}
       ListboxComponent={Listbox}
       options={options}
-      multiple={props.multiple || false}
+      multiple={multiple || false}
       disabled={disabled}
       open={open}
       onOpen={() => {
@@ -177,7 +178,7 @@ export default function PlacesAutocomplete(props) {
         }
       }}
       onChange={(event, newValue) => {
-        if (props.multiple) {
+        if (multiple) {
           setOptions(newValue.length > 0 ? [...newValue, ...options] : options)
         } else {
           setOptions(newValue ? [newValue, ...options] : options)
@@ -194,6 +195,7 @@ export default function PlacesAutocomplete(props) {
       renderTags={(value, getTagProps) => {
         return value.map((option, index) => (
           <Chip
+            key={index}
             variant="outlined"
             label={option.description}
             {...getTagProps({ index })}

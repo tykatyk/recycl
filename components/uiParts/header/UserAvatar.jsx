@@ -31,7 +31,7 @@ export default function UserAvatar(props) {
       localAvatar = <AccountCircle />
     }
     setAvatar(localAvatar)
-  }, [session, status])
+  }, [session, status, classes])
 
   return (
     <IconButton

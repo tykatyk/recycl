@@ -14,7 +14,7 @@ export default function TextFieldDependantFormik(props) {
       setFieldValue(name, '', false)
       setFieldTouched(name, false, false)
     }
-  }, [values[masterField], setFieldValue, name, touched[masterField]])
+  }, [masterField, setFieldValue, name, touched, setFieldTouched, values])
 
   return <TextField {...fieldToTextField(props)} />
 }

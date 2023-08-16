@@ -29,7 +29,7 @@ export default function Marker(options) {
         })
       )
     }
-  }, [children])
+  }, [children, content, infoWindow])
 
   useEffect(() => {
     if (marker) {
@@ -47,7 +47,7 @@ export default function Marker(options) {
       infoWindow.setContent(content)
       setListenerAdded(true)
     }
-  }, [marker, rest])
+  }, [marker, rest, content, infoWindow, listenerAdded, map])
 
   return ReactDOM.createPortal(children, content)
 }

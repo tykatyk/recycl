@@ -69,7 +69,7 @@ export default function Header(props) {
         window.removeEventListener('resize', () => setResponsiveness())
       }
     }
-  }, [])
+  }, [theme])
 
   const handleDrawerOpen = () =>
     setState((prevState) => ({ ...prevState, drawerOpen: true }))

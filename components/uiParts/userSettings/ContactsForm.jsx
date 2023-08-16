@@ -90,7 +90,7 @@ export default function ContactsForm() {
         : null
 
       setFieldValue('location', locationToShow, false)
-    }, [data])
+    }, [setFieldValue])
 
     return (
       <Form className={classes.form} noValidate autoComplete="off">

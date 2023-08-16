@@ -21,6 +21,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const dataIsValid = (data) => {
+  if (
+    data &&
+    data.getDialogs &&
+    data.getDialogs.dialogs &&
+    data.getDialogs.dialogs.length > 0
+  ) {
+    return true
+  }
+  return false
+}
+
 export default function DialogsPage() {
   const classes = useStyles()
   const [checkedRows, setCheckedRows] = useState([])
@@ -105,7 +117,6 @@ export default function DialogsPage() {
       const result = await deleteMutation({
         variables: { ids },
       })
-      console.log(result)
       if (
         !result ||
         !result.data ||
@@ -168,7 +179,9 @@ export default function DialogsPage() {
   }
 
   //load initial dialog data at page loads
-  useEffect(async () => await handleFetch(0), [])
+  useEffect(() => {
+    handleFetch(0)
+  }, [handleFetch])
 
   //update numRows and page after data is updated
   useEffect(() => {
@@ -190,22 +203,22 @@ export default function DialogsPage() {
       setNumRows(0)
       handleFetch(Math.max(page - 1, 0))
     }
-  }, [data])
+  }, [data, page, handleFetch])
 
   useEffect(() => {
     if (headerChecked && checkedRows.length < 1) setHeaderChecked(false)
-  }, [checkedRows])
+  }, [checkedRows, headerChecked])
 
-  useEffect(async () => {
-    await handleFetch(0)
-  }, [pageSize])
+  useEffect(() => {
+    handleFetch(0)
+  }, [pageSize, handleFetch])
 
-  useEffect(async () => {
+  useEffect(() => {
     if (prevDialogId.current && !router.query.dialogId) {
       refetch()
     }
     prevDialogId.current = router.query.dialogId
-  }, [router.query.dialogId])
+  }, [router.query.dialogId, refetch])
 
   const Data = (props) => {
     const { messages } = props

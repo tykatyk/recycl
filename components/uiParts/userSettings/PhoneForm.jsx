@@ -69,7 +69,7 @@ export default function PhoneForm() {
     useEffect(() => {
       if (!data || !data.getPhone || !data.getPhone.phone) return
       setFieldValue('phone', data.getPhone.phone, false)
-    }, [data])
+    }, [setFieldValue])
 
     return (
       <Form className={classes.form} noValidate autoComplete="off">
