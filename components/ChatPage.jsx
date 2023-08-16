@@ -35,7 +35,7 @@ import {
   GET_UNREAD_DIALOG_IDS,
 } from '../lib/graphql/queries/message'
 import { chatSchema } from '../lib/validation'
-import whitespaceRegex from '../lib/validation/regularExpressions'
+import { whitespaceRegex } from '../lib/validation/regularExpressions'
 import io from 'socket.io-client'
 
 const messageContainerHeight = 400

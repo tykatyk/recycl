@@ -9,7 +9,7 @@ import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import { useMutation } from '@apollo/client'
 import { CREATE_MESSAGE } from '../../lib/graphql/queries/message'
-import whitespaceRegex from '../../lib/validation/regularExpressions'
+import { whitespaceRegex } from '../../lib/validation/regularExpressions'
 
 const useStyles = makeStyles((theme) => ({
   root: {

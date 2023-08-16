@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core'
 import Layout from './layouts/Layout'
 import { contactUsSchema } from '../lib/validation'
-import whitespaceRegex from '../lib/validation/regularExpressions'
+import { whitespaceRegex } from '../lib/validation/regularExpressions'
 import submitWithCapthca from '../lib/helpers/submitWithCaptcha'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik'
 import Snackbars from './uiParts/Snackbars'
