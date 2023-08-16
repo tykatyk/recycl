@@ -75,7 +75,7 @@ const columns = [
   },
 ]
 
-export default function allEvents() {
+export default function AllEvents() {
   const classes = useStyles()
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
