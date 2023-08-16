@@ -42,7 +42,7 @@ export default function CookieConsentPopup() {
   useEffect(() => {
     let cookieConsentAgreed = Cookies.get('cookieConsent')
     if (!cookieConsentAgreed) setShowCookieConsent(true)
-  }, [Cookies.get('cookieConsent')])
+  }, [])
 
   if (showCookieConsent) {
     return (
