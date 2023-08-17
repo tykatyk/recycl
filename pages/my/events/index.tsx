@@ -10,6 +10,6 @@ export const getServerSideProps: (req: any) => Promise<SSProps> = async ({
   req,
 }) => {
   return {
-    props: { variant: 'inactive' },
+    props: { variant: 'active' },
   }
 }

@@ -3,8 +3,8 @@ import { Tab, Tabs, Box } from '@material-ui/core'
 
 interface TabPanelProps {
   children?: React.ReactNode
-  index: number
-  value: number
+  index: string
+  value: string
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -32,8 +32,8 @@ function a11yProps(index: number) {
 
 interface AdTabProps {
   children: React.ReactNode
-  value: number
-  handleChange: (event: React.SyntheticEvent, newValue: number) => void
+  value: string
+  handleChange: (event: React.SyntheticEvent, newValue: string) => void
 }
 
 export default function AdTabs(props: AdTabProps) {
@@ -47,14 +47,14 @@ export default function AdTabs(props: AdTabProps) {
           onChange={handleChange}
           aria-label="Предложения о вывозе отходов"
         >
-          <Tab label="Активные" {...a11yProps(0)} />
-          <Tab label="Неактивные" {...a11yProps(1)} />
+          <Tab value="active" label="Активные" {...a11yProps(0)} />
+          <Tab value="inactive" label="Неактивные" {...a11yProps(1)} />
         </Tabs>
       </Box>
-      <TabPanel value={value} index={0}>
+      <TabPanel value={value} index={'active'}>
         {children}
       </TabPanel>
-      <TabPanel value={value} index={1}>
+      <TabPanel value={value} index={'inactive'}>
         {children}
       </TabPanel>
     </Box>
