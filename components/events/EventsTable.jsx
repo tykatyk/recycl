@@ -4,7 +4,6 @@ import {
   Typography,
   Badge,
   makeStyles,
-  TablePagination,
   TableContainer,
   Checkbox,
   Table,
@@ -13,6 +12,7 @@ import {
   TableCell,
   TableRow,
   Button,
+  Box,
 } from '@material-ui/core'
 import Link from '../uiParts/Link'
 import Tabs from '../uiParts/Tabs'
@@ -36,6 +36,17 @@ const useStyles = makeStyles((theme) => ({
       cursor: 'pointer',
     },
   },
+  actionsRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    '&>*:not(:last-child)': {
+      marginRight: '24px',
+    },
+  },
+  cell: {
+    background: theme.palette.background.paper,
+  },
 }))
 
 const columns = [
@@ -43,12 +54,6 @@ const columns = [
     id: 'checkbox',
     headerName: 'Выбрать',
     width: 70,
-  },
-
-  {
-    id: 'location',
-    headerName: 'Место',
-    width: 170,
   },
   {
     id: 'date',
@@ -60,6 +65,11 @@ const columns = [
     headerName: 'Время',
     width: 150,
     headerAlign: 'center',
+  },
+  {
+    id: 'location',
+    headerName: 'Место',
+    width: 170,
   },
   {
     id: 'wasteType',
@@ -96,7 +106,7 @@ export default function EventsTable({ rows, variant }) {
               return (
                 <React.Fragment key={index}>
                   <TableRow>
-                    <TableCell rowSpan={2}>
+                    <TableCell className={classes.cell} rowSpan={2}>
                       <Checkbox
                         color="primary"
                         checked={false}
@@ -110,47 +120,50 @@ export default function EventsTable({ rows, variant }) {
                       {row.date}
                     </TableCell>
                     <TableCell className={classes.noBorder}>
-                      {row.locations}
+                      {row.time}
                     </TableCell>
                     <TableCell className={classes.noBorder}>
-                      {row.time}
+                      {row.locations}
                     </TableCell>
                     <TableCell className={classes.noBorder}>
                       {row.wasteTypes}
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>
-                      <Link
-                        color="secondary"
-                        href={`/my/events/edit/${row.id}`}
-                      >
-                        Редактировать
-                      </Link>
-                    </TableCell>
-                    <TableCell colSpan={2}>
-                      <Button
-                        color="secondary"
-                        style={{ textTransform: 'none' }}
-                      >
-                        {variant === 'inactive'
-                          ? 'Активировать'
-                          : 'Деактивировать'}
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <VisibilityIcon />
-                        <span style={{ padding: '4px 8px' }}>
-                          {Math.floor(Math.random() * 50)}
+                    <TableCell className={classes.cell} colspan={5}>
+                      <Box className={classes.actionsRow}>
+                        <Button
+                          color="secondary"
+                          // variant="body2"
+                          href={`/my/events/edit/${row.id}`}
+                          // component="button"
+                          style={{
+                            textTransform: 'none',
+                          }}
+                        >
+                          Редактировать
+                        </Button>
+                        <Button
+                          color="secondary"
+                          style={{ textTransform: 'none' }}
+                        >
+                          {variant === 'inactive'
+                            ? 'Активировать'
+                            : 'Деактивировать'}
+                        </Button>
+                        <span
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                          }}
+                        >
+                          <VisibilityIcon />
+                          <span style={{ padding: '4px 8px' }}>
+                            {Math.floor(Math.random() * 50)}
+                          </span>
                         </span>
-                      </div>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 </React.Fragment>
