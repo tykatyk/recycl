@@ -12,8 +12,6 @@ import {
   TableCell,
   TableRow,
 } from '@material-ui/core'
-import Link from '../uiParts/Link'
-import MailIcon from '@material-ui/icons/Mail'
 import Layout from '../layouts/Layout'
 import Snackbar from '../uiParts/Snackbars'
 import Tabs from '../uiParts/Tabs'
@@ -21,7 +19,6 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import DataGridNoRowsOverlay from '../uiParts/DataGridNoRowsOverlay'
 import DataGridErrorOverlay from '../uiParts/DataGridErrorOverlay'
-import { DataGrid } from '@mui/x-data-grid'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSession } from 'next-auth/react'
 import {
@@ -153,6 +150,14 @@ export default function Events(props: RemovalEventProps) {
             </Typography>
             <Tabs value={variant} handleChange={handleChange}>
               <EventsTable variant={variant} rows={data} />
+              <DataGridFooter
+                numRows={data.length}
+                page={page}
+                pageSize={pageSize}
+                selected={selected}
+                handlePageChange={handlePageChange}
+                handlePageSizeChange={handlePageSizeChange}
+              />
             </Tabs>
           </Grid>
         </Layout>
