@@ -130,7 +130,7 @@ export default function EventsTable({ rows, variant }) {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell className={classes.cell} colspan={5}>
+                    <TableCell className={classes.cell} colSpan={5}>
                       <Box className={classes.actionsRow}>
                         <Button
                           color="secondary"
