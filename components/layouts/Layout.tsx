@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { Container, makeStyles } from '@material-ui/core'
-import Wrapper from '../uiParts/Wrapper.jsx'
-import Header from '../uiParts/header/Header.jsx'
-import Footer from '../uiParts/Footer.jsx'
-import Head from '../uiParts/Head.jsx'
+import Wrapper from '../uiParts/Wrapper'
+import Header from '../uiParts/header/Header'
+import Footer from '../uiParts/Footer'
+import Head from '../uiParts/Head'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -12,7 +12,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function Layout({ children, title, currentDialogId }) {
+type LayoutProps = {
+  children: ReactNode
+  title: string
+  currentDialogId?: string
+}
+export default function Layout({
+  children,
+  title,
+  currentDialogId,
+}: LayoutProps) {
   const classes = useStyles()
 
   return (
