@@ -7,8 +7,7 @@
     "dev": "cross-env NODE_OPTIONS='--trace-warnings' next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "disableStalePub": "set DATABASE_URL=mongodb://127.0.0.1:27017/recycldb&& node lib/db/disablePublications.mjs"
+    "lint": "next lint"
   },
   "devDependencies": {
     "@types/node": "^18.0.3",
