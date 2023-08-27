@@ -1,12 +1,12 @@
 import { React, useEffect, useState } from 'react'
+import { styled, useTheme } from '@mui/material/styles'
 import {
   Grid,
   Typography,
   InputAdornment,
   Button,
   CircularProgress,
-  useTheme,
-} from '@material-ui/core'
+} from '@mui/material'
 import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import TextFieldDependantFormik from '../uiParts/formInputs/TextFieldDependantFormik'
@@ -14,9 +14,8 @@ import RemovalPopover from './RemovalPopover'
 import SelectFormik from '../uiParts/formInputs/SelectFormik'
 import Snackbar from '../uiParts/Snackbars'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
-import { CheckboxWithLabel } from 'formik-material-ui'
+import { CheckboxWithLabel } from 'formik-mui'
 import { Formik, Form, Field, useFormikContext } from 'formik'
-import removalFormStyles from './removalFormStyles'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
@@ -30,12 +29,43 @@ import { GET_PHONE } from '../../lib/graphql/queries/user'
 import { getInitialValues, getNormalizedValues } from './removalFormConfig.js'
 import { removalApplicationSchema } from '../../lib/validation'
 
-const useStyles = removalFormStyles
+const PREFIX = 'RemovalForm'
+
+const classes = {
+  formRoot: `${PREFIX}-formRoot`,
+  gridContainer: `${PREFIX}-gridContainer`,
+  sectionTitle: `${PREFIX}-sectionTitle`,
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.formRoot}`]: {
+    '& > fieldset': {
+      margin: 0,
+      marginBottom: theme.spacing(5),
+      padding: 0,
+      border: 'none',
+    },
+  },
+
+  [`& .${classes.gridContainer}`]: {
+    '& > div': {
+      paddingBottom: theme.spacing(2),
+    },
+    '& > div:last-child': {
+      paddingBottom: 0,
+    },
+  },
+
+  [`& .${classes.sectionTitle}`]: {
+    '& h4': { marginBottom: 0 },
+  },
+}))
+
 const initialValues = getInitialValues()
 const fields = Object.keys(initialValues)
 
 export default function RemovalForm(props) {
-  const classes = useStyles()
   const theme = useTheme()
   const router = useRouter()
   const { data: session } = useSession()
@@ -359,7 +389,7 @@ export default function RemovalForm(props) {
   }
 
   return (
-    <>
+    <Root>
       <Formik
         enableReinitialize
         initialValues={initialValues}
@@ -382,6 +412,6 @@ export default function RemovalForm(props) {
           setBackendError(null)
         }}
       />
-    </>
+    </Root>
   )
 }

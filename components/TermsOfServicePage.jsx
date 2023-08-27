@@ -1,34 +1,52 @@
 import React from 'react'
-import { makeStyles, Typography, Container, useTheme } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Typography, Container } from '@mui/material'
 import Layout from './layouts/Layout'
 import Link from './uiParts/Link'
 
-const useStyles = makeStyles((theme) => ({
-  container: {
+const PREFIX = 'TermsOfServicePage'
+
+const classes = {
+  container: `${PREFIX}-container`,
+  h1: `${PREFIX}-h1`,
+  h2: `${PREFIX}-h2`,
+  section: `${PREFIX}-section`,
+  subtitle: `${PREFIX}-subtitle`,
+  list: `${PREFIX}-list`,
+  link: `${PREFIX}-link`,
+}
+
+const StyledLayout = styled(Layout)(({ theme }) => ({
+  [`& .${classes.container}`]: {
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
     maxWidth: 800,
   },
-  h1: {
+
+  [`& .${classes.h1}`]: {
     fontSize: '3rem',
     marginBottom: '3rem',
     fontWeight: 'bold',
     color: '#adce5d',
   },
-  h2: {
+
+  [`& .${classes.h2}`]: {
     fontSize: '2rem',
     fontWeight: 'bold',
     color: '#adce5d',
   },
-  section: {
+
+  [`& .${classes.section}`]: {
     marginBottom: '3rem',
   },
-  subtitle: {
+
+  [`& .${classes.subtitle}`]: {
     fontWeight: 'bold',
     color: '#adce5d',
   },
-  list: {
+
+  [`& .${classes.list}`]: {
     paddingLeft: '2em',
     listStyle: 'disc',
     marginBottom: theme.spacing(2),
@@ -36,7 +54,8 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: '1.5',
     letterSpacing: '0.00938em',
   },
-  link: {
+
+  [`& .${classes.link}`]: {
     fontSize: '1rem',
     lineHeight: '1.5',
     letterSpacing: '0.00938em',
@@ -48,11 +67,10 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function TermsOfServicePage() {
-  const classes = useStyles()
   //Strings which contain apostrophes or quotes are placed insede
   //curly braces to properly escape these characters
   return (
-    <Layout title="Соглашение пользователя | Recycl">
+    <StyledLayout title="Соглашение пользователя | Recycl">
       <Container className={classes.container}>
         <Typography
           variant="h1"
@@ -756,6 +774,6 @@ export default function TermsOfServicePage() {
           </section>
         </article>
       </Container>
-    </Layout>
+    </StyledLayout>
   )
 }

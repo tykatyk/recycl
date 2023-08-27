@@ -1,26 +1,35 @@
 import React from 'react'
+import { styled } from '@mui/material/styles'
 import clsx from 'clsx'
-import { Fab, Tooltip, makeStyles } from '@material-ui/core'
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
-import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+import { Fab, Tooltip } from '@mui/material'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
-const fabLeft = 250
-const useStyles = makeStyles((theme) => ({
-  fab: {
+const PREFIX = 'MapActionButton'
+
+const classes = {
+  fab: `${PREFIX}-fab`,
+  fabOpen: `${PREFIX}-fabOpen`,
+  fabClose: `${PREFIX}-fabClose`,
+}
+
+const StyledFab = styled(Fab)(({ theme }) => ({
+  [`&.${classes.fab}`]: {
     position: 'fixed',
     top: '50%',
     left: 5,
     zIndex: 1,
   },
 
-  fabOpen: {
+  [`&.${classes.fabOpen}`]: {
     transition: theme.transitions.create('left', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
     left: fabLeft,
   },
-  fabClose: {
+
+  [`&.${classes.fabClose}`]: {
     transition: theme.transitions.create('left', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -29,12 +38,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const fabLeft = 250
+
 export default function MapActionButton(props) {
-  const classes = useStyles()
   const { onClick = () => {}, open = false } = props
 
   return (
-    <Fab
+    <StyledFab
       color="primary"
       aria-label="show panel"
       className={clsx(classes.fab, {
@@ -54,6 +64,6 @@ export default function MapActionButton(props) {
           <ChevronRightIcon />
         </Tooltip>
       )}
-    </Fab>
+    </StyledFab>
   )
 }

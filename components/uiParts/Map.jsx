@@ -1,15 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { makeStyles } from '@material-ui/core'
 import PageLoadingCircle from './PageLoadingCircle'
 
-const useStyles = makeStyles((theme) => ({
-  mapContainer: {
-    flexGrow: 1,
-  },
-}))
-
 const MapContainer = (props) => {
-  const classes = useStyles()
   const ref = useRef()
   const [map, setMap] = useState(null)
   const { center, zoom, onIdle, children } = props
@@ -39,7 +31,7 @@ const MapContainer = (props) => {
 
   return (
     <>
-      <div className={classes.mapContainer} ref={ref} id="map" />
+      <div style={{ flexGrow: 1 }} ref={ref} id="map" />
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           // set the map prop on the child component

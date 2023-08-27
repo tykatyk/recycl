@@ -1,12 +1,6 @@
 import React, { useState, useRef } from 'react'
-import {
-  makeStyles,
-  Typography,
-  Box,
-  Button,
-  Container,
-  useTheme,
-} from '@material-ui/core'
+import { styled, useTheme } from '@mui/material/styles'
+import { Typography, Box, Button, Container } from '@mui/material'
 import Layout from './layouts/Layout'
 import { contactUsSchema } from '../lib/validation'
 import { whitespaceRegex } from '../lib/validation/regularExpressions'
@@ -17,17 +11,28 @@ import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import ReCAPTCHA from 'react-google-recaptcha'
 
-const useStyles = makeStyles((theme) => ({
-  container: {
+const PREFIX = 'ContactUsPage'
+
+const classes = {
+  container: `${PREFIX}-container`,
+  header: `${PREFIX}-header`,
+  form: `${PREFIX}-form`,
+  remainedSymbols: `${PREFIX}-remainedSymbols`,
+}
+
+const StyledLayout = styled(Layout)(({ theme }) => ({
+  [`& .${classes.container}`]: {
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
     maxWidth: 800,
   },
-  header: {
+
+  [`& .${classes.header}`]: {
     marginBottom: theme.spacing(5),
   },
-  form: {
+
+  [`& .${classes.form}`]: {
     '& > fieldset': {
       margin: 0,
       marginBottom: theme.spacing(5),
@@ -35,13 +40,13 @@ const useStyles = makeStyles((theme) => ({
       border: 'none',
     },
   },
-  remainedSymbols: {
+
+  [`& .${classes.remainedSymbols}`]: {
     color: theme.palette.text.secondary,
   },
 }))
 
 export default function SupportUsPage() {
-  const classes = useStyles()
   const limit = 1000
   const theme = useTheme()
   const [notification, setNotification] = useState('')
@@ -55,7 +60,7 @@ export default function SupportUsPage() {
   }
 
   return (
-    <Layout title="Связаться с нами | Recycl">
+    <StyledLayout title="Связаться с нами | Recycl">
       <Container className={classes.container}>
         {!!notification && (
           <Snackbars
@@ -193,6 +198,6 @@ export default function SupportUsPage() {
           />
         </div>
       </Container>
-    </Layout>
+    </StyledLayout>
   )
 }

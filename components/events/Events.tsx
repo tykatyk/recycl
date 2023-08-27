@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Grid,
-  Typography,
-  Badge,
-  makeStyles,
-  TablePagination,
-  TableContainer,
-  Checkbox,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from '@material-ui/core'
+import { Grid, Typography } from '@mui/material'
 import Layout from '../layouts/Layout'
 import Snackbar from '../uiParts/Snackbars'
 import Tabs from '../uiParts/Tabs'
@@ -29,28 +17,11 @@ import Router from 'next/router'
 import { active, inactive } from './data'
 import EventsTable from './EventsTable'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
-      outline: 'none',
-    },
-  },
-  noBorder: {
-    borderBottom: 'none',
-  },
-  row: {
-    '&:hover': {
-      cursor: 'pointer',
-    },
-  },
-}))
-
 export type RemovalEventProps = {
   variant: 'inactive' | 'active'
 }
 
 export default function Events(props: RemovalEventProps) {
-  const classes = useStyles()
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(1)
@@ -132,7 +103,8 @@ export default function Events(props: RemovalEventProps) {
   if (status === 'authenticated') {
     // if (!error) {
     // }
-    if (variant !== 'active' && variant !== 'inactive') return <>{`Loading`}</>
+    if (variant !== 'active' && variant !== 'inactive')
+      return <div>{`Loading`}</div>
 
     return (
       <>

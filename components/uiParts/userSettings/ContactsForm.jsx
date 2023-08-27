@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import { styled, useTheme } from '@mui/material/styles'
 import { useSession } from 'next-auth/react'
-import {
-  Avatar,
-  Button,
-  Box,
-  Typography,
-  makeStyles,
-  useTheme,
-} from '@material-ui/core'
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline'
+import { Avatar, Button, Box, Typography } from '@mui/material'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { Formik, Form, Field, useFormikContext } from 'formik'
 import Snackbar from '../Snackbars'
 import PlacesAutocomplete from '../formInputs/PlacesAutocomplete'
@@ -22,39 +16,53 @@ import {
 } from '../../../lib/graphql/queries/user'
 import { useMutation, useQuery } from '@apollo/client'
 
-const useStyles = makeStyles((theme) => ({
-  avatar: {
+const PREFIX = 'ContactsForm'
+
+const classes = {
+  avatar: `${PREFIX}-avatar`,
+  box: `${PREFIX}-box`,
+  alternativeBox: `${PREFIX}-alternativeBox`,
+  form: `${PREFIX}-form`,
+  field: `${PREFIX}-field`,
+  submit: `${PREFIX}-submit`,
+}
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  [`& .${classes.avatar}`]: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
 
-  box: {
+  [`& .${classes.box}`]: {
     width: '100%',
     maxWidth: '400px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  alternativeBox: {
+
+  [`&.${classes.alternativeBox}`]: {
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  form: {
+
+  [`& .${classes.form}`]: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
-  field: {
+
+  [`& .${classes.field}`]: {
     marginBottom: theme.spacing(4),
   },
-  submit: {
+
+  [`& .${classes.submit}`]: {
     margin: theme.spacing(3, 0, 2),
   },
 }))
 
 export default function ContactsForm() {
-  const classes = useStyles()
   const theme = useTheme()
   const { data: session } = useSession()
   const [id, setId] = useState('')
@@ -134,9 +142,9 @@ export default function ContactsForm() {
 
   if (loading)
     return (
-      <Box className={classes.alternativeBox}>
+      <StyledBox className={classes.alternativeBox}>
         <PageLoadingCircle style={{ position: 'static' }} />
-      </Box>
+      </StyledBox>
     )
 
   if (error) {

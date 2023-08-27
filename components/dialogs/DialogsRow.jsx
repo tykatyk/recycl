@@ -1,12 +1,20 @@
 import React from 'react'
-import { Grid, Typography, Checkbox, makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Grid, Typography, Checkbox } from '@mui/material'
 import { useRouter } from 'next/router'
 import clsx from 'clsx'
 
 import { useSession } from 'next-auth/react'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'DialogsRow'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  unreadMessage: `${PREFIX}-unreadMessage`,
+}
+
+const StyledGrid = styled(Grid)(({ theme }) => ({
+  [`&.${classes.root}`]: {
     padding: theme.spacing(2),
     borderBottom: '1px solid #fff',
     cursor: 'pointer',
@@ -16,14 +24,14 @@ const useStyles = makeStyles((theme) => ({
     },
     alignItems: 'stretch',
   },
-  unreadMessage: {
+
+  [`& .${classes.unreadMessage}`]: {
     color: theme.palette.secondary.main,
     fontWeight: 'bold',
   },
 }))
 
 export default function DialogsRow(props) {
-  const classes = useStyles()
   const { data: session } = useSession()
   const router = useRouter()
 
@@ -49,7 +57,7 @@ export default function DialogsRow(props) {
   }
 
   return (
-    <Grid
+    <StyledGrid
       className={classes.root}
       container
       item
@@ -109,6 +117,6 @@ export default function DialogsRow(props) {
           </Typography>
         </Grid>
       </Grid>
-    </Grid>
+    </StyledGrid>
   )
 }

@@ -1,9 +1,16 @@
 import React from 'react'
-import { Typography, Box, makeStyles } from '@material-ui/core'
-import ErrorIcon from '@material-ui/icons/Error'
+import { styled } from '@mui/material/styles'
+import { Typography, Box } from '@mui/material'
+import ErrorIcon from '@mui/icons-material/Error'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'ErrorOverlay'
+
+const classes = {
+  root: `${PREFIX}-root`,
+}
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  [`&.${classes.root}`]: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -11,15 +18,13 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function ErrorOverlay(props) {
-  const classes = useStyles()
-
   const { message = 'Ошибка при загрузке данных' } = props
   return (
-    <Box className={classes.root}>
+    <StyledBox className={classes.root}>
       <ErrorIcon color="error" fontSize="large" />
       <Typography align="center" color="error">
         {message}
       </Typography>
-    </Box>
+    </StyledBox>
   )
 }

@@ -1,11 +1,6 @@
 import React, { useRef, useState } from 'react'
-import {
-  Container,
-  Button,
-  useTheme,
-  makeStyles,
-  Typography,
-} from '@material-ui/core'
+import { styled, useTheme } from '@mui/material/styles'
+import { Container, Button, Typography } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import PlacesAutocomplete from './formInputs/PlacesAutocomplete'
@@ -13,21 +8,31 @@ import Snackbar from './Snackbars'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { userLocationSchema } from '../../lib/validation'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'UserLocation'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  form: `${PREFIX}-form`,
+  submit: `${PREFIX}-submit`,
+}
+
+const StyledContainer = styled(Container)(({ theme }) => ({
+  [`&.${classes.root}`]: {
     maxWidth: 600,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     marginTop: theme.spacing(12),
   },
-  form: {
+
+  [`& .${classes.form}`]: {
     width: '100%', // Fix IE 11 issue.
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
   },
-  submit: {
+
+  [`& .${classes.submit}`]: {
     flexGrow: 0,
     margin: theme.spacing(3, 'auto', 2),
   },
@@ -46,7 +51,6 @@ export default function UserLocation(props) {
     setRecaptcha(token)
   }
 
-  const classes = useStyles()
   const { setCenter, setLocationError } = props
 
   if (typeof window !== 'undefined' && window.google && !loaded.current) {
@@ -55,7 +59,7 @@ export default function UserLocation(props) {
   }
 
   return (
-    <Container className={classes.root}>
+    <StyledContainer className={classes.root}>
       <Typography align="center" paragraph>
         Для отображения карты, укажите пожалуйста населенный пункт в котором вы
         хотите сдать отходы
@@ -160,6 +164,6 @@ export default function UserLocation(props) {
           }}
         />
       )}
-    </Container>
+    </StyledContainer>
   )
 }

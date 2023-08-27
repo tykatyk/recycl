@@ -1,25 +1,33 @@
 import React from 'react'
-import { Typography, Divider, makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Typography, Divider } from '@mui/material'
 import Link from './Link'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'MapInfoWindow'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  link: `${PREFIX}-link`,
+}
+
+const Root = styled('div')(({ theme }) => ({
+  [`&.${classes.root}`]: {
     display: 'flex',
     flexDirection: 'column',
     color: 'black',
     maxWidth: 150,
   },
-  link: {
+
+  [`& .${classes.link}`]: {
     alignSelf: 'flex-start',
   },
 }))
 
 export default function MapInfoWindow(props) {
-  const classes = useStyles()
   const { cityId, wasteTypeId, totalProposals, totalWeight } = props
 
   return (
-    <div className={classes.root}>
+    <Root className={classes.root}>
       <Typography
         variant="body2"
         color="inherit"
@@ -35,6 +43,6 @@ export default function MapInfoWindow(props) {
       >
         Посмотреть
       </Link>
-    </div>
+    </Root>
   )
 }

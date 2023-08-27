@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+
 import MapLayout from './layouts/MapLayout'
 import Map from './uiParts/Map'
 import Marker from './uiParts/Marker'
@@ -13,8 +14,14 @@ import { useLazyQuery } from '@apollo/client'
 import { Wrapper, Status } from '@googlemaps/react-wrapper'
 import PageLoadingCircle from './uiParts/PageLoadingCircle'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'ProposalsPage'
+
+const classes = {
+  root: `${PREFIX}-root`,
+}
+
+const StyledMapLayout = styled(MapLayout)(({ theme }) => ({
+  [`& .${classes.root}`]: {
     display: 'flex',
     flex: '1 1 auto',
   },
@@ -31,7 +38,6 @@ export default function ProposalsPage() {
     GET_REMOVAL_APPLICATIONS_FOR_MAP
   )
   const [markers, setMarkers] = useState([])
-  const classes = useStyles()
 
   useEffect(() => {
     if (visibleRect.length == 0) return
@@ -163,7 +169,7 @@ export default function ProposalsPage() {
   }
 
   return (
-    <MapLayout title="Сдать отходы | Recycl">
+    <StyledMapLayout title="Сдать отходы | Recycl">
       <Wrapper
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}
         render={render}
@@ -171,6 +177,6 @@ export default function ProposalsPage() {
       >
         {content}
       </Wrapper>
-    </MapLayout>
+    </StyledMapLayout>
   )
 }

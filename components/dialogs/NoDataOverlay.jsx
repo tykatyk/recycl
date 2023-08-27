@@ -1,27 +1,33 @@
 import React from 'react'
-import { Typography, Box, makeStyles } from '@material-ui/core'
-import InfoIcon from '@material-ui/icons/Info'
+import { styled } from '@mui/material/styles'
+import { Typography, Box } from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'NoDataOverlay'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  text: `${PREFIX}-text`,
+}
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  [`&.${classes.root}`]: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
 
-  text: {
+  [`& .${classes.text}`]: {
     marginTop: theme.spacing(1),
     color: theme.palette.secondary.main,
   },
 }))
 
 export default function NoData() {
-  const classes = useStyles()
-
   return (
-    <Box className={classes.root}>
+    <StyledBox className={classes.root}>
       <InfoIcon color="secondary" fontSize="large" />
       <Typography className={classes.text}>Нет данных</Typography>
-    </Box>
+    </StyledBox>
   )
 }

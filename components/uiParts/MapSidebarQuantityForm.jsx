@@ -1,16 +1,28 @@
 import React, { useEffect } from 'react'
-import { TextField, Button, Typography, makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { TextField, Button, Typography } from '@mui/material'
 import { Formik, Form, ErrorMessage, useFormikContext } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import { quantitySchema } from '../../lib/validation'
 import mapErrors from '../../lib/helpers/mapErrors'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'MapSidebarQuantityForm'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  wrapper: `${PREFIX}-wrapper`,
+  helperTextRoot: `${PREFIX}-helperTextRoot`,
+  inputRoot: `${PREFIX}-inputRoot`,
+  submit: `${PREFIX}-submit`,
+}
+
+const StyledFormik = styled(Formik)(({ theme }) => ({
+  [`& .${classes.root}`]: {
     width: '100%',
     overflowX: 'hidden',
   },
-  wrapper: {
+
+  [`& .${classes.wrapper}`]: {
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-around',
@@ -21,16 +33,19 @@ const useStyles = makeStyles((theme) => ({
       marginRight: 0,
     },
   },
-  helperTextRoot: {
+
+  [`& .${classes.helperTextRoot}`]: {
     textAlign: 'center',
   },
-  inputRoot: {
+
+  [`& .${classes.inputRoot}`]: {
     maxWidth: '20px',
     '& input': {
       padding: '3px !important',
     },
   },
-  submit: {
+
+  [`& .${classes.submit}`]: {
     marginTop: 5,
   },
 }))
@@ -126,11 +141,10 @@ const QuantityForm = (props) => {
 }
 
 export default function MapSidebarQuantityForm(props) {
-  const classes = useStyles()
   const { min = 0, max = 0 } = props
 
   return (
-    <Formik
+    <StyledFormik
       enableReinitialize
       initialValues={{
         min,
@@ -152,6 +166,6 @@ export default function MapSidebarQuantityForm(props) {
       }}
     >
       <QuantityForm min={min} max={max} />
-    </Formik>
+    </StyledFormik>
   )
 }

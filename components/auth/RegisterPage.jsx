@@ -1,15 +1,8 @@
 import React, { useState, useRef } from 'react'
-import {
-  Avatar,
-  Button,
-  Grid,
-  Typography,
-  makeStyles,
-  useTheme,
-  Container,
-} from '@material-ui/core'
+import { styled, useTheme } from '@mui/material/styles'
+import { Avatar, Button, Grid, Typography, Container } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
@@ -22,27 +15,39 @@ import AuthLayout from '../layouts/AuthLayout'
 import ReCAPTCHA from 'react-google-recaptcha'
 import submitWithCapthca from '../../lib/helpers/submitWithCaptcha'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'RegisterPage'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  avatar: `${PREFIX}-avatar`,
+  form: `${PREFIX}-form`,
+  submit: `${PREFIX}-submit`,
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.root}`]: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  avatar: {
+
+  [`& .${classes.avatar}`]: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
-  form: {
+
+  [`& .${classes.form}`]: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
-  submit: {
+
+  [`& .${classes.submit}`]: {
     margin: theme.spacing(3, 0, 2),
   },
 }))
 
 export default function SignUp() {
-  const classes = useStyles()
   const theme = useTheme()
   const [notification, setNotification] = useState('')
   const [severity, setSeverity] = useState('error')
@@ -64,7 +69,7 @@ export default function SignUp() {
   }
 
   return (
-    <>
+    <Root>
       <AuthLayout title="Recycl | Регистрация">
         <Container className={classes.root} component="main" maxWidth="xs">
           <Avatar className={classes.avatar}>
@@ -200,6 +205,6 @@ export default function SignUp() {
         message={notification}
         handleClose={() => setNotification('')}
       />
-    </>
+    </Root>
   )
 }

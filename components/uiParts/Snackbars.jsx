@@ -1,26 +1,23 @@
 import React from 'react'
-import { Snackbar, IconButton, makeStyles } from '@material-ui/core'
-import CloseIcon from '@material-ui/icons/Close'
-import MuiAlert from '@material-ui/lab/Alert'
+import { Snackbar, IconButton } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import { Alert } from '@mui/material'
 
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />
+function CustomAlert(props) {
+  return <Alert variant="filled" {...props} />
 }
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& > * + *': {
-      marginTop: theme.spacing(2),
-    },
-  },
-}))
-
 export default function Snackbars(props) {
-  const classes = useStyles()
   const { message, severity, open, handleClose } = props
 
   return (
-    <div className={classes.root}>
+    <div
+      css={(theme) => ({
+        '& > * + *': {
+          marginTop: theme.spacing(2),
+        },
+      })}
+    >
       <Snackbar
         open={open}
         onClose={handleClose}
@@ -36,9 +33,9 @@ export default function Snackbars(props) {
           </IconButton>
         }
       >
-        <Alert onClose={handleClose} severity={severity}>
+        <CustomAlert onClose={handleClose} severity={severity}>
           {message}
-        </Alert>
+        </CustomAlert>
       </Snackbar>
     </div>
   )

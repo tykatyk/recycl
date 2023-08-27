@@ -1,10 +1,23 @@
 import React from 'react'
-import { Paper, Grid, Typography, makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Paper, Grid, Typography } from '@mui/material'
 import Layout from '../layouts/Layout'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import SendMessage from '../uiParts/SendMessage'
 import { useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATION } from '../../lib/graphql/queries/removalApplication'
+
+const PREFIX = 'ShowSingle'
+
+const classes = {
+  paper: `${PREFIX}-paper`,
+}
+
+const StyledGrid = styled(Grid)(({ theme }) => ({
+  [`& .${classes.paper}`]: {
+    padding: theme.spacing(2),
+  },
+}))
 
 export default function ShowSingle(props) {
   const { id } = props
@@ -24,7 +37,7 @@ export default function ShowSingle(props) {
 
   return (
     <Layout title="Заявка на вывоз | Recycl">
-      <Grid
+      <StyledGrid
         container
         direction="column"
         style={{
@@ -34,20 +47,13 @@ export default function ShowSingle(props) {
         }}
       >
         {content}
-      </Grid>
+      </StyledGrid>
     </Layout>
   )
 }
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(2),
-  },
-}))
-
 function ShowData(props) {
   const { applicationData } = props
-  const classes = useStyles()
 
   return (
     <Grid container spacing={2} direction="column" item xs>

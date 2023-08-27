@@ -1,11 +1,6 @@
 import React, { useState, useRef } from 'react'
-import {
-  Typography,
-  Button,
-  makeStyles,
-  useTheme,
-  Container,
-} from '@material-ui/core'
+import { styled, useTheme } from '@mui/material/styles'
+import { Typography, Button, Container } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
 import Snackbar from '../uiParts/Snackbars'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
@@ -15,27 +10,39 @@ import { emailSchema } from '../../lib/validation'
 import ReCAPTCHA from 'react-google-recaptcha'
 import submitWithCapthca from '../../lib/helpers/submitWithCaptcha'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'ForgetPasswordPage'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  avatar: `${PREFIX}-avatar`,
+  form: `${PREFIX}-form`,
+  submit: `${PREFIX}-submit`,
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.root}`]: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  avatar: {
+
+  [`& .${classes.avatar}`]: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
-  form: {
+
+  [`& .${classes.form}`]: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
-  submit: {
+
+  [`& .${classes.submit}`]: {
     margin: theme.spacing(3, 0, 2),
   },
 }))
 
 export default function ForgetPasswordPage() {
-  const classes = useStyles()
   const theme = useTheme()
   const [notification, setNotification] = useState('')
   const [severity, setSeverity] = useState('error')
@@ -48,14 +55,14 @@ export default function ForgetPasswordPage() {
   }
 
   return (
-    <>
+    <Root>
       <AuthLayout title="Recycl | Forget password">
         <Container className={classes.root} component="main" maxWidth="xs">
           <Typography
             component="h1"
             variant="h3"
             align="center"
-            style={{ marginBottom: `${theme.spacing(6)}px` }}
+            style={{ marginBottom: theme.spacing(6) }}
             color="secondary"
           >
             Забыли пароль?
@@ -63,7 +70,7 @@ export default function ForgetPasswordPage() {
           <Typography
             align="center"
             style={{
-              marginBottom: `${theme.spacing(2)}px`,
+              marginBottom: theme.spacing(2),
             }}
           >
             Введите ваш email и мы вышлем вам код подтверждения. Вы сможете
@@ -136,13 +143,12 @@ export default function ForgetPasswordPage() {
           </div>
         </Container>
       </AuthLayout>
-
       <Snackbar
         severity={severity}
         open={!!notification}
         message={notification}
         handleClose={() => setNotification('')}
       />
-    </>
+    </Root>
   )
 }

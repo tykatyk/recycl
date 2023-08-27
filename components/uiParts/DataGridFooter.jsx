@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, TablePagination } from '@material-ui/core'
+import { Button, TablePagination } from '@mui/material'
 
 export default function DataGridFooter(props) {
   const {

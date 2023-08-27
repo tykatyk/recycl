@@ -1,14 +1,9 @@
 import React, { useState } from 'react'
-import {
-  Grid,
-  Typography,
-  Badge,
-  makeStyles,
-  TablePagination,
-} from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Grid, Typography, Badge, TablePagination } from '@mui/material'
 import Link from '../uiParts/Link'
-import MailIcon from '@material-ui/icons/Mail'
-import CreateIcon from '@material-ui/icons/Create'
+import MailIcon from '@mui/icons-material/Mail'
+import CreateIcon from '@mui/icons-material/Create'
 import Layout from '../layouts/Layout'
 import Snackbar from '../uiParts/Snackbars'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
@@ -24,13 +19,22 @@ import {
 } from '../../lib/graphql/queries/removalApplication'
 import Router from 'next/router'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'IndexOwner'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  row: `${PREFIX}-row`,
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.root}`]: {
     '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
       outline: 'none',
     },
   },
-  row: {
+
+  [`& .${classes.row}`]: {
     '&:hover': {
       cursor: 'pointer',
     },
@@ -94,7 +98,6 @@ const columns = [
 ]
 
 export default function RemovalApplications(props) {
-  const classes = useStyles()
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(10)
@@ -152,7 +155,7 @@ export default function RemovalApplications(props) {
     }
 
     return (
-      <>
+      <Root>
         <Layout title="Мои заявки на вывоз | Recycl">
           <Grid
             container
@@ -223,7 +226,7 @@ export default function RemovalApplications(props) {
             setBackendError(null)
           }}
         />
-      </>
+      </Root>
     )
   }
   return ''

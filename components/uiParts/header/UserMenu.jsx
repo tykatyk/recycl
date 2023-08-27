@@ -1,4 +1,5 @@
 import React from 'react'
+import { styled, useTheme } from '@mui/material/styles'
 import {
   MenuItem,
   ClickAwayListener,
@@ -8,25 +9,30 @@ import {
   ListItem,
   MenuList,
   ListItemText,
-  useTheme,
-  makeStyles,
-} from '@material-ui/core'
+} from '@mui/material'
 import Link from '../Link'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 
-const apolloClient = initializeApollo()
-const useStyles = makeStyles({
-  link: {
+const PREFIX = 'UserMenu'
+
+const classes = {
+  link: `${PREFIX}-link`,
+}
+
+const StyledPopper = styled(Popper)({
+  [`& .${classes.link}`]: {
     width: '100%',
     height: '100%',
   },
 })
 
+const apolloClient = initializeApollo()
+
 export default function UserMenu(props) {
   const theme = useTheme()
-  const classes = useStyles()
+
   const { data: session, status } = useSession()
   const preventDefault = () => false
   const { open, anchorEl, handleClose, handleListKeyDown } = props
@@ -78,7 +84,7 @@ export default function UserMenu(props) {
   }
 
   return (
-    <Popper
+    <StyledPopper
       open={open}
       anchorEl={anchorEl}
       role={undefined}
@@ -126,6 +132,6 @@ export default function UserMenu(props) {
           </Paper>
         </Grow>
       )}
-    </Popper>
+    </StyledPopper>
   )
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Tab, Tabs, Box } from '@material-ui/core'
+import { Tab, Tabs, Box } from '@mui/material'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -43,6 +43,9 @@ export default function AdTabs(props: AdTabProps) {
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
+          sx={{ '& .Mui-selected': { color: 'rgba(255, 255, 255, 0.9)' } }}
+          textColor="primary"
+          indicatorColor="secondary"
           value={value}
           onChange={handleChange}
           aria-label="Предложения о вывозе отходов"

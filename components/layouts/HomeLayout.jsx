@@ -4,13 +4,13 @@ import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import Head from '../uiParts/Head'
 
-export default function Layout({ children, title }) {
+export default function Layout({ children, title, className = '' }) {
   return (
     <>
       <Head title={title} />
       <Wrapper>
         <Header />
-        <main>{children}</main>
+        <main className={className}>{children}</main>
         <Footer />
       </Wrapper>
     </>

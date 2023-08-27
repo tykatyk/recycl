@@ -1,10 +1,16 @@
 import React from 'react'
-import { makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
 import NavigationLinks from './NavigationLinks'
 import Logo from './Logo'
 
-const useStyles = makeStyles({
-  wrapper: {
+const PREFIX = 'DesktopNavigation'
+
+const classes = {
+  wrapper: `${PREFIX}-wrapper`,
+}
+
+const Root = styled('div')({
+  [`&.${classes.wrapper}`]: {
     display: 'flex',
     width: '100%',
     alignItems: 'center',
@@ -13,12 +19,10 @@ const useStyles = makeStyles({
 })
 
 export default function DesktopNavigation() {
-  const classes = useStyles()
-
   return (
-    <div className={classes.wrapper}>
+    <Root className={classes.wrapper}>
       <Logo />
       <NavigationLinks isDesktop />
-    </div>
+    </Root>
   )
 }

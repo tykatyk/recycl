@@ -1,17 +1,33 @@
 import React from 'react'
-import Autocomplete from '@material-ui/lab/Autocomplete'
-import LocationOnIcon from '@material-ui/icons/LocationOn'
-import {
-  Grid,
-  Typography,
-  TextField,
-  Chip,
-  makeStyles,
-} from '@material-ui/core'
-import { fieldToTextField } from 'formik-material-ui'
+import { styled } from '@mui/material/styles'
+import Autocomplete from '@mui/material/Autocomplete'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
+import { Grid, Typography, TextField, Chip } from '@mui/material'
+import { fieldToTextField } from 'formik-mui'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox'
+
+const PREFIX = 'PlacesAutocomplete'
+
+const classes = {
+  locationIcon: `${PREFIX}-locationIcon`,
+  paper: `${PREFIX}-paper`,
+}
+
+const StyledGrid = styled(Grid)(({ theme }) => ({
+  [`& .${classes.locationIcon}`]: {
+    marginRight: theme.spacing(2),
+  },
+
+  [`& .${classes.paper}`]: ({ backgroundColor }) => {
+    return {
+      background: backgroundColor
+        ? backgroundColor
+        : theme.palette.background.paper,
+    }
+  },
+}))
 
 function loadScript(src, position, id) {
   if (!position) return
@@ -24,19 +40,6 @@ function loadScript(src, position, id) {
 
 const autocompleteService = { current: null }
 
-const useStyles = makeStyles((theme) => ({
-  locationIcon: {
-    marginRight: theme.spacing(2),
-  },
-  paper: ({ backgroundColor }) => {
-    return {
-      background: backgroundColor
-        ? backgroundColor
-        : theme.palette.background.paper,
-    }
-  },
-}))
-
 export default function PlacesAutocomplete(props) {
   const {
     form: { setFieldValue, handleBlur, setFieldTouched, values },
@@ -46,7 +49,7 @@ export default function PlacesAutocomplete(props) {
 
   const { label, variant, value, error, helperText, disabled } =
     fieldToTextField(props)
-  const classes = useStyles(props)
+
   const [inputValue, setInputValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
   const [shouldOpen, setShouldOpen] = React.useState(false)
@@ -237,7 +240,7 @@ export default function PlacesAutocomplete(props) {
           )
 
           return (
-            <Grid container alignItems="center">
+            <StyledGrid container alignItems="center">
               <Grid item>
                 <LocationOnIcon className={classes.locationIcon} />
               </Grid>
@@ -255,7 +258,7 @@ export default function PlacesAutocomplete(props) {
                   {option.structured_formatting.secondary_text}
                 </Typography>
               </Grid>
-            </Grid>
+            </StyledGrid>
           )
         }
 

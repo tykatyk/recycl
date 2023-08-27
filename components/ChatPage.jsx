@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { styled } from '@mui/material/styles'
 import {
   Fade,
   Box,
@@ -10,12 +11,11 @@ import {
   Paper,
   Badge,
   Typography,
-  makeStyles,
-} from '@material-ui/core'
+} from '@mui/material'
 import { InView } from 'react-intersection-observer'
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
-import CheckIcon from '@material-ui/icons/Check'
-import DoneAllIcon from '@material-ui/icons/DoneAll'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import CheckIcon from '@mui/icons-material/Check'
+import DoneAllIcon from '@mui/icons-material/DoneAll'
 import Layout from './layouts/Layout'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
@@ -38,79 +38,108 @@ import { chatSchema } from '../lib/validation'
 import { whitespaceRegex } from '../lib/validation/regularExpressions'
 import io from 'socket.io-client'
 
+const PREFIX = 'ChatPage'
+
+const classes = {
+  chatContainer: `${PREFIX}-chatContainer`,
+  dialogWrapper: `${PREFIX}-dialogWrapper`,
+  dialog: `${PREFIX}-dialog`,
+  loadingIndicator: `${PREFIX}-loadingIndicator`,
+  typingIndicator: `${PREFIX}-typingIndicator`,
+  newMessageIndicator: `${PREFIX}-newMessageIndicator`,
+  checkmark: `${PREFIX}-checkmark`,
+  message: `${PREFIX}-message`,
+  messageContent: `${PREFIX}-messageContent`,
+  messageInfo: `${PREFIX}-messageInfo`,
+  right: `${PREFIX}-right`,
+  remainedSymbolsIndicator: `${PREFIX}-remainedSymbolsIndicator`,
+}
+
+const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
+  ({ theme }) => ({
+    [`& .${classes.chatContainer}`]: {
+      width: '100%',
+    },
+
+    [`& .${classes.dialogWrapper}`]: {
+      position: 'relative',
+      paddingBottom: theme.spacing(7),
+    },
+
+    [`& .${classes.dialog}`]: {
+      height: messageContainerHeight,
+      overflowY: 'auto',
+    },
+
+    [`& .${classes.loadingIndicator}`]: {
+      position: 'absolute',
+      left: '50%',
+      transform: 'translate(-50%, 0)',
+      color: theme.palette.grey['900'],
+      background: theme.palette.secondary.main,
+      borderRadius: theme.spacing(1),
+      padding: 4,
+    },
+
+    [`& .${classes.typingIndicator}`]: {
+      position: 'absolute',
+      bottom: theme.spacing(1),
+      left: theme.spacing(2),
+    },
+
+    [`& .${classes.newMessageIndicator}`]: {
+      position: 'absolute',
+      bottom: 0,
+      right: theme.spacing(4),
+    },
+
+    [`& .${classes.checkmark}`]: {
+      color: '#adce5d',
+      marginLeft: theme.spacing(1),
+    },
+
+    [`& .${classes.message}`]: {
+      display: 'flex',
+      flexDirection: 'column',
+      width: 'auto',
+      maxWidth: '85%',
+    },
+
+    [`& .${classes.messageContent}`]: {
+      background: '#78909c',
+      borderRadius: '1em',
+      borderTopLeftRadius: 0,
+      padding: theme.spacing(1),
+    },
+
+    [`& .${classes.messageInfo}`]: {
+      display: 'flex',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      paddingLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
+    },
+
+    //aligns messages sent by the other user to the right
+    [`& .${classes.right}`]: {
+      justifyContent: 'flex-end',
+      '& $message': {
+        alignItems: 'flex-end',
+      },
+      '& $messageContent': {
+        background: '#5c6bc0',
+      },
+    },
+
+    [`& .${classes.remainedSymbolsIndicator}`]: {
+      marginLeft: theme.spacing(2),
+    },
+  })
+)
+
 const messageContainerHeight = 400
 
-const useStyles = makeStyles((theme) => ({
-  chatContainer: {
-    width: '100%',
-  },
-
-  dialogWrapper: {
-    position: 'relative',
-    paddingBottom: theme.spacing(7),
-  },
-
-  dialog: {
-    height: messageContainerHeight,
-    overflowY: 'auto',
-  },
-
-  loadingIndicator: {
-    position: 'absolute',
-    left: '50%',
-    transform: 'translate(-50%, 0)',
-    color: theme.palette.grey['900'],
-    background: theme.palette.secondary.main,
-    borderRadius: theme.spacing(1),
-    padding: 4,
-  },
-  typingIndicator: {
-    position: 'absolute',
-    bottom: theme.spacing(1),
-    left: theme.spacing(2),
-  },
-  newMessageIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    right: theme.spacing(4),
-  },
-  checkmark: { color: '#adce5d', marginLeft: theme.spacing(1) },
-  message: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: 'auto',
-    maxWidth: '85%',
-  },
-  messageContent: {
-    background: '#78909c',
-    borderRadius: '1em',
-    borderTopLeftRadius: 0,
-    padding: theme.spacing(1),
-  },
-  messageInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    paddingLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-  },
-  //aligns messages sent by the other user to the right
-  right: {
-    justifyContent: 'flex-end',
-    '& $message': {
-      alignItems: 'flex-end',
-    },
-    '& $messageContent': {
-      background: '#5c6bc0',
-    },
-  },
-  remainedSymbolsIndicator: {
-    marginLeft: theme.spacing(2),
-  },
-}))
-
 export default function ChatPage(props) {
-  const classes = useStyles()
   const { data: session } = useSession()
   const thisUserId = session && session.id ? session.id : ''
   const thisUserName = session && session.user ? session.user.name : ''
@@ -812,10 +841,10 @@ export default function ChatPage(props) {
   }
 
   return (
-    <RedirectUnathenticatedUser>
+    <StyledRedirectUnathenticatedUser>
       <Layout title={title} currentDialogId={dialogId}>
         {content}
       </Layout>
-    </RedirectUnathenticatedUser>
+    </StyledRedirectUnathenticatedUser>
   )
 }

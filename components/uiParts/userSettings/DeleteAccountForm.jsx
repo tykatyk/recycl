@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
-import { Box, Button, makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Box, Button } from '@mui/material'
 import { useSession } from 'next-auth/react'
 import { Formik, Form } from 'formik'
 import Snackbar from '../Snackbars'
@@ -9,39 +10,53 @@ import { DELETE_USER } from '../../../lib/graphql/queries/user'
 import { useMutation } from '@apollo/client'
 import { signOut } from 'next-auth/react'
 
-const useStyles = makeStyles((theme) => ({
-  avatar: {
+const PREFIX = 'DeleteAccountForm'
+
+const classes = {
+  avatar: `${PREFIX}-avatar`,
+  box: `${PREFIX}-box`,
+  alternativeBox: `${PREFIX}-alternativeBox`,
+  form: `${PREFIX}-form`,
+  field: `${PREFIX}-field`,
+  submit: `${PREFIX}-submit`,
+}
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  [`& .${classes.avatar}`]: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
 
-  box: {
+  [`&.${classes.box}`]: {
     width: '100%',
     maxWidth: '400px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  alternativeBox: {
+
+  [`& .${classes.alternativeBox}`]: {
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  form: {
+
+  [`& .${classes.form}`]: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
-  field: {
+
+  [`& .${classes.field}`]: {
     marginBottom: theme.spacing(4),
   },
-  submit: {
+
+  [`& .${classes.submit}`]: {
     margin: theme.spacing(3, 0, 2),
   },
 }))
 
 export default function DeleteAccountForm() {
-  const classes = useStyles()
   const { data: session } = useSession()
   const [severity, setSeverity] = useState('error')
   const [notification, setNotification] = useState('')
@@ -52,7 +67,7 @@ export default function DeleteAccountForm() {
   const [open, setOpen] = React.useState(false)
 
   return (
-    <Box className={classes.box}>
+    <StyledBox className={classes.box}>
       <Formik
         initialValues={{
           userId: session.id,
@@ -123,6 +138,6 @@ export default function DeleteAccountForm() {
           setNotification('')
         }}
       />
-    </Box>
+    </StyledBox>
   )
 }

@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react'
-import { makeStyles, Typography, Button, Grow } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Typography, Button, Grow } from '@mui/material'
 import Link from './Link'
 import Cookies from 'js-cookie'
 
-const useStyles = makeStyles((theme) => ({
-  link: {
+const PREFIX = 'CookieConsentPopup'
+
+const classes = {
+  link: `${PREFIX}-link`,
+  termsPopup: `${PREFIX}-termsPopup`,
+  termsButton: `${PREFIX}-termsButton`,
+}
+
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.link}`]: {
     color: '#adce5d',
     '&:hover': {
       textDecoration: 'underline',
     },
   },
-  termsPopup: {
+
+  [`&.${classes.termsPopup}`]: {
     padding: theme.spacing(4),
     background: '#6f0595;',
     position: 'fixed',
@@ -23,17 +33,17 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       padding: theme.spacing(2),
     },
   },
-  termsButton: {
+
+  [`& .${classes.termsButton}`]: {
     marginLeft: 40,
   },
 }))
 
 export default function CookieConsentPopup() {
-  const classes = useStyles()
   const [showCookieConsent, setShowCookieConsent] = useState(false)
   const handleClick = () => {
     Cookies.set('cookieConsent', 'agreed', { expires: 31, sameSite: 'Lax' })
@@ -46,7 +56,7 @@ export default function CookieConsentPopup() {
 
   if (showCookieConsent) {
     return (
-      <div className={classes.termsPopup}>
+      <Root className={classes.termsPopup}>
         <div>
           <Typography>
             Мы используем файлы cookie для улучшения качества работы.
@@ -71,7 +81,7 @@ export default function CookieConsentPopup() {
         >
           OK
         </Button>
-      </div>
+      </Root>
     )
   }
 

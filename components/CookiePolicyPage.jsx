@@ -1,6 +1,6 @@
 import React from 'react'
+import { styled } from '@mui/material/styles'
 import {
-  makeStyles,
   Typography,
   Container,
   Table,
@@ -10,36 +10,55 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from '@material-ui/core'
+} from '@mui/material'
 import Layout from './layouts/Layout'
 import Link from './uiParts/Link'
 
-const useStyles = makeStyles((theme) => ({
-  container: {
+const PREFIX = 'CookiePolicyPage'
+
+const classes = {
+  container: `${PREFIX}-container`,
+  h1: `${PREFIX}-h1`,
+  h2: `${PREFIX}-h2`,
+  section: `${PREFIX}-section`,
+  subtitle: `${PREFIX}-subtitle`,
+  list: `${PREFIX}-list`,
+  tableContainer: `${PREFIX}-tableContainer`,
+  table: `${PREFIX}-table`,
+  link: `${PREFIX}-link`,
+}
+
+const StyledLayout = styled(Layout)(({ theme }) => ({
+  [`& .${classes.container}`]: {
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
     maxWidth: 800,
   },
-  h1: {
+
+  [`& .${classes.h1}`]: {
     fontSize: '3rem',
     marginBottom: '3rem',
     fontWeight: 'bold',
     color: '#adce5d',
   },
-  h2: {
+
+  [`& .${classes.h2}`]: {
     fontSize: '2rem',
     fontWeight: 'bold',
     color: '#adce5d',
   },
-  section: {
+
+  [`& .${classes.section}`]: {
     marginBottom: '3rem',
   },
-  subtitle: {
+
+  [`& .${classes.subtitle}`]: {
     fontWeight: 'bold',
     color: '#adce5d',
   },
-  list: {
+
+  [`& .${classes.list}`]: {
     paddingLeft: '2em',
     listStyle: 'disc',
     marginBottom: theme.spacing(2),
@@ -47,13 +66,16 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: '1.5',
     letterSpacing: '0.00938em',
   },
-  tableContainer: {
+
+  [`& .${classes.tableContainer}`]: {
     marginBottom: '1em',
   },
-  table: {
+
+  [`& .${classes.table}`]: {
     minWidth: 650,
   },
-  link: {
+
+  [`& .${classes.link}`]: {
     fontSize: '1rem',
     lineHeight: '1.5',
     letterSpacing: '0.00938em',
@@ -99,10 +121,8 @@ const operationalCookies = [
 ]
 
 export default function CookiePolicyPage() {
-  const classes = useStyles()
-
   return (
-    <Layout title="Политика использования cookie файлов | Recycl">
+    <StyledLayout title="Политика использования cookie файлов | Recycl">
       <Container className={classes.container}>
         <Typography
           variant="h1"
@@ -405,6 +425,6 @@ export default function CookiePolicyPage() {
           </section>
         </article>
       </Container>
-    </Layout>
+    </StyledLayout>
   )
 }

@@ -1,14 +1,24 @@
 import React from 'react'
-import { makeStyles, Typography, Box, Paper } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Typography, Box, Paper } from '@mui/material'
 import Layout from './layouts/Layout'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'SupportUsPage'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  item: `${PREFIX}-item`,
+  header: `${PREFIX}-header`,
+}
+
+const StyledLayout = styled(Layout)(({ theme }) => ({
+  [`& .${classes.root}`]: {
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
   },
-  item: {
+
+  [`& .${classes.item}`]: {
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
     '& > :last-child': {
@@ -16,18 +26,18 @@ const useStyles = makeStyles((theme) => ({
       paddingBottom: 0,
     },
   },
-  header: {
+
+  [`& .${classes.header}`]: {
     marginBottom: theme.spacing(5),
   },
 }))
 
 export default function SupportUsPage() {
-  const classes = useStyles()
   const btcWallet = '6Le-cZ8dAAAAABgRwLZP_IVBeV8ZJueinte6rm5n'
   const ethWallet = '2lkadg9xlkj#laclk98255xkjagsdf'
   const card = '1234 5678 9112 3456'
   return (
-    <Layout title="Помочь проекту | Recycl">
+    <StyledLayout title="Помочь проекту | Recycl">
       <div className={classes.root}>
         <Typography variant="h6" className={classes.header} align="center">
           Если вы хотите помочь проекту, то можете сделать это одним из
@@ -54,6 +64,6 @@ export default function SupportUsPage() {
           </Box>
         </Paper>
       </div>
-    </Layout>
+    </StyledLayout>
   )
 }

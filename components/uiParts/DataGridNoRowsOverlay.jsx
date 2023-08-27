@@ -1,27 +1,34 @@
 import React from 'react'
-import { makeStyles } from '@material-ui/core'
-import { GridOverlay } from '@mui/x-data-grid'
-import InfoIcon from '@material-ui/icons/Info'
+import { styled } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+import { GridOverlay } from '@mui/x-data-grid'
+import InfoIcon from '@mui/icons-material/Info'
+
+const PREFIX = 'DataGridNoRowsOverlay'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  label: `${PREFIX}-label`,
+}
+
+const StyledGridOverlay = styled(GridOverlay)(({ theme }) => ({
+  [`&.${classes.root}`]: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  label: {
+
+  [`& .${classes.label}`]: {
     marginTop: theme.spacing(1),
     color: theme.palette.secondary.main,
   },
 }))
 
 export default function DataGridNoRowsOverlay() {
-  const classes = useStyles()
-
   return (
-    <GridOverlay className={classes.root}>
+    <StyledGridOverlay className={classes.root}>
       <InfoIcon color="secondary" fontSize="large" />
       <div className={classes.label}>Нет данных</div>
-    </GridOverlay>
+    </StyledGridOverlay>
   )
 }

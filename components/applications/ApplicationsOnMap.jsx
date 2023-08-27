@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { makeStyles } from '@material-ui/core'
 import MapLayout from '../layouts/MapLayout'
 import Map from '../uiParts/Map'
 import Marker from '../uiParts/Marker'
@@ -13,13 +12,12 @@ import { GET_REMOVAL_APPLICATIONS_FOR_MAP } from '../../lib/graphql/queries/remo
 import { useLazyQuery } from '@apollo/client'
 import { Wrapper, Status } from '@googlemaps/react-wrapper'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
+import { css } from '@emotion/react'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    flex: '1 1 auto',
-  },
-}))
+const containerCss = css({
+  display: 'flex',
+  flex: '1 1 auto',
+})
 
 export default function RemovalApplicationsPage() {
   const [center, setCenter] = useState(null)
@@ -32,7 +30,6 @@ export default function RemovalApplicationsPage() {
     GET_REMOVAL_APPLICATIONS_FOR_MAP
   )
   const [markers, setMarkers] = useState([])
-  const classes = useStyles()
 
   useEffect(() => {
     if (!getApplications || visibleRect.length == 0) return
@@ -123,7 +120,7 @@ export default function RemovalApplicationsPage() {
 
   if (locationError) {
     content = (
-      <main className={classes.root}>
+      <main css={containerCss}>
         <UserLocation
           setCenter={setCenter}
           setLocationError={setLocationError}
@@ -148,7 +145,7 @@ export default function RemovalApplicationsPage() {
             open={true}
           />
         )}
-        <main className={classes.root}>
+        <main css={containerCss}>
           <Map center={center} zoom={zoom} onIdle={onIdle}>
             {markers}
           </Map>

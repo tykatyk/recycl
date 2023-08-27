@@ -1,10 +1,16 @@
-import React, { useState, useRef } from 'react'
-import { makeStyles, Container, useTheme } from '@material-ui/core'
+import React from 'react'
+import { styled, useTheme } from '@mui/material/styles'
+import { Container } from '@mui/material'
 import Layout from './layouts/Layout'
-import { Formik, Form, Field } from 'formik'
 
-const useStyles = makeStyles((theme) => ({
-  container: {
+const PREFIX = 'AboutUsPage'
+
+const classes = {
+  container: `${PREFIX}-container`,
+}
+
+const StyledLayout = styled(Layout)(({ theme }) => ({
+  [`& .${classes.container}`]: {
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
@@ -13,12 +19,11 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function SupportUsPage() {
-  const classes = useStyles()
   const theme = useTheme()
 
   return (
-    <Layout title="О нас | Recycl">
+    <StyledLayout title="О нас | Recycl">
       <Container className={classes.container}></Container>
-    </Layout>
+    </StyledLayout>
   )
 }

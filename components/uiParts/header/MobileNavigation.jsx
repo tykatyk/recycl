@@ -1,16 +1,24 @@
 import React from 'react'
-import { IconButton, Drawer, makeStyles } from '@material-ui/core'
-import MenuIcon from '@material-ui/icons/Menu'
+import { styled } from '@mui/material/styles'
+import { IconButton, Drawer } from '@mui/material'
+import MenuIcon from '@mui/icons-material/Menu'
 import NavigationLinks from './NavigationLinks'
 import Logo from './Logo'
 
-const useStyles = makeStyles({
-  wrapper: {
+const PREFIX = 'MobileNavigation'
+
+const classes = {
+  wrapper: `${PREFIX}-wrapper`,
+  logoWrapper: `${PREFIX}-logoWrapper`,
+}
+
+const Root = styled('div')({
+  [`&.${classes.wrapper}`]: {
     display: 'flex',
     width: '100%',
     alignItems: 'center',
   },
-  logoWrapper: {
+  [`& .${classes.logoWrapper}`]: {
     display: 'flex',
     width: '100%',
     boxSizing: 'border-box',
@@ -19,11 +27,10 @@ const useStyles = makeStyles({
 })
 
 export default function MobileNavigation(props) {
-  const classes = useStyles()
   const { drawerOpen, handleDrawerOpen, handleDrawerClose } = props
 
   return (
-    <div className={classes.wrapper}>
+    <Root className={classes.wrapper}>
       <IconButton
         {...{
           'aria-label': 'menu',
@@ -31,6 +38,7 @@ export default function MobileNavigation(props) {
           onClick: handleDrawerOpen,
           color: 'inherit',
         }}
+        size="large"
       >
         <MenuIcon />
       </IconButton>
@@ -46,6 +54,6 @@ export default function MobileNavigation(props) {
       >
         <NavigationLinks isDesktop={false} />
       </Drawer>
-    </div>
+    </Root>
   )
 }

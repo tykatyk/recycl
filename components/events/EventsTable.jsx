@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
+import { styled } from '@mui/material/styles'
 import {
   Grid,
   Typography,
   Badge,
-  makeStyles,
   TableContainer,
   Checkbox,
   Table,
@@ -13,30 +13,43 @@ import {
   TableRow,
   Button,
   Box,
-} from '@material-ui/core'
+} from '@mui/material'
 import Link from '../uiParts/Link'
 import Tabs from '../uiParts/Tabs'
-import VisibilityIcon from '@material-ui/icons/Visibility'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSession } from 'next-auth/react'
 import { inactive } from './data'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'EventsTable'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  noBorder: `${PREFIX}-noBorder`,
+  row: `${PREFIX}-row`,
+  actionsRow: `${PREFIX}-actionsRow`,
+  cell: `${PREFIX}-cell`,
+}
+
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.root}`]: {
     '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
       outline: 'none',
     },
   },
-  noBorder: {
+
+  [`& .${classes.noBorder}`]: {
     borderBottom: 'none',
   },
-  row: {
+
+  [`& .${classes.row}`]: {
     '&:hover': {
       cursor: 'pointer',
     },
   },
-  actionsRow: {
+
+  [`& .${classes.actionsRow}`]: {
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
@@ -44,7 +57,8 @@ const useStyles = makeStyles((theme) => ({
       marginRight: '24px',
     },
   },
-  cell: {
+
+  [`& .${classes.cell}`]: {
     background: theme.palette.background.paper,
   },
 }))
@@ -80,10 +94,8 @@ const columns = [
 ]
 
 export default function EventsTable({ rows, variant }) {
-  const classes = useStyles()
-
   return (
-    <div style={{ width: '100%' }}>
+    <Root style={{ width: '100%' }}>
       <TableContainer>
         <Table>
           <TableHead>
@@ -172,6 +184,6 @@ export default function EventsTable({ rows, variant }) {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Root>
   )
 }

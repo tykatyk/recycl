@@ -1,6 +1,6 @@
 import React from 'react'
-import { Grid } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { Grid } from '@mui/material'
+import Alert from '@mui/material/Alert'
 import AuthLayout from './AuthLayout'
 
 export default function ResetLayout(props) {

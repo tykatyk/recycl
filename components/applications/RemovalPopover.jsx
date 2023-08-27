@@ -1,19 +1,29 @@
 import React from 'react'
-import { Popover, makeStyles, useTheme } from '@material-ui/core'
-import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined'
+import { styled, useTheme } from '@mui/material/styles'
+import { Popover } from '@mui/material'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 
-const useStyles = makeStyles((theme) => ({
-  popover: {
+const PREFIX = 'RemovalPopover'
+
+const classes = {
+  popover: `${PREFIX}-popover`,
+  paper: `${PREFIX}-paper`,
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.popover}`]: {
     pointerEvents: 'none',
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(1),
   },
 }))
 
 export default function RemovalPopover(props) {
   const theme = useTheme()
-  const classes = useStyles()
+
   const [anchor, setAnchor] = React.useState(null)
 
   const handlePopoverOpen = (event) => {
@@ -26,7 +36,7 @@ export default function RemovalPopover(props) {
   const open = Boolean(anchor)
 
   return (
-    <>
+    <Root>
       <InfoOutlinedIcon
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
@@ -52,6 +62,6 @@ export default function RemovalPopover(props) {
       >
         {props.children}
       </Popover>
-    </>
+    </Root>
   )
 }

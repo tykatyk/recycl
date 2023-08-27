@@ -1,16 +1,9 @@
 import React, { useState, useRef } from 'react'
+import { styled, useTheme } from '@mui/material/styles'
 import { useRouter } from 'next/router'
-import {
-  Avatar,
-  Button,
-  Grid,
-  Typography,
-  makeStyles,
-  useTheme,
-  Container,
-} from '@material-ui/core'
+import { Avatar, Button, Grid, Typography, Container } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import Link from '../uiParts/Link'
 import Snackbar from '../uiParts/Snackbars'
@@ -21,27 +14,39 @@ import showErrorMessages from '../../lib/helpers/showErrorMessages'
 import AuthLayout from '../layouts/AuthLayout'
 import ReCAPTCHA from 'react-google-recaptcha'
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
+const PREFIX = 'LoginPage'
+
+const classes = {
+  paper: `${PREFIX}-paper`,
+  avatar: `${PREFIX}-avatar`,
+  form: `${PREFIX}-form`,
+  submit: `${PREFIX}-submit`,
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.paper}`]: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  avatar: {
+
+  [`& .${classes.avatar}`]: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
-  form: {
+
+  [`& .${classes.form}`]: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
-  submit: {
+
+  [`& .${classes.submit}`]: {
     margin: theme.spacing(3, 0, 2),
   },
 }))
 
 export default function SignIn() {
-  const classes = useStyles()
   const theme = useTheme()
   const [backendError, setBackendError] = useState(null)
   const router = useRouter()
@@ -54,7 +59,7 @@ export default function SignIn() {
   }
 
   return (
-    <>
+    <Root>
       <AuthLayout title="Recycl | Вход">
         <Container component="main" maxWidth="xs">
           <div className={classes.paper}>
@@ -227,7 +232,6 @@ export default function SignIn() {
           </div>
         </Container>
       </AuthLayout>
-
       <Snackbar
         severity="error"
         open={!!backendError}
@@ -236,6 +240,6 @@ export default function SignIn() {
           setBackendError(null)
         }}
       />
-    </>
+    </Root>
   )
 }

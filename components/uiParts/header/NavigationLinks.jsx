@@ -1,18 +1,21 @@
 import React from 'react'
-import {
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  makeStyles,
-} from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { List, ListItem, ListItemText, Typography } from '@mui/material'
 import Link from '../Link'
 
-const useStyles = makeStyles((theme) => ({
-  navLinks: {
+const PREFIX = 'NavigationLinks'
+
+const classes = {
+  navLinks: `${PREFIX}-navLinks`,
+  link: `${PREFIX}-link`,
+}
+
+const StyledTypography = styled(Typography)(({ theme }) => ({
+  [`&.${classes.navLinks}`]: {
     flexGrow: 1,
   },
-  link: {
+
+  [`& .${classes.link}`]: {
     '&:hover': {
       color: '#adce5d',
     },
@@ -20,8 +23,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function HeaderLinks(props) {
-  const classes = useStyles()
-
   const preventDefault = () => false
 
   const links = [
@@ -44,7 +45,11 @@ export default function HeaderLinks(props) {
     ;(styles.display = 'inline-block'), (styles.width = 'auto')
   }
   return (
-    <Typography component="nav" align="right" className={classes.navLinks}>
+    <StyledTypography
+      component="nav"
+      align="right"
+      className={classes.navLinks}
+    >
       <List>
         {links.map((link, index) => (
           <ListItem key={index} style={styles}>
@@ -62,7 +67,7 @@ export default function HeaderLinks(props) {
           </ListItem>
         ))}
       </List>
-    </Typography>
+    </StyledTypography>
   )
 }
 

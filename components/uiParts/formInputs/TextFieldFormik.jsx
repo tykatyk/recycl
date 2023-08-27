@@ -1,7 +1,7 @@
 import React from 'react'
-import { TextField } from '@material-ui/core'
-import { fieldToTextField } from 'formik-material-ui'
+import { TextField } from '@mui/material'
+import { fieldToTextField } from 'formik-mui'
 
 export default function TextFieldFormik(props) {
-  return <TextField {...fieldToTextField(props)} />
+  return <TextField variant="standard" {...fieldToTextField(props)} />
 }

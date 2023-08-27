@@ -1,29 +1,28 @@
 import React from 'react'
-import {
-  Grid,
-  Typography,
-  Checkbox,
-  Button,
-  makeStyles,
-} from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Grid, Typography, Checkbox, Button } from '@mui/material'
 
-const useStyles = makeStyles((theme) => ({
-  header: {
+const PREFIX = 'DialogsHeader'
+
+const classes = {
+  header: `${PREFIX}-header`,
+}
+
+const StyledGrid = styled(Grid)(({ theme }) => ({
+  [`& .${classes.header}`]: {
     padding: theme.spacing(2),
   },
 }))
 
 export default function DialogsHeader(props) {
-  const classes = useStyles()
-
   const { handleDelete, checked, handleToggle } = props
   let headerContent = null
 
   if (checked) {
     headerContent = (
-      <Grid item xs={10} sm={11}>
+      <StyledGrid item xs={10} sm={11}>
         <Button onClick={handleDelete}>Удалить отмеченные</Button>
-      </Grid>
+      </StyledGrid>
     )
   } else {
     headerContent = (

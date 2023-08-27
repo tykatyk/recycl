@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
-import {
-  Grid,
-  Typography,
-  makeStyles,
-  TablePagination,
-} from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Grid, Typography, TablePagination } from '@mui/material'
 import Layout from '../layouts/Layout'
 import Snackbar from '../uiParts/Snackbars'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
@@ -17,18 +13,28 @@ import { useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATIONS } from '../../lib/graphql/queries/removalApplication'
 import Router from 'next/router'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
-      outline: 'none',
+const PREFIX = 'Index'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  row: `${PREFIX}-row`,
+}
+
+const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
+  ({ theme }) => ({
+    [`& .${classes.root}`]: {
+      '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
+        outline: 'none',
+      },
     },
-  },
-  row: {
-    '&:hover': {
-      cursor: 'pointer',
+
+    [`& .${classes.row}`]: {
+      '&:hover': {
+        cursor: 'pointer',
+      },
     },
-  },
-}))
+  })
+)
 
 const columns = [
   {
@@ -51,7 +57,6 @@ const columns = [
 ]
 
 export default function Index(props) {
-  const classes = useStyles()
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(10)
   const [backendError, setBackendError] = useState(null)
@@ -110,7 +115,7 @@ export default function Index(props) {
   }
 
   return (
-    <RedirectUnathenticatedUser>
+    <StyledRedirectUnathenticatedUser>
       <Layout title={`${title} | Recycl`}>
         <Grid
           container
@@ -167,6 +172,6 @@ export default function Index(props) {
           setBackendError(null)
         }}
       />
-    </RedirectUnathenticatedUser>
+    </StyledRedirectUnathenticatedUser>
   )
 }

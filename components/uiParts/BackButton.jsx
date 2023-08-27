@@ -1,6 +1,8 @@
 import React from 'react'
-import { Button, useTheme } from '@material-ui/core'
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
+import { Button } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
+
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import { useRouter } from 'next/router'
 
 export default function BackButton(props) {

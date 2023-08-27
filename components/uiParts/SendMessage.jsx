@@ -1,5 +1,6 @@
 import { React, useState } from 'react'
-import { Box, Typography, Button, makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Box, Typography, Button } from '@mui/material'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import * as yup from 'yup'
@@ -11,8 +12,17 @@ import { useMutation } from '@apollo/client'
 import { CREATE_MESSAGE } from '../../lib/graphql/queries/message'
 import { whitespaceRegex } from '../../lib/validation/regularExpressions'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'SendMessage'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  relativePosition: `${PREFIX}-relativePosition`,
+  remainedSymbols: `${PREFIX}-remainedSymbols`,
+  shim: `${PREFIX}-shim`,
+}
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  [`& .${classes.root}`]: {
     '& > fieldset': {
       margin: 0,
       marginBottom: theme.spacing(5),
@@ -20,13 +30,16 @@ const useStyles = makeStyles((theme) => ({
       border: 'none',
     },
   },
-  relativePosition: {
+
+  [`& .${classes.relativePosition}`]: {
     position: 'relative',
   },
-  remainedSymbols: {
+
+  [`& .${classes.remainedSymbols}`]: {
     color: theme.palette.grey['400'],
   },
-  shim: {
+
+  [`& .${classes.shim}`]: {
     position: 'absolute',
     left: 0,
     right: 0,
@@ -36,7 +49,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function SendMessage(props) {
-  const classes = useStyles()
   const { data: session, status } = useSession()
   const router = useRouter()
   const { id } = router.query
@@ -100,7 +112,7 @@ export default function SendMessage(props) {
   }
 
   return (
-    <Box>
+    <StyledBox>
       <Snackbars
         open={!!notification}
         handleClose={() => setNotification('')}
@@ -174,6 +186,6 @@ export default function SendMessage(props) {
           )
         }}
       </Formik>
-    </Box>
+    </StyledBox>
   )
 }

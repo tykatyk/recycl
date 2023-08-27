@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import {
-  AppBar,
-  Toolbar,
-  Container,
-  makeStyles,
-  useTheme,
-} from '@material-ui/core'
+import { styled, useTheme } from '@mui/material/styles'
+import { AppBar, Toolbar, Container } from '@mui/material'
 import UserMenu from './UserMenu'
 import UnreadDialogsCounter from './UnreadDialogsCounter'
 import UserAvatar from './UserAvatar'
@@ -14,31 +9,43 @@ import MobileNavigation from './MobileNavigation'
 import CreateButton from './CreateButton'
 import { useSession } from 'next-auth/react'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'Header'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  header: `${PREFIX}-header`,
+  buttons: `${PREFIX}-buttons`,
+  gutter: `${PREFIX}-gutter`,
+}
+
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  [`&.${classes.root}`]: {
     zIndex: theme.zIndex.drawer + 1,
+    background: theme.palette.primary.main,
   },
-  header: {
+
+  [`& .${classes.header}`]: {
     display: 'flex',
     justifyContent: 'space-between',
     padding: 0,
   },
-  buttons: {
+
+  [`& .${classes.buttons}`]: {
     display: 'flex',
     alignItems: 'center',
     marginLeft: 'auto',
   },
-  gutter: {
+
+  [`& .${classes.gutter}`]: {
     display: 'flex',
     paddingLeft: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       paddingLeft: 0,
     },
   },
 }))
 
 export default function Header(props) {
-  const classes = useStyles()
   const theme = useTheme()
   const [anchorEl, setAnchorEl] = useState(null)
   const menuOpen = Boolean(anchorEl)
@@ -90,7 +97,7 @@ export default function Header(props) {
   }
 
   return (
-    <AppBar position="static" id="mainHeader" className={classes.root}>
+    <StyledAppBar position="static" id="mainHeader" className={classes.root}>
       <Container component="div">
         <Toolbar className={classes.header}>
           {mobileView ? (
@@ -117,6 +124,6 @@ export default function Header(props) {
           />
         </Toolbar>
       </Container>
-    </AppBar>
+    </StyledAppBar>
   )
 }

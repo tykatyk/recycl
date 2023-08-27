@@ -1,24 +1,28 @@
 import React from 'react'
-import {
-  Container,
-  Grid,
-  List,
-  ListItem,
-  Typography,
-  makeStyles,
-} from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Container, Grid, List, ListItem, Typography } from '@mui/material'
 import Link from './Link'
 import Logo from './header/Logo'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'Footer'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  container: `${PREFIX}-container`,
+  title: `${PREFIX}-title`,
+  link: `${PREFIX}-link`,
+}
+
+const Root = styled('footer')(({ theme }) => ({
+  [`&.${classes.root}`]: {
     marginTop: 'auto',
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.text.primary,
   },
-  container: {
+
+  [`& .${classes.container}`]: {
     '& > *': {
       marginBottom: theme.spacing(1),
     },
@@ -26,11 +30,13 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: 0,
     },
   },
-  title: {
-    padding: `0 ${theme.spacing(2)}px `,
+
+  [`& .${classes.title}`]: {
+    padding: `0 ${theme.spacing(2)} `,
     fontWeight: 'bold',
   },
-  link: {
+
+  [`& .${classes.link}`]: {
     '&:hover': {
       color: '#adce5d',
     },
@@ -38,10 +44,8 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function Footer() {
-  const classes = useStyles()
-
   return (
-    <footer className={classes.root}>
+    <Root className={classes.root}>
       <Container component="div" className={classes.container}>
         <Grid container component="nav">
           <Grid
@@ -162,6 +166,6 @@ export default function Footer() {
           </Grid>
         </Grid>
       </Container>
-    </footer>
+    </Root>
   )
 }

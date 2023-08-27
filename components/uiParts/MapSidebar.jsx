@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { styled } from '@mui/material/styles'
 import clsx from 'clsx'
 import {
   Drawer,
@@ -8,28 +9,37 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  makeStyles,
-} from '@material-ui/core'
-import HomeIcon from '@material-ui/icons/Home'
-import AddIcon from '@material-ui/icons/Add'
+} from '@mui/material'
+import HomeIcon from '@mui/icons-material/Home'
+import AddIcon from '@mui/icons-material/Add'
 import MapActionButton from './MapActionButton'
 
-const drawerWidth = 240
+const PREFIX = 'MapSidebar'
 
-const useStyles = makeStyles((theme) => ({
-  drawer: {
+const classes = {
+  drawer: `${PREFIX}-drawer`,
+  drawerOpen: `${PREFIX}-drawerOpen`,
+  drawerClose: `${PREFIX}-drawerClose`,
+  secondaryColor: `${PREFIX}-secondaryColor`,
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.drawer}`]: {
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
   },
-  drawerOpen: {
+
+  [`& .${classes.drawerOpen}`]: {
     width: drawerWidth,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
-  drawerClose: {
+
+  [`& .${classes.drawerClose}`]: {
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -37,13 +47,15 @@ const useStyles = makeStyles((theme) => ({
     overflowX: 'hidden',
     width: 0,
   },
-  secondaryColor: {
+
+  [`& .${classes.secondaryColor}`]: {
     color: theme.palette.secondary.main,
   },
 }))
 
+const drawerWidth = 240
+
 export default function MapSidebar(props) {
-  const classes = useStyles()
   const [open, setOpen] = useState(false)
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -51,7 +63,7 @@ export default function MapSidebar(props) {
   const { children } = props
 
   return (
-    <>
+    <Root>
       <MapActionButton onClick={handleDrawerToggle} open={open} />
       <Drawer
         variant="permanent"
@@ -84,6 +96,6 @@ export default function MapSidebar(props) {
           {children}
         </List>
       </Drawer>
-    </>
+    </Root>
   )
 }

@@ -1,29 +1,37 @@
 import React from 'react'
+import { styled } from '@mui/material/styles'
 import {
   Collapse,
   Radio,
   List,
   Typography,
-  makeStyles,
   ListItem,
   ListItemIcon,
   ListItemText,
-} from '@material-ui/core'
+} from '@mui/material'
 import { useQuery } from '@apollo/client'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
 import PageLoadingCircle from './PageLoadingCircle'
-import BlurOnIcon from '@material-ui/icons/BlurOn'
-import ExpandLess from '@material-ui/icons/ExpandLess'
-import ExpandMore from '@material-ui/icons/ExpandMore'
+import BlurOnIcon from '@mui/icons-material/BlurOn'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 
-const useStyles = makeStyles((theme) => ({
-  loading: {
+const PREFIX = 'MapSidebarWasteTypes'
+
+const classes = {
+  loading: `${PREFIX}-loading`,
+  error: `${PREFIX}-error`,
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+  [`& .${classes.loading}`]: {
     display: 'flex',
     justifyContent: 'center',
     position: 'relative',
   },
 
-  error: {
+  [`& .${classes.error}`]: {
     whiteSpace: 'normal',
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
@@ -33,10 +41,9 @@ const useStyles = makeStyles((theme) => ({
 export default function MapSidebarWasteTypes(props) {
   const { loading, data, error } = useQuery(GET_WASTE_TYPES)
   const { open, onClick, checked, handleChange } = props
-  const classes = useStyles()
 
   return (
-    <>
+    <Root>
       <ListItem button key={'Тип отходов'} onClick={onClick}>
         <ListItemIcon>
           <BlurOnIcon />
@@ -44,9 +51,7 @@ export default function MapSidebarWasteTypes(props) {
         <ListItemText primary={'Тип отходов'} />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
-
       {loading && <PageLoadingCircle className={classes.loading} />}
-
       {error && (
         <Typography
           className={classes.error}
@@ -57,7 +62,6 @@ export default function MapSidebarWasteTypes(props) {
           Не удалось загрузить типы отходов
         </Typography>
       )}
-
       {data && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           {data && data.getWasteTypes && (
@@ -92,6 +96,6 @@ export default function MapSidebarWasteTypes(props) {
           )}
         </Collapse>
       )}
-    </>
+    </Root>
   )
 }

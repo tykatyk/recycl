@@ -1,10 +1,17 @@
 import React from 'react'
-import { Grid, makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Grid } from '@mui/material'
 import DialogsRow from './DialogsRow'
 import { useSession } from 'next-auth/react'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+const PREFIX = 'DialogsList'
+
+const classes = {
+  root: `${PREFIX}-root`,
+}
+
+const StyledGrid = styled(Grid)(({ theme }) => ({
+  [`&.${classes.root}`]: {
     '& > :last-child': {
       borderBottom: 'none',
     },
@@ -12,14 +19,13 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function DialogsList(props) {
-  const classes = useStyles()
   const { data: session } = useSession()
   const { messages, checkedRows, handleRowToggle } = props
   const thisUserId = session.id
 
   if (messages) {
     return (
-      <Grid item xs={12} className={classes.root}>
+      <StyledGrid item xs={12} className={classes.root}>
         {messages.map((message) => {
           return (
             <DialogsRow
@@ -44,7 +50,7 @@ export default function DialogsList(props) {
             />
           )
         })}
-      </Grid>
+      </StyledGrid>
     )
   }
 

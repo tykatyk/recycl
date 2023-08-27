@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { Grid, makeStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Grid } from '@mui/material'
 import DialogsHeader from './DialogsHeader'
 import DialogsFooter from './DialogsFooter'
 import DialogsList from './DialogsList'
@@ -15,11 +16,19 @@ import { GET_DIALOGS } from '../../lib/graphql/queries/message'
 import { DELETE_DIALOGS } from '../../lib/graphql/queries/message'
 import { useRouter } from 'next/router'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: 1024,
-  },
-}))
+const PREFIX = 'DialogsPage'
+
+const classes = {
+  root: `${PREFIX}-root`,
+}
+
+const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
+  ({ theme }) => ({
+    [`& .${classes.root}`]: {
+      maxWidth: 1024,
+    },
+  })
+)
 
 const dataIsValid = (data) => {
   if (
@@ -34,7 +43,6 @@ const dataIsValid = (data) => {
 }
 
 export default function DialogsPage() {
-  const classes = useStyles()
   const [checkedRows, setCheckedRows] = useState([])
   const [headerChecked, setHeaderChecked] = useState(false)
   const [notification, setNotification] = useState('')
@@ -266,13 +274,13 @@ export default function DialogsPage() {
     }
 
     return (
-      <RedirectUnathenticatedUser>
+      <StyledRedirectUnathenticatedUser>
         <Layout title="Мои сообщения | Recycl">
           <Grid className={classes.root} container direction="column">
             {content}
           </Grid>
         </Layout>
-      </RedirectUnathenticatedUser>
+      </StyledRedirectUnathenticatedUser>
     )
   }
 }
