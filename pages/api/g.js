@@ -3,27 +3,29 @@ import { startServerAndCreateNextHandler } from '@as-integrations/next'
 import dbConnect from '../../lib/db/connection'
 import typeDefs from '../../lib/graphql/typeDefs'
 import resolvers from '../../lib/graphql/resolvers'
-import { getSession } from 'next-auth/react'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '../../pages/api/auth/[...nextauth]'
+
 import { User } from '../../lib/db/models'
 
-const context = ({ req }) => {
-  return (async () => {
-    try {
-      await dbConnect()
-    } catch (error) {
-      throw new Error("Can't connect to the database")
-    }
-    try {
-      const session = await getSession({ req })
-      if (!session) return { user: null }
-      const user = await User.findById(session.id, { password: 0 })
+const context = async (req, res) => {
+  //ToDo: Remove try catch
+  try {
+    await dbConnect()
+  } catch (error) {
+    throw new Error("Can't connect to the database")
+  }
+  const contextObj = { req, res, user: null }
+  try {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return contextObj
+    contextObj.user = await User.findById(session.id, { password: 0 })
 
-      return { user }
-    } catch (error) {
-      console.log(error)
-      return { user: null }
-    }
-  })()
+    return contextObj
+  } catch (error) {
+    console.log(error)
+    return contextObj
+  }
 }
 
 const apolloServer = new ApolloServer({

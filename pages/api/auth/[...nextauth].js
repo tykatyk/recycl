@@ -9,10 +9,12 @@ import {
 } from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation/index'
 import nextAuthDbAdapter from '../../../lib/helpers/nextAuthDbAdapter'
+import { MongoDBAdapter } from '@auth/mongodb-adapter'
+import clientPromise from '../../../lib/helpers/nextAuthClientPromise'
 import * as nodeUrl from 'url'
 const apolloClient = initializeApollo()
 
-export default NextAuth({
+export const authOptions = {
   session: {
     strategy: 'jwt',
   },
@@ -143,23 +145,22 @@ export default NextAuth({
   pages: {
     signIn: '/auth/login',
   },
-  adapter: nextAuthDbAdapter(),
+  adapter: MongoDBAdapter(clientPromise),
   callbacks: {
-    jwt: ({ token, user }) => {
+    async jwt({ token, user }) {
       // first time jwt callback is run, user object is available
       if (user) {
         token.id = user.id
       }
       return token
     },
-    session: ({ session, token }) => {
+    async session({ session, token }) {
       if (token) {
         session.id = token.id
       }
-
       return session
     },
-    redirect: ({ url }) => {
+    async redirect({ url }) {
       const queryData = nodeUrl.parse(url, true).query
 
       if (queryData.from) {
@@ -169,9 +170,7 @@ export default NextAuth({
       return url
     },
   },
-  secret: process.env.AUTH_SECRET,
-  jwt: {
-    secret: process.env.JWT_SECRET,
-    encryption: true,
-  },
-})
+  secret: process.env.NEXTAUTH_SECRET,
+}
+
+export default NextAuth(authOptions)
