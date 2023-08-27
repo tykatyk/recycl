@@ -14,7 +14,7 @@
     "@types/react": "^18.2.20",
     "prettier": "2.3.2",
     "prop-types": "^15.7.2",
-    "typescript": "^4.7.4"
+    "typescript": "^5.1.6"
   },
   "dependencies": {
     "@apollo/client": "^3.8.1",
