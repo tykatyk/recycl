@@ -1,4 +1,5 @@
-import { ApolloServer } from 'apollo-server-micro'
+import { ApolloServer } from '@apollo/server'
+import { startServerAndCreateNextHandler } from '@as-integrations/next'
 import dbConnect from '../../lib/db/connection'
 import typeDefs from '../../lib/graphql/typeDefs'
 import resolvers from '../../lib/graphql/resolvers'
@@ -31,7 +32,8 @@ const apolloServer = new ApolloServer({
   csrfPrevention: true,
   context,
 })
-
+export default startServerAndCreateNextHandler(apolloServer, { context })
+/*
 const startServer = apolloServer.start()
 
 //ToDo: make graphql server to be run on separate server, not on Nextjs server
@@ -58,3 +60,4 @@ export const config = {
     bodyParser: false,
   },
 }
+*/
