@@ -11,11 +11,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.0.3",
-    "@types/react": "^17.0.47",
-    "eslint": "^7.32.0",
-    "eslint-config-next": "11.1.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-react-hooks": "^1.7.0",
+    "@types/react": "^18.2.20",
     "prettier": "2.3.2",
     "prop-types": "^15.7.2",
     "typescript": "^4.7.4"
@@ -43,8 +39,8 @@
     "next": "^11.1.0",
     "next-auth": "^4.0.0-beta.6",
     "proper-lockfile": "^4.1.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-google-recaptcha": "^2.1.0",
     "react-intersection-observer": "^9.2.0",
     "socket.io": "^4.5.0",
