@@ -174,7 +174,7 @@ export default function RemovalApplicationsPage() {
       <Wrapper
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}
         render={render}
-        libraries={['places', 'geocoder']}
+        libraries={['places', 'geocoding']}
       >
         {content}
       </Wrapper>
