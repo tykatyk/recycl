@@ -13,6 +13,7 @@ import DataGridErrorOverlay from '../uiParts/DataGridErrorOverlay'
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import {
   GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT,
   DELETE_REMOVAL_APPLICATIONS,
@@ -103,6 +104,7 @@ export default function RemovalApplications(props) {
   const [pageSize, setPageSize] = useState(10)
   const [backendError, setBackendError] = useState(null)
   const { status } = useSession()
+  const { asPath } = useRouter()
   const { loading, error, data } = useQuery(
     GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT
   )
@@ -128,7 +130,7 @@ export default function RemovalApplications(props) {
     Router.push({
       pathname: '/auth/login',
       query: {
-        from: '/removal/application',
+        from: asPath,
       },
     })
   }
