@@ -18,7 +18,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
     </div>
   )
 }
@@ -43,7 +43,11 @@ export default function AdTabs(props: AdTabProps) {
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
-          sx={{ '& .Mui-selected': { color: 'rgba(255, 255, 255, 0.9)' } }}
+          sx={{
+            '& .Mui-selected': {
+              color: 'rgba(255, 255, 255, 0.9)',
+            },
+          }}
           textColor="primary"
           indicatorColor="secondary"
           value={value}
@@ -54,6 +58,7 @@ export default function AdTabs(props: AdTabProps) {
           <Tab value="inactive" label="Неактивные" {...a11yProps(1)} />
         </Tabs>
       </Box>
+
       <TabPanel value={value} index={'active'}>
         {children}
       </TabPanel>
