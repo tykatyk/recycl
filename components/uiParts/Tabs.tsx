@@ -41,10 +41,15 @@ export default function AdTabs(props: AdTabProps) {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
+      >
         <Tabs
           sx={{
-            '& .Mui-selected': {
+            '& .MuiButtonBase-root.MuiTab-root.Mui-selected': {
               color: 'rgba(255, 255, 255, 0.9)',
             },
           }}
