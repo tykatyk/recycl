@@ -16,12 +16,9 @@ import {
 import Router from 'next/router'
 import { active, inactive } from './data'
 import EventsTable from './EventsTable'
+import { EventProps, Variant } from '../../lib/types/frontend/removalEventTypes'
 
-export type RemovalEventProps = {
-  variant: 'inactive' | 'active'
-}
-
-export default function Events(props: RemovalEventProps) {
+export default function Events(props: EventProps) {
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(1)
@@ -30,12 +27,8 @@ export default function Events(props: RemovalEventProps) {
 
   const [data, setData] = useState(active)
   const { variant: initialVariant } = props
-  const [variant, setVariant] =
-    useState<RemovalEventProps['variant']>(initialVariant)
-  const handleChange = (
-    event: React.SyntheticEvent,
-    newValue: RemovalEventProps['variant']
-  ) => {
+  const [variant, setVariant] = useState<Variant>(initialVariant)
+  const handleChange = (event: React.SyntheticEvent, newValue: Variant) => {
     setVariant(newValue)
     if (newValue === 'active') {
       window.history.pushState(null, '', '/my/events')

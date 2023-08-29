@@ -1,11 +1,14 @@
 import React from 'react'
 import Events from '../../../components/events/Events'
-import { SSProps } from '../../../lib/types/frontend/removalEventTypes'
+import { EventProps } from '../../../lib/types/frontend/removalEventTypes'
 
-export default function InactiveEvents({ variant }) {
+export default function ActiveEvents({ variant }) {
   return <Events variant={variant} />
 }
 
+type SSProps = {
+  props: EventProps
+}
 export const getServerSideProps: (req: any) => Promise<SSProps> = async ({
   req,
 }) => {

@@ -1,11 +1,12 @@
-interface Data {
+export type EventsData ={
     id: number
     date: string
     time: string
     locations: string
     wasteTypes: string
   }
-  export const active: Data[] = [
+ 
+  export const active: EventsData[] = [
     {
         id: 1,
         date: '15 августа',
@@ -29,7 +30,7 @@ interface Data {
       },
   ]
 
-  export const inactive: Data[] = [
+  export const inactive: EventsData[] = [
     {
       id: 1,
       date: '8 сентября',

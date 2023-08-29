@@ -1,5 +1,5 @@
-import { RemovalEventProps } from "../../../components/events/Events"
+export type Variant = 'inactive' | 'active'
 
-export type SSProps = {
-    props: RemovalEventProps
-  }
+export type EventProps = {
+  variant: Variant
+}
