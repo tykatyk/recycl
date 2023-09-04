@@ -53,7 +53,6 @@ const Listbox = forwardRef((props, ref) => {
       <Divider />
       <div className={classes.googleLogo}>
         <Image
-          layout="responsive"
           width={144}
           height={18}
           srcSet={imageSources}
