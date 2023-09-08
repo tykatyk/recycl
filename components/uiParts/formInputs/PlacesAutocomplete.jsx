@@ -1,5 +1,4 @@
 import React from 'react'
-import { styled } from '@mui/material/styles'
 import Autocomplete from '@mui/material/Autocomplete'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { Grid, Typography, TextField, Chip } from '@mui/material'
@@ -7,27 +6,6 @@ import { fieldToTextField } from 'formik-mui'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox'
-
-const PREFIX = 'PlacesAutocomplete'
-
-const classes = {
-  locationIcon: `${PREFIX}-locationIcon`,
-  paper: `${PREFIX}-paper`,
-}
-
-const StyledGrid = styled(Grid)(({ theme }) => ({
-  [`& .${classes.locationIcon}`]: {
-    marginRight: theme.spacing(2),
-  },
-
-  [`& .${classes.paper}`]: ({ backgroundColor }) => {
-    return {
-      background: backgroundColor
-        ? backgroundColor
-        : theme.palette.background.paper,
-    }
-  },
-}))
 
 function loadScript(src, position, id) {
   if (!position) return
@@ -51,8 +29,7 @@ export default function PlacesAutocomplete(props) {
     fieldToTextField(props)
 
   const [inputValue, setInputValue] = React.useState('')
-  const [open, setOpen] = React.useState(false)
-  const [shouldOpen, setShouldOpen] = React.useState(false)
+
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const loaded = React.useRef(false)
@@ -78,9 +55,9 @@ export default function PlacesAutocomplete(props) {
 
   React.useEffect(() => {
     let active = true
-    if (!shouldOpen) {
-      setInputValue(value ? value.description : '')
-    }
+    // if (!shouldOpen) {
+    //   setInputValue(value ? value.description : '')
+    // }
 
     if (
       !autocompleteService.current &&
@@ -121,7 +98,7 @@ export default function PlacesAutocomplete(props) {
     return () => {
       active = false
     }
-  }, [value, inputValue, fetch, multiple, sessionToken, shouldOpen])
+  }, [value, inputValue, fetch, multiple, sessionToken])
 
   const masterField = props['data-master']
 
@@ -146,13 +123,6 @@ export default function PlacesAutocomplete(props) {
     <Autocomplete
       value={value}
       key={key}
-      classes={{
-        root: classes.root,
-        paper: classes.paper,
-        focused: classes.focused,
-        popupIndicator: classes.popupIndicator,
-        clearIndicator: classes.clearIndicator,
-      }}
       noOptionsText="Нет вариантов"
       loadingText="Загрузка"
       getOptionLabel={(option) =>
@@ -167,18 +137,8 @@ export default function PlacesAutocomplete(props) {
       options={options}
       multiple={multiple || false}
       disabled={disabled}
-      open={open}
-      onOpen={() => {
-        if (shouldOpen && inputValue) setOpen(true)
-      }}
-      onClose={() => setOpen(false)}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue)
-        if (shouldOpen && inputValue) {
-          setOpen(true)
-        } else {
-          setOpen(false)
-        }
       }}
       onChange={(event, newValue) => {
         if (multiple) {
@@ -212,37 +172,29 @@ export default function PlacesAutocomplete(props) {
             fullWidth
             variant={variant}
             name={name}
-            InputLabelProps={{
-              classes: {
-                focused: classes.inputLabelFocused,
-              },
-            }}
             helperText={helperText}
             label={label}
             error={error}
-            onFocus={() => {
-              if (!shouldOpen) setShouldOpen(true)
-            }}
+            // onFocus={() => {
+            //   if (!shouldOpen) setShouldOpen(true)
+            // }}
           />
         )
       }}
-      renderOption={(option) => {
-        if (
-          option.structured_formatting &&
-          option.structured_formatting.main_text_matched_substrings
-        ) {
-          const matches =
-            option.structured_formatting.main_text_matched_substrings
+      renderOption={(props, option) => {
+        const matches =
+          option.structured_formatting.main_text_matched_substrings || []
 
-          const parts = parse(
-            option.structured_formatting.main_text,
-            matches.map((match) => [match.offset, match.offset + match.length])
-          )
+        const parts = parse(
+          option.structured_formatting.main_text,
+          matches.map((match) => [match.offset, match.offset + match.length])
+        )
 
-          return (
-            <StyledGrid container alignItems="center">
+        return (
+          <li {...props}>
+            <Grid container alignItems="center">
               <Grid item>
-                <LocationOnIcon className={classes.locationIcon} />
+                <LocationOnIcon sx={{ mr: 2 }} />
               </Grid>
               <Grid item xs>
                 {parts.map((part, index) => (
@@ -258,31 +210,8 @@ export default function PlacesAutocomplete(props) {
                   {option.structured_formatting.secondary_text}
                 </Typography>
               </Grid>
-            </StyledGrid>
-          )
-        }
-
-        return (
-          <Grid container alignItems="center">
-            <Grid item>
-              <LocationOnIcon className={classes.locationIcon} />
             </Grid>
-            <Grid item xs>
-              <span key={index} style={{ fontWeight: 700 }}>
-                {option.structured_formatting &&
-                option.structured_formatting.main_text
-                  ? option.structured_formatting.main_text
-                  : ''}
-              </span>
-
-              <Typography variant="body2">
-                {option.structured_formatting &&
-                option.structured_formatting.secondary_text
-                  ? option.structured_formatting.secondary_text
-                  : ''}
-              </Typography>
-            </Grid>
-          </Grid>
+          </li>
         )
       }}
     />
