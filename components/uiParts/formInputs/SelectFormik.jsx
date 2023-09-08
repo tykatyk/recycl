@@ -28,7 +28,6 @@ export default function SelectFormik(props) {
             vertical: 'top',
             horizontal: 'left',
           },
-          getContentAnchorEl: null,
         },
       }}
     >
