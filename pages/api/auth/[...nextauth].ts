@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth'
+import type { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
@@ -8,13 +9,23 @@ import {
   DELETE_NOT_CONFIRMED_USER,
 } from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation/index'
-import nextAuthDbAdapter from '../../../lib/helpers/nextAuthDbAdapter'
-import { MongoDBAdapter } from '@auth/mongodb-adapter'
+// import nextAuthDbAdapter from '../../../lib/helpers/nextAuthDbAdapter'
+import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/helpers/nextAuthClientPromise'
-import * as nodeUrl from 'url'
+import { URL } from 'url'
+
 const apolloClient = initializeApollo()
 
-export const authOptions = {
+declare global {
+  namespace NodeJS {
+    export interface ProcessEnv {
+      GOOGLE_ID: string
+      GOOGLE_SECRET: string
+    }
+  }
+}
+
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
@@ -25,7 +36,8 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_SECRET,
     }),
     CredentialsProvider({
-      async authorize(credentials) {
+      credentials: {},
+      async authorize(credentials: { email: string; password: string }) {
         // Any object returned will be saved in `user` property of the JWT
         // If you return null or false then the credentials will be rejected
         // You can also Reject this callback with an Error or with a URL:
@@ -103,7 +115,7 @@ export const authOptions = {
         if (
           !emailConfirmed &&
           typeof confirmEmailExpires != undefined &&
-          new Date(confirmEmailExpires * 1000) >= Date.now()
+          new Date(confirmEmailExpires * 1000) >= new Date()
         ) {
           //delete this user
           await apolloClient.mutate({
@@ -160,11 +172,18 @@ export const authOptions = {
       }
       return session
     },
-    async redirect({ url }) {
-      const queryData = nodeUrl.parse(url, true).query
+    async redirect({ url, baseUrl }) {
+      let myUrl: URL
+      if (url.startsWith('/')) {
+        myUrl = new URL(`${baseUrl}${url}`)
+      } else {
+        myUrl = new URL(url)
+      }
 
-      if (queryData.from) {
-        return queryData.from
+      const from = myUrl.searchParams.get('from')
+
+      if (from) {
+        return from
       }
 
       return url
