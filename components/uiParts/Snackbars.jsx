@@ -3,10 +3,6 @@ import { Snackbar, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { Alert } from '@mui/material'
 
-function CustomAlert(props) {
-  return <Alert variant="filled" {...props} />
-}
-
 export default function Snackbars(props) {
   const { message, severity, open, handleClose } = props
 
@@ -33,9 +29,9 @@ export default function Snackbars(props) {
           </IconButton>
         }
       >
-        <CustomAlert onClose={handleClose} severity={severity}>
+        <Alert variant="filled" onClose={handleClose} severity={severity}>
           {message}
-        </CustomAlert>
+        </Alert>
       </Snackbar>
     </div>
   )
