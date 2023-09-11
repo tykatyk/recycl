@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Grid, Typography, Button, CircularProgress } from '@mui/material'
+import { Grid, Typography, Button } from '@mui/material'
 import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import SelectFormik from '../uiParts/formInputs/SelectFormik'
@@ -8,28 +8,19 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { Date } from '../uiParts/formInputs/Date'
 import { Time } from '../uiParts/formInputs/Time'
-import { Formik, Form, Field, useFormikContext } from 'formik'
+import { Formik, Form, Field, useFormikContext, FormikHelpers } from 'formik'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
-import {
-  CREATE_REMOVAL_APPLICATION,
-  GET_REMOVAL_APPLICATION,
-  UPDATE_REMOVAL_APPLICATION,
-} from '../../lib/graphql/queries/removalApplication'
+import { useLazyQuery, useQuery } from '@apollo/client'
+import { GET_REMOVAL_APPLICATION } from '../../lib/graphql/queries/removalApplication'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
 import { GET_PHONE } from '../../lib/graphql/queries/user'
-import { getInitialValues } from './eventFormConfig'
-import { getNormalizedValues } from '../applications/removalFormConfig'
+import { getInitialValues, getNormalizedValues } from './eventFormConfig'
 import { eventSchema } from '../../lib/validation'
 import { EventId } from '../../lib/types/frontend/removalEventTypes'
-import { Session } from 'next-auth'
 import 'dayjs/locale/ru'
-
 const initialValues = getInitialValues()
 const fields = Object.keys(initialValues)
-
-// type ExtendedSession = Session & { id?: string }
 
 export default function EventForm(props: EventId) {
   const router = useRouter()
@@ -55,19 +46,32 @@ export default function EventForm(props: EventId) {
     },
   ] = useLazyQuery(GET_REMOVAL_APPLICATION)
 
-  const [createMutation] = useMutation(CREATE_REMOVAL_APPLICATION)
-  const [updateMutation] = useMutation(UPDATE_REMOVAL_APPLICATION)
-
+  type EventValues = {
+    location: string
+    wasteType: string
+    date: string
+    startTime?: string
+    endTime?: string
+    phone: string
+  }
   //ToDo: refactor to helper function, since this handler can also be used for creating removalApplications
-  const createHandler = (values, setSubmitting) => {
+  const createHandler = (
+    values: EventValues,
+    setSubmitting: FormikHelpers<EventValues>['setSubmitting']
+  ) => {
     setSubmitting(true)
     const normalizedValues = getNormalizedValues(values)
-    createMutation({
-      variables: { event: normalizedValues },
-      fetchPolicy: 'no-cache',
+
+    fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(normalizedValues),
     })
-      .then((data) => {
-        router.push('/my/events')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+        return response.json()
       })
       .catch((error) => {
         setBackendError('Возникла ошибка при создании документа')
@@ -77,12 +81,15 @@ export default function EventForm(props: EventId) {
       })
   }
 
-  const updateHandler = (values, setSubmitting) => {
+  const updateHandler = (
+    values: EventValues,
+    setSubmitting: FormikHelpers<EventValues>['setSubmitting']
+  ) => {
     setSubmitting(true)
     const normalizedValues = getNormalizedValues(values)
-    updateMutation({
-      variables: { id: applicationId, newValues: normalizedValues },
-    })
+      // updateMutation({
+      //   variables: { id: applicationId, newValues: normalizedValues },
+      // })
       .then((data) => {})
       .catch((err) => {
         setBackendError('Возникла ошибка при сохранении заявки')
@@ -99,16 +106,8 @@ export default function EventForm(props: EventId) {
     return <PageLoadingCircle />
   }
 
-  type EventValues = {
-    location: string
-    wasteType: string
-    date: string
-    startTime?: string
-    endTime?: string
-    phone: string
-  }
   const MyEventForm = () => {
-    const { setFieldValue, isSubmitting, values } =
+    const { setFieldValue, isSubmitting, values, errors } =
       useFormikContext<EventValues>()
     const shouldDisable =
       gettingApplication || gettingWasteTypes || isSubmitting
@@ -188,7 +187,7 @@ export default function EventForm(props: EventId) {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12}>
             <Field
               id="startTime"
               name="startTime"
@@ -196,19 +195,10 @@ export default function EventForm(props: EventId) {
               fullWidth
               component={Time}
               label="Время начала"
-              helperText="*Обязательное поле"
               disabled={shouldDisable}
             />
           </Grid>
-          <Grid
-            item
-            xs={12}
-            md={6}
-            sx={{
-              display: 'flex',
-              justifyContent: { xs: 'start', md: 'end' },
-            }}
-          >
+          <Grid item xs={12}>
             <Field
               id="endTime"
               name="endTime"
@@ -216,7 +206,6 @@ export default function EventForm(props: EventId) {
               fullWidth
               component={Time}
               label="Время завершения"
-              helperText="*Обязательное поле"
               disabled={shouldDisable}
             />
           </Grid>
@@ -281,8 +270,10 @@ export default function EventForm(props: EventId) {
         enableReinitialize
         initialValues={initialValues}
         validationSchema={eventSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          // console.log(values)
+        onSubmit={(
+          values: EventValues,
+          { setSubmitting }: FormikHelpers<EventValues>
+        ) => {
           if (applicationId) {
             updateHandler(values, setSubmitting)
           } else {

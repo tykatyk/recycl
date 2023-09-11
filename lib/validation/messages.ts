@@ -11,5 +11,7 @@ const validationMessages = {
   incorrectValue: 'Значение указано не верно',
   dateIsSameOrAfter: 'Нельзя выбирать прошедшие даты',
   dateIsOneYearAfterNow: 'Нелязя выбирать даты в далеком будущем',
+  timeisNotOverdue: 'Это время уже прошло',
+  endTimeIsGreaterThanStartTime: 'Значение не может быть меньше времени начала',
 }
 export default validationMessages
