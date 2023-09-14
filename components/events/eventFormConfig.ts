@@ -1,5 +1,12 @@
-import dayjs from 'dayjs'
-export function getInitialValues(event) {
+import {
+  InitialEventValues,
+  RawEventValues,
+  EventValues,
+} from '../../lib/types/event'
+import { PlaceType } from '../../lib/types/placeAutocomplete'
+import { WasteType } from '../../lib/types/waste'
+
+export function getInitialValues(event: InitialEventValues | null = null) {
   return {
     location: event?.location || null,
     wasteType: event?.wasteType || '',
@@ -12,18 +19,12 @@ export function getInitialValues(event) {
 }
 
 //ToDo привести цю функцію у відповідність з аналогічною функцією в removalFormConfig
-export function getNormalizedValues(values) {
-  const normalizedValues = {}
-  Object.assign(normalizedValues, values)
-
-  const location = {
+export function getNormalizedValues(values: RawEventValues): EventValues {
+  const location: PlaceType = {
     place_id: values.location.place_id,
     main_text: values.location.structured_formatting.main_text,
   }
-  normalizedValues.location = location
+  const wasteType: WasteType = JSON.parse(values.wasteType)
 
-  const wasteType = JSON.parse(values.wasteType)
-  normalizedValues.wasteType = wasteType
-
-  return normalizedValues
+  return { ...values, location, wasteType }
 }

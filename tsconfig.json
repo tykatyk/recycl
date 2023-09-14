@@ -15,7 +15,8 @@
     "jsx": "preserve",
     "jsxImportSource": "@emotion/react",
     "strictNullChecks": true,
-    "incremental": true
+    "incremental": true,
+    "typeRoots": ["./lib/types", "./node_modules/@types"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
