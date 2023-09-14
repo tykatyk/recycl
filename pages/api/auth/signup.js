@@ -47,12 +47,9 @@ export default async function handler(req, res) {
       })
     } catch (error) {
       console.log(JSON.stringify(error, null, 2))
-      res.status(500).json({
-        error: {
-          type: 'perForm',
-          message: 'Возникла ошибка при проверке существования пользователя',
-        },
-      })
+      perFormErrorResponse(
+        'Возникла ошибка при проверке существования пользователя'
+      )
       return
     }
 
@@ -74,12 +71,7 @@ export default async function handler(req, res) {
           })
         } catch (error) {
           console.log(error)
-          res.status(500).json({
-            error: {
-              type: 'perForm',
-              message: 'Невозможно создать пользователя',
-            },
-          })
+          perFormErrorResponse('Невозможно создать пользователя')
           return
         }
       }
@@ -122,12 +114,8 @@ export default async function handler(req, res) {
       })
     } catch (error) {
       console.log(error)
-      return res.status(500).json({
-        error: {
-          type: 'perForm',
-          message: 'Возникла ошибка при создании пользователя',
-        },
-      })
+      perFormErrorResponse('Возникла ошибка при создании пользователя')
+      return
     }
 
     if (user.data && user.data.createUser) {
@@ -150,20 +138,10 @@ export default async function handler(req, res) {
         dynamicTemplateData,
       })
     }
-
-    return res.status(500).json({
-      error: {
-        type: 'perForm',
-        message: 'Неизвестная ошибка сервера',
-      },
-    })
+    perFormErrorResponse('Неизвестная ошибка сервера')
+    return
   } else {
     console.log('Only POST method is allowed')
-    return res.status(500).json({
-      error: {
-        type: 'perForm',
-        message: 'Only POST method is allowed',
-      },
-    })
+    perFormErrorResponse('Only POST method is allowed')
   }
 }
