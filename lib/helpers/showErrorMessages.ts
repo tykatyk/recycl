@@ -1,10 +1,11 @@
 import { FormikHelpers, FormikValues } from 'formik'
 import type { ApiError } from '../types/error'
+import { Dispatch, SetStateAction } from 'react'
 
 export default function showErrorMessages(
   error: ApiError,
   setErrors: FormikHelpers<FormikValues>['setErrors'],
-  setNotification
+  setNotification: Dispatch<SetStateAction<string>>
 ) {
   if (!error) return
   if (error.type === 'perField') {
