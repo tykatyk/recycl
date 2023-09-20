@@ -1,16 +1,16 @@
 import type { PlaceType, RawPlaceType } from './placeAutocomplete'
 import type { WasteType } from './waste'
 
-export type Variant = 'inactive' | 'active'
-type SSProps = {
-  props: EventProps
-}
-
 export type EventId = {
   id?: string
 }
+
+export type SSProps = {
+  props: EventProps
+}
+
 export type EventProps = {
-  variant: Variant
+  variant: 'inactive' | 'active'
 }
 
 export type InitialEventValues = {
