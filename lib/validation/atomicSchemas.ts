@@ -3,24 +3,16 @@ import {
   location,
   phone as phoneValidator,
   email as emailValidator,
-} from './atomicValidators.js'
-import messages from './messages'
-
-const { required } = messages
+  password as passwordValidator,
+  confirmPassword as confirmPasswordValidator,
+} from './atomicValidators'
 
 export const password = yup.object().shape({
-  password: yup
-    .string()
-    .required(required)
-    .min(6, 'Минимум 6 символов')
-    .max(255, 'Максимум 255 символов'),
+  password: passwordValidator,
 })
 
 export const confirmPassword = yup.object().shape({
-  confirmPassword: yup
-    .string()
-    .required(required)
-    .oneOf([yup.ref('password'), null], 'Пароли не совпадают!'),
+  confirmPassword: confirmPasswordValidator,
 })
 
 export const email = yup.object().shape({
