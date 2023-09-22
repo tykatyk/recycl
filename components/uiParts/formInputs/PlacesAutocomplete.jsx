@@ -55,9 +55,6 @@ export default function PlacesAutocomplete(props) {
 
   React.useEffect(() => {
     let active = true
-    // if (!shouldOpen) {
-    //   setInputValue(value ? value.description : '')
-    // }
 
     if (
       !autocompleteService.current &&
@@ -87,6 +84,11 @@ export default function PlacesAutocomplete(props) {
           }
 
           if (results) {
+            if (value) {
+              results = results.filter(
+                (item) => item.place_id !== value.place_id
+              )
+            }
             newOptions = [...newOptions, ...results]
           }
 
