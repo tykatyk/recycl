@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { Alert } from '@mui/material'
 
 export default function Snackbars(props) {
-  const { message, severity, open, handleClose } = props
+  const { message, severity = 'success', open, handleClose } = props
 
   return (
     <div
