@@ -13,6 +13,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/node": "^18.0.3",
     "@types/react": "^18.2.20",
+    "eslint-config-next": "^13.4.19",
     "prettier": "2.3.2",
     "prop-types": "^15.7.2",
     "typescript": "^5.1.6"
