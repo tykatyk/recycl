@@ -17,6 +17,8 @@ export default function DialogsFooter(props) {
       count={numRows}
       page={page}
       rowsPerPage={pageSize}
+      //ToDo: Should be set to default values
+      rowsPerPageOptions={[1, 2, 3]}
       onPageChange={handlePageChange}
       onRowsPerPageChange={handlePageSizeChange}
       nextIconButtonProps={{ onClick: handleNextPageButtonClick }}

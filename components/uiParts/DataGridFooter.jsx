@@ -37,6 +37,7 @@ export default function DataGridFooter(props) {
         count={numRows}
         page={page}
         rowsPerPage={pageSize}
+        rowsPerPageOptions={[1, 2, 3]}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handlePageSizeChange}
       />
