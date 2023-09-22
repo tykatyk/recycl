@@ -1,12 +1,13 @@
-import {
-  InitialEventValues,
-  RawEventValues,
-  EventValues,
-} from '../../lib/types/event'
-import { PlaceType } from '../../lib/types/placeAutocomplete'
-import { WasteType } from '../../lib/types/waste'
+import type { EventValues, NormalizedEventValues } from '../../lib/types/event'
+import type {
+  NormalizedPlaceType,
+  PlaceType,
+} from '../../lib/types/placeAutocomplete'
+import type { WasteType } from '../../lib/types/waste'
 
-export function getInitialValues(event: InitialEventValues | null = null) {
+export function getInitialValues(
+  event: EventValues | null = null
+): EventValues {
   return {
     location: event?.location || null,
     wasteType: event?.wasteType || '',
@@ -19,10 +20,13 @@ export function getInitialValues(event: InitialEventValues | null = null) {
 }
 
 //ToDo привести цю функцію у відповідність з аналогічною функцією в removalFormConfig
-export function getNormalizedValues(values: RawEventValues): EventValues {
-  const location: PlaceType = {
-    place_id: values.location.place_id,
-    main_text: values.location.structured_formatting.main_text,
+export function getNormalizedValues(
+  values: EventValues
+): NormalizedEventValues {
+  const rawLocation = values.location as PlaceType
+  const location: NormalizedPlaceType = {
+    place_id: rawLocation.place_id,
+    main_text: rawLocation.structured_formatting?.main_text,
   }
   const wasteType: WasteType = JSON.parse(values.wasteType)
 

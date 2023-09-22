@@ -17,22 +17,28 @@ import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
 import { GET_PHONE } from '../../lib/graphql/queries/user'
 import { getInitialValues, getNormalizedValues } from './eventFormConfig'
 import { eventSchema } from '../../lib/validation'
-import { EventId } from '../../lib/types/frontend/removalEventTypes'
+import showErrorMessages from '../../lib/helpers/showErrorMessages'
 import 'dayjs/locale/ru'
+import {
+  EventId,
+  EventValues,
+  NormalizedEventValues,
+} from '../../lib/types/event'
 const initialValues = getInitialValues()
 const fields = Object.keys(initialValues)
-
+const errorMessage = 'Возникла ошибка при сохранении заявки'
 export default function EventForm(props: EventId) {
   const router = useRouter()
   const { data: session } = useSession()
   const userId = session ? session.id : null
   const { id: applicationId } = router.query
-  const [backendError, setBackendError] = useState<null | string>(null)
+  const [severity, setSeverity] = useState<string>('success')
   const {
     loading: gettingWasteTypes,
     data: wasteTypesData,
     error: wasteTypesError,
   } = useQuery(GET_WASTE_TYPES)
+  const [notification, setNotification] = useState<string>('')
 
   const { data: phoneData } = useQuery(GET_PHONE, { variables: { id: userId } })
 
@@ -46,35 +52,43 @@ export default function EventForm(props: EventId) {
     },
   ] = useLazyQuery(GET_REMOVAL_APPLICATION)
 
-  type EventValues = {
-    location: string
-    wasteType: string
-    date: string
-    startTime?: string
-    endTime?: string
-    phone: string
-  }
   //ToDo: refactor to helper function, since this handler can also be used for creating removalApplications
   const createHandler = (
     values: EventValues,
-    setSubmitting: FormikHelpers<EventValues>['setSubmitting']
+    setSubmitting: FormikHelpers<EventValues>['setSubmitting'],
+    setErrors: FormikHelpers<EventValues>['setErrors']
   ) => {
     setSubmitting(true)
-    const normalizedValues = getNormalizedValues(values)
-
+    let normalizedValues: NormalizedEventValues
+    try {
+      normalizedValues = getNormalizedValues(values)
+    } catch (e) {
+      // console.log(e)
+      setSeverity('error')
+      setNotification(errorMessage)
+      setSubmitting(false)
+      return
+    }
     fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(normalizedValues),
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
         return response.json()
       })
+      .then((data) => {
+        if (data.error) {
+          setSeverity('error')
+          showErrorMessages(data.error, setErrors, setNotification)
+        } else if (data.message) {
+          setSeverity('success')
+          setNotification(data.message)
+        }
+      })
       .catch((error) => {
-        setBackendError('Возникла ошибка при создании документа')
+        console.log(error)
+        setNotification(errorMessage)
       })
       .finally(() => {
         setSubmitting(false)
@@ -87,12 +101,13 @@ export default function EventForm(props: EventId) {
   ) => {
     setSubmitting(true)
     const normalizedValues = getNormalizedValues(values)
-      // updateMutation({
-      //   variables: { id: applicationId, newValues: normalizedValues },
-      // })
+    // updateMutation({
+    //   variables: { id: applicationId, newValues: normalizedValues },
+    // })
+    fetch('')
       .then((data) => {})
       .catch((err) => {
-        setBackendError('Возникла ошибка при сохранении заявки')
+        setNotification(errorMessage)
       })
       .finally(() => {
         setSubmitting(false)
@@ -269,26 +284,23 @@ export default function EventForm(props: EventId) {
       <Formik
         enableReinitialize
         initialValues={initialValues}
-        validationSchema={eventSchema}
-        onSubmit={(
-          values: EventValues,
-          { setSubmitting }: FormikHelpers<EventValues>
-        ) => {
+        // validationSchema={eventSchema}
+        onSubmit={(values, { setSubmitting, setErrors }) => {
           if (applicationId) {
             updateHandler(values, setSubmitting)
           } else {
-            createHandler(values, setSubmitting)
+            createHandler(values, setSubmitting, setErrors)
           }
         }}
       >
         <MyEventForm />
       </Formik>
       <Snackbar
-        severity="error"
-        open={!!backendError}
-        message={backendError}
+        severity={severity}
+        open={!!notification}
+        message={notification}
         handleClose={() => {
-          setBackendError(null)
+          setNotification('')
         }}
       />
     </div>
