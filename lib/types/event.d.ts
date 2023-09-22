@@ -10,8 +10,9 @@ export type SSProps = {
   props: EventProps
 }
 
+export type Variant = 'inactive' | 'active'
 export type EventProps = {
-  variant: 'inactive' | 'active'
+  variant: Variant
 }
 
 export type EventValues = {

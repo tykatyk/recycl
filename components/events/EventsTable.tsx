@@ -25,7 +25,7 @@ import { useQuery, useMutation } from '@apollo/client'
 import { useSession } from 'next-auth/react'
 import { inactive, EventsData } from './data'
 import clsx from 'clsx'
-import { Variant } from '../../lib/types/frontend/removalEventTypes'
+import { Variant } from '../../lib/types/event'
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',

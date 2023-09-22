@@ -16,7 +16,7 @@ import {
 import Router from 'next/router'
 import { active, inactive } from './data'
 import EventsTable from './EventsTable'
-import { EventProps, Variant } from '../../lib/types/frontend/removalEventTypes'
+import { EventProps, Variant } from '../../lib/types/event'
 
 export default function Events(props: EventProps) {
   const [selected, setSelected] = useState([])
