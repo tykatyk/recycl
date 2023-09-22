@@ -1,17 +1,12 @@
 import { React, useEffect, useState } from 'react'
 import { styled, useTheme } from '@mui/material/styles'
-import {
-  Grid,
-  Typography,
-  InputAdornment,
-  Button,
-  CircularProgress,
-} from '@mui/material'
+import { Grid, Typography, InputAdornment, Button } from '@mui/material'
 import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import TextFieldDependantFormik from '../uiParts/formInputs/TextFieldDependantFormik'
 import RemovalPopover from './RemovalPopover'
 import SelectFormik from '../uiParts/formInputs/SelectFormik'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import Snackbar from '../uiParts/Snackbars'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { CheckboxWithLabel } from 'formik-mui'
@@ -131,18 +126,7 @@ export default function RemovalForm(props) {
     return <Typography>Возникла ошибка при загрузке данных</Typography>
 
   if (gettingApplication || gettingWasteTypes) {
-    return (
-      <div
-        style={{
-          position: 'fixed',
-          top: ' 50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
-        <CircularProgress color="secondary" />
-      </div>
-    )
+    return <PageLoadingCircle />
   }
 
   const RemovalForm = () => {
