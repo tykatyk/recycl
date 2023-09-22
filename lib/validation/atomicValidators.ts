@@ -35,14 +35,6 @@ export const confirmPassword = yup
 
 export const email = yup.string().required(required).email(emailMsg)
 
-export const location = yup
-  .object({
-    main_text: yup.string().typeError(incorrectValue).required(required),
-    place_id: yup.string().typeError(incorrectValue).required(required),
-  })
-  .nullable()
-  .required(required)
-
 export const phone = yup
   .string()
   .min(10, phoneMsg)
@@ -67,6 +59,14 @@ export const comment = yup
   .max(1000, maxLength)
   .concat(notOnlySpaces)
 
+export const location = yup
+  .object({
+    main_text: yup.string().typeError(incorrectValue).required(required),
+    place_id: yup.string().typeError(incorrectValue).required(required),
+  })
+  .nullable()
+  .required(required)
+
 export const wasteLocation = yup
   .object({
     _id: yup.string().typeError(incorrectValue).required(required),
@@ -76,8 +76,7 @@ export const wasteLocation = yup
   .required(required)
 
 export const wasteType = yup
-  .object()
-  .shape({
+  .object({
     _id: yup.string().typeError(incorrectValue).required(required),
     name: yup.string().typeError(incorrectValue).required(required),
   })

@@ -13,12 +13,18 @@ import {
 import validationMessages from './messages'
 const { required } = validationMessages
 
-export default yup.object().shape({
+const eventValidationSchema = yup.object({
   location: wasteLocation,
   wasteType,
   phone: phone.required(required),
   comment,
   date,
   startTime,
-  endTime,
+  // endTime,
 })
+export interface FormikEventValues
+  extends yup.InferType<typeof eventValidationSchema> {
+  // using interface instead of type generally gives nicer editor feedback
+}
+
+export default eventValidationSchema
