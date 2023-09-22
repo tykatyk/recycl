@@ -1,23 +1,18 @@
 import React from 'react'
-import { MenuItem, Button } from '@mui/material'
+import { MenuItem } from '@mui/material'
 import TextFieldFormik from './TextFieldFormik'
 import { Field } from 'formik'
-
 export default function SelectFormik(props) {
-  const { error, loading, data, name, label, helperText, disabled } = props
+  const { error, loading, data, ...rest } = props
 
   return (
     <Field
+      {...rest}
       component={TextFieldFormik}
       fullWidth
       select
-      type="text"
-      name={name}
       color="secondary"
       variant="outlined"
-      label={label}
-      helperText={helperText}
-      disabled={disabled}
       SelectProps={{
         MenuProps: {
           anchorOrigin: {
