@@ -103,11 +103,12 @@ export default function PlacesAutocomplete(props) {
   }, [value, inputValue, fetch, multiple, sessionToken])
 
   const masterField = props['data-master']
+  const masterFieldValue = values[masterField]
 
   const [key, setKey] = React.useState(new Date().getTime())
 
   React.useEffect(() => {
-    if (masterField && !values[masterField]) {
+    if (masterField && !masterFieldValue) {
       setOptions([])
 
       if (multiple) {
@@ -119,7 +120,14 @@ export default function PlacesAutocomplete(props) {
       setFieldTouched(name, false, false)
       setKey(new Date().getTime())
     }
-  }, [masterField, values, name, multiple, setFieldTouched, setFieldValue])
+  }, [
+    masterField,
+    masterFieldValue,
+    name,
+    multiple,
+    setFieldTouched,
+    setFieldValue,
+  ])
 
   return (
     <Autocomplete
