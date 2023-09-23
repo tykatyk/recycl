@@ -19,33 +19,35 @@ export default function UnreadDialogsCounter(props) {
     }
   }, [error])
 
-  return <>
-    <IconButton href="/my/dialogs" size="large">
-      <Badge
-        badgeContent={
-          data && data.getUnreadDialogsIDs
-            ? data.getUnreadDialogsIDs.length
-            : 0
-        }
-        color="secondary"
-      >
-        <MailIcon
-          aria-label="incoming messages"
-          aria-controls="menu-appbar"
-          aria-haspopup="false"
-          color="inherit"
+  return (
+    <>
+      <IconButton href="/my/dialogs" size="large">
+        <Badge
+          badgeContent={
+            data && data.getUnreadDialogsIDs
+              ? data.getUnreadDialogsIDs.length
+              : 0
+          }
+          color="secondary"
+        >
+          <MailIcon
+            aria-label="incoming messages"
+            aria-controls="menu-appbar"
+            aria-haspopup="false"
+            color="inherit"
+          />
+        </Badge>
+      </IconButton>
+      {backendError && (
+        <Snackbar
+          severity="error"
+          open={true}
+          message={backendError}
+          handleClose={() => {
+            setBackendError(null)
+          }}
         />
-      </Badge>
-    </IconButton>
-    {backendError && (
-      <Snackbar
-        severity="error"
-        open={true}
-        message={backendError}
-        handleClose={() => {
-          setBackendError(null)
-        }}
-      />
-    )}
-  </>;
+      )}
+    </>
+  )
 }
