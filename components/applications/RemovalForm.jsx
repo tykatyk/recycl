@@ -21,7 +21,7 @@ import {
 } from '../../lib/graphql/queries/removalApplication'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
 import { GET_PHONE } from '../../lib/graphql/queries/user'
-import { getInitialValues, getNormalizedValues } from './removalFormConfig.js'
+import { getInitialValues, getNormalizedValues } from './removalFormConfig'
 import { removalApplicationSchema } from '../../lib/validation'
 
 const PREFIX = 'RemovalForm'
