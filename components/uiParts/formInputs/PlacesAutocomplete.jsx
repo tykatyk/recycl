@@ -84,11 +84,6 @@ export default function PlacesAutocomplete(props) {
           }
 
           if (results) {
-            if (value) {
-              results = results.filter(
-                (item) => item.place_id !== value.place_id
-              )
-            }
             newOptions = [...newOptions, ...results]
           }
 
@@ -152,9 +147,9 @@ export default function PlacesAutocomplete(props) {
       }}
       onChange={(event, newValue) => {
         if (multiple) {
-          setOptions(newValue.length > 0 ? [...newValue, ...options] : options)
+          setOptions(newValue.length > 0 ? [...newValue] : options)
         } else {
-          setOptions(newValue ? [newValue, ...options] : options)
+          setOptions(newValue ? [newValue] : [])
         }
         setFieldValue(name, newValue)
         if (autocompleteService.current && window.google) {
@@ -185,9 +180,6 @@ export default function PlacesAutocomplete(props) {
             helperText={helperText}
             label={label}
             error={error}
-            // onFocus={() => {
-            //   if (!shouldOpen) setShouldOpen(true)
-            // }}
           />
         )
       }}
