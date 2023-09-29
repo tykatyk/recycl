@@ -100,8 +100,6 @@ export default function PlacesAutocomplete(props) {
   const masterField = props['data-master']
   const masterFieldValue = values[masterField]
 
-  const [key, setKey] = React.useState(new Date().getTime())
-
   React.useEffect(() => {
     if (masterField && !masterFieldValue) {
       setOptions([])
@@ -113,7 +111,6 @@ export default function PlacesAutocomplete(props) {
       }
 
       setFieldTouched(name, false, false)
-      setKey(new Date().getTime())
     }
   }, [
     masterField,
@@ -127,7 +124,6 @@ export default function PlacesAutocomplete(props) {
   return (
     <Autocomplete
       value={value}
-      key={key}
       noOptionsText="Нет вариантов"
       loadingText="Загрузка"
       getOptionLabel={(option) =>
