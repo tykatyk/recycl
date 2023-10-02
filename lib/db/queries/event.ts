@@ -24,14 +24,18 @@ const eventQueries = {
 
   get: async (id) => {
     try {
-      const result = await Event.findById(id)
-        .populate('wasteType')
-        .populate('user')
-        .exec()
+      const result = await Event.findById(id, {
+        __v: 0,
+        user: 0,
+        isActive: 0,
+        expires: 0,
+        createdAt: 0,
+        updatedAt: 0,
+      }).exec()
       return result
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      // throw internalServerError
     }
   },
 
