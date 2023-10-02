@@ -75,7 +75,15 @@ export const wasteLocation = yup
   .nullable()
   .required(required)
 
-export const wasteType = yup
+// export const wasteLocation = yup
+//   .object({
+//     _id: yup.string().typeError(incorrectValue).required(required),
+//     name: yup.string().typeError(incorrectValue).required(required),
+//   })
+//   .nullable()
+//   .required(required)
+
+export const backendWasteType = yup
   .object({
     _id: yup.string().typeError(incorrectValue).required(required),
     name: yup.string().typeError(incorrectValue).required(required),
@@ -83,38 +91,10 @@ export const wasteType = yup
   .required(required)
   .typeError(incorrectValue)
 
-export const startTime = yup
+export const wasteType = yup
   .string()
-  .nullable()
-  .test('timeisValid', incorrectValue, function (value) {
-    if (value) {
-      return dayjs(value).isValid()
-    }
-    return true
-  })
-  .test('timeisNotOverdue', timeisNotOverdue, function (value) {
-    const { date } = this.parent
-    if (value && date) {
-      return dayjs(date)
-        .set('hour', dayjs(value).get('hour'))
-        .set('minute', dayjs(value).get('minute'))
-        .set('second', dayjs(value).get('second'))
-        .isSameOrAfter(dayjs())
-    }
-    return true
-  })
-
-export const endTime = startTime.test(
-  'endTimeIsGreaterThanStartTime',
-  endTimeIsGreaterThanStartTime,
-  function (value) {
-    const { startTime } = this.parent
-    if (value && startTime) {
-      return dayjs(value).isSameOrAfter(dayjs(startTime))
-    }
-    return true
-  }
-)
+  .required(required)
+  .typeError(incorrectValue)
 
 export const date = yup
   .string()

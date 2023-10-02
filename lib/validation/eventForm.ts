@@ -5,8 +5,6 @@ import {
   wasteLocation,
   wasteType,
   comment,
-  startTime,
-  endTime,
   date,
 } from './atomicValidators'
 
@@ -19,8 +17,7 @@ const eventValidationSchema = yup.object({
   phone: phone.required(required),
   comment,
   date,
-  startTime,
-  // endTime,
+})
 })
 export interface FormikEventValues
   extends yup.InferType<typeof eventValidationSchema> {

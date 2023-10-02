@@ -7,9 +7,7 @@ import Snackbar from '../uiParts/Snackbars'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { Date } from '../uiParts/formInputs/Date'
-import { Time } from '../uiParts/formInputs/Time'
 import { Formik, Form, Field, useFormikContext, FormikHelpers } from 'formik'
-import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATION } from '../../lib/graphql/queries/removalApplication'
@@ -198,29 +196,6 @@ export default function EventForm(props: EventId) {
               component={Date}
               label="Дата"
               helperText="*Обязательное поле"
-              disabled={shouldDisable}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <Field
-              id="startTime"
-              name="startTime"
-              variant="outlined"
-              fullWidth
-              component={Time}
-              label="Время начала"
-              disabled={shouldDisable}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Field
-              id="endTime"
-              name="endTime"
-              variant="outlined"
-              fullWidth
-              component={Time}
-              label="Время завершения"
               disabled={shouldDisable}
             />
           </Grid>
