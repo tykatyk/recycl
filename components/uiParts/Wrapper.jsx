@@ -6,7 +6,7 @@ export default function Wrapper(props) {
       css={(theme) => ({
         display: 'flex',
         boxSizing: 'border-box',
-        flexDirection: 'column',
+        flexWrap: 'wrap',
         minHeight: '100vh',
         backgroundColor: `${theme.palette.background.default}`,
       })}
