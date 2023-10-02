@@ -1,23 +1,24 @@
-import type { PlaceType, NormalizedPlaceType } from './placeAutocomplete'
+import type { PlaceType } from './placeAutocomplete'
 import type { WasteType } from './waste'
 import type { FormikEventValues } from './../validation/eventForm'
 
-export type EventId = {
+/*export type EventId = {
   id?: string
+}*/
+
+export type Variant = 'inactive' | 'active'
+
+export type EventProps = {
+  variant: Variant
 }
 
 export type SSProps = {
   props: EventProps
 }
 
-export type Variant = 'inactive' | 'active'
-export type EventProps = {
-  variant: Variant
-}
-
 export type EventValues = {
   location: PlaceType | null
-  wasteType: string
+  wasteType: WasteType | string
   date: string
   startTime?: string
   endTime?: string
@@ -25,10 +26,14 @@ export type EventValues = {
   comment?: string
 }
 
-export type NormalizedEventValues = {
+export type InitialEventData = {
+  event?: EventValues
+}
+
+/*export type NormalizedEventValues = {
   [K in keyof InitialEventValues]: K extends 'location'
     ? NormalizedPlaceType
     : K extends 'wasteType'
     ? WasteType
     : InitialEventValues[K]
-}
+}*/
