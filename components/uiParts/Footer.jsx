@@ -20,6 +20,7 @@ const Root = styled('footer')(({ theme }) => ({
     paddingBottom: theme.spacing(3),
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.text.primary,
+    width: '100%',
   },
 
   [`& .${classes.container}`]: {

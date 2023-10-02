@@ -1,24 +1,9 @@
 import React, { ReactNode } from 'react'
-import { styled } from '@mui/material/styles'
-import { Container } from '@mui/material'
+import { Box, Container } from '@mui/material'
 import Wrapper from '../uiParts/Wrapper'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import Head from '../uiParts/Head'
-
-const PREFIX = 'Layout'
-
-const classes = {
-  root: `${PREFIX}-root`,
-}
-
-// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')(({ theme }) => ({
-  [`& .${classes.root}`]: {
-    paddingTop: theme.spacing(6),
-    paddingBottom: theme.spacing(6),
-  },
-}))
 
 type LayoutProps = {
   children: ReactNode
@@ -31,15 +16,19 @@ export default function Layout({
   currentDialogId,
 }: LayoutProps) {
   return (
-    <Root>
+    <>
       <Head title={title} />
       <Wrapper>
         <Header currentDialogId={currentDialogId} />
-        <Container className={classes.root} component="div" maxWidth="md">
-          <main>{children}</main>
+        <Container
+          component="main"
+          maxWidth="md"
+          sx={{ position: 'relative', paddingTop: 6, paddingBottom: 6 }}
+        >
+          {children}
         </Container>
         <Footer />
       </Wrapper>
-    </Root>
+    </>
   )
 }

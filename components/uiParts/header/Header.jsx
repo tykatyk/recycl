@@ -22,6 +22,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   [`&.${classes.root}`]: {
     zIndex: theme.zIndex.drawer + 1,
     background: theme.palette.primary.main,
+    alignSelf: 'flex-start',
   },
 
   [`& .${classes.header}`]: {
