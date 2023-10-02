@@ -1,3 +1,4 @@
+import { values } from 'lodash'
 import type { EventValues } from '../../lib/types/event'
 import type { WasteType } from '../../lib/types/waste'
 
@@ -17,14 +18,16 @@ export function getInitialValues(
 
 //ToDo привести цю функцію у відповідність з аналогічною функцією в removalFormConfig
 export function getNormalizedValues(
-  values: EventValues
-): NormalizedEventValues {
-  const rawLocation = values.location as PlaceType
-  const location: NormalizedPlaceType = {
-    place_id: rawLocation.place_id,
-    main_text: rawLocation.structured_formatting?.main_text,
-  }
-  const wasteType: WasteType = JSON.parse(values.wasteType)
+  values: EventValues,
+  wasteTypesData
+): EventValues {
+  const wasteName: string = wasteTypesData.getWasteTypes.find(
+    (el) => el._id === values.wasteType
+  ).name
 
-  return { ...values, location, wasteType }
+  let normalizedValues = { ...values }
+  const wasteType = { _id: values.wasteType as string, name: wasteName }
+  normalizedValues.wasteType = wasteType
+
+  return normalizedValues
 }

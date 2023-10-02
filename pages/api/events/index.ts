@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import eventValidator from '../../../lib/validation/eventForm'
+import { backendEventValidationSchema } from '../../../lib/validation/eventForm'
 import eventQueries from '../../../lib/db/queries/event'
 import {
   errorResponse,
@@ -24,7 +24,7 @@ export default async function Events(
 
   if (req.method === 'POST') {
     try {
-      await eventValidator.validate(req.body, {
+      await backendEventValidationSchema.validate(req.body, {
         abortEarly: false,
       })
     } catch (error) {
@@ -42,7 +42,7 @@ export default async function Events(
       return
     }
 
-    res.status(200).json({ message: 'Event successfully created' })
+    res.status(200).json({ message: 'Документ успешно создан' })
   }
   if (req.method === 'PUT') {
   }
