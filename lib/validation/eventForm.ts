@@ -2,7 +2,7 @@ import * as yup from 'yup'
 
 import {
   phone,
-  wasteLocation,
+  location,
   wasteType,
   comment,
   date,

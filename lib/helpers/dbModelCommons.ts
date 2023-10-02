@@ -74,16 +74,32 @@ export const wasteLocation = {
     required: true,
   },
 }
-export const locationSchema = {
+
+const structuredFormattingSchema = new Schema({
   main_text: {
     type: String,
     required: true,
   },
-  place_id: {
+  secondary_text: {
     type: String,
     required: true,
   },
-}
+})
+
+export const locationSchema = new Schema(
+  {
+    description: {
+      type: String,
+      required: true,
+    },
+    place_id: {
+      type: String,
+      required: true,
+    },
+    structured_formatting: { type: structuredFormattingSchema, required: true },
+  },
+  { _id: false }
+)
 
 export const expires = {
   type: Date,

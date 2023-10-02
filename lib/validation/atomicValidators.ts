@@ -55,22 +55,24 @@ export const message = yup
 
 export const comment = yup
   .string()
-  .min(10, minLength)
+  // .min(10, minLength)
   .max(1000, maxLength)
   .concat(notOnlySpaces)
 
 export const location = yup
   .object({
-    main_text: yup.string().typeError(incorrectValue).required(required),
+    description: yup.string().typeError(incorrectValue).required(required),
     place_id: yup.string().typeError(incorrectValue).required(required),
-  })
-  .nullable()
-  .required(required)
-
-export const wasteLocation = yup
-  .object({
-    _id: yup.string().typeError(incorrectValue).required(required),
-    name: yup.string().typeError(incorrectValue).required(required),
+    structured_formatting: yup
+      .object({
+        main_text: yup.string().typeError(incorrectValue).required(required),
+        secondary_text: yup
+          .string()
+          .typeError(incorrectValue)
+          .required(required),
+      })
+      .required(required)
+      .typeError(incorrectValue),
   })
   .nullable()
   .required(required)

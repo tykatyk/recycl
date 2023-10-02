@@ -1,8 +1,4 @@
-import type { EventValues, NormalizedEventValues } from '../../lib/types/event'
-import type {
-  NormalizedPlaceType,
-  PlaceType,
-} from '../../lib/types/placeAutocomplete'
+import type { EventValues } from '../../lib/types/event'
 import type { WasteType } from '../../lib/types/waste'
 
 export function getInitialValues(
