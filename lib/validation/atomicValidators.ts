@@ -18,8 +18,6 @@ const {
   incorrectValue,
   dateIsSameOrAfter,
   dateIsOneYearAfterNow,
-  endTimeIsGreaterThanStartTime,
-  timeisNotOverdue,
 } = messages
 
 export const password = yup
@@ -77,26 +75,7 @@ export const location = yup
   .nullable()
   .required(required)
 
-// export const wasteLocation = yup
-//   .object({
-//     _id: yup.string().typeError(incorrectValue).required(required),
-//     name: yup.string().typeError(incorrectValue).required(required),
-//   })
-//   .nullable()
-//   .required(required)
-
-export const backendWasteType = yup
-  .object({
-    _id: yup.string().typeError(incorrectValue).required(required),
-    name: yup.string().typeError(incorrectValue).required(required),
-  })
-  .required(required)
-  .typeError(incorrectValue)
-
-export const wasteType = yup
-  .string()
-  .required(required)
-  .typeError(incorrectValue)
+export const waste = yup.string().required(required).typeError(incorrectValue)
 
 export const date = yup
   .string()

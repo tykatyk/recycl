@@ -1,12 +1,9 @@
-import React from 'react'
 import Layout from '../layouts/Layout'
-import EventForm from './EventForm'
+import EventForm from './EventCreateUpdateUI'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
-import { InitialEventData } from '../../lib/types/event'
+import type { EventCreateUpdateProps } from '../../lib/types/event'
 
-//ToDo: seems like tihs component can be separated to prevent code duplication
-//since it's used also in removal applications
-export default function CreateUpdateEvent(props: InitialEventData) {
+export default function CreateUpdateEvent(props: EventCreateUpdateProps) {
   const { event } = props
   const title = event
     ? 'Редактировать объявление о вывозе отходов | Recycl'

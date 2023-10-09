@@ -1,33 +1,29 @@
-import { values } from 'lodash'
-import type { EventValues } from '../../lib/types/event'
-import type { WasteType } from '../../lib/types/waste'
+import dayjs from 'dayjs'
+import type { Event } from '../../lib/types/event'
 
-export function getInitialValues(
-  event: EventValues | null = null
-): EventValues {
+export function getInitialValues(event?: Event, userPhone: string = ''): Event {
   return {
     location: event?.location || null,
-    wasteType: event?.wasteType || '',
-    date: event?.date || '',
-    startTime: event?.startTime || '',
-    endTime: event?.endTime || '',
-    phone: event?.phone || '',
+    waste: event?.waste || '',
+    date: event ? dayjs(event.date) : '',
+    phone: event?.phone || userPhone,
     comment: event?.comment || '',
   }
 }
 
 //ToDo привести цю функцію у відповідність з аналогічною функцією в removalFormConfig
-export function getNormalizedValues(
-  values: EventValues,
-  wasteTypesData
-): EventValues {
-  const wasteName: string = wasteTypesData.getWasteTypes.find(
-    (el) => el._id === values.wasteType
-  ).name
+export function getNormalizedValues(values: Event): Event {
+  if (!values.location) return values
 
-  let normalizedValues = { ...values }
-  const wasteType = { _id: values.wasteType as string, name: wasteName }
-  normalizedValues.wasteType = wasteType
+  const normalizedLocation = {
+    description: values.location.description,
+    place_id: values.location?.place_id,
+    structured_formatting: {
+      main_text: values.location?.structured_formatting.main_text,
+      secondary_text: values.location?.structured_formatting.secondary_text,
+    },
+  }
+  const normalizedValues = { ...values, location: normalizedLocation }
 
   return normalizedValues
 }

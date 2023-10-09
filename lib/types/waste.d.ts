@@ -1,4 +1,4 @@
-export type WasteType = {
+export type Waste = {
   _id: string
   name: string
 }

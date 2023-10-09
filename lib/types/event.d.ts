@@ -1,10 +1,7 @@
 import type { PlaceType } from './placeAutocomplete'
-import type { WasteType } from './waste'
+import type { Waste } from './waste'
 import type { FormikEventValues } from './../validation/eventForm'
-
-/*export type EventId = {
-  id?: string
-}*/
+import type { Dayjs } from 'dayjs'
 
 export type Variant = 'inactive' | 'active'
 
@@ -16,24 +13,16 @@ export type SSProps = {
   props: EventProps
 }
 
-export type EventValues = {
+export type EventCreateUpdateProps = {
+  event?: Event
+  wasteTypes?: [Waste]
+  userPhone?: string
+}
+export type Event = {
+  _id?: string
   location: PlaceType | null
-  wasteType: WasteType | string
-  date: string
-  startTime?: string
-  endTime?: string
+  waste: string
+  date: Dayjs | string
   phone: string
   comment?: string
 }
-
-export type InitialEventData = {
-  event?: EventValues
-}
-
-/*export type NormalizedEventValues = {
-  [K in keyof InitialEventValues]: K extends 'location'
-    ? NormalizedPlaceType
-    : K extends 'wasteType'
-    ? WasteType
-    : InitialEventValues[K]
-}*/
