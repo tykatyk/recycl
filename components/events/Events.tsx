@@ -37,6 +37,35 @@ export default function Events(props: EventProps) {
     }
   }
 
+  const handleCheckboxClick = (row) => {
+    const selectedIndex = selected.indexOf(row.id)
+    let newSelected: readonly string[] = []
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, row.id)
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1))
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1))
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      )
+    }
+
+    setSelected(newSelected)
+  }
+
+  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelected = data.map((row) => row.id)
+      setSelected(newSelected)
+      return
+    }
+    setSelected([])
+  }
+
   useEffect(() => {
     let mounted = true
     if (mounted && variant) {
@@ -114,7 +143,13 @@ export default function Events(props: EventProps) {
               Предложения о вывозе отходов
             </Typography>
             <Tabs value={variant} handleChange={handleChange}>
-              <EventsTable variant={variant} rows={data} />
+              <EventsTable
+                variant={variant}
+                rows={data}
+                handleCheckboxClick={handleCheckboxClick}
+                selectedRows={selected}
+                handleSelectAllClick={handleSelectAllClick}
+              />
               <DataGridFooter
                 numRows={data.length}
                 page={page}

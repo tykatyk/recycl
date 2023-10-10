@@ -111,7 +111,17 @@ type EventsTableProps = {
   rows: EventsData[]
   variant: Variant
 }
-export default function EventsTable({ rows, variant }: EventsTableProps) {
+export default function EventsTable(
+  {
+    rows,
+    variant,
+    selectedRows,
+    handleCheckboxClick,
+    handleSelectAllClick,
+  } /*: EventsTableProps*/,
+) {
+  const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
+
   return (
     <Root>
       <TableContainer>
@@ -129,6 +139,9 @@ export default function EventsTable({ rows, variant }: EventsTableProps) {
                       inputProps={{
                         'aria-label': 'Выбрать все',
                       }}
+                      onClick={(e) => {
+                        handleSelectAllClick(e)
+                      }}
                     />
                   )}
                 </TableCell>
@@ -139,14 +152,20 @@ export default function EventsTable({ rows, variant }: EventsTableProps) {
           <TableBody>
             {rows.map((row, index) => {
               const labelId = `enhanced-table-checkbox-${index}`
+              const isItemSelected = isSelected(row.id)
 
               return (
                 <React.Fragment key={index}>
                   <TableRow className={clsx('noBorder', 'dataRow')}>
-                    <TableCell rowSpan={2}>
+                    <TableCell
+                      rowSpan={2}
+                      onClick={() => {
+                        handleCheckboxClick(row)
+                      }}
+                    >
                       <Checkbox
                         color="secondary"
-                        checked={false}
+                        checked={isItemSelected}
                         inputProps={{
                           'aria-labelledby': labelId,
                         }}
