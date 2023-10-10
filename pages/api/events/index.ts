@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { backendEventValidationSchema } from '../../../lib/validation/eventForm'
+import { eventValidationSchema } from '../../../lib/validation/eventForm'
 import eventQueries from '../../../lib/db/queries/event'
 import {
   errorResponse,
@@ -10,7 +10,7 @@ import {
 
 export default async function Events(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const session = await getServerSession(req, res, authOptions)
 
@@ -24,7 +24,7 @@ export default async function Events(
 
   if (req.method === 'POST') {
     try {
-      await backendEventValidationSchema.validate(req.body, {
+      await eventValidationSchema.validate(req.body, {
         abortEarly: false,
       })
     } catch (error) {
