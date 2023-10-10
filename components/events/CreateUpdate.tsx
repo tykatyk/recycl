@@ -1,5 +1,5 @@
 import Layout from '../layouts/Layout'
-import EventForm from './EventCreateUpdateUI'
+import EventCreateUpdateUI from './EventCreateUpdateUI'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import type { EventCreateUpdateProps } from '../../lib/types/event'
 
@@ -12,7 +12,7 @@ export default function CreateUpdateEvent(props: EventCreateUpdateProps) {
   return (
     <RedirectUnathenticatedUser>
       <Layout title={title}>
-        <EventForm {...props} />
+        <EventCreateUpdateUI {...props} />
       </Layout>
     </RedirectUnathenticatedUser>
   )
