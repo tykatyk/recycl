@@ -16,7 +16,7 @@ const removalApplicationSchema = new Schema(
     },
     //ToDo: refactor wasteLocation schema. Use locationSchema from dbModelCommons
     wasteLocation,
-    //ToDo: refactor wasteType schema. Use one from dbModelCommons
+
     wasteType: {
       type: Schema.Types.ObjectId,
       ref: 'WasteType',
@@ -34,7 +34,7 @@ const removalApplicationSchema = new Schema(
     notificationRadiusCheckbox: Boolean,
     expires,
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 type RemovalApplication = InferSchemaType<typeof removalApplicationSchema>
 
