@@ -45,6 +45,24 @@ export default async function Events(
     res.status(200).json({ message: 'Документ успешно создан' })
   }
   if (req.method === 'PUT') {
+    try {
+      await eventValidationSchema.validate(req.body, {
+        abortEarly: false,
+      })
+    } catch (error) {
+      console.log(error)
+      return errorResponse(error, res)
+    }
+
+    try {
+      await eventQueries.update(req.body)
+    } catch (e) {
+      console.log('here')
+      perFormErrorResponse('Ошибка при обновлении документа', res)
+      return
+    }
+
+    res.status(200).json({ message: 'Документ обновлен' })
   }
   if (req.method === 'DELETE') {
   }

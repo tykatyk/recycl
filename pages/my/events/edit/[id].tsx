@@ -1,25 +1,52 @@
-import React from 'react'
 import CreateUpdate from '../../../../components/events/CreateUpdate'
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next'
-import { EventProps as InitialEventData } from '../../../../lib/types/event'
-import { useRouter } from 'next/router'
-import queries from "../../../../lib/db/queries"
-import dbConnect from "../../../../lib/db/connection"
+import type { Event } from '../../../../lib/types/event'
+import type { Waste } from '../../../../lib/types/waste'
+import queries from '../../../../lib/db/queries'
+import dbConnect from '../../../../lib/db/connection'
+import { getSession } from 'next-auth/react'
+import { ParsedUrlQuery } from 'querystring'
 
-export default function CreateEvent({
+interface Params extends ParsedUrlQuery {
+  id: string
+}
+
+export default function UpdateEvent({
   event,
+  wasteTypes,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  return <CreateUpdate event={event} />
+  return <CreateUpdate event={event} wasteTypes={wasteTypes} />
 }
 
 export const getServerSideProps = (async (context) => {
-  
-  const {id} = context.params
+  const session = await getSession({ req: context.req })
+
+  if (!session?.user)
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/auth/login',
+      },
+    }
+
+  const { id } = context.params as Params
+
   await dbConnect()
   const event = await queries.eventQueries.get(id)
-  //ToDo: Add try catch
-  console.log(JSON.parse(JSON.stringify(event)));
-  return {
-    props: { event:event ? JSON.parse(JSON.stringify(event)): null },
+  if (!event) {
+    return {
+      notFound: true,
+    }
   }
-}) satisfies GetServerSideProps<InitialEventData>
+  const wasteTypes = await queries.wasteType.getAll()
+
+  return {
+    props: {
+      event: JSON.parse(JSON.stringify(event)) as Event,
+      wasteTypes: JSON.parse(JSON.stringify(wasteTypes)) as [Waste],
+    },
+  }
+}) satisfies GetServerSideProps<{
+  event: Event
+  wasteTypes: [Waste]
+}>
