@@ -10,12 +10,12 @@ export const Date = (props: TextFieldProps) => {
     form: { setFieldValue },
     field: { name },
   } = props
-  const { error, value, onChange, ...rest } = fieldToTextField(props)
+  const { error, value, onChange, label, ...rest } = fieldToTextField(props)
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
       <DatePicker
-        label="Дата"
+        label={label}
         value={value}
         disablePast
         maxDate={oneYearAfterNow}

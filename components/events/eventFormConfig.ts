@@ -5,7 +5,7 @@ export function getInitialValues(event?: Event, userPhone: string = ''): Event {
   return {
     location: event?.location || null,
     waste: event?.waste || '',
-    date: event ? dayjs(event.date) : '',
+    date: event ? dayjs(event.date) : null,
     phone: event?.phone || userPhone,
     comment: event?.comment || '',
   }

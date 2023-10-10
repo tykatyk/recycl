@@ -22,7 +22,7 @@ export type Event = {
   _id?: string
   location: PlaceType | null
   waste: string
-  date: Dayjs | string
+  date: Dayjs | null
   phone: string
   comment?: string
 }
