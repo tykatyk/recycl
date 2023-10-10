@@ -3,18 +3,6 @@ import { phone as phoneValidator } from '../validation/atomicValidators'
 
 const NUM_DAYS_TO_EXPIRE = 30
 
-export const wasteSchema = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    ref: 'WasteType',
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-})
-
 //ToDo: використати цю схему також в removalApplication
 export const userSchema = new Schema({
   _id: {
@@ -98,7 +86,7 @@ export const locationSchema = new Schema(
     },
     structured_formatting: { type: structuredFormattingSchema, required: true },
   },
-  { _id: false }
+  { _id: false },
 )
 
 export const expires = {

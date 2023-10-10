@@ -3,7 +3,6 @@ import { Schema, models, model, InferSchemaType } from 'mongoose'
 import {
   contactPhone,
   expires,
-  wasteSchema,
   userSchema,
   locationSchema,
 } from '../../helpers/dbModelCommons'
@@ -12,7 +11,11 @@ const eventSchema = new Schema(
   {
     user: { type: userSchema, required: true },
     location: { type: locationSchema, required: true },
-    wasteType: { type: wasteSchema, required: true },
+    waste: {
+      type: Schema.Types.ObjectId,
+      ref: 'WasteType',
+      required: true,
+    },
     date: { type: Date, required: true },
     startTime: Date,
     endTime: Date,
@@ -21,7 +24,7 @@ const eventSchema = new Schema(
     comment: String,
     expires,
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
 type Event = InferSchemaType<typeof eventSchema>
