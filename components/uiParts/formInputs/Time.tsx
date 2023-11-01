@@ -24,7 +24,7 @@ export const Time = (props: TextFieldProps) => {
         onChange={(newValue) => {
           setFieldValue(name, newValue, false)
         }}
-        // disablePast
+        disablePast
         slotProps={{
           popper: {
             sx: {
