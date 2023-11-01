@@ -6,12 +6,14 @@ import { getInitialValues, getNormalizedValues } from './eventFormConfig'
 import { eventSchema } from '../../lib/validation'
 import showErrorMessages from '../../lib/helpers/showErrorMessages'
 import type { Event, EventCreateUpdateProps } from '../../lib/types/event'
+import { useRouter } from 'next/router'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 
 export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
   const { event, userPhone } = props
   const [severity, setSeverity] = useState<string>('success')
+  const router = useRouter()
   const [notification, setNotification] = useState<string>('')
   const initialValues = getInitialValues(event, userPhone)
 
@@ -60,7 +62,7 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
     fetch('/api/events', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ _id: event?._id, ...values }),
+      body: JSON.stringify({ _id: event?._id, ...values, isActive: true }),
     })
       .then((response) => {
         return response.json()
@@ -70,8 +72,7 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
           setSeverity('error')
           showErrorMessages(data.error, setErrors, setNotification)
         } else if (data.message) {
-          setSeverity('success')
-          setNotification(data.message)
+          router.push('/my/events')
         }
       })
       .catch((error) => {
