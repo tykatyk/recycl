@@ -3,6 +3,7 @@ import type { Event } from '../../lib/types/event'
 
 export function getInitialValues(event?: Event, userPhone: string = ''): Event {
   return {
+    user: event?.user || '',
     location: event?.location || null,
     waste: event?.waste || '',
     date: event ? dayjs(event.date) : null,
