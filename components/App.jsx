@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { StyledEngineProvider, CssBaseline } from '@mui/material'
+import { CssBaseline } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { ApolloProvider } from '@apollo/client'
 import { initializeApollo } from '../lib/apolloClient/apolloClient'
@@ -12,7 +12,7 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import CookieConsentPopup from './uiParts/CookieConsentPopup'
-import { CacheProvider, EmotionCache } from '@emotion/react'
+import { CacheProvider } from '@emotion/react'
 import createEmotionCache from '../lib/helpers/createEmotionCache'
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -37,20 +37,18 @@ export default function App(props) {
 
   return (
     <React.Fragment>
-      <StyledEngineProvider injectFirst>
-        <CacheProvider value={emotionCache}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <GlobalCss />
-            <SessionProvider session={session}>
-              <ApolloProvider client={apolloClient}>
-                <Component {...pageProps} />
-                <CookieConsentPopup />
-              </ApolloProvider>
-            </SessionProvider>
-          </ThemeProvider>
-        </CacheProvider>
-      </StyledEngineProvider>
+      <CacheProvider value={emotionCache}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <GlobalCss />
+          <SessionProvider session={session}>
+            <ApolloProvider client={apolloClient}>
+              <Component {...pageProps} />
+              <CookieConsentPopup />
+            </ApolloProvider>
+          </SessionProvider>
+        </ThemeProvider>
+      </CacheProvider>
     </React.Fragment>
   )
 }

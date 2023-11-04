@@ -8,9 +8,9 @@ export default function MyDocument({ emotionStyleTags }) {
   return (
     <Html lang="en">
       <Head>
-        <meta name="emotion-insertion-point" content="" />
-        <meta name="theme-color" content={theme.palette.primary.main} />
         <link rel="icon" href="/favicon.ico" />
+        <meta name="theme-color" content={theme.palette.primary.main} />
+        <meta name="emotion-insertion-point" content="" />
         {/* Insertion point for client. This connects with createEmotionCache.ts */}
         {emotionStyleTags}
       </Head>
