@@ -120,7 +120,7 @@ export default function SendMessage(props) {
         severity={severity}
       />
       <Typography variant="h6" gutterBottom>
-        Написать сообщение
+        Написать сообщение автору
       </Typography>
       <Formik
         enableReinitialize
