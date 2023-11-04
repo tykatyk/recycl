@@ -6,6 +6,7 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import BackButton from '../uiParts/BackButton'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import { Box } from '@mui/material'
 
 export default function AuthLayout({
   children,
@@ -22,7 +23,9 @@ export default function AuthLayout({
         <Head title={title} />
         <Wrapper>
           <BackButton to={backButtonTo} text={backButtonText} />
-          <main>{children}</main>
+          <Box component="main" sx={{ width: '100%' }}>
+            {children}
+          </Box>
           <Footer />
         </Wrapper>
       </>
