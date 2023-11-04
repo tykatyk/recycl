@@ -3,7 +3,7 @@ import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import SelectFormik from '../uiParts/formInputs/SelectFormik'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
-import { Date } from '../uiParts/formInputs/Date'
+import { DateTime } from '../uiParts/formInputs/DateTime'
 import { Form, Field, useFormikContext } from 'formik'
 import 'dayjs/locale/ru'
 import type { Event } from '../../lib/types/event'
@@ -56,8 +56,8 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
             name="date"
             variant="outlined"
             fullWidth
-            component={Date}
-            label="Дата"
+            component={DateTime}
+            label="Дата и время"
             helperText="*Обязательное поле"
             disabled={isSubmitting}
           />
