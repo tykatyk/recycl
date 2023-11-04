@@ -7,16 +7,8 @@ import SendMessage from '../uiParts/SendMessage'
 import { useQuery } from '@apollo/client'
 import { GET_REMOVAL_APPLICATION } from '../../lib/graphql/queries/removalApplication'
 
-const PREFIX = 'ShowSingle'
-
-const classes = {
-  paper: `${PREFIX}-paper`,
-}
-
-const StyledGrid = styled(Grid)(({ theme }) => ({
-  [`& .${classes.paper}`]: {
-    padding: theme.spacing(2),
-  },
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
 }))
 
 export default function ShowSingle(props) {
@@ -35,21 +27,7 @@ export default function ShowSingle(props) {
     content = <ShowData applicationData={data.getRemovalApplication} />
   }
 
-  return (
-    <Layout title="Заявка на вывоз | Recycl">
-      <StyledGrid
-        container
-        direction="column"
-        style={{
-          maxWidth: '750px',
-          margin: '0 auto',
-          padding: '16px',
-        }}
-      >
-        {content}
-      </StyledGrid>
-    </Layout>
-  )
+  return <Layout title="Заявка на вывоз отходов | Recycl">{content}</Layout>
 }
 
 function ShowData(props) {
@@ -57,32 +35,37 @@ function ShowData(props) {
 
   return (
     <Grid container spacing={2} direction="column" item xs>
+      <Grid item xs sx={{ mb: 4 }}>
+        <Typography component="h1" variant="h3" gutterBottom>
+          Заявка на вывоз отходов
+        </Typography>
+      </Grid>
       <Grid item xs>
-        <Paper className={classes.paper}>
+        <StyledPaper>
           <Typography variant="h6" gutterBottom>
             Местоположение отходов
           </Typography>
           <Typography>{applicationData.wasteLocation.description}</Typography>
-        </Paper>
+        </StyledPaper>
       </Grid>
       <Grid item xs>
-        <Paper className={classes.paper}>
+        <StyledPaper>
           <Typography variant="h6" gutterBottom>
             Тип отходов
           </Typography>
           <Typography>{applicationData.wasteType.name}</Typography>
-        </Paper>
+        </StyledPaper>
       </Grid>
       <Grid item xs>
-        <Paper className={classes.paper}>
+        <StyledPaper>
           <Typography variant="h6" gutterBottom>
             Количество, кг.
           </Typography>
           <Typography>{applicationData.quantity}</Typography>
-        </Paper>
+        </StyledPaper>
       </Grid>
       <Grid item xs>
-        <Paper className={classes.paper}>
+        <StyledPaper>
           <Typography variant="h6" gutterBottom>
             Документ о передаче отходов на переработку
           </Typography>
@@ -91,35 +74,35 @@ function ShowData(props) {
           ) : (
             <Typography>Не нужен</Typography>
           )}
-        </Paper>
+        </StyledPaper>
       </Grid>
       <Grid item xs>
-        <Paper className={classes.paper}>
+        <StyledPaper>
           <Typography variant="h6" gutterBottom>
             Контактный телефон
           </Typography>
           <Typography>{applicationData.contactPhone}</Typography>
-        </Paper>
+        </StyledPaper>
       </Grid>
       {applicationData.wasteLocation.comment && (
         <Grid item xs>
-          <Paper className={classes.paper}>
+          <StyledPaper>
             <Typography variant="h6" gutterBottom>
               Примечание
             </Typography>
             <Typography>{applicationData.comment}</Typography>
-          </Paper>
+          </StyledPaper>
         </Grid>
       )}
       <Grid item xs>
-        <Paper className={classes.paper}>
+        <StyledPaper>
           <SendMessage
             receiver={{
               _id: applicationData.user['_id'],
               name: applicationData.user.name,
             }}
           />
-        </Paper>
+        </StyledPaper>
       </Grid>
     </Grid>
   )
