@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import {
-  Grid,
-  Typography,
-  Badge,
   TableContainer,
   Checkbox,
   Table,
@@ -14,23 +11,21 @@ import {
   Button,
   Box,
 } from '@mui/material'
-import Link from '../uiParts/Link'
-import Tabs from '../uiParts/Tabs'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
-import { useQuery, useMutation } from '@apollo/client'
-import { useSession } from 'next-auth/react'
-import { inactive, EventsData } from './data'
 import clsx from 'clsx'
 import { Variant } from '../../lib/types/event'
+import dayjs from 'dayjs'
+import 'dayjs/locale/ru'
+import { EmotionJSX } from '@emotion/react/types/jsx-namespace'
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
 
-  '& .noBorder>td:not(:first-child), & .spacer': {
+  '& .noBorder>td, & .spacer': {
     borderBottom: 'none',
     borderTop: 'none',
   },
@@ -38,79 +33,125 @@ const Root = styled('div')(({ theme }) => ({
     ...theme.typography.body1,
   },
 
-  '& .actionsRow': {
+  '& .actions': {
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
     '&>*:not(:last-child)': {
-      marginRight: '24px',
+      marginRight: '32px',
     },
+  },
+
+  '& .actionsRow td': {
+    border: 'none',
   },
 
   '& .header>th': {
     textTransform: 'uppercase',
     borderBottom: 'none',
-    background: theme.palette.primary.main,
   },
 
   '& tbody td:not(.spacer)': {
-    background: theme.palette.background.paper,
+    background: '#1d303a',
   },
 
   '& .button': {
     fontWeight: theme.typography.fontWeightLight,
     textTransform: 'none',
-    color: '#fff',
   },
 }))
+
 type ColumnProps = {
   id: string
-  headerName: string
+  headerName: string | EmotionJSX.Element
   width: number
   headerAlign?: 'left' | ' right' | 'center'
 }
-const columns: ColumnProps[] = [
-  {
-    id: 'checkbox',
-    headerName: 'Выбрать',
-    width: 70,
-  },
-  {
-    id: 'date',
-    headerName: 'Дата',
-    width: 150,
-  },
-  {
-    id: 'time',
-    headerName: 'Время',
-    width: 150,
-    headerAlign: 'center',
-  },
-  {
-    id: 'location',
-    headerName: 'Место',
-    width: 170,
-  },
-  {
-    id: 'wasteType',
-    headerName: 'Тип отходов',
-    width: 200,
-    headerAlign: 'center',
-  },
-]
+
+const getHeader = (
+  selectedRows,
+  variant,
+  handleMassDeactivationDeletion,
+  buttonDisabled,
+  setButtonDisabled,
+) => {
+  return selectedRows.length > 0 ? (
+    // variant === 'inactive' ? (
+    //   'Удалить'
+    // ) : (
+    <Button
+      color="secondary"
+      disabled={buttonDisabled}
+      onClick={async () => {
+        setButtonDisabled(true)
+        await handleMassDeactivationDeletion(selectedRows, 'inactivate')
+        setButtonDisabled(false)
+      }}
+    >
+      Деактивировать
+    </Button>
+  ) : (
+    //)
+    'Дата'
+  )
+}
+
+const getColumns = (
+  selectedRows,
+  variant,
+  handleMassDeactivationDeletion,
+  buttonDisabled,
+  setButtonDisabled,
+): ColumnProps[] => {
+  return [
+    {
+      id: 'checkbox',
+      headerName: 'Выбрать',
+      width: 70,
+    },
+    {
+      id: 'date',
+      headerName: getHeader(
+        selectedRows,
+        variant,
+        handleMassDeactivationDeletion,
+        buttonDisabled,
+        setButtonDisabled,
+      ),
+      width: 150,
+    },
+    {
+      id: 'time',
+      headerName: 'Время',
+      width: 150,
+      headerAlign: 'center',
+    },
+    {
+      id: 'location',
+      headerName: 'Место',
+      width: 170,
+    },
+    {
+      id: 'wasteType',
+      headerName: 'Тип отходов',
+      width: 200,
+      headerAlign: 'center',
+    },
+  ]
+}
 
 const Spacer = () => {
   return (
     <TableRow>
-      <TableCell className="spacer" sx={{ p: 1 }} colSpan={5}></TableCell>
+      <TableCell className="spacer" sx={{ p: 2 }} colSpan={5}></TableCell>
     </TableRow>
   )
 }
 
-type EventsTableProps = {
+/*type EventsTableProps = {
   rows: EventsData[]
   variant: Variant
-}
+}*/
 export default function EventsTable(
   {
     rows,
@@ -118,9 +159,12 @@ export default function EventsTable(
     selectedRows,
     handleCheckboxClick,
     handleSelectAllClick,
+    handleDisable,
+    handleMassDeactivationDeletion,
   } /*: EventsTableProps*/,
 ) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
+  const [buttonDisabled, setButtonDisabled] = useState(false)
 
   return (
     <Root>
@@ -128,18 +172,24 @@ export default function EventsTable(
         <Table>
           <TableHead>
             <TableRow className="header">
-              {columns.map((column) => (
+              {getColumns(
+                selectedRows,
+                variant,
+                handleMassDeactivationDeletion,
+                buttonDisabled,
+                setButtonDisabled,
+              ).map((column) => (
                 <TableCell key={column.id} sx={{ minWidth: column.width }}>
                   {column.id !== 'checkbox' ? (
                     column.headerName
                   ) : (
                     <Checkbox
                       color="secondary"
-                      checked={false}
+                      checked={rows && selectedRows.length > 0}
                       inputProps={{
                         'aria-label': 'Выбрать все',
                       }}
-                      onClick={(e) => {
+                      onChange={(e) => {
                         handleSelectAllClick(e)
                       }}
                     />
@@ -152,7 +202,7 @@ export default function EventsTable(
           <TableBody>
             {rows.map((row, index) => {
               const labelId = `enhanced-table-checkbox-${index}`
-              const isItemSelected = isSelected(row.id)
+              const isItemSelected = isSelected(row._id)
 
               return (
                 <React.Fragment key={index}>
@@ -172,50 +222,61 @@ export default function EventsTable(
                       />
                     </TableCell>
 
-                    <TableCell>{row.date}</TableCell>
-                    <TableCell>{row.time}</TableCell>
-                    <TableCell>{row.locations}</TableCell>
-                    <TableCell>{row.wasteTypes}</TableCell>
+                    <TableCell>
+                      {dayjs(row.date).locale('ru').format('D MMMM')}
+                    </TableCell>
+                    <TableCell>
+                      {dayjs(row.date).locale('ru').format('HH:mm')}
+                    </TableCell>
+                    <TableCell>
+                      {row.location.structured_formatting.main_text}
+                    </TableCell>
+                    <TableCell>{row.waste.name}</TableCell>
                   </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={5}>
-                      <Box className={'actionsRow'}>
+                  <TableRow className={'actionsRow'}>
+                    <TableCell colSpan={3}>
+                      <Box className={'actions'}>
                         <Button
                           color="secondary"
-                          href={`/my/events/edit/${row.id}`}
-                          className="button"
-                          startIcon={<EditIcon />}
-                        >
-                          Редактировать
-                        </Button>
-                        <Button
-                          color="secondary"
+                          href={`/my/events/edit/${row._id}`}
                           className="button"
                           startIcon={
-                            variant === 'inactive' ? (
-                              <RestartAltIcon />
-                            ) : (
-                              <DeleteIcon />
-                            )
+                            !row.isActive ? <RefreshIcon /> : <EditIcon />
                           }
                         >
+                          {!row.isActive ? 'Активировать' : 'Редактировать'}
+                        </Button>
+                        <Button
+                          color="secondary"
+                          className="button"
+                          onClick={() => {
+                            handleDisable({
+                              ...row,
+                              waste: row.waste._id,
+                              isActive: false,
+                            })
+                          }}
+                          startIcon={<DeleteIcon />}
+                        >
                           {variant === 'inactive'
-                            ? 'Активировать'
+                            ? 'Удалить'
                             : 'Деактивировать'}
                         </Button>
-                        <Box
-                          component="span"
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                            fontWeight: 'fontWeightLight',
-                          }}
-                        >
-                          <VisibilityIcon sx={{ fontSize: '1.25rem' }} />
-                          <Box component="span" sx={{ p: '4px 8px' }}>
-                            {Math.floor(Math.random() * 50)}
-                          </Box>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        component="span"
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          fontWeight: 'fontWeightLight',
+                        }}
+                      >
+                        <VisibilityIcon sx={{ fontSize: '1.25rem' }} />
+                        <Box component="span" sx={{ p: '4px 8px' }}>
+                          {row.viewCount}
                         </Box>
                       </Box>
                     </TableCell>

@@ -1,35 +1,33 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { Grid, Typography } from '@mui/material'
 import Layout from '../layouts/Layout'
-import Snackbar from '../uiParts/Snackbars'
 import Tabs from '../uiParts/Tabs'
-import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import DataGridFooter from '../uiParts/DataGridFooter'
-import DataGridNoRowsOverlay from '../uiParts/DataGridNoRowsOverlay'
-import DataGridErrorOverlay from '../uiParts/DataGridErrorOverlay'
-import { useQuery, useMutation } from '@apollo/client'
+import NoRows from '../uiParts/NoRows'
+import Error from '../uiParts/Error'
 import { useSession } from 'next-auth/react'
-import {
-  GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT,
-  DELETE_REMOVAL_APPLICATIONS,
-} from '../../lib/graphql/queries/removalApplication.js'
 import Router from 'next/router'
-import { active, inactive } from './data'
 import EventsTable from './EventsTable'
 import { EventProps, Variant } from '../../lib/types/event'
 
 export default function Events(props: EventProps) {
-  const [selected, setSelected] = useState([])
+  const { variant: initialVariant } = props
+  const [selected, setSelected] = useState<string[]>([])
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(1)
-  const [backendError, setBackendError] = useState(null)
-  const { status } = useSession()
-
-  const [data, setData] = useState(active)
-  const { variant: initialVariant } = props
+  const [numRows, setNumRows] = useState(0)
   const [variant, setVariant] = useState<Variant>(initialVariant)
+  const [direction, setDirection] = useState('forward')
+  const [offset, setOffset] = useState('')
+  const [backendError, setBackendError] = useState('')
+  const { status } = useSession()
+  const [data, setData] = useState([])
+
+  const titleHeading = 'Мои предложения о вывозе отходов'
+
   const handleChange = (event: React.SyntheticEvent, newValue: Variant) => {
     setVariant(newValue)
+    setSelected([])
     if (newValue === 'active') {
       window.history.pushState(null, '', '/my/events')
     } else {
@@ -37,12 +35,60 @@ export default function Events(props: EventProps) {
     }
   }
 
+  const handleDisable = (row) => {
+    handleMassDeactivationDeletion([row._id], 'inactivate')
+  }
+
+  const handleMassDeactivationDeletion = async (
+    eventIds: string[] = [],
+    action: 'inactivate' | 'delete',
+  ) => {
+    if (
+      (action !== 'inactivate' && action !== 'delete') ||
+      eventIds.length === 0
+    )
+      return
+
+    let route = ''
+
+    switch (action) {
+      case 'inactivate':
+        route = 'mass-deactivation'
+        break
+      case 'delete':
+        route = 'mass-deletion'
+        break
+      default:
+        return
+    }
+
+    fetch(`/api/events/${route}`, {
+      method: 'POST',
+      body: JSON.stringify({ eventIds }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        console.log(response.status)
+        if (response.status === 200) {
+          console.log('Events deactivated successfully')
+          // refetch events
+          fetcher()
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+        setBackendError('Ошибка при сохранении')
+      })
+  }
+
   const handleCheckboxClick = (row) => {
-    const selectedIndex = selected.indexOf(row.id)
+    const selectedIndex = selected.indexOf(row._id)
     let newSelected: readonly string[] = []
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, row.id)
+      newSelected = newSelected.concat(selected, row._id)
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1))
     } else if (selectedIndex === selected.length - 1) {
@@ -59,38 +105,47 @@ export default function Events(props: EventProps) {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = data.map((row) => row.id)
+      const newSelected = data.map((row) => row._id)
       setSelected(newSelected)
       return
     }
     setSelected([])
   }
 
+  const fetcher = useCallback(() => {
+    // console.log(variant)
+    fetch(
+      `/api/events?${new URLSearchParams({
+        variant,
+        offset,
+        direction,
+      })}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        setData(data.events)
+        setNumRows(data.total)
+      })
+      .catch((error) => {
+        console.log('error is')
+        console.log(error)
+        setBackendError('Неизвестная ошибка')
+      })
+  }, [variant, offset, pageSize, direction])
+
   useEffect(() => {
-    let mounted = true
-    if (mounted && variant) {
-      variant === 'inactive' ? setData(inactive) : setData(active)
-    }
-    return () => {
-      mounted = false
-    }
-  }, [variant])
-
-  /*const { loading, error, data } = useQuery(
-    GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT
-  )
-  const [deleteMutation, { loading: deleting, error: deletionError }] =
-    useMutation(DELETE_REMOVAL_APPLICATIONS)
-
-  const deleteHandler = (event) => {
-    if (selected.length < 1) return
-    deleteMutation({
-      variables: { ids: selected },
-      refetchQueries: [{ query: GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT }],
-    })
-  }*/
+    fetcher()
+  }, [variant, offset, pageSize, direction])
 
   const handlePageChange = (_, newPage) => setPage(newPage)
+
   const handlePageSizeChange = (event) => {
     setPageSize(parseInt(event.target.value, 10))
     setPage(0)
@@ -103,8 +158,7 @@ export default function Events(props: EventProps) {
     if (params.field !== '__check__') Router.push(`/applications/${params.id}`)
   }
 
-  // let rows = []
-  const getRoows = (data) => {
+  const getRows = (data) => {
     return data.map((item) => {
       const rowSpan = item.location.length
     })
@@ -123,52 +177,57 @@ export default function Events(props: EventProps) {
   }
 
   if (status === 'authenticated') {
-    // if (!error) {
-    // }
-    if (variant !== 'active' && variant !== 'inactive')
-      return <div>{`Loading`}</div>
+    let content = null
+
+    //ToDo: Add loading overlay
+    if (data && data.length === 0) {
+      content = <NoRows />
+    }
+    if (backendError) content = <Error />
+    if (data && data.length > 0) {
+      content = (
+        <>
+          <EventsTable
+            variant={variant}
+            rows={data}
+            handleCheckboxClick={handleCheckboxClick}
+            handleDisable={handleDisable}
+            handleMassDeactivationDeletion={handleMassDeactivationDeletion}
+            selectedRows={selected}
+            handleSelectAllClick={handleSelectAllClick}
+          />
+          <DataGridFooter
+            numRows={numRows}
+            page={page}
+            pageSize={pageSize}
+            selected={selected}
+            handlePageChange={handlePageChange}
+            handlePageSizeChange={handlePageSizeChange}
+          />
+        </>
+      )
+    }
 
     return (
       <>
-        <Layout title="Мои предложения о вывозе отходов | Recycl">
+        <Layout title={`${titleHeading} | Recycl`}>
           <Grid
             container
             direction="column"
-            style={{
+            sx={{
               margin: '0 auto',
-              padding: '16px',
             }}
           >
-            <Typography gutterBottom variant="h4">
-              Предложения о вывозе отходов
-            </Typography>
-            <Tabs value={variant} handleChange={handleChange}>
-              <EventsTable
-                variant={variant}
-                rows={data}
-                handleCheckboxClick={handleCheckboxClick}
-                selectedRows={selected}
-                handleSelectAllClick={handleSelectAllClick}
-              />
-              <DataGridFooter
-                numRows={data.length}
-                page={page}
-                pageSize={pageSize}
-                selected={selected}
-                handlePageChange={handlePageChange}
-                handlePageSizeChange={handlePageSizeChange}
-              />
-            </Tabs>
+            <>
+              <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
+                {titleHeading}
+              </Typography>
+              <Tabs value={variant} handleChange={handleChange}>
+                {content}
+              </Tabs>
+            </>
           </Grid>
         </Layout>
-        <Snackbar
-          severity="error"
-          open={!!backendError}
-          message={backendError}
-          handleClose={() => {
-            setBackendError(null)
-          }}
-        />
       </>
     )
   }

@@ -8,10 +8,7 @@ const eventQueries = {
   create: async (data, user) => {
     if (!user) return null
 
-    data.user = {}
-
-    data.user._id = user['_id']
-    data.user.name = user.name
+    data.user = user['_id']
 
     const event = new Event(data)
     return await event.save()
@@ -40,7 +37,7 @@ const eventQueries = {
     } = queryParams
 
     type EventQuery = {
-      'user._id': mongoose.Types.ObjectId
+      user: mongoose.Types.ObjectId
       _id?: {
         $lt?: mongoose.Types.ObjectId
         $gt?: mongoose.Types.ObjectId
@@ -50,7 +47,7 @@ const eventQueries = {
 
     const query: EventQuery | {} = {}
 
-    query['user._id'] = new mongoose.Types.ObjectId(user)
+    query['user'] = new mongoose.Types.ObjectId(user)
 
     if (offset) {
       if (direction === 'forward') {
@@ -78,7 +75,7 @@ const eventQueries = {
     const events = await Event.find(query).limit(pageSize).populate('waste')
 
     const totalItems = await Event.countDocuments({
-      'user._id': query['user._id'],
+      user: query['user'],
     })
 
     return { total: totalItems, events }

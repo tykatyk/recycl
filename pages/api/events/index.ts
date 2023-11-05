@@ -1,12 +1,13 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { eventValidationSchema } from '../../../lib/validation/eventForm'
-import eventQueries from '../../../lib/db/queries/event'
+import { eventValidationSchema } from '../../../lib/validation/eventFormValidator'
+import eventQueries from '../../../lib/db/queries/eventQuery'
 import {
   errorResponse,
   perFormErrorResponse,
 } from '../../../lib/helpers/responses'
+import dbConnect from '../../../lib/db/connection'
 
 export default async function Events(
   req: NextApiRequest,
@@ -20,9 +21,16 @@ export default async function Events(
   }
 
   if (req.method === 'GET') {
+    await dbConnect()
+
+    const userId = session?.id
+    const data = await eventQueries.getAll(req.query, userId)
+    res.json(data)
   }
 
   if (req.method === 'POST') {
+    await dbConnect()
+
     try {
       await eventValidationSchema.validate(req.body, {
         abortEarly: false,
@@ -35,7 +43,6 @@ export default async function Events(
     try {
       await eventQueries.create(req.body, {
         _id: session.id,
-        name: session.user?.name,
       })
     } catch (e) {
       perFormErrorResponse('Ошибка при создании документа', res)
@@ -44,9 +51,13 @@ export default async function Events(
 
     res.status(200).json({ message: 'Документ успешно создан' })
   }
+
   if (req.method === 'PUT') {
+    await dbConnect()
+    const event = req.body
+    //ToDo check if user has right to update events
     try {
-      await eventValidationSchema.validate(req.body, {
+      await eventValidationSchema.validate(event, {
         abortEarly: false,
       })
     } catch (error) {
@@ -55,7 +66,7 @@ export default async function Events(
     }
 
     try {
-      await eventQueries.update(req.body)
+      await eventQueries.update(event)
     } catch (e) {
       console.log('here')
       perFormErrorResponse('Ошибка при обновлении документа', res)

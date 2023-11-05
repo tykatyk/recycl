@@ -1,4 +1,3 @@
-import React from 'react'
 import Events from '../../../components/events/Events'
 import { EventProps } from '../../../lib/types/event'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
@@ -9,7 +8,7 @@ export default function ActiveEvents({
   return <Events variant={variant} />
 }
 
-export const getServerSideProps = (async () => {
+export const getServerSideProps = (async (context) => {
   return {
     props: { variant: 'active' },
   }

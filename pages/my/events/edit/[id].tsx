@@ -30,7 +30,7 @@ export const getServerSideProps = (async (context) => {
     }
 
   const { id } = context.params as Params
-
+  //ToDo: add user authorization
   await dbConnect()
   const event = await queries.eventQueries.get(id)
   if (!event) {
