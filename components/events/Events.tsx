@@ -11,14 +11,16 @@ import EventsTable from './EventsTable'
 import { EventProps, Variant } from '../../lib/types/event'
 
 export default function Events(props: EventProps) {
+  const FORWARD = 'forward'
+  const BACKWARD = 'backward'
   const { variant: initialVariant } = props
   const [selected, setSelected] = useState<string[]>([])
   const [page, setPage] = useState(0)
+  const [offset, setOffset] = useState('')
   const [pageSize, setPageSize] = useState(1)
   const [numRows, setNumRows] = useState(0)
   const [variant, setVariant] = useState<Variant>(initialVariant)
-  const [direction, setDirection] = useState('forward')
-  const [offset, setOffset] = useState('')
+  const [direction, setDirection] = useState(FORWARD)
   const [backendError, setBackendError] = useState('')
   const { status } = useSession()
   const [data, setData] = useState([])
@@ -113,12 +115,12 @@ export default function Events(props: EventProps) {
   }
 
   const fetcher = useCallback(() => {
-    // console.log(variant)
     fetch(
       `/api/events?${new URLSearchParams({
         variant,
         offset,
         direction,
+        pageSize: String(pageSize),
       })}`,
       {
         headers: {
@@ -138,30 +140,29 @@ export default function Events(props: EventProps) {
         console.log(error)
         setBackendError('Неизвестная ошибка')
       })
-  }, [variant, offset, pageSize, direction])
+  }, [variant, offset, pageSize])
 
   useEffect(() => {
     fetcher()
-  }, [variant, offset, pageSize, direction])
+  }, [variant, offset, pageSize])
 
-  const handlePageChange = (_, newPage) => setPage(newPage)
+  const handlePageChange = (_, newPage) => {
+    if (numRows > 0) {
+      if (newPage - page > 0) {
+        setDirection(BACKWARD)
+        setOffset(data[data.length - 1]._id)
+      } else {
+        setDirection(FORWARD)
+        setOffset(data[0]._id)
+      }
+    }
+    setPage(newPage)
+  }
 
   const handlePageSizeChange = (event) => {
     setPageSize(parseInt(event.target.value, 10))
     setPage(0)
-  }
-  const handleClick = (params) => {
-    if (params.field === 'messages') {
-      Router.push(`/messages`)
-      return
-    }
-    if (params.field !== '__check__') Router.push(`/applications/${params.id}`)
-  }
-
-  const getRows = (data) => {
-    return data.map((item) => {
-      const rowSpan = item.location.length
-    })
+    setOffset('')
   }
 
   // if (loading) return <PageLoadingCircle />

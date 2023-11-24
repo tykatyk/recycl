@@ -52,13 +52,13 @@ const eventQueries = {
     if (offset) {
       if (direction === 'forward') {
         query['_id'] = {
-          $lt: new mongoose.Types.ObjectId(queryParams.offset),
+          $gt: new mongoose.Types.ObjectId(offset),
         }
       }
 
       if (direction === 'backward') {
         query['_id'] = {
-          $gt: new mongoose.Types.ObjectId(queryParams.offset),
+          $lt: new mongoose.Types.ObjectId(offset),
         }
       }
     }
@@ -72,7 +72,10 @@ const eventQueries = {
       query['$or'] = [{ isActive: false }, { date: { $lt: new Date() } }]
     }
 
-    const events = await Event.find(query).limit(pageSize).populate('waste')
+    const events = await Event.find(query)
+      .sort({ date: -1 })
+      .limit(pageSize)
+      .populate('waste')
 
     const totalItems = await Event.countDocuments({
       user: query['user'],
