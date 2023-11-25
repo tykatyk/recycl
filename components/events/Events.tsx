@@ -5,31 +5,38 @@ import Tabs from '../uiParts/Tabs'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import NoRows from '../uiParts/NoRows'
 import Error from '../uiParts/Error'
-import { useSession } from 'next-auth/react'
-import Router from 'next/router'
 import EventsTable from './EventsTable'
-import { EventProps, Variant } from '../../lib/types/event'
+import { Event, Variant } from '../../lib/types/event'
+import { _id } from '@next-auth/mongodb-adapter'
+import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
-export default function Events(props: EventProps) {
-  const FORWARD = 'forward'
-  const BACKWARD = 'backward'
+export default function Events(props: { variant: Variant }) {
+  const forward = 'forward'
+  const backward = 'backward'
+  const titleHeading = 'Мои предложения о вывозе отходов'
+  const errorMessage = 'Неизвестная ошибка'
+
   const { variant: initialVariant } = props
-  const [selected, setSelected] = useState<string[]>([])
+
+  const [selected, setSelected] = useState<readonly string[]>([])
   const [page, setPage] = useState(0)
   const [offset, setOffset] = useState('')
   const [pageSize, setPageSize] = useState(1)
   const [numRows, setNumRows] = useState(0)
   const [variant, setVariant] = useState<Variant>(initialVariant)
-  const [direction, setDirection] = useState(FORWARD)
+  const [direction, setDirection] = useState(forward)
   const [backendError, setBackendError] = useState('')
-  const { status } = useSession()
-  const [data, setData] = useState([])
+  const [data, setData] = useState<Event[]>([])
+  const [loading, setLoading] = useState(false)
 
-  const titleHeading = 'Мои предложения о вывозе отходов'
-
-  const handleChange = (event: React.SyntheticEvent, newValue: Variant) => {
+  const handleVariantChange = (
+    event: React.SyntheticEvent,
+    newValue: Variant,
+  ) => {
     setVariant(newValue)
     setSelected([])
+
     if (newValue === 'active') {
       window.history.pushState(null, '', '/my/events')
     } else {
@@ -37,11 +44,11 @@ export default function Events(props: EventProps) {
     }
   }
 
-  const handleDisable = (row) => {
-    handleMassDeactivationDeletion([row._id], 'inactivate')
+  const handleDisable = (row: Event) => {
+    handleMassDeactivationAndDeletion([row._id as string], 'inactivate')
   }
 
-  const handleMassDeactivationDeletion = async (
+  const handleMassDeactivationAndDeletion = async (
     eventIds: string[] = [],
     action: 'inactivate' | 'delete',
   ) => {
@@ -63,8 +70,8 @@ export default function Events(props: EventProps) {
       default:
         return
     }
-
-    fetch(`/api/events/${route}`, {
+    setLoading(true)
+    await fetch(`/api/events/${route}`, {
       method: 'POST',
       body: JSON.stringify({ eventIds }),
       headers: {
@@ -72,25 +79,23 @@ export default function Events(props: EventProps) {
       },
     })
       .then((response) => {
-        console.log(response.status)
         if (response.status === 200) {
-          console.log('Events deactivated successfully')
           // refetch events
           fetcher()
         }
       })
       .catch((error) => {
-        console.log(error)
-        setBackendError('Ошибка при сохранении')
+        setBackendError(errorMessage)
       })
+    setLoading(false)
   }
 
-  const handleCheckboxClick = (row) => {
-    const selectedIndex = selected.indexOf(row._id)
+  const handleSelect = (row: Event) => {
+    const selectedIndex = selected.indexOf(row._id as string)
     let newSelected: readonly string[] = []
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, row._id)
+      newSelected = newSelected.concat(selected, row._id as string)
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1))
     } else if (selectedIndex === selected.length - 1) {
@@ -105,17 +110,18 @@ export default function Events(props: EventProps) {
     setSelected(newSelected)
   }
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = data.map((row) => row._id)
+      const newSelected = data.map((row) => row._id as string)
       setSelected(newSelected)
       return
     }
     setSelected([])
   }
 
-  const fetcher = useCallback(() => {
-    fetch(
+  const fetcher = useCallback(async () => {
+    setLoading(true)
+    await fetch(
       `/api/events?${new URLSearchParams({
         variant,
         offset,
@@ -136,101 +142,84 @@ export default function Events(props: EventProps) {
         setNumRows(data.total)
       })
       .catch((error) => {
-        console.log('error is')
-        console.log(error)
-        setBackendError('Неизвестная ошибка')
+        setBackendError(errorMessage)
       })
+    setLoading(false)
   }, [variant, offset, pageSize])
 
   useEffect(() => {
     fetcher()
   }, [variant, offset, pageSize])
 
-  const handlePageChange = (_, newPage) => {
+  const handlePageChange = (_: unknown, newPage: number) => {
     if (numRows > 0) {
       if (newPage - page > 0) {
-        setDirection(BACKWARD)
-        setOffset(data[data.length - 1]._id)
+        setDirection(backward)
+        setOffset(data[data.length - 1]._id as string)
       } else {
-        setDirection(FORWARD)
-        setOffset(data[0]._id)
+        setDirection(forward)
+        setOffset(data[0]._id as string)
       }
     }
     setPage(newPage)
   }
 
-  const handlePageSizeChange = (event) => {
+  const handlePageSizeChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setPageSize(parseInt(event.target.value, 10))
     setPage(0)
     setOffset('')
   }
 
-  // if (loading) return <PageLoadingCircle />
+  let content = <NoRows />
 
-  if (status === 'unauthenticated') {
-    Router.push({
-      pathname: '/auth/login',
-      query: {
-        //change it to route from router
-        from: '/my/events',
-      },
-    })
-  }
+  if (loading) content = <PageLoadingCircle />
 
-  if (status === 'authenticated') {
-    let content = null
+  if (backendError) content = <Error />
 
-    //ToDo: Add loading overlay
-    if (data && data.length === 0) {
-      content = <NoRows />
-    }
-    if (backendError) content = <Error />
-    if (data && data.length > 0) {
-      content = (
-        <>
-          <EventsTable
-            variant={variant}
-            rows={data}
-            handleCheckboxClick={handleCheckboxClick}
-            handleDisable={handleDisable}
-            handleMassDeactivationDeletion={handleMassDeactivationDeletion}
-            selectedRows={selected}
-            handleSelectAllClick={handleSelectAllClick}
-          />
-          <DataGridFooter
-            numRows={numRows}
-            page={page}
-            pageSize={pageSize}
-            selected={selected}
-            handlePageChange={handlePageChange}
-            handlePageSizeChange={handlePageSizeChange}
-          />
-        </>
-      )
-    }
-
-    return (
+  if (data && data.length > 0) {
+    content = (
       <>
-        <Layout title={`${titleHeading} | Recycl`}>
-          <Grid
-            container
-            direction="column"
-            sx={{
-              margin: '0 auto',
-            }}
-          >
-            <>
-              <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
-                {titleHeading}
-              </Typography>
-              <Tabs value={variant} handleChange={handleChange}>
-                {content}
-              </Tabs>
-            </>
-          </Grid>
-        </Layout>
+        <EventsTable
+          variant={variant}
+          rows={data}
+          handleCheckboxClick={handleSelect}
+          handleDisable={handleDisable}
+          handleMassDeactivationDeletion={handleMassDeactivationAndDeletion}
+          selectedRows={selected}
+          handleSelectAll={handleSelectAll}
+        />
+        <DataGridFooter
+          numRows={numRows}
+          page={page}
+          pageSize={pageSize}
+          selected={selected}
+          handlePageChange={handlePageChange}
+          handlePageSizeChange={handlePageSizeChange}
+        />
       </>
     )
   }
-  return null
+
+  return (
+    <RedirectUnathenticatedUser>
+      <Layout title={`${titleHeading} | Recycl`}>
+        <Grid
+          container
+          direction="column"
+          sx={{
+            margin: '0 auto',
+          }}
+        >
+          <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
+            {titleHeading}
+          </Typography>
+          <Tabs value={variant} handleChange={handleVariantChange}>
+            {content}
+          </Tabs>
+        </Grid>
+      </Layout>
+    </RedirectUnathenticatedUser>
+  )
 }

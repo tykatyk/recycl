@@ -158,7 +158,7 @@ export default function EventsTable(
     variant,
     selectedRows,
     handleCheckboxClick,
-    handleSelectAllClick,
+    handleSelectAll,
     handleDisable,
     handleMassDeactivationDeletion,
   } /*: EventsTableProps*/,
@@ -190,7 +190,7 @@ export default function EventsTable(
                         'aria-label': 'Выбрать все',
                       }}
                       onChange={(e) => {
-                        handleSelectAllClick(e)
+                        handleSelectAll(e)
                       }}
                     />
                   )}
