@@ -1,4 +1,3 @@
-import React from 'react'
 import { styled, useTheme } from '@mui/material/styles'
 import {
   MenuItem,
@@ -6,6 +5,7 @@ import {
   Grow,
   Paper,
   Popper,
+  List,
   ListItem,
   MenuList,
   ListItemText,
@@ -39,18 +39,82 @@ export default function UserMenu(props) {
 
   const menuItems = [
     {
-      text: 'Сдать отходы',
-      href: '/my/applications',
+      text: 'Мои',
+      items: [
+        {
+          text: 'Обьявления о наличии отходов',
+          href: '/my/applications',
+        },
+        {
+          text: 'Обьявления о вывозе отходов',
+          href: '/my/events',
+        },
+        {
+          text: 'Пункты приема отходов',
+          href: '#',
+        },
+      ],
     },
     {
-      text: 'Собрать отходы',
-      href: '/my/events',
+      text: 'Добавить',
+      items: [
+        {
+          text: 'Обьявление о наличии отходов',
+          href: '/applications/create',
+        },
+        {
+          text: 'Обьявление о вывозе отходов',
+          href: '/my/events/create',
+        },
+        {
+          text: 'Пункт приема отходов',
+          href: '#',
+        },
+      ],
     },
     {
       text: 'Настройки',
       href: '/my/account',
     },
   ]
+
+  const showSubmenu = (item, startPadding = 4, index) => {
+    if (item.items) {
+      startPadding += 4
+      return (
+        <List component="div">
+          <ListItem>
+            <ListItemText
+              style={{
+                color: theme.palette.secondary.main,
+                textTransform: 'uppercase',
+              }}
+              secondary={item.text}
+            />
+          </ListItem>
+          <MenuList disablePadding>
+            {item.items.map((i, k) => {
+              return showSubmenu(i, startPadding, k)
+            })}
+          </MenuList>
+        </List>
+      )
+    } else {
+      return (
+        <MenuItem sx={{ pl: startPadding }} onClick={handleClose} key={index}>
+          <Link
+            href={item.href}
+            onClick={preventDefault}
+            color="inherit"
+            underline="none"
+            className={classes.link}
+          >
+            {item.text}
+          </Link>
+        </MenuItem>
+      )
+    }
+  }
 
   let logIn = (
     <Link
@@ -113,19 +177,9 @@ export default function UserMenu(props) {
                     />
                   </ListItem>
                 )}
-                {menuItems.map((item, index) => (
-                  <MenuItem onClick={handleClose} key={index}>
-                    <Link
-                      href={item.href}
-                      onClick={preventDefault}
-                      color="inherit"
-                      underline="none"
-                      className={classes.link}
-                    >
-                      {item.text}
-                    </Link>
-                  </MenuItem>
-                ))}
+                {menuItems.map((item, index) => {
+                  return showSubmenu(item, index)
+                })}
                 <MenuItem onClick={handleClose}>{logIn}</MenuItem>
               </MenuList>
             </ClickAwayListener>
