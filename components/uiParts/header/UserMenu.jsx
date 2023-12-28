@@ -56,23 +56,6 @@ export default function UserMenu(props) {
       ],
     },
     {
-      text: 'Добавить',
-      items: [
-        {
-          text: 'Обьявление о наличии отходов',
-          href: '/applications/create',
-        },
-        {
-          text: 'Обьявление о вывозе отходов',
-          href: '/my/events/create',
-        },
-        {
-          text: 'Пункт приема отходов',
-          href: '#',
-        },
-      ],
-    },
-    {
       text: 'Настройки',
       href: '/my/account',
     },
