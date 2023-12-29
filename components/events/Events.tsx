@@ -194,7 +194,7 @@ export default function Events(props: { variant: Variant }) {
           numRows={numRows}
           page={page}
           pageSize={pageSize}
-          selected={selected}
+          numSelected={selected.length}
           handlePageChange={handlePageChange}
           handlePageSizeChange={handlePageSizeChange}
         />

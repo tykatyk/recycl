@@ -5,7 +5,7 @@ export default function DataGridFooter(props) {
   const {
     showDeleteButton = false,
     deleting = false,
-    selected = [],
+    numSelected = 0,
     deleteHandler = () => {},
     numRows,
     handlePageChange,
@@ -25,7 +25,7 @@ export default function DataGridFooter(props) {
       {showDeleteButton && (
         <Button
           color="secondary"
-          disabled={deleting || selected.length < 1}
+          disabled={deleting || numSelected < 1}
           onClick={(event) => deleteHandler(event)}
         >
           Удалить отмеченные

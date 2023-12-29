@@ -106,7 +106,7 @@ export default function RemovalApplications(props) {
   const { status } = useSession()
   const { asPath } = useRouter()
   const { loading, error, data } = useQuery(
-    GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT
+    GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT,
   )
   const [deleteMutation, { loading: deleting, error: deletionError }] =
     useMutation(DELETE_REMOVAL_APPLICATIONS)
@@ -207,7 +207,7 @@ export default function RemovalApplications(props) {
                   footer: {
                     deleteHandler,
                     deleting,
-                    selected,
+                    numSelected: selected.length,
                     numRows: rows && rows.length ? rows.length : 0,
                     handlePageChange,
                     handlePageSizeChange,
