@@ -17,10 +17,10 @@ export default async function EventMassDeactivation(
 
   if (req.method === 'POST') {
     await dbConnect()
-    console.log(req.body)
+
     const { eventIds }: { eventIds: string[] } = req.body
 
-    if (!Array.isArray(eventIds) || !(eventIds.length > 0)) {
+    if (!Array.isArray(eventIds) || eventIds.length < 1) {
       res
         .status(400)
         .json({ error: `Expected an array of ids but got ${eventIds}` })
