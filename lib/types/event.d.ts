@@ -22,4 +22,5 @@ export type Event = {
   date: Dayjs | null
   phone: string
   comment?: string
+  viewCount?: number
 }
