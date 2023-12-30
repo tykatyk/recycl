@@ -1,7 +1,6 @@
 //ToDo: Add validation before create and update operations
 import { Event } from '../models/index'
 import mongoose from 'mongoose'
-import user from './user'
 import { _id } from '@next-auth/mongodb-adapter'
 
 const eventQueries = {
@@ -17,7 +16,6 @@ const eventQueries = {
   get: async (id) => {
     const result = await Event.findById(id, {
       __v: 0,
-      user: 0,
       isActive: 0,
       expires: 0,
       createdAt: 0,
