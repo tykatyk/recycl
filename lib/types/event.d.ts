@@ -5,8 +5,6 @@ import type { Dayjs } from 'dayjs'
 
 export type Variant = 'inactive' | 'active'
 
-export type EventProps = { events: [Event]; variant: Variant }
-
 export type SSProps = {
   props: EventProps
 }

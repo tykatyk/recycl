@@ -1,5 +1,5 @@
 import Events from '../../../components/events/Events'
-import type { EventProps } from '../../../lib/types/event'
+import type { Variant } from '../../../lib/types/event'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 
 export default function InactiveEvents({
@@ -12,4 +12,4 @@ export const getServerSideProps = (async () => {
   return {
     props: { variant: 'inactive' },
   }
-}) satisfies GetServerSideProps<EventProps>
+}) satisfies GetServerSideProps<{ variant: Variant }>
