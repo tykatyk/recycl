@@ -56,7 +56,7 @@ export default function SendMessage(props) {
   const { receiver } = props
   const [createMessageMutation, { loading }] = useMutation(CREATE_MESSAGE)
   const [notification, setNotification] = useState('')
-  const [severity, setSeverity] = useState('')
+  const [severity, setSeverity] = useState('success')
 
   const submitHandler = (values, setSubmitting, resetForm) => {
     const sender = session.id
