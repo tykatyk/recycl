@@ -76,7 +76,13 @@ function ShowData(props: { applicationData: RecycleEvent }) {
           <Typography component="h1" variant="h3" gutterBottom>
             Предложение о вывозе отходов
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
             <Button
               href={`/users/${user._id}`}
               sx={{ textTransform: 'none' }}
@@ -85,6 +91,15 @@ function ShowData(props: { applicationData: RecycleEvent }) {
             >
               {user.name}
             </Button>
+            <Box>
+              <Typography
+                component="span"
+                variant="body2"
+                sx={{ color: 'grey.400' }}
+              >
+                {`ID: ${applicationData._id}`}
+              </Typography>
+            </Box>
           </Box>
         </Grid>
         <Grid item xs>
