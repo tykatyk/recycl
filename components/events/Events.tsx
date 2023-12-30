@@ -19,7 +19,7 @@ export default function Events(props: { variant: Variant }) {
 
   const { variant: initialVariant } = props
 
-  const [selected, setSelected] = useState<readonly string[]>([])
+  const [selected, setSelected] = useState<string[]>([])
   const [page, setPage] = useState(0)
   const [offset, setOffset] = useState('')
   const [pageSize, setPageSize] = useState(1)
@@ -44,11 +44,7 @@ export default function Events(props: { variant: Variant }) {
     }
   }
 
-  const handleDisable = (row: Event) => {
-    handleMassDeactivationAndDeletion([row._id as string], 'inactivate')
-  }
-
-  const handleMassDeactivationAndDeletion = async (
+  const handleDeactivationAndDeletion = async (
     eventIds: string[] = [],
     action: 'inactivate' | 'delete',
   ) => {
@@ -92,7 +88,7 @@ export default function Events(props: { variant: Variant }) {
 
   const handleSelect = (row: Event) => {
     const selectedIndex = selected.indexOf(row._id as string)
-    let newSelected: readonly string[] = []
+    let newSelected: string[] = []
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, row._id as string)
@@ -184,11 +180,10 @@ export default function Events(props: { variant: Variant }) {
         <EventsTable
           variant={variant}
           rows={data}
-          handleCheckboxClick={handleSelect}
-          handleDisable={handleDisable}
-          handleMassDeactivationDeletion={handleMassDeactivationAndDeletion}
           selectedRows={selected}
+          handleSelect={handleSelect}
           handleSelectAll={handleSelectAll}
+          handleDeactivationAndDeletion={handleDeactivationAndDeletion}
         />
         <DataGridFooter
           numRows={numRows}
