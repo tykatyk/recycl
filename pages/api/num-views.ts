@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import eventModel from '../../lib/db/models/eventModel'
-import type { Event } from '../../lib/db/models/eventModel'
+import type { EventModel } from '../../lib/db/models/eventModel'
 import dbConnect from '../../lib/db/connection'
 import cryptoRandomString from 'crypto-random-string'
 import dayjs from 'dayjs'
@@ -15,7 +15,7 @@ export default async function viewCounter(
   const session = await getServerSession(req, res, authOptions)
 
   const incrementViewCount = async (
-    ad: HydratedDocument<Event>,
+    ad: HydratedDocument<EventModel>,
     identifier: string,
   ) => {
     ad.viewedBy.push(identifier)

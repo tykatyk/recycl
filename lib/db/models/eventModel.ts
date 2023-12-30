@@ -29,6 +29,6 @@ const eventSchema = new Schema(
   { timestamps: true },
 )
 
-type Event = InferSchemaType<typeof eventSchema>
+export type EventModel = InferSchemaType<typeof eventSchema>
 
 export default models.Event || model<Event>('Event', eventSchema)
