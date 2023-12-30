@@ -63,7 +63,12 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
     fetch('/api/events', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ _id: event?._id, ...values, isActive: true }),
+      body: JSON.stringify({
+        _id: event?._id,
+        isActive: true,
+        ...values,
+        user: event?.user,
+      }),
     })
       .then((response) => {
         return response.json()
