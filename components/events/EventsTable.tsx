@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback, ReactNode } from 'react'
 import { styled } from '@mui/material/styles'
 import {
   TableContainer,
@@ -14,13 +14,11 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import RefreshIcon from '@mui/icons-material/Refresh'
-import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import clsx from 'clsx'
-import { Variant } from '../../lib/types/event'
+import { Variant, Event } from '../../lib/types/event'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
-import { EmotionJSX } from '@emotion/react/types/jsx-namespace'
+import { getColumns } from './eventFormConfig'
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -61,85 +59,6 @@ const Root = styled('div')(({ theme }) => ({
   },
 }))
 
-type ColumnProps = {
-  id: string
-  headerName: string | EmotionJSX.Element
-  width: number
-  headerAlign?: 'left' | ' right' | 'center'
-}
-
-const getHeader = (
-  selectedRows,
-  variant,
-  handleMassDeactivationDeletion,
-  buttonDisabled,
-  setButtonDisabled,
-) => {
-  return selectedRows.length > 0 ? (
-    // variant === 'inactive' ? (
-    //   'Удалить'
-    // ) : (
-    <Button
-      color="secondary"
-      disabled={buttonDisabled}
-      onClick={async () => {
-        setButtonDisabled(true)
-        await handleMassDeactivationDeletion(selectedRows, 'inactivate')
-        setButtonDisabled(false)
-      }}
-    >
-      Деактивировать
-    </Button>
-  ) : (
-    //)
-    'Дата'
-  )
-}
-
-const getColumns = (
-  selectedRows,
-  variant,
-  handleMassDeactivationDeletion,
-  buttonDisabled,
-  setButtonDisabled,
-): ColumnProps[] => {
-  return [
-    {
-      id: 'checkbox',
-      headerName: 'Выбрать',
-      width: 70,
-    },
-    {
-      id: 'date',
-      headerName: getHeader(
-        selectedRows,
-        variant,
-        handleMassDeactivationDeletion,
-        buttonDisabled,
-        setButtonDisabled,
-      ),
-      width: 150,
-    },
-    {
-      id: 'time',
-      headerName: 'Время',
-      width: 150,
-      headerAlign: 'center',
-    },
-    {
-      id: 'location',
-      headerName: 'Место',
-      width: 170,
-    },
-    {
-      id: 'wasteType',
-      headerName: 'Тип отходов',
-      width: 200,
-      headerAlign: 'center',
-    },
-  ]
-}
-
 const Spacer = () => {
   return (
     <TableRow>
@@ -148,23 +67,50 @@ const Spacer = () => {
   )
 }
 
-/*type EventsTableProps = {
-  rows: EventsData[]
+type EventsTableProps = {
   variant: Variant
-}*/
-export default function EventsTable(
-  {
-    rows,
-    variant,
-    selectedRows,
-    handleCheckboxClick,
-    handleSelectAll,
-    handleDisable,
-    handleMassDeactivationDeletion,
-  } /*: EventsTableProps*/,
-) {
+  rows: Event[]
+  selectedRows: string[]
+  handleSelect: (row: Event) => void
+  handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
+  handleDeactivationAndDeletion: (
+    eventIds: string[] | undefined,
+    action: 'inactivate' | 'delete',
+  ) => Promise<void>
+}
+
+export default function EventsTable({
+  variant,
+  rows,
+  selectedRows,
+  handleSelect,
+  handleSelectAll,
+  handleDeactivationAndDeletion,
+}: EventsTableProps) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
   const [buttonDisabled, setButtonDisabled] = useState(false)
+
+  const getHeader = useCallback<() => ReactNode | 'Дата'>(() => {
+    if (selectedRows.length > 0) {
+      const action = variant === 'inactive' ? 'delete' : 'inactivate'
+      const buttonText = variant === 'inactive' ? 'Удалить' : 'Деактивировать'
+
+      return (
+        <Button
+          color="secondary"
+          disabled={buttonDisabled}
+          onClick={async () => {
+            setButtonDisabled(true)
+            await handleDeactivationAndDeletion(selectedRows, action)
+            setButtonDisabled(false)
+          }}
+        >
+          {buttonText}
+        </Button>
+      )
+    }
+    return 'Дата'
+  }, [variant, selectedRows])
 
   return (
     <Root>
@@ -172,13 +118,7 @@ export default function EventsTable(
         <Table>
           <TableHead>
             <TableRow className="header">
-              {getColumns(
-                selectedRows,
-                variant,
-                handleMassDeactivationDeletion,
-                buttonDisabled,
-                setButtonDisabled,
-              ).map((column) => (
+              {getColumns(getHeader).map((column) => (
                 <TableCell key={column.id} sx={{ minWidth: column.width }}>
                   {column.id !== 'checkbox' ? (
                     column.headerName
@@ -200,9 +140,9 @@ export default function EventsTable(
             <Spacer />
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => {
+            {rows.map((row: Event, index: number) => {
               const labelId = `enhanced-table-checkbox-${index}`
-              const isItemSelected = isSelected(row._id)
+              const isItemSelected = isSelected(row._id as string)
 
               return (
                 <React.Fragment key={index}>
@@ -210,7 +150,7 @@ export default function EventsTable(
                     <TableCell
                       rowSpan={2}
                       onClick={() => {
-                        handleCheckboxClick(row)
+                        handleSelect(row)
                       }}
                     >
                       <Checkbox
@@ -229,9 +169,17 @@ export default function EventsTable(
                       {dayjs(row.date).locale('ru').format('HH:mm')}
                     </TableCell>
                     <TableCell>
-                      {row.location.structured_formatting.main_text}
+                      {row.location?.structured_formatting.main_text}
                     </TableCell>
-                    <TableCell>{row.waste.name}</TableCell>
+                    <TableCell>
+                      {
+                        //though we know that the type of row.waste is object here,
+                        //we use type narrowing to prevent Typescript error
+                        typeof row.waste !== 'string'
+                          ? row.waste.name
+                          : row.waste
+                      }
+                    </TableCell>
                   </TableRow>
                   <TableRow className={'actionsRow'}>
                     <TableCell colSpan={3}>
@@ -240,21 +188,33 @@ export default function EventsTable(
                           color="secondary"
                           href={`/my/events/edit/${row._id}`}
                           className="button"
-                          startIcon={
-                            !row.isActive ? <RefreshIcon /> : <EditIcon />
-                          }
+                          startIcon={<EditIcon />}
                         >
-                          {!row.isActive ? 'Активировать' : 'Редактировать'}
+                          {'Редактировать'}
                         </Button>
                         <Button
                           color="secondary"
                           className="button"
-                          onClick={() => {
-                            handleDisable({
-                              ...row,
-                              waste: row.waste._id,
-                              isActive: false,
-                            })
+                          disabled={buttonDisabled}
+                          onClick={async () => {
+                            setButtonDisabled(true)
+
+                            //Just another check to prevent Typescript error
+                            if (!row._id) return
+
+                            if (variant === 'inactive') {
+                              await handleDeactivationAndDeletion(
+                                [row._id],
+                                'delete',
+                              )
+                            }
+                            if (variant === 'active') {
+                              await handleDeactivationAndDeletion(
+                                [row._id],
+                                'inactivate',
+                              )
+                            }
+                            setButtonDisabled(false)
                           }}
                           startIcon={<DeleteIcon />}
                         >

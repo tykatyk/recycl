@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import dayjs from 'dayjs'
 import type { Event } from '../../lib/types/event'
 
@@ -27,4 +28,45 @@ export function getNormalizedValues(values: Event): Event {
   const normalizedValues = { ...values, location: normalizedLocation }
 
   return normalizedValues
+}
+
+type ColumnHeader = {
+  id: string
+  headerName: ReactNode | string
+  headerAlign?: 'left' | ' right' | 'center'
+  width: number
+}
+
+export function getColumns(
+  getHeader: () => ReactNode | 'Дата',
+): ColumnHeader[] {
+  return [
+    {
+      id: 'checkbox',
+      headerName: 'Выбрать',
+      width: 70,
+    },
+    {
+      id: 'date',
+      headerName: getHeader(),
+      width: 150,
+    },
+    {
+      id: 'time',
+      headerName: 'Время',
+      width: 150,
+      headerAlign: 'center',
+    },
+    {
+      id: 'location',
+      headerName: 'Место',
+      width: 170,
+    },
+    {
+      id: 'wasteType',
+      headerName: 'Тип отходов',
+      width: 200,
+      headerAlign: 'center',
+    },
+  ]
 }
