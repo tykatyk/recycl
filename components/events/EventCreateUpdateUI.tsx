@@ -2,7 +2,10 @@ import { useState } from 'react'
 import Snackbar from '../uiParts/Snackbars'
 import EventForm from './EventForm'
 import { Formik, FormikHelpers } from 'formik'
-import { getInitialValues, getNormalizedValues } from './eventFormConfig'
+import {
+  getInitialValues,
+  getNormalizedValues,
+} from '../../lib/helpers/eventHelpers'
 import { eventSchema } from '../../lib/validation'
 import showErrorMessages from '../../lib/helpers/showErrorMessages'
 import type { Event, EventCreateUpdateProps } from '../../lib/types/event'

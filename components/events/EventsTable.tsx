@@ -18,7 +18,7 @@ import clsx from 'clsx'
 import { Variant, Event } from '../../lib/types/event'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
-import { getColumns } from './eventFormConfig'
+import { getColumns } from '../../lib/helpers/eventHelpers'
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',

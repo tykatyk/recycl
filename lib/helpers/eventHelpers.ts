@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import dayjs from 'dayjs'
-import type { Event } from '../../lib/types/event'
+import type { Event } from '../types/event'
 
 export function getInitialValues(event?: Event, userPhone: string = ''): Event {
   return {
