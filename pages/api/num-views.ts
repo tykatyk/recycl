@@ -1,51 +1,71 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { eventValidationSchema } from '../../lib/validation/eventFormValidator'
 import eventModel from '../../lib/db/models/eventModel'
-import {
-  errorResponse,
-  perFormErrorResponse,
-} from '../../lib/helpers/responses'
+import type { Event } from '../../lib/db/models/eventModel'
 import dbConnect from '../../lib/db/connection'
-import { cookies } from 'next/headers'
 import cryptoRandomString from 'crypto-random-string'
-import { serialize } from 'mongodb'
+import dayjs from 'dayjs'
+import { HydratedDocument } from 'mongoose'
 
-export default async function Events(
+export default async function viewCounter(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   const session = await getServerSession(req, res, authOptions)
 
+  const incrementViewCount = async (
+    ad: HydratedDocument<Event>,
+    identifier: string,
+  ) => {
+    ad.viewedBy.push(identifier)
+    ad.viewCount += 1
+    await ad.save()
+  }
+
   if (req.method === 'POST') {
     await dbConnect()
 
-    const { adType, adId } = req.body // Get the ad ID from the request
+    const { adType, adId } = req.body // Get the ad type and ad ID from the request
 
     switch (adType) {
       case 'event':
         try {
-          // Check if the IP address has already viewed this ad
           const ad = await eventModel.findById(adId)
           if (!ad) {
             return res.status(404).json({ message: 'Ad not found' })
           }
 
-          // Increment the view count if the visitor is unique
-          let uid = req.cookies.visitorId //ToDo: check cookie type
-          if (!uid) {
+          if (ad.user === session?.id) {
+            return res.status(200).json({
+              message: `Viewing ad by ad's author doesn't increment view count`,
+            })
+          }
+
+          //only count views for ads which are not stale
+          const maxAge = dayjs(ad.date).diff(dayjs(), 's')
+          if (maxAge <= 0) {
+            return res.status(200).json({ message: 'Ad is stale' })
+          }
+
+          let uid = req.cookies.visitorId
+          const sessionId = session?.id
+
+          if (uid && !ad.viewedBy.includes(uid)) {
+            if (sessionId && !ad.viewedBy.includes(sessionId)) {
+              await incrementViewCount(ad, uid)
+            } else if (!sessionId) {
+              await incrementViewCount(ad, uid)
+            }
+          } else if (!uid && sessionId && !ad.viewedBy.includes(sessionId)) {
+            await incrementViewCount(ad, sessionId)
+          } else if (!uid && !sessionId) {
             uid = cryptoRandomString({ length: 32 })
             res.setHeader(
               'Set-Cookie',
-              'visitorId=visitorId; httpOnly=true; maxAge=31536000',
+              `visitorId=${uid}; httpOnly=true; maxAge=31536000`, // 1-year expiration
             )
-          }
-
-          if (!ad.viewedBy.includes(uid)) {
-            ad.viewedBy.push(uid)
-            ad.viewCount += 1
-            await ad.save()
+            await incrementViewCount(ad, uid)
           }
 
           return res.status(200).json({ message: 'Ad viewed successfully' })
@@ -57,5 +77,7 @@ export default async function Events(
       default:
         return res.status(404).json({ message: 'Ad not found' })
     }
+  } else {
+    res.status(405).json({ error: 'Method not allowed' })
   }
 }

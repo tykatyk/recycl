@@ -15,6 +15,8 @@ interface PopulatedProp {
   _id: string
 }
 
+let loading = false
+
 export default function ShowSingleEvent(props: { event: RecycleEvent | null }) {
   const { event } = props
   const content = event ? <ShowData applicationData={event} /> : <NoRows />
@@ -22,6 +24,8 @@ export default function ShowSingleEvent(props: { event: RecycleEvent | null }) {
 
   //update the counter of number of times the ad was viewed
   useEffect(() => {
+    if (loading) return
+    loading = true
     //if the user is viewing his own ad, don't increment the counter
     if (!event || (event.user as PopulatedProp)._id === session?.id) return
 
@@ -45,6 +49,9 @@ export default function ShowSingleEvent(props: { event: RecycleEvent | null }) {
         console.log(
           'Неизвестная ошибка при обновлении числа просмотров обьявления',
         )
+      })
+      .finally(() => {
+        loading = false
       })
   }, [])
 
