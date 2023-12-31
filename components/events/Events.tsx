@@ -12,8 +12,8 @@ import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
 export default function Events(props: { variant: Variant }) {
-  const forward = 'forward'
-  const backward = 'backward'
+  const prev = 'prev'
+  const next = 'next'
   const titleHeading = 'Мои предложения о вывозе отходов'
   const errorMessage = 'Неизвестная ошибка'
 
@@ -25,7 +25,7 @@ export default function Events(props: { variant: Variant }) {
   const [pageSize, setPageSize] = useState(1)
   const [numRows, setNumRows] = useState(0)
   const [variant, setVariant] = useState<Variant>(initialVariant)
-  const [direction, setDirection] = useState(forward)
+  const [direction, setDirection] = useState(prev)
   const [backendError, setBackendError] = useState('')
   const [data, setData] = useState<Event[]>([])
   const [loading, setLoading] = useState(false)
@@ -150,10 +150,10 @@ export default function Events(props: { variant: Variant }) {
   const handlePageChange = (_: unknown, newPage: number) => {
     if (numRows > 0) {
       if (newPage - page > 0) {
-        setDirection(backward)
+        setDirection(next)
         setOffset(data[data.length - 1]._id as string)
       } else {
-        setDirection(forward)
+        setDirection(prev)
         setOffset(data[0]._id as string)
       }
     }

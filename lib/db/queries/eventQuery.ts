@@ -29,7 +29,7 @@ const eventQueries = {
 
     const {
       variant = 'active',
-      direction = 'forward',
+      direction = 'prev',
       offset = '',
       pageSize = 0,
     } = queryParams
@@ -48,15 +48,15 @@ const eventQueries = {
     query['user'] = new mongoose.Types.ObjectId(user)
 
     if (offset) {
-      if (direction === 'forward') {
+      if (direction === 'prev') {
         query['_id'] = {
-          $gt: new mongoose.Types.ObjectId(offset),
+          $lt: new mongoose.Types.ObjectId(offset),
         }
       }
 
-      if (direction === 'backward') {
+      if (direction === 'next') {
         query['_id'] = {
-          $lt: new mongoose.Types.ObjectId(offset),
+          $gt: new mongoose.Types.ObjectId(offset),
         }
       }
     }
