@@ -85,8 +85,8 @@ export const date = yup
     return dayjs(value).isValid()
   })
   .test('dateIsSameOrAfter', dateIsSameOrAfter, function (value) {
-    return dayjs(value).isSameOrAfter(dayjs(), 'day')
+    return dayjs(value).isSameOrAfter(dayjs())
   })
   .test('dateIsOneYearAfterNow', dateIsOneYearAfterNow, function (value) {
-    return dayjs(value).isSameOrBefore(dayjs().add(1, 'year'), 'day')
+    return dayjs(value).isSameOrBefore(dayjs().add(1, 'year'))
   })
