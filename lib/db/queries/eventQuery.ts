@@ -75,9 +75,7 @@ const eventQueries = {
       .limit(pageSize)
       .populate('waste')
 
-    const totalItems = await Event.countDocuments({
-      user: query['user'],
-    })
+    const totalItems = await Event.countDocuments(query)
 
     return { total: totalItems, events }
   },
