@@ -16,6 +16,10 @@ import type {
 import { useRouter } from 'next/router'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
+const api = '/api/events'
+const createRoute = `${api}/create`
+const indexRoute = '/my/events'
+const inactiveEventsRoute = '/my/events/inactive'
 
 export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
   const { event, userPhone } = props
@@ -34,7 +38,7 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
 
     const normailizedValues = getNormalizedValues(values)
 
-    fetch('/api/events', {
+    fetch(createRoute, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(normailizedValues),
@@ -48,7 +52,7 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
           showErrorMessages(data.error, setErrors, setNotification)
         } else if (data.message) {
           resetForm()
-          router.push('/my/events')
+          router.push(indexRoute)
         }
       })
       .catch((error) => {
@@ -68,7 +72,7 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
     //delete user property from modifiedValues
     const { user, ...modifiedValues } = values
     const searchParams = isInactive ? new URLSearchParams({ isInactive }) : ''
-    fetch(`/api/events?${searchParams}`, {
+    fetch(`${api}?${searchParams}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -85,8 +89,8 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
           showErrorMessages(data.error, setErrors, setNotification)
         } else if (data.message) {
           isInactive
-            ? router.push('/my/events/inactive')
-            : router.push('/my/events')
+            ? router.push(inactiveEventsRoute)
+            : router.push(indexRoute)
         }
       })
       .catch((error) => {
