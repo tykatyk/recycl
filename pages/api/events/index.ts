@@ -3,34 +3,37 @@ import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { eventValidationSchema } from '../../../lib/validation/eventFormValidator'
 import eventQueries from '../../../lib/db/queries/eventQuery'
+import eventModel from '../../../lib/db/models/eventModel'
 import {
   errorResponse,
   perFormErrorResponse,
 } from '../../../lib/helpers/responses'
 import dbConnect from '../../../lib/db/connection'
+import type { IsInactive } from '../../../lib/types/event'
+import mongoose from 'mongoose'
 
 export default async function Events(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  //check if user is authenticated
   const session = await getServerSession(req, res, authOptions)
-
   if (!session) {
     res.status(401).end()
     return
   }
 
-  if (req.method === 'GET') {
-    await dbConnect()
+  const userId = session.id
+  await dbConnect()
 
-    const userId = session?.id
+  //read event
+  if (req.method === 'GET') {
     const data = await eventQueries.getAll(req.query, userId)
     res.json(data)
   }
 
+  //create event
   if (req.method === 'POST') {
-    await dbConnect()
-
     try {
       await eventValidationSchema.validate(req.body, {
         abortEarly: false,
@@ -42,7 +45,7 @@ export default async function Events(
 
     try {
       await eventQueries.create(req.body, {
-        _id: session.id,
+        _id: userId,
       })
     } catch (e) {
       perFormErrorResponse('Ошибка при создании документа', res)
@@ -52,10 +55,12 @@ export default async function Events(
     res.status(200).json({ message: 'Документ успешно создан' })
   }
 
+  //update event
   if (req.method === 'PUT') {
-    await dbConnect()
     const event = req.body
-    //ToDo check if user has right to update events
+    const { isInactive }: IsInactive = req.query
+    const { _id: eventId, ...eventRest } = event
+
     try {
       await eventValidationSchema.validate(event, {
         abortEarly: false,
@@ -65,10 +70,15 @@ export default async function Events(
       return errorResponse(error, res)
     }
 
+    if (isInactive) eventRest.isActive = false
+
     try {
-      await eventQueries.update(event)
+      await eventModel.updateOne(
+        { _id: eventId, user: new mongoose.Types.ObjectId(userId) },
+        eventRest,
+      )
     } catch (e) {
-      console.log('here')
+      console.log(e)
       perFormErrorResponse('Ошибка при обновлении документа', res)
       return
     }

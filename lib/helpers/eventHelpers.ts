@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import dayjs from 'dayjs'
-import type { Event } from '../types/event'
+import type { Event, EventActions } from '../types/event'
 
 export function getInitialValues(event?: Event, userPhone: string = ''): Event {
   return {
@@ -69,4 +69,10 @@ export function getColumns(
       headerAlign: 'center',
     },
   ]
+}
+
+export const eventActions: EventActions = {
+  activate: 'activate',
+  deactivate: 'deactivate',
+  remove: 'remove',
 }

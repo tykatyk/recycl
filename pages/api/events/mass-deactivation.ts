@@ -3,6 +3,10 @@ import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import eventModel from '../../../lib/db/models/eventModel'
 import dbConnect from '../../../lib/db/connection'
+import type { EventActions } from '../../../lib/types/event'
+import { eventActions } from '../../../lib/helpers/eventHelpers'
+
+const { activate } = eventActions
 
 export default async function EventMassDeactivation(
   req: NextApiRequest,
@@ -18,7 +22,13 @@ export default async function EventMassDeactivation(
   if (req.method === 'POST') {
     await dbConnect()
 
-    const { eventIds }: { eventIds: string[] } = req.body
+    const {
+      eventIds,
+      action,
+    }: {
+      eventIds: string[]
+      action: keyof Pick<EventActions, 'activate' | 'deactivate'>
+    } = req.body
 
     if (!Array.isArray(eventIds) || eventIds.length < 1) {
       res
@@ -30,7 +40,7 @@ export default async function EventMassDeactivation(
     try {
       await eventModel.updateMany(
         { user: session.id, _id: { $in: eventIds } },
-        { isActive: false },
+        { isActive: action === activate ? true : false },
       )
     } catch (e) {
       console.log(e)

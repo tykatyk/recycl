@@ -8,9 +8,12 @@ import {
 } from '../../lib/helpers/eventHelpers'
 import { eventSchema } from '../../lib/validation'
 import showErrorMessages from '../../lib/helpers/showErrorMessages'
-import type { Event, EventCreateUpdateProps } from '../../lib/types/event'
+import type {
+  Event,
+  EventCreateUpdateProps,
+  IsInactive,
+} from '../../lib/types/event'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 
@@ -18,9 +21,9 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
   const { event, userPhone } = props
   const [severity, setSeverity] = useState<string>('success')
   const router = useRouter()
+  const { isInactive }: IsInactive = router.query
   const [notification, setNotification] = useState<string>('')
   const initialValues = getInitialValues(event, userPhone)
-  const { data: session } = useSession()
 
   //ToDo: refactor to helper function, since this handler can also be used for creating removalApplications
   const createHandler = (
@@ -62,15 +65,15 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
     { setSubmitting, setErrors }: FormikHelpers<Event>,
   ) => {
     setSubmitting(true)
-
-    fetch('/api/events', {
+    //delete user property from modifiedValues
+    const { user, ...modifiedValues } = values
+    const searchParams = isInactive ? new URLSearchParams({ isInactive }) : ''
+    fetch(`/api/events?${searchParams}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         _id: event?._id,
-        isActive: true,
-        ...values,
-        user: event?.user,
+        ...modifiedValues,
       }),
     })
       .then((response) => {
@@ -81,7 +84,9 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
           setSeverity('error')
           showErrorMessages(data.error, setErrors, setNotification)
         } else if (data.message) {
-          router.push('/my/events')
+          isInactive
+            ? router.push('/my/events/inactive')
+            : router.push('/my/events')
         }
       })
       .catch((error) => {

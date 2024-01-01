@@ -10,15 +10,26 @@ import {
   TableRow,
   Button,
   Box,
+  Typography,
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import clsx from 'clsx'
-import { Variant, Event } from '../../lib/types/event'
+import type {
+  Variant,
+  Event,
+  IsInactive,
+  EventActions,
+} from '../../lib/types/event'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
-import { getColumns } from '../../lib/helpers/eventHelpers'
+import { getColumns, eventActions } from '../../lib/helpers/eventHelpers'
+import { date } from '../../lib/validation/atomicValidators'
+
+const isInactive: IsInactive = {
+  isInactive: '1',
+}
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -75,9 +86,12 @@ type EventsTableProps = {
   handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
   handleDeactivationAndDeletion: (
     eventIds: string[] | undefined,
-    action: 'inactivate' | 'delete',
+    action: keyof EventActions,
   ) => Promise<void>
 }
+
+const message = 'Дата и время в объявлении меньше текущих'
+const { activate, deactivate, remove } = eventActions
 
 export default function EventsTable({
   variant,
@@ -89,10 +103,12 @@ export default function EventsTable({
 }: EventsTableProps) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
   const [buttonDisabled, setButtonDisabled] = useState(false)
+  const [validationError, setValidationError] = useState('')
+  const [staleAd, setStaleAd] = useState('')
 
   const getHeader = useCallback<() => ReactNode | 'Дата'>(() => {
     if (selectedRows.length > 0) {
-      const action = variant === 'inactive' ? 'delete' : 'inactivate'
+      const action = variant === 'inactive' ? remove : deactivate
       const buttonText = variant === 'inactive' ? 'Удалить' : 'Деактивировать'
 
       return (
@@ -111,6 +127,22 @@ export default function EventsTable({
     }
     return 'Дата'
   }, [variant, selectedRows])
+
+  const ErrorComponent = () => {
+    return (
+      <TableRow className={'noBorder'}>
+        <TableCell colSpan={4}>
+          <Typography
+            component="div"
+            variant="body2"
+            sx={{ color: 'error.main' }}
+          >
+            {message}
+          </Typography>
+        </TableCell>
+      </TableRow>
+    )
+  }
 
   return (
     <Root>
@@ -148,7 +180,7 @@ export default function EventsTable({
                 <React.Fragment key={index}>
                   <TableRow className={clsx('noBorder', 'dataRow')}>
                     <TableCell
-                      rowSpan={2}
+                      rowSpan={validationError && row._id === staleAd ? 3 : 2}
                       onClick={() => {
                         handleSelect(row)
                       }}
@@ -186,7 +218,13 @@ export default function EventsTable({
                       <Box className={'actions'}>
                         <Button
                           color="secondary"
-                          href={`/my/events/edit/${row._id}`}
+                          href={
+                            variant === 'inactive'
+                              ? `/my/events/edit/${
+                                  row._id
+                                }?${new URLSearchParams(isInactive)}`
+                              : `/my/events/edit/${row._id}`
+                          }
                           className="button"
                           startIcon={<EditIcon />}
                         >
@@ -205,13 +243,13 @@ export default function EventsTable({
                             if (variant === 'inactive') {
                               await handleDeactivationAndDeletion(
                                 [row._id],
-                                'delete',
+                                remove,
                               )
                             }
                             if (variant === 'active') {
                               await handleDeactivationAndDeletion(
                                 [row._id],
-                                'inactivate',
+                                deactivate,
                               )
                             }
                             setButtonDisabled(false)
@@ -222,6 +260,43 @@ export default function EventsTable({
                             ? 'Удалить'
                             : 'Деактивировать'}
                         </Button>
+                        {variant === 'inactive' && (
+                          <Button
+                            color="secondary"
+                            className="button"
+                            disabled={buttonDisabled}
+                            onClick={async () => {
+                              //Just another check to prevent Typescript error
+                              if (!row._id) return
+
+                              if (validationError) setValidationError('')
+                              if (staleAd) setStaleAd('')
+
+                              setButtonDisabled(true)
+
+                              try {
+                                setButtonDisabled(true)
+                                await date.validate(row.date)
+                              } catch (e) {
+                                setStaleAd(row._id)
+                                setValidationError(message)
+                                return
+                              } finally {
+                                setButtonDisabled(false)
+                              }
+
+                              await handleDeactivationAndDeletion(
+                                [row._id],
+                                activate,
+                              )
+
+                              setButtonDisabled(false)
+                            }}
+                            startIcon={<DeleteIcon />}
+                          >
+                            {'Активировать'}
+                          </Button>
+                        )}
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -241,6 +316,8 @@ export default function EventsTable({
                       </Box>
                     </TableCell>
                   </TableRow>
+                  {row._id === staleAd ? <ErrorComponent /> : null}
+                  {/*Don't add spacer after the last row*/}
                   {index !== rows.length - 1 && <Spacer />}
                 </React.Fragment>
               )

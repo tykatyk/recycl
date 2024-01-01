@@ -24,3 +24,13 @@ export type Event = {
   comment?: string
   viewCount?: number
 }
+
+export type IsInactive = {
+  isInactive?: '1'
+}
+
+export type EventActions = {
+  activate: 'activate'
+  deactivate: 'deactivate'
+  remove: 'remove'
+}

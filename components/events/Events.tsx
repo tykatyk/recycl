@@ -6,17 +6,19 @@ import DataGridFooter from '../uiParts/DataGridFooter'
 import NoRows from '../uiParts/NoRows'
 import Error from '../uiParts/Error'
 import EventsTable from './EventsTable'
-import { Event, Variant } from '../../lib/types/event'
+import type { Event, Variant, EventActions } from '../../lib/types/event'
+import { eventActions } from '../../lib/helpers/eventHelpers'
 import { _id } from '@next-auth/mongodb-adapter'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
-export default function Events(props: { variant: Variant }) {
-  const prev = 'prev'
-  const next = 'next'
-  const titleHeading = 'Мои предложения о вывозе отходов'
-  const errorMessage = 'Неизвестная ошибка'
+const { activate, deactivate, remove } = eventActions
+const prev = 'prev'
+const next = 'next'
+const titleHeading = 'Мои предложения о вывозе отходов'
+const errorMessage = 'Неизвестная ошибка'
 
+export default function Events(props: { variant: Variant }) {
   const { variant: initialVariant } = props
 
   const [selected, setSelected] = useState<string[]>([])
@@ -46,21 +48,20 @@ export default function Events(props: { variant: Variant }) {
 
   const handleDeactivationAndDeletion = async (
     eventIds: string[] = [],
-    action: 'inactivate' | 'delete',
+    action: keyof EventActions,
   ) => {
-    if (
-      (action !== 'inactivate' && action !== 'delete') ||
-      eventIds.length === 0
-    )
-      return
+    if (eventIds.length === 0) return
 
     let route = ''
 
     switch (action) {
-      case 'inactivate':
+      case deactivate:
         route = 'mass-deactivation'
         break
-      case 'delete':
+      case activate:
+        route = 'mass-deactivation'
+        break
+      case remove:
         route = 'mass-deletion'
         break
       default:
@@ -69,7 +70,10 @@ export default function Events(props: { variant: Variant }) {
     setLoading(true)
     await fetch(`/api/events/${route}`, {
       method: 'POST',
-      body: JSON.stringify({ eventIds }),
+      body:
+        action === activate || action === deactivate
+          ? JSON.stringify({ eventIds, action })
+          : JSON.stringify({ eventIds }),
       headers: {
         'Content-Type': 'application/json',
       },
