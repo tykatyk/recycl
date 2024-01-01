@@ -76,3 +76,42 @@ export const eventActions: EventActions = {
   deactivate: 'deactivate',
   remove: 'remove',
 }
+
+export const getEventTableStyles = (theme) => ({
+  width: '100%',
+
+  '& .noBorder>td, & .spacer': {
+    borderBottom: 'none',
+    borderTop: 'none',
+  },
+  '& .dataRow td': {
+    ...theme.typography.body1,
+  },
+
+  '& .actions': {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    '&>*:not(:last-child)': {
+      marginRight: '32px',
+    },
+  },
+
+  '& .actionsRow td': {
+    border: 'none',
+  },
+
+  '& .header>th': {
+    textTransform: 'uppercase',
+    borderBottom: 'none',
+  },
+
+  '& tbody td:not(.spacer)': {
+    background: '#1d303a',
+  },
+
+  '& .button': {
+    fontWeight: theme.typography.fontWeightLight,
+    textTransform: 'none',
+  },
+})

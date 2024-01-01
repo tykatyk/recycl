@@ -24,51 +24,20 @@ import type {
 } from '../../lib/types/event'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
-import { getColumns, eventActions } from '../../lib/helpers/eventHelpers'
+import {
+  getColumns,
+  eventActions,
+  getEventTableStyles,
+} from '../../lib/helpers/eventHelpers'
 import { date } from '../../lib/validation/atomicValidators'
 
 const isInactive: IsInactive = {
   isInactive: '1',
 }
 
-const Root = styled('div')(({ theme }) => ({
-  width: '100%',
-
-  '& .noBorder>td, & .spacer': {
-    borderBottom: 'none',
-    borderTop: 'none',
-  },
-  '& .dataRow td': {
-    ...theme.typography.body1,
-  },
-
-  '& .actions': {
-    display: 'flex',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    '&>*:not(:last-child)': {
-      marginRight: '32px',
-    },
-  },
-
-  '& .actionsRow td': {
-    border: 'none',
-  },
-
-  '& .header>th': {
-    textTransform: 'uppercase',
-    borderBottom: 'none',
-  },
-
-  '& tbody td:not(.spacer)': {
-    background: '#1d303a',
-  },
-
-  '& .button': {
-    fontWeight: theme.typography.fontWeightLight,
-    textTransform: 'none',
-  },
-}))
+const Root = styled('div')(({ theme }) => {
+  return getEventTableStyles(theme)
+})
 
 const Spacer = () => {
   return (
