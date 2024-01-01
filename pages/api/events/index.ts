@@ -85,17 +85,4 @@ export default async function Events(
 
     res.status(200).json({ message: 'Документ обновлен' })
   }
-
-  //delete event
-  if (req.method === 'DELETE') {
-    const eventId = req.query
-
-    try {
-      await eventModel.deleteOne({ user: userId, _id: eventId })
-    } catch (e) {
-      res.status(500).json({ error: 'An error occurred while deleting event' })
-      return
-    }
-    res.status(200).json({ message: 'Документ удален' })
-  }
 }

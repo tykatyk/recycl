@@ -18,7 +18,7 @@ const next = 'next'
 const titleHeading = 'Мои предложения о вывозе отходов'
 const errorMessage = 'Неизвестная ошибка'
 const changeActivityRoute = 'changeActivity'
-const bulkDeletionRoute = 'bulkDeletion'
+const deletionRoute = 'delete'
 const api = '/api/events/'
 const activeEventsRoute = '/my/events'
 const inactiveEventsRoute = '/my/events/inactive'
@@ -67,7 +67,7 @@ export default function Events(props: { variant: Variant }) {
         actionRoute = changeActivityRoute
         break
       case remove:
-        actionRoute = bulkDeletionRoute
+        actionRoute = deletionRoute
         break
       default:
         return
