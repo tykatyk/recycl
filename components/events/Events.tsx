@@ -13,6 +13,8 @@ import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
 const { activate, deactivate, remove } = eventActions
+
+const active = 'active'
 const prev = 'prev'
 const next = 'next'
 const titleHeading = 'Мои предложения о вывозе отходов'
@@ -44,7 +46,7 @@ export default function Events(props: { variant: Variant }) {
     setVariant(newValue)
     setSelected([])
 
-    if (newValue === 'active') {
+    if (newValue === active) {
       window.history.pushState(null, '', activeEventsRoute)
     } else {
       window.history.pushState(null, '', inactiveEventsRoute)
@@ -127,7 +129,7 @@ export default function Events(props: { variant: Variant }) {
   const fetcher = useCallback(async () => {
     setLoading(true)
     await fetch(
-      `/api/events?${new URLSearchParams({
+      `${api}?${new URLSearchParams({
         variant,
         offset,
         direction,

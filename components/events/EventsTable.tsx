@@ -95,9 +95,8 @@ const active = 'active'
 const inactive = 'inactive'
 
 const validationErrorMsg = 'Дата и время в объявлении меньше текущих'
-const deleteMsg = 'Удалить'
-const deactivateMsg = 'Деактивировать'
-
+const deleteBtnText = 'Удалить'
+const deactivateBtnText = 'Деактивировать'
 const selectAllBtnText = 'Выбрать все'
 const editBtnText = 'Редактировать'
 const activateBtnText = 'Активировать'
@@ -119,7 +118,8 @@ export default function EventsTable({
   const getHeader = useCallback<() => ReactNode | 'Дата'>(() => {
     if (selectedRows.length > 0) {
       const action = variant === inactive ? remove : deactivate
-      const buttonText = variant === inactive ? deleteMsg : deactivateMsg
+      const buttonText =
+        variant === inactive ? deleteBtnText : deactivateBtnText
 
       return (
         <Button
@@ -266,7 +266,9 @@ export default function EventsTable({
                           }}
                           startIcon={<DeleteIcon />}
                         >
-                          {variant === inactive ? deleteMsg : deactivateMsg}
+                          {variant === inactive
+                            ? deleteBtnText
+                            : deactivateBtnText}
                         </Button>
                         {variant === inactive && (
                           <Button
