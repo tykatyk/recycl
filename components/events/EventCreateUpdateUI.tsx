@@ -18,6 +18,7 @@ import { useRouter } from 'next/router'
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 const api = '/api/events'
 const createRoute = `${api}/create`
+const updateRoute = (id: string) => `${api}/${id}`
 const indexRoute = '/my/events'
 const inactiveEventsRoute = '/my/events/inactive'
 
@@ -68,15 +69,18 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
     values: Event,
     { setSubmitting, setErrors }: FormikHelpers<Event>,
   ) => {
+    //though event._id always exists in update handler
+    //we check it anyway to narrow its type and prevent Typescript error
+    if (!event || !event._id) return
     setSubmitting(true)
     //delete user property from modifiedValues
     const { user, ...modifiedValues } = values
     const searchParams = isInactive ? new URLSearchParams({ isInactive }) : ''
-    fetch(`${api}?${searchParams}`, {
+    fetch(`${updateRoute(event._id)}?${searchParams}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        _id: event?._id,
+        // _id: event?._id,
         ...modifiedValues,
       }),
     })
