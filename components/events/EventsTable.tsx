@@ -27,6 +27,7 @@ import 'dayjs/locale/ru'
 import {
   getColumns,
   eventActions,
+  eventVariants,
   getEventTableStyles,
 } from '../../lib/helpers/eventHelpers'
 import { date } from '../../lib/validation/atomicValidators'
@@ -60,8 +61,7 @@ type EventsTableProps = {
 }
 
 const { activate, deactivate, remove } = eventActions
-const active = 'active'
-const inactive = 'inactive'
+const { active, inactive } = eventVariants
 
 const validationErrorMsg = 'Дата и время в объявлении меньше текущих'
 const deleteBtnText = 'Удалить'

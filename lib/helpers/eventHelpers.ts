@@ -77,6 +77,11 @@ export const eventActions: EventActions = {
   remove: 'remove',
 }
 
+export const eventVariants = {
+  active: 'active',
+  inactive: 'inactive',
+}
+
 export const getEventTableStyles = (theme) => ({
   width: '100%',
 
