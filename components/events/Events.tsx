@@ -17,6 +17,11 @@ const prev = 'prev'
 const next = 'next'
 const titleHeading = 'Мои предложения о вывозе отходов'
 const errorMessage = 'Неизвестная ошибка'
+const changeActivityRoute = 'changeActivity'
+const bulkDeletionRoute = 'bulkDeletion'
+const api = '/api/events/'
+const activeEventsRoute = '/my/events'
+const inactiveEventsRoute = '/my/events/inactive'
 
 export default function Events(props: { variant: Variant }) {
   const { variant: initialVariant } = props
@@ -40,9 +45,9 @@ export default function Events(props: { variant: Variant }) {
     setSelected([])
 
     if (newValue === 'active') {
-      window.history.pushState(null, '', '/my/events')
+      window.history.pushState(null, '', activeEventsRoute)
     } else {
-      window.history.pushState(null, '', `/my/events/${newValue}`)
+      window.history.pushState(null, '', inactiveEventsRoute)
     }
   }
 
@@ -52,23 +57,23 @@ export default function Events(props: { variant: Variant }) {
   ) => {
     if (eventIds.length === 0) return
 
-    let route = ''
+    let actionRoute = ''
 
     switch (action) {
       case deactivate:
-        route = 'mass-deactivation'
+        actionRoute = changeActivityRoute
         break
       case activate:
-        route = 'mass-deactivation'
+        actionRoute = changeActivityRoute
         break
       case remove:
-        route = 'mass-deletion'
+        actionRoute = bulkDeletionRoute
         break
       default:
         return
     }
     setLoading(true)
-    await fetch(`/api/events/${route}`, {
+    await fetch(`${api}${actionRoute}`, {
       method: 'POST',
       body:
         action === activate || action === deactivate

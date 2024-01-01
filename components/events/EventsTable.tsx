@@ -90,8 +90,18 @@ type EventsTableProps = {
   ) => Promise<void>
 }
 
-const message = 'Дата и время в объявлении меньше текущих'
 const { activate, deactivate, remove } = eventActions
+const active = 'active'
+const inactive = 'inactive'
+
+const validationErrorMsg = 'Дата и время в объявлении меньше текущих'
+const deleteMsg = 'Удалить'
+const deactivateMsg = 'Деактивировать'
+
+const selectAllBtnText = 'Выбрать все'
+const editBtnText = 'Редактировать'
+const activateBtnText = 'Активировать'
+const editRoute = '/my/events/edit/'
 
 export default function EventsTable({
   variant,
@@ -108,8 +118,8 @@ export default function EventsTable({
 
   const getHeader = useCallback<() => ReactNode | 'Дата'>(() => {
     if (selectedRows.length > 0) {
-      const action = variant === 'inactive' ? remove : deactivate
-      const buttonText = variant === 'inactive' ? 'Удалить' : 'Деактивировать'
+      const action = variant === inactive ? remove : deactivate
+      const buttonText = variant === inactive ? deleteMsg : deactivateMsg
 
       return (
         <Button
@@ -137,7 +147,7 @@ export default function EventsTable({
             variant="body2"
             sx={{ color: 'error.main' }}
           >
-            {message}
+            {validationErrorMsg}
           </Typography>
         </TableCell>
       </TableRow>
@@ -159,7 +169,7 @@ export default function EventsTable({
                       color="secondary"
                       checked={rows && selectedRows.length > 0}
                       inputProps={{
-                        'aria-label': 'Выбрать все',
+                        'aria-label': selectAllBtnText,
                       }}
                       onChange={(e) => {
                         handleSelectAll(e)
@@ -219,16 +229,16 @@ export default function EventsTable({
                         <Button
                           color="secondary"
                           href={
-                            variant === 'inactive'
-                              ? `/my/events/edit/${
-                                  row._id
-                                }?${new URLSearchParams(isInactive)}`
-                              : `/my/events/edit/${row._id}`
+                            variant === inactive
+                              ? `${editRoute}${row._id}?${new URLSearchParams(
+                                  isInactive,
+                                )}`
+                              : `${editRoute}${row._id}`
                           }
                           className="button"
                           startIcon={<EditIcon />}
                         >
-                          {'Редактировать'}
+                          {editBtnText}
                         </Button>
                         <Button
                           color="secondary"
@@ -240,13 +250,13 @@ export default function EventsTable({
                             //Just another check to prevent Typescript error
                             if (!row._id) return
 
-                            if (variant === 'inactive') {
+                            if (variant === inactive) {
                               await handleDeactivationAndDeletion(
                                 [row._id],
                                 remove,
                               )
                             }
-                            if (variant === 'active') {
+                            if (variant === active) {
                               await handleDeactivationAndDeletion(
                                 [row._id],
                                 deactivate,
@@ -256,11 +266,9 @@ export default function EventsTable({
                           }}
                           startIcon={<DeleteIcon />}
                         >
-                          {variant === 'inactive'
-                            ? 'Удалить'
-                            : 'Деактивировать'}
+                          {variant === inactive ? deleteMsg : deactivateMsg}
                         </Button>
-                        {variant === 'inactive' && (
+                        {variant === inactive && (
                           <Button
                             color="secondary"
                             className="button"
@@ -279,7 +287,7 @@ export default function EventsTable({
                                 await date.validate(row.date)
                               } catch (e) {
                                 setStaleAd(row._id)
-                                setValidationError(message)
+                                setValidationError(validationErrorMsg)
                                 return
                               } finally {
                                 setButtonDisabled(false)
@@ -294,7 +302,7 @@ export default function EventsTable({
                             }}
                             startIcon={<DeleteIcon />}
                           >
-                            {'Активировать'}
+                            {activateBtnText}
                           </Button>
                         )}
                       </Box>
