@@ -1,67 +1,89 @@
-//ToDo: Add validation before create and update operations
 import { Event } from '../models/index'
-import mongoose from 'mongoose'
 import { _id } from '@next-auth/mongodb-adapter'
+import { eventVariants } from '../../helpers/eventHelpers'
+import type { Variant, Direction } from '../../types/event'
+const { active } = eventVariants
 
-const eventQueries = {
-  create: async (data, user) => {
-    if (!user) return null
+type QueryParams = {
+  variant?: Variant
+  direction?: Direction
+  offset?: string
+  offsetDate?: string
+  pageSize?: number
+}
 
-    data.user = user['_id']
+const getQuery = (queryParams: Omit<QueryParams, 'pageSize'>, user: string) => {
+  const {
+    variant = active,
+    direction,
+    offset = '',
+    offsetDate = '',
+  } = queryParams
 
-    const event = new Event(data)
-    return await event.save()
-  },
+  const query = {}
 
-  get: async (id) => {
-    const result = await Event.findById(id, {
-      __v: 0,
-      isActive: 0,
-      expires: 0,
-      createdAt: 0,
-      updatedAt: 0,
-    }).exec()
-    return result
-  },
+  query['user'] = user
 
-  getAll: async (queryParams, user) => {
-    if (!user) return { total: 0, data: [] }
-
-    const {
-      variant = 'active',
-      direction = 'prev',
-      offset = '',
-      pageSize = 0,
-    } = queryParams
-
-    type EventQuery = {
-      user: mongoose.Types.ObjectId
-      _id?: {
-        $lt?: mongoose.Types.ObjectId
-        $gt?: mongoose.Types.ObjectId
+  if (offset) {
+    if (direction === 'prev') {
+      if (variant === 'active') {
+        //prev active
+        query['isActive'] = true
+        query['_id'] = { $gt: offset }
+        query['$and'] = [
+          { date: { $gte: new Date(offsetDate) } },
+          { date: { $gte: new Date() } },
+        ]
+      } else {
+        //prev inactive
+        query['$or'] = [
+          {
+            isActive: false,
+            _id: { $gt: offset },
+            date: {
+              $gte: new Date(offsetDate),
+            },
+          },
+          {
+            isActive: true,
+            _id: { $gt: offset },
+            date: {
+              $and: [{ $gte: new Date(offsetDate) }, { $lt: new Date() }],
+            },
+          },
+        ]
       }
-      isActive: Boolean
+    } else {
+      if (variant === 'active') {
+        //next active
+        query['isActive'] = true
+        query['_id'] = { $lt: offset }
+        query['$and'] = [
+          { date: { $lte: new Date(offsetDate) } },
+          { date: { $gte: new Date() } },
+        ]
+      } else {
+        //next inactive
+        query['$or'] = [
+          {
+            isActive: false,
+            _id: { $lt: offset },
+            date: {
+              $lte: new Date(offsetDate),
+            },
+          },
+          {
+            isActive: true,
+            _id: { $lt: offset },
+            date: {
+              $and: [{ $lte: new Date(offsetDate) }, { $lt: new Date() }],
+            },
+          },
+        ]
+      }
     }
-
-    const query: EventQuery | {} = {}
-
-    query['user'] = new mongoose.Types.ObjectId(user)
-
-    if (offset) {
-      if (direction === 'prev') {
-        query['_id'] = {
-          $lt: new mongoose.Types.ObjectId(offset),
-        }
-      }
-
-      if (direction === 'next') {
-        query['_id'] = {
-          $gt: new mongoose.Types.ObjectId(offset),
-        }
-      }
-    }
-
-    if (variant === 'active') {
+  } else {
+    if (variant === active) {
       query['isActive'] = true
       query['date'] = {
         $gte: new Date(),
@@ -69,29 +91,58 @@ const eventQueries = {
     } else {
       query['$or'] = [{ isActive: false }, { date: { $lt: new Date() } }]
     }
+  }
+  return query
+}
 
-    const events = await Event.find(query)
-      .sort({ date: -1 })
+const getCountQuery = (
+  queryParams: Pick<QueryParams, 'variant'>,
+  user: string,
+) => {
+  let countQuery = { user }
+
+  if (queryParams.variant === active) {
+    countQuery['$and'] = [{ isActive: true }, { date: { $gt: new Date() } }]
+  } else {
+    countQuery['$or'] = [{ isActive: false }, { date: { $lt: new Date() } }]
+  }
+  return countQuery
+}
+
+const getSortQuery = (direction?: Direction) => {
+  let sortQuery = {}
+
+  if (direction === 'prev') {
+    sortQuery['date'] = 1
+    sortQuery['_id'] = 1
+  } else {
+    sortQuery['date'] = -1
+    sortQuery['_id'] = -1
+  }
+  console.log(sortQuery)
+  return sortQuery
+}
+
+const eventQueries = {
+  getAll: async (queryParams: QueryParams, user: string) => {
+    if (!user) return { total: 0, data: [] }
+
+    const { pageSize = 0, ...rest } = queryParams
+
+    const query = getQuery(rest, user)
+    const countQuery = getCountQuery(rest, user)
+    const sortQuery = getSortQuery(queryParams.direction)
+
+    let events = await Event.find(query)
+      .sort(sortQuery)
       .limit(pageSize)
       .populate('waste')
 
-    const totalItems = await Event.countDocuments(query)
+    if (queryParams.direction == 'prev') events = events.reverse()
+
+    const totalItems = await Event.countDocuments(countQuery)
 
     return { total: totalItems, events }
-  },
-
-  update: async (newValue) => {
-    return await Event.findByIdAndUpdate(newValue._id, newValue, {
-      new: true,
-    }).exec()
-  },
-
-  delete: async (id) => {
-    return await Event.findByIdAndRemove(id).exec()
-  },
-
-  deleteMany: async (ids) => {
-    return await Event.deleteMany({ _id: { $in: ids } }).exec()
   },
 }
 export default eventQueries

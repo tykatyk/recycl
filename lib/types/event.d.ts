@@ -5,6 +5,8 @@ import type { Dayjs } from 'dayjs'
 
 export type Variant = 'inactive' | 'active'
 
+export type Direction = 'prev' | 'next'
+
 export type SSProps = {
   props: EventProps
 }

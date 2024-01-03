@@ -6,7 +6,12 @@ import DataGridFooter from '../uiParts/DataGridFooter'
 import NoRows from '../uiParts/NoRows'
 import Error from '../uiParts/Error'
 import EventsTable from './EventsTable'
-import type { Event, Variant, EventActions } from '../../lib/types/event'
+import type {
+  Event,
+  Variant,
+  Direction,
+  EventActions,
+} from '../../lib/types/event'
 import { eventActions } from '../../lib/helpers/eventHelpers'
 import { _id } from '@next-auth/mongodb-adapter'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
@@ -14,9 +19,9 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
 const { activate, deactivate, remove } = eventActions
 
-const active = 'active'
-const prev = 'prev'
-const next = 'next'
+const active: Variant = 'active'
+const prev: Direction = 'prev'
+const next: Direction = 'next'
 const titleHeading = 'Мои предложения о вывозе отходов'
 const errorMessage = 'Неизвестная ошибка'
 const changeActivityRoute = 'changeActivity'
@@ -31,22 +36,27 @@ export default function Events(props: { variant: Variant }) {
   const [selected, setSelected] = useState<string[]>([])
   const [page, setPage] = useState(0)
   const [offset, setOffset] = useState('')
+  const [offsetDate, setOffsetDate] = useState('')
   const [pageSize, setPageSize] = useState(1)
   const [numRows, setNumRows] = useState(0)
   const [variant, setVariant] = useState<Variant>(initialVariant)
-  const [direction, setDirection] = useState(prev)
+  const [direction, setDirection] = useState('')
   const [backendError, setBackendError] = useState('')
   const [data, setData] = useState<Event[]>([])
   const [loading, setLoading] = useState(false)
 
   const handleVariantChange = (
     event: React.SyntheticEvent,
-    newValue: Variant,
+    newVariant: Variant,
   ) => {
-    setVariant(newValue)
+    setOffset('')
+    setOffsetDate('')
+    setDirection('')
+    setPage(0)
+    setVariant(newVariant)
     setSelected([])
 
-    if (newValue === active) {
+    if (newVariant === active) {
       window.history.pushState(null, '', activeEventsRoute)
     } else {
       window.history.pushState(null, '', inactiveEventsRoute)
@@ -87,6 +97,9 @@ export default function Events(props: { variant: Variant }) {
     })
       .then((response) => {
         if (response.status === 200) {
+          setDirection('next')
+          setOffset(data[data.length - 1]._id)
+          setOffsetDate(data[data.length - 1].date)
           // refetch events
           fetcher()
         }
@@ -132,6 +145,7 @@ export default function Events(props: { variant: Variant }) {
       `${api}?${new URLSearchParams({
         variant,
         offset,
+        offsetDate,
         direction,
         pageSize: String(pageSize),
       })}`,
@@ -152,20 +166,22 @@ export default function Events(props: { variant: Variant }) {
         setBackendError(errorMessage)
       })
     setLoading(false)
-  }, [variant, offset, pageSize])
+  }, [variant, offset, offsetDate, pageSize])
 
   useEffect(() => {
     fetcher()
-  }, [variant, offset, pageSize])
+  }, [variant, offset, offsetDate, pageSize])
 
   const handlePageChange = (_: unknown, newPage: number) => {
     if (numRows > 0) {
       if (newPage - page > 0) {
         setDirection(next)
         setOffset(data[data.length - 1]._id as string)
+        setOffsetDate(data[data.length - 1].date)
       } else {
         setDirection(prev)
         setOffset(data[0]._id as string)
+        setOffsetDate(data[0].date)
       }
     }
     setPage(newPage)
@@ -177,6 +193,8 @@ export default function Events(props: { variant: Variant }) {
     setPageSize(parseInt(event.target.value, 10))
     setPage(0)
     setOffset('')
+    setOffsetDate('')
+    setDirection('')
   }
 
   let content = <NoRows />

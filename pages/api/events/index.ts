@@ -16,19 +16,20 @@ export default async function Events(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  //check if user is authenticated
-  const session = await getServerSession(req, res, authOptions)
-  if (!session) {
-    res.status(401).end()
-    return
-  }
-
-  const userId = session.id
-  await dbConnect()
-
-  //read event
   if (req.method === 'GET') {
+    //check if user is authenticated
+    const session = await getServerSession(req, res, authOptions)
+    if (!session || !session.id) {
+      res.status(401).end()
+      return
+    }
+    console.log(req.query)
+    const userId = session.id
+    await dbConnect()
+
     const data = await eventQueries.getAll(req.query, userId)
     res.json(data)
+  } else {
+    res.status(405).json({ error: 'Method not allowed' })
   }
 }
