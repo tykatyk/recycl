@@ -10,6 +10,7 @@ type QueryParams = {
   offset?: string
   offsetDate?: string
   pageSize?: number
+  dateTimeBound?: string
 }
 
 const getQuery = (queryParams: Omit<QueryParams, 'pageSize'>, user: string) => {
@@ -18,38 +19,49 @@ const getQuery = (queryParams: Omit<QueryParams, 'pageSize'>, user: string) => {
     direction,
     offset = '',
     offsetDate = '',
+    dateTimeBound,
   } = queryParams
 
   const query = {}
-
   query['user'] = user
 
+  if (!dateTimeBound) return query
+
   if (offset) {
+    query['updatedAt'] = { $lte: new Date(dateTimeBound) }
+
     if (direction === 'prev') {
       if (variant === 'active') {
         //prev active
         query['isActive'] = true
-        query['_id'] = { $gt: offset }
-        query['$and'] = [
-          { date: { $gte: new Date(offsetDate) } },
-          { date: { $gte: new Date() } },
+        query['$or'] = [
+          {
+            $and: [{ _id: { $gt: offset } }, { date: new Date(offsetDate) }],
+          },
+          { date: { $gt: new Date(offsetDate) } },
         ]
       } else {
         //prev inactive
         query['$or'] = [
           {
-            isActive: false,
-            _id: { $gt: offset },
-            date: {
-              $gte: new Date(offsetDate),
-            },
+            $and: [
+              { _id: { $gt: offset } },
+              {
+                date: new Date(offsetDate),
+              },
+            ],
           },
           {
-            isActive: true,
-            _id: { $gt: offset },
-            date: {
-              $and: [{ $gte: new Date(offsetDate) }, { $lt: new Date() }],
-            },
+            $and: [
+              { date: { $gt: new Date(offsetDate) } },
+              { date: { $lt: new Date(dateTimeBound) } },
+            ],
+          },
+          {
+            $and: [
+              { isActive: false },
+              { date: { $gt: new Date(dateTimeBound) } },
+            ],
           },
         ]
       }
@@ -57,27 +69,30 @@ const getQuery = (queryParams: Omit<QueryParams, 'pageSize'>, user: string) => {
       if (variant === 'active') {
         //next active
         query['isActive'] = true
-        query['_id'] = { $lt: offset }
-        query['$and'] = [
-          { date: { $lte: new Date(offsetDate) } },
-          { date: { $gte: new Date() } },
+        query['$or'] = [
+          {
+            $and: [{ _id: { $lt: offset } }, { date: new Date(offsetDate) }],
+          },
+          {
+            $and: [
+              { date: { $lt: new Date(offsetDate) } },
+              { date: { $gte: new Date(dateTimeBound) } },
+            ],
+          },
         ]
       } else {
         //next inactive
         query['$or'] = [
           {
-            isActive: false,
-            _id: { $lt: offset },
-            date: {
-              $lte: new Date(offsetDate),
-            },
+            $and: [
+              { _id: { $lt: offset } },
+              {
+                date: new Date(offsetDate),
+              },
+            ],
           },
           {
-            isActive: true,
-            _id: { $lt: offset },
-            date: {
-              $and: [{ $lte: new Date(offsetDate) }, { $lt: new Date() }],
-            },
+            date: { $lt: new Date(offsetDate) },
           },
         ]
       }
@@ -86,25 +101,55 @@ const getQuery = (queryParams: Omit<QueryParams, 'pageSize'>, user: string) => {
     if (variant === active) {
       query['isActive'] = true
       query['date'] = {
-        $gte: new Date(),
+        $gte: new Date(dateTimeBound),
       }
     } else {
-      query['$or'] = [{ isActive: false }, { date: { $lt: new Date() } }]
+      query['$or'] = [
+        { isActive: false },
+        {
+          $and: [
+            { isActive: true },
+            { date: { $lt: new Date(dateTimeBound) } },
+          ],
+        },
+      ]
+      // query['date'] = { $lt: new Date(dateTimeBound) }
     }
   }
+  console.log(new Date(dateTimeBound))
+  console.log(query)
   return query
 }
 
 const getCountQuery = (
-  queryParams: Pick<QueryParams, 'variant'>,
+  queryParams: Pick<QueryParams, 'variant' | 'dateTimeBound'>,
   user: string,
 ) => {
   let countQuery = { user }
+  const { dateTimeBound } = queryParams
+
+  if (!dateTimeBound) return countQuery
 
   if (queryParams.variant === active) {
-    countQuery['$and'] = [{ isActive: true }, { date: { $gt: new Date() } }]
+    countQuery['$and'] = [
+      { isActive: true },
+      { date: { $gte: new Date(dateTimeBound) } },
+      { updatedAt: { $lte: new Date(dateTimeBound) } },
+    ]
   } else {
-    countQuery['$or'] = [{ isActive: false }, { date: { $lt: new Date() } }]
+    countQuery['$or'] = [
+      {
+        isActive: false,
+        $and: [
+          { date: { $gte: new Date(dateTimeBound) } },
+          { updatedAt: { $lte: new Date(dateTimeBound) } },
+        ],
+      },
+      {
+        date: { $lt: new Date(dateTimeBound) },
+        updatedAt: { $lte: new Date(dateTimeBound) },
+      },
+    ]
   }
   return countQuery
 }
@@ -119,7 +164,7 @@ const getSortQuery = (direction?: Direction) => {
     sortQuery['date'] = -1
     sortQuery['_id'] = -1
   }
-  console.log(sortQuery)
+
   return sortQuery
 }
 

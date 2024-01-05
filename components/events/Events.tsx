@@ -18,7 +18,6 @@ import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
 const { activate, deactivate, remove } = eventActions
-
 const active: Variant = 'active'
 const prev: Direction = 'prev'
 const next: Direction = 'next'
@@ -29,6 +28,7 @@ const deletionRoute = 'delete'
 const api = '/api/events/'
 const activeEventsRoute = '/my/events'
 const inactiveEventsRoute = '/my/events/inactive'
+let dateTimeBound = new Date()
 
 export default function Events(props: { variant: Variant }) {
   const { variant: initialVariant } = props
@@ -49,9 +49,9 @@ export default function Events(props: { variant: Variant }) {
     event: React.SyntheticEvent,
     newVariant: Variant,
   ) => {
+    setDirection('')
     setOffset('')
     setOffsetDate('')
-    setDirection('')
     setPage(0)
     setVariant(newVariant)
     setSelected([])
@@ -98,8 +98,8 @@ export default function Events(props: { variant: Variant }) {
       .then((response) => {
         if (response.status === 200) {
           setDirection('next')
-          setOffset(data[data.length - 1]._id)
-          setOffsetDate(data[data.length - 1].date)
+          setOffset(data[0]._id)
+          setOffsetDate(data[0].date)
           // refetch events
           fetcher()
         }
@@ -148,6 +148,7 @@ export default function Events(props: { variant: Variant }) {
         offsetDate,
         direction,
         pageSize: String(pageSize),
+        dateTimeBound: dateTimeBound.toISOString(),
       })}`,
       {
         headers: {
@@ -173,6 +174,7 @@ export default function Events(props: { variant: Variant }) {
   }, [variant, offset, offsetDate, pageSize])
 
   const handlePageChange = (_: unknown, newPage: number) => {
+    if (newPage === 0) dateTimeBound = new Date()
     if (numRows > 0) {
       if (newPage - page > 0) {
         setDirection(next)
