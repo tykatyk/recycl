@@ -23,7 +23,7 @@ export default async function Events(
       res.status(401).end()
       return
     }
-    console.log(req.query)
+
     const userId = session.id
     await dbConnect()
 

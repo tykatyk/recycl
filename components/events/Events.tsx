@@ -28,15 +28,12 @@ const deletionRoute = 'delete'
 const api = '/api/events/'
 const activeEventsRoute = '/my/events'
 const inactiveEventsRoute = '/my/events/inactive'
-let dateTimeBound = new Date()
 
 export default function Events(props: { variant: Variant }) {
   const { variant: initialVariant } = props
 
   const [selected, setSelected] = useState<string[]>([])
   const [page, setPage] = useState(0)
-  const [offset, setOffset] = useState('')
-  const [offsetDate, setOffsetDate] = useState('')
   const [pageSize, setPageSize] = useState(1)
   const [numRows, setNumRows] = useState(0)
   const [variant, setVariant] = useState<Variant>(initialVariant)
@@ -50,8 +47,6 @@ export default function Events(props: { variant: Variant }) {
     newVariant: Variant,
   ) => {
     setDirection('')
-    setOffset('')
-    setOffsetDate('')
     setPage(0)
     setVariant(newVariant)
     setSelected([])
@@ -98,9 +93,6 @@ export default function Events(props: { variant: Variant }) {
       .then((response) => {
         if (response.status === 200) {
           setDirection('next')
-          setOffset(data[0]._id)
-          setOffsetDate(data[0].date)
-          // refetch events
           fetcher()
         }
       })
@@ -144,11 +136,9 @@ export default function Events(props: { variant: Variant }) {
     await fetch(
       `${api}?${new URLSearchParams({
         variant,
-        offset,
-        offsetDate,
         direction,
+        page: String(page),
         pageSize: String(pageSize),
-        dateTimeBound: dateTimeBound.toISOString(),
       })}`,
       {
         headers: {
@@ -162,29 +152,25 @@ export default function Events(props: { variant: Variant }) {
       .then((data) => {
         setData(data.events)
         setNumRows(data.total)
+        setPage(data.currentPage)
       })
       .catch((error) => {
         setBackendError(errorMessage)
       })
     setLoading(false)
-  }, [variant, offset, offsetDate, pageSize])
+  }, [variant, page, pageSize])
 
   useEffect(() => {
     fetcher()
-  }, [variant, offset, offsetDate, pageSize])
+  }, [variant, page, pageSize])
 
   const handlePageChange = (_: unknown, newPage: number) => {
-    if (newPage === 0) dateTimeBound = new Date()
-    if (numRows > 0) {
-      if (newPage - page > 0) {
-        setDirection(next)
-        setOffset(data[data.length - 1]._id as string)
-        setOffsetDate(data[data.length - 1].date)
-      } else {
-        setDirection(prev)
-        setOffset(data[0]._id as string)
-        setOffsetDate(data[0].date)
-      }
+    if (numRows === 0) return
+
+    if (newPage - page > 0) {
+      setDirection(next)
+    } else {
+      setDirection(prev)
     }
     setPage(newPage)
   }
@@ -194,8 +180,6 @@ export default function Events(props: { variant: Variant }) {
   ) => {
     setPageSize(parseInt(event.target.value, 10))
     setPage(0)
-    setOffset('')
-    setOffsetDate('')
     setDirection('')
   }
 

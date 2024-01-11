@@ -1,193 +1,101 @@
 import { Event } from '../models/index'
 import { _id } from '@next-auth/mongodb-adapter'
 import { eventVariants } from '../../helpers/eventHelpers'
-import type { Variant, Direction } from '../../types/event'
+import type { Variant, Direction, Event as EventType } from '../../types/event'
 const { active } = eventVariants
+
+type Sort = 'date' | 'wasteType' | 'location'
 
 type QueryParams = {
   variant?: Variant
   direction?: Direction
-  offset?: string
-  offsetDate?: string
-  pageSize?: number
-  dateTimeBound?: string
+  page?: string
+  pageSize?: string
+  sortOrder?: Sort
 }
 
-const getQuery = (queryParams: Omit<QueryParams, 'pageSize'>, user: string) => {
-  const {
-    variant = active,
-    direction,
-    offset = '',
-    offsetDate = '',
-    dateTimeBound,
-  } = queryParams
-
-  const query = {}
-  query['user'] = user
-
-  if (!dateTimeBound) return query
-
-  if (offset) {
-    query['updatedAt'] = { $lte: new Date(dateTimeBound) }
-
-    if (direction === 'prev') {
-      if (variant === 'active') {
-        //prev active
-        query['isActive'] = true
-        query['$or'] = [
-          {
-            $and: [{ _id: { $gt: offset } }, { date: new Date(offsetDate) }],
-          },
-          { date: { $gt: new Date(offsetDate) } },
-        ]
-      } else {
-        //prev inactive
-        query['$or'] = [
-          {
-            $and: [
-              { _id: { $gt: offset } },
-              {
-                date: new Date(offsetDate),
-              },
-            ],
-          },
-          {
-            $and: [
-              { date: { $gt: new Date(offsetDate) } },
-              { date: { $lt: new Date(dateTimeBound) } },
-            ],
-          },
-          {
-            $and: [
-              { isActive: false },
-              { date: { $gt: new Date(dateTimeBound) } },
-            ],
-          },
-        ]
-      }
-    } else {
-      if (variant === 'active') {
-        //next active
-        query['isActive'] = true
-        query['$or'] = [
-          {
-            $and: [{ _id: { $lt: offset } }, { date: new Date(offsetDate) }],
-          },
-          {
-            $and: [
-              { date: { $lt: new Date(offsetDate) } },
-              { date: { $gte: new Date(dateTimeBound) } },
-            ],
-          },
-        ]
-      } else {
-        //next inactive
-        query['$or'] = [
-          {
-            $and: [
-              { _id: { $lt: offset } },
-              {
-                date: new Date(offsetDate),
-              },
-            ],
-          },
-          {
-            date: { $lt: new Date(offsetDate) },
-          },
-        ]
-      }
-    }
-  } else {
-    if (variant === active) {
-      query['isActive'] = true
-      query['date'] = {
-        $gte: new Date(dateTimeBound),
-      }
-    } else {
-      query['$or'] = [
-        { isActive: false },
-        {
-          $and: [
-            { isActive: true },
-            { date: { $lt: new Date(dateTimeBound) } },
-          ],
-        },
-      ]
-      // query['date'] = { $lt: new Date(dateTimeBound) }
-    }
-  }
-  console.log(new Date(dateTimeBound))
-  console.log(query)
-  return query
+interface SelectQuery {
+  user: string
+  isActive: boolean
 }
 
-const getCountQuery = (
-  queryParams: Pick<QueryParams, 'variant' | 'dateTimeBound'>,
-  user: string,
-) => {
-  let countQuery = { user }
-  const { dateTimeBound } = queryParams
+const getSelectQuery = (variant: Variant, user: string): SelectQuery => {
+  const status = variant === active ? true : false
+  const selectQuery = { user, isActive: status }
 
-  if (!dateTimeBound) return countQuery
+  return selectQuery
+}
 
-  if (queryParams.variant === active) {
-    countQuery['$and'] = [
-      { isActive: true },
-      { date: { $gte: new Date(dateTimeBound) } },
-      { updatedAt: { $lte: new Date(dateTimeBound) } },
-    ]
-  } else {
-    countQuery['$or'] = [
-      {
-        isActive: false,
-        $and: [
-          { date: { $gte: new Date(dateTimeBound) } },
-          { updatedAt: { $lte: new Date(dateTimeBound) } },
-        ],
-      },
-      {
-        date: { $lt: new Date(dateTimeBound) },
-        updatedAt: { $lte: new Date(dateTimeBound) },
-      },
-    ]
-  }
+interface CountQuery {
+  user: string
+  isActive: boolean
+}
+const getCountQuery = (variant: Variant, user: string): CountQuery => {
+  const status = variant === active ? true : false
+  let countQuery: CountQuery = { user, isActive: status }
+
   return countQuery
 }
 
-const getSortQuery = (direction?: Direction) => {
-  let sortQuery = {}
+type SortOption = -1 | 1
 
-  if (direction === 'prev') {
-    sortQuery['date'] = 1
-    sortQuery['_id'] = 1
-  } else {
-    sortQuery['date'] = -1
-    sortQuery['_id'] = -1
-  }
+interface SortQuery {
+  [key: string]: SortOption
+}
+
+const getSortQuery = (sort?: Sort): SortQuery => {
+  const sortQuery: SortQuery = { _id: -1 }
+
+  if (!sort) sortQuery['date'] = -1
 
   return sortQuery
 }
 
 const eventQueries = {
   getAll: async (queryParams: QueryParams, user: string) => {
-    if (!user) return { total: 0, data: [] }
+    const result: {
+      total: number
+      events: EventType[]
+      currentPage: number
+    } = {
+      total: 0,
+      events: [],
+      currentPage: 0,
+    }
+    const { page = 0, pageSize = 0, variant, sortOrder = 'date' } = queryParams
 
-    const { pageSize = 0, ...rest } = queryParams
+    const pageInt = parseInt(String(page), 10)
+    const pageSizeInt = parseInt(String(pageSize), 10)
 
-    const query = getQuery(rest, user)
-    const countQuery = getCountQuery(rest, user)
-    const sortQuery = getSortQuery(queryParams.direction)
+    console.log(typeof pageSize)
 
-    let events = await Event.find(query)
-      .sort(sortQuery)
-      .limit(pageSize)
+    if (!user || !variant) return result
+
+    const select = getSelectQuery(variant, user)
+    const countAll = getCountQuery(variant, user)
+    const sort = getSortQuery(sortOrder)
+
+    const total = await Event.countDocuments(countAll)
+    let skip = pageInt * pageSizeInt
+
+    if (total === 0) return result
+
+    if (skip > total) skip = total - pageSizeInt
+    if (skip < 0) skip = 0
+
+    const events: EventType[] = await Event.find(select)
+      .sort(sort)
+      .skip(skip)
+      .limit(pageSizeInt)
       .populate('waste')
 
-    if (queryParams.direction == 'prev') events = events.reverse()
+    const currentPage = Math.ceil(skip / pageSizeInt)
 
-    const totalItems = await Event.countDocuments(countQuery)
+    result.total = total
+    result.events = events
+    result.currentPage = currentPage
 
-    return { total: totalItems, events }
+    return result
   },
 }
 export default eventQueries
