@@ -1,4 +1,10 @@
-import React, { useState, useCallback, ReactNode } from 'react'
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  ReactNode,
+  useEffect,
+} from 'react'
 import { styled } from '@mui/material/styles'
 import {
   TableContainer,
@@ -71,6 +77,12 @@ const editBtnText = 'Редактировать'
 const activateBtnText = 'Активировать'
 const editRoute = '/my/events/edit/'
 
+const setStyles = (target, el) => {
+  target.style.height = `${el.offsetHeight}px`
+  target.style.visibility = 'visible'
+  target.style.opacity = 1
+}
+
 export default function EventsTable({
   variant,
   rows,
@@ -80,9 +92,98 @@ export default function EventsTable({
   handleDeactivationAndDeletion,
 }: EventsTableProps) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
-  const [buttonDisabled, setButtonDisabled] = useState(false)
+  const [dropAllDisabled, setDropAllDisabled] = useState(false)
   const [validationError, setValidationError] = useState('')
   const [staleAd, setStaleAd] = useState('')
+  const [showOverlay, setShowOverlay] = useState(false)
+  const rowRefs: any = useRef({})
+  const overlayRefs: any = useRef({})
+  const [rowToDisableButtons, setRowToDisableButtons] = useState('')
+
+  useEffect(() => {
+    let el
+    let target
+
+    if (
+      showOverlay &&
+      rowToDisableButtons &&
+      rowRefs.current[rowToDisableButtons] &&
+      overlayRefs.current[rowToDisableButtons]
+    ) {
+      let el = rowRefs.current[rowToDisableButtons]
+      let target = overlayRefs.current[rowToDisableButtons]
+      setStyles(target, el)
+      return
+    }
+
+    for (const _id in overlayRefs.current) {
+      el = rowRefs.current[_id]
+      target = overlayRefs.current[_id]
+      //prevent memory leak (increasing overlayRefs size) when the user changes variant, deletes or paginates through events
+      //here we basically remove refs for rows which are not visible
+      if (!target) {
+        delete overlayRefs.current[_id]
+        continue
+      }
+
+      if (showOverlay && selectedRows.includes(_id)) {
+        console.log('here')
+
+        setStyles(target, el)
+      }
+      if (!showOverlay) {
+        target.style.opacity = 0
+        target.style.height = 0
+        target.style.visibility = 'hidden'
+      }
+    }
+  }, [showOverlay, rowToDisableButtons, selectedRows])
+
+  const Overlay = () => {
+    let elements = []
+    //prevent memory leak (increasing rowRefs size) when the user changes variant, deletes or paginates through events
+    //here we basically remove refs for rows which are not visible
+    for (const _id in rowRefs.current) {
+      if (!rowRefs.current[_id]) {
+        delete rowRefs.current[_id]
+        continue
+      }
+
+      const item = (
+        <Box
+          key={_id}
+          className="shim"
+          ref={(el) => (overlayRefs.current[_id] = el)}
+          sx={{
+            position: 'absolute',
+            width: '100%',
+            left: rowRefs.current[_id].offsetLeft,
+            top: rowRefs.current[_id].offsetTop,
+            height: 0,
+            visibility: 'hidden',
+            opacity: 0,
+            overflow: 'hidden',
+            background: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            fontWeight: 'bold',
+            fontSize: '18px',
+            transition: 'opacity 1s',
+          }}
+        >
+          <Typography component="span" sx={{ color: 'red' }}>
+            Row deleted
+          </Typography>
+        </Box>
+      )
+
+      elements.push(item)
+    }
+
+    return elements
+  }
 
   const getHeader = useCallback<() => ReactNode | 'Дата'>(() => {
     if (selectedRows.length > 0) {
@@ -93,11 +194,16 @@ export default function EventsTable({
       return (
         <Button
           color="secondary"
-          disabled={buttonDisabled}
+          disabled={dropAllDisabled}
           onClick={async () => {
-            setButtonDisabled(true)
-            await handleDeactivationAndDeletion(selectedRows, action)
-            setButtonDisabled(false)
+            if (rowToDisableButtons) setRowToDisableButtons('')
+            setShowOverlay(true)
+            setDropAllDisabled(true)
+            setTimeout(() => {
+              setDropAllDisabled(false)
+              setShowOverlay(false)
+            }, 1000)
+            // await handleDeactivationAndDeletion(selectedRows, action)
           }}
         >
           {buttonText}
@@ -105,7 +211,7 @@ export default function EventsTable({
       )
     }
     return 'Дата'
-  }, [variant, selectedRows])
+  }, [variant, rows, selectedRows, dropAllDisabled])
 
   const ErrorComponent = () => {
     return (
@@ -125,7 +231,7 @@ export default function EventsTable({
 
   return (
     <Root>
-      <TableContainer>
+      <TableContainer sx={{ position: 'relative' }}>
         <Table>
           <TableHead>
             <TableRow className="header">
@@ -152,157 +258,171 @@ export default function EventsTable({
           </TableHead>
           <TableBody>
             {rows.map((row: Event, index: number) => {
+              if (!row._id) return
               const labelId = `enhanced-table-checkbox-${index}`
-              const isItemSelected = isSelected(row._id as string)
+              const isItemSelected = isSelected(row._id)
 
               return (
                 <React.Fragment key={index}>
-                  <TableRow className={clsx('noBorder', 'dataRow')}>
-                    <TableCell
-                      rowSpan={validationError && row._id === staleAd ? 3 : 2}
-                      onClick={() => {
-                        handleSelect(row)
-                      }}
-                    >
-                      <Checkbox
-                        color="secondary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                      />
-                    </TableCell>
-
-                    <TableCell>
-                      {dayjs(row.date).locale('ru').format('D MMMM')}
-                    </TableCell>
-                    <TableCell>
-                      {dayjs(row.date).locale('ru').format('HH:mm')}
-                    </TableCell>
-                    <TableCell>
-                      {row.location?.structured_formatting.main_text}
-                    </TableCell>
-                    <TableCell>
-                      {
-                        //though we know that the type of row.waste is object here,
-                        //we use type narrowing to prevent Typescript error
-                        typeof row.waste !== 'string'
-                          ? row.waste.name
-                          : row.waste
-                      }
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className={'actionsRow'}>
-                    <TableCell colSpan={3}>
-                      <Box className={'actions'}>
-                        <Button
-                          color="secondary"
-                          href={
-                            variant === inactive
-                              ? `${editRoute}${row._id}?${new URLSearchParams(
-                                  isInactive,
-                                )}`
-                              : `${editRoute}${row._id}`
-                          }
-                          className="button"
-                          startIcon={<EditIcon />}
-                        >
-                          {editBtnText}
-                        </Button>
-                        <Button
-                          color="secondary"
-                          className="button"
-                          disabled={buttonDisabled}
-                          onClick={async () => {
-                            setButtonDisabled(true)
-
-                            //Just another check to prevent Typescript error
-                            if (!row._id) return
-
-                            if (variant === inactive) {
-                              await handleDeactivationAndDeletion(
-                                [row._id],
-                                remove,
-                              )
-                            }
-                            if (variant === active) {
-                              await handleDeactivationAndDeletion(
-                                [row._id],
-                                deactivate,
-                              )
-                            }
-                            setButtonDisabled(false)
-                          }}
-                          startIcon={<DeleteIcon />}
-                        >
-                          {variant === inactive
-                            ? deleteBtnText
-                            : deactivateBtnText}
-                        </Button>
-                        {variant === inactive && (
-                          <Button
-                            color="secondary"
-                            className="button"
-                            disabled={buttonDisabled}
-                            onClick={async () => {
-                              //Just another check to prevent Typescript error
-                              if (!row._id) return
-
-                              if (validationError) setValidationError('')
-                              if (staleAd) setStaleAd('')
-
-                              setButtonDisabled(true)
-
-                              try {
-                                setButtonDisabled(true)
-                                await date.validate(row.date)
-                              } catch (e) {
-                                setStaleAd(row._id)
-                                setValidationError(validationErrorMsg)
-                                return
-                              } finally {
-                                setButtonDisabled(false)
+                  <TableRow ref={(el) => (rowRefs.current[row._id] = el)}>
+                    <TableCell colSpan={5}>
+                      <Table>
+                        <TableBody>
+                          <TableRow className={clsx('noBorder', 'dataRow')}>
+                            <TableCell
+                              rowSpan={
+                                validationError && row._id === staleAd ? 3 : 2
                               }
+                              onClick={() => {
+                                handleSelect(row)
+                              }}
+                            >
+                              <Checkbox
+                                color="secondary"
+                                checked={isItemSelected}
+                                inputProps={{
+                                  'aria-labelledby': labelId,
+                                }}
+                              />
+                            </TableCell>
 
-                              await handleDeactivationAndDeletion(
-                                [row._id],
-                                activate,
-                              )
+                            <TableCell>
+                              {dayjs(row.date).locale('ru').format('D MMMM')}
+                            </TableCell>
+                            <TableCell>
+                              {dayjs(row.date).locale('ru').format('HH:mm')}
+                            </TableCell>
+                            <TableCell>
+                              {row.location?.structured_formatting.main_text}
+                            </TableCell>
+                            <TableCell>
+                              {
+                                //though we know that the type of row.waste is object here,
+                                //we use type narrowing to prevent Typescript error
+                                typeof row.waste !== 'string'
+                                  ? row.waste.name
+                                  : row.waste
+                              }
+                            </TableCell>
+                          </TableRow>
+                          <TableRow className={'noBorder'}>
+                            <TableCell colSpan={3}>
+                              <Box className={'actions'}>
+                                <Button
+                                  color="secondary"
+                                  href={
+                                    variant === inactive
+                                      ? `${editRoute}${
+                                          row._id
+                                        }?${new URLSearchParams(isInactive)}`
+                                      : `${editRoute}${row._id}`
+                                  }
+                                  disabled={row._id === rowToDisableButtons}
+                                  className="button"
+                                  startIcon={<EditIcon />}
+                                >
+                                  {editBtnText}
+                                </Button>
+                                <Button
+                                  color="secondary"
+                                  className="button"
+                                  // disabled={
+                                  //   row._id === rowToDisableButtons
+                                  // }
+                                  onClick={async () => {
+                                    //Just another check to prevent Typescript error
+                                    if (!row._id) return
+                                    setRowToDisableButtons(row._id)
+                                    setShowOverlay(true)
 
-                              setButtonDisabled(false)
-                            }}
-                            startIcon={<DeleteIcon />}
-                          >
-                            {activateBtnText}
-                          </Button>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box
-                        component="span"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                          fontWeight: 'fontWeightLight',
-                        }}
-                      >
-                        <VisibilityIcon sx={{ fontSize: '1.25rem' }} />
-                        <Box component="span" sx={{ p: '4px 8px' }}>
-                          {row.viewCount}
-                        </Box>
-                      </Box>
+                                    return
+                                    if (variant === inactive) {
+                                      await handleDeactivationAndDeletion(
+                                        [row._id],
+                                        remove,
+                                      )
+                                    }
+                                    if (variant === active) {
+                                      await handleDeactivationAndDeletion(
+                                        [row._id],
+                                        deactivate,
+                                      )
+                                    }
+                                    setRowToDisableButtons('')
+                                  }}
+                                  startIcon={<DeleteIcon />}
+                                >
+                                  {variant === inactive
+                                    ? deleteBtnText
+                                    : deactivateBtnText}
+                                </Button>
+                                {variant === inactive && (
+                                  <Button
+                                    color="secondary"
+                                    className="button"
+                                    disabled={row._id === rowToDisableButtons}
+                                    onClick={async () => {
+                                      //Just another check to prevent Typescript error
+                                      if (!row._id) return
+
+                                      setRowToDisableButtons(row._id)
+
+                                      if (validationError)
+                                        setValidationError('')
+                                      if (staleAd) setStaleAd('')
+
+                                      try {
+                                        await date.validate(row.date)
+                                      } catch (e) {
+                                        setStaleAd(row._id)
+                                        setValidationError(validationErrorMsg)
+                                        return
+                                      }
+
+                                      setRowToDisableButtons('')
+
+                                      await handleDeactivationAndDeletion(
+                                        [row._id],
+                                        activate,
+                                      )
+                                    }}
+                                    startIcon={<DeleteIcon />}
+                                  >
+                                    {activateBtnText}
+                                  </Button>
+                                )}
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  fontWeight: 'fontWeightLight',
+                                }}
+                              >
+                                <VisibilityIcon sx={{ fontSize: '1.25rem' }} />
+                                <Box component="span" sx={{ p: '4px 8px' }}>
+                                  {row.viewCount}
+                                </Box>
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                          {row._id === staleAd ? <ErrorComponent /> : null}
+                        </TableBody>
+                      </Table>
                     </TableCell>
                   </TableRow>
-                  {row._id === staleAd ? <ErrorComponent /> : null}
-                  {/*Don't add spacer after the last row*/}
+                  {/*No spacer after the last row*/}
                   {index !== rows.length - 1 && <Spacer />}
                 </React.Fragment>
               )
             })}
           </TableBody>
         </Table>
+        <Overlay />
       </TableContainer>
     </Root>
   )
