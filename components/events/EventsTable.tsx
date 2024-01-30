@@ -4,6 +4,8 @@ import React, {
   useCallback,
   ReactNode,
   useEffect,
+  useLayoutEffect,
+  ReactElement,
 } from 'react'
 import { styled } from '@mui/material/styles'
 import {
@@ -37,14 +39,12 @@ import {
   getEventTableStyles,
 } from '../../lib/helpers/eventHelpers'
 import { date } from '../../lib/validation/atomicValidators'
-import { element } from 'prop-types'
-import { forEach } from 'lodash'
 
 const isInactive: IsInactive = {
   isInactive: '1',
 }
 
-const Root = styled('div')(({ theme }) => {
+const Root = styled(Box)(({ theme }) => {
   return getEventTableStyles(theme)
 })
 
@@ -70,7 +70,6 @@ type EventsTableProps = {
 
 const { activate, deactivate, remove } = eventActions
 const { active, inactive } = eventVariants
-
 const validationErrorMsg = 'Дата и время в объявлении меньше текущих'
 const deleteBtnText = 'Удалить'
 const deactivateBtnText = 'Деактивировать'
@@ -78,21 +77,33 @@ const selectAllBtnText = 'Выбрать все'
 const editBtnText = 'Редактировать'
 const activateBtnText = 'Активировать'
 const editRoute = '/my/events/edit/'
+let timeout: ReturnType<typeof setTimeout>
 
-const setStyles = (target, el) => {
-  // const elHeight = `${el.offsetHeight}px`
+const setOverlayStylesVisible = (
+  target: HTMLDivElement,
+  source: HTMLTableRowElement,
+) => {
   let height = 0
-  const _id = el.getAttribute('data-id')
-  const elements = document.querySelectorAll(`[data-id="${_id}"]`)
-  console.log(elements)
+  const _id = source.getAttribute('data-id')
+  const elements = document.querySelectorAll<HTMLTableRowElement>(
+    `[data-id="${_id}"]`,
+  )
+
   elements.forEach((element) => {
-    console.log(element.offsetHeight)
     height += element.offsetHeight
   })
 
+  target.style.left = `${source.offsetLeft}px`
+  target.style.top = `${source.offsetTop}px`
   target.style.height = `${height}px`
   target.style.visibility = 'visible'
-  target.style.opacity = 1
+  target.style.opacity = '1'
+}
+
+const setOverlayStylesHidden = (target: HTMLDivElement) => {
+  target.style.opacity = '0'
+  target.style.height = '0'
+  target.style.visibility = 'hidden'
 }
 
 export default function EventsTable({
@@ -108,49 +119,68 @@ export default function EventsTable({
   const [validationError, setValidationError] = useState('')
   const [staleAd, setStaleAd] = useState('')
   const [showOverlay, setShowOverlay] = useState(false)
-  const rowRefs: any = useRef({})
-  const overlayRefs: any = useRef({})
+  const rowRefs = useRef<Record<string, HTMLTableRowElement>>({})
+  const overlayRefs = useRef<Record<string, HTMLDivElement>>({})
   const [rowToDisableButtons, setRowToDisableButtons] = useState('')
 
+  function adjustOverlay() {
+    //debounce setting overlay styles to prevent perfomance issues
+    timeout = setTimeout(() => {
+      let source: HTMLTableRowElement
+      let target: HTMLDivElement
+
+      if (
+        showOverlay &&
+        rowToDisableButtons &&
+        rowRefs.current[rowToDisableButtons] &&
+        overlayRefs.current[rowToDisableButtons]
+      ) {
+        source = rowRefs.current[rowToDisableButtons]
+        target = overlayRefs.current[rowToDisableButtons]
+        setOverlayStylesVisible(target, source)
+        return
+      }
+
+      for (const _id in overlayRefs.current) {
+        source = rowRefs.current[_id]
+        target = overlayRefs.current[_id]
+        //prevent memory leak (increasing overlayRefs size) when the user changes variant, deletes or paginates through events
+        //here we basically remove refs for rows which are not visible
+        if (!target) {
+          delete overlayRefs.current[_id]
+          continue
+        }
+
+        if (showOverlay && selectedRows.includes(_id)) {
+          setOverlayStylesVisible(target, source)
+        }
+        if (!showOverlay) {
+          setOverlayStylesHidden(target)
+        }
+      }
+    }, 200)
+
+    return timeout
+  }
+
   useEffect(() => {
-    let el
-    let target
-    // console.log('here3')
-    if (
-      showOverlay &&
-      rowToDisableButtons &&
-      rowRefs.current[rowToDisableButtons] &&
-      overlayRefs.current[rowToDisableButtons]
-    ) {
-      let el = rowRefs.current[rowToDisableButtons]
-      let target = overlayRefs.current[rowToDisableButtons]
-      setStyles(target, el)
-      return
-    }
-
-    for (const _id in overlayRefs.current) {
-      el = rowRefs.current[_id]
-      target = overlayRefs.current[_id]
-      //prevent memory leak (increasing overlayRefs size) when the user changes variant, deletes or paginates through events
-      //here we basically remove refs for rows which are not visible
-      if (!target) {
-        delete overlayRefs.current[_id]
-        continue
-      }
-
-      if (showOverlay && selectedRows.includes(_id)) {
-        setStyles(target, el)
-      }
-      if (!showOverlay) {
-        target.style.opacity = 0
-        target.style.height = 0
-        target.style.visibility = 'hidden'
-      }
-    }
+    clearTimeout(timeout)
+    timeout = adjustOverlay()
+    return () => clearTimeout(timeout)
   }, [showOverlay, rowToDisableButtons, selectedRows])
 
+  useLayoutEffect(() => {
+    window.addEventListener('resize', adjustOverlay)
+    clearTimeout(timeout)
+    timeout = adjustOverlay()
+    return () => {
+      clearTimeout(timeout)
+      window.removeEventListener('resize', adjustOverlay)
+    }
+  })
+
   const Overlay = () => {
-    let elements = []
+    let elements: ReactElement[] = []
     //prevent memory leak (increasing rowRefs size) when the user changes variant, deletes or paginates through events
     //here we basically remove refs for rows which are not visible
     for (const _id in rowRefs.current) {
@@ -159,11 +189,12 @@ export default function EventsTable({
         continue
       }
 
-      const item = (
+      const item: ReactElement = (
         <Box
           key={_id}
-          className="shim"
-          ref={(el) => (overlayRefs.current[_id] = el)}
+          // className="shim"
+          //ToDo: how to say to assistant technology that this is just overlay
+          ref={(el: HTMLDivElement) => (overlayRefs.current[_id] = el)}
           sx={{
             position: 'absolute',
             width: '100%',
@@ -204,7 +235,7 @@ export default function EventsTable({
       return (
         <Button
           color="secondary"
-          disabled={dropAllDisabled}
+          disabled={dropAllDisabled || !!rowToDisableButtons}
           onClick={async () => {
             if (rowToDisableButtons) setRowToDisableButtons('')
             setShowOverlay(true)
@@ -212,7 +243,8 @@ export default function EventsTable({
             setTimeout(() => {
               setDropAllDisabled(false)
               setShowOverlay(false)
-            }, 1000)
+            }, 10000)
+            //ToDo: correct code
             // await handleDeactivationAndDeletion(selectedRows, action)
           }}
         >
@@ -276,6 +308,7 @@ export default function EventsTable({
                 <React.Fragment key={index}>
                   <TableRow
                     ref={(el) => (rowRefs.current[row._id] = el)}
+                    //ToDo: check css for no border
                     className={clsx('noBorder', 'dataRow')}
                     data-id={row._id}
                   >
