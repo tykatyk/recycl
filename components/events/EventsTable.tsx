@@ -37,6 +37,8 @@ import {
   getEventTableStyles,
 } from '../../lib/helpers/eventHelpers'
 import { date } from '../../lib/validation/atomicValidators'
+import { element } from 'prop-types'
+import { forEach } from 'lodash'
 
 const isInactive: IsInactive = {
   isInactive: '1',
@@ -78,7 +80,17 @@ const activateBtnText = 'Активировать'
 const editRoute = '/my/events/edit/'
 
 const setStyles = (target, el) => {
-  target.style.height = `${el.offsetHeight}px`
+  // const elHeight = `${el.offsetHeight}px`
+  let height = 0
+  const _id = el.getAttribute('data-id')
+  const elements = document.querySelectorAll(`[data-id="${_id}"]`)
+  console.log(elements)
+  elements.forEach((element) => {
+    console.log(element.offsetHeight)
+    height += element.offsetHeight
+  })
+
+  target.style.height = `${height}px`
   target.style.visibility = 'visible'
   target.style.opacity = 1
 }
@@ -103,7 +115,7 @@ export default function EventsTable({
   useEffect(() => {
     let el
     let target
-
+    // console.log('here3')
     if (
       showOverlay &&
       rowToDisableButtons &&
@@ -127,8 +139,6 @@ export default function EventsTable({
       }
 
       if (showOverlay && selectedRows.includes(_id)) {
-        console.log('here')
-
         setStyles(target, el)
       }
       if (!showOverlay) {
@@ -213,9 +223,9 @@ export default function EventsTable({
     return 'Дата'
   }, [variant, rows, selectedRows, dropAllDisabled])
 
-  const ErrorComponent = () => {
+  const ErrorComponent = ({ id }) => {
     return (
-      <TableRow className={'noBorder'}>
+      <TableRow className={'noBorder'} data-id={id}>
         <TableCell colSpan={4}>
           <Typography
             component="div"
@@ -264,157 +274,151 @@ export default function EventsTable({
 
               return (
                 <React.Fragment key={index}>
-                  <TableRow ref={(el) => (rowRefs.current[row._id] = el)}>
-                    <TableCell colSpan={5}>
-                      <Table>
-                        <TableBody>
-                          <TableRow className={clsx('noBorder', 'dataRow')}>
-                            <TableCell
-                              rowSpan={
-                                validationError && row._id === staleAd ? 3 : 2
-                              }
-                              onClick={() => {
-                                handleSelect(row)
-                              }}
-                            >
-                              <Checkbox
-                                color="secondary"
-                                checked={isItemSelected}
-                                inputProps={{
-                                  'aria-labelledby': labelId,
-                                }}
-                              />
-                            </TableCell>
+                  <TableRow
+                    ref={(el) => (rowRefs.current[row._id] = el)}
+                    className={clsx('noBorder', 'dataRow')}
+                    data-id={row._id}
+                  >
+                    <TableCell
+                      rowSpan={validationError && row._id === staleAd ? 3 : 2}
+                      onClick={() => {
+                        handleSelect(row)
+                      }}
+                    >
+                      <Checkbox
+                        color="secondary"
+                        checked={isItemSelected}
+                        inputProps={{
+                          'aria-labelledby': labelId,
+                        }}
+                      />
+                    </TableCell>
 
-                            <TableCell>
-                              {dayjs(row.date).locale('ru').format('D MMMM')}
-                            </TableCell>
-                            <TableCell>
-                              {dayjs(row.date).locale('ru').format('HH:mm')}
-                            </TableCell>
-                            <TableCell>
-                              {row.location?.structured_formatting.main_text}
-                            </TableCell>
-                            <TableCell>
-                              {
-                                //though we know that the type of row.waste is object here,
-                                //we use type narrowing to prevent Typescript error
-                                typeof row.waste !== 'string'
-                                  ? row.waste.name
-                                  : row.waste
-                              }
-                            </TableCell>
-                          </TableRow>
-                          <TableRow className={'noBorder'}>
-                            <TableCell colSpan={3}>
-                              <Box className={'actions'}>
-                                <Button
-                                  color="secondary"
-                                  href={
-                                    variant === inactive
-                                      ? `${editRoute}${
-                                          row._id
-                                        }?${new URLSearchParams(isInactive)}`
-                                      : `${editRoute}${row._id}`
-                                  }
-                                  disabled={row._id === rowToDisableButtons}
-                                  className="button"
-                                  startIcon={<EditIcon />}
-                                >
-                                  {editBtnText}
-                                </Button>
-                                <Button
-                                  color="secondary"
-                                  className="button"
-                                  // disabled={
-                                  //   row._id === rowToDisableButtons
-                                  // }
-                                  onClick={async () => {
-                                    //Just another check to prevent Typescript error
-                                    if (!row._id) return
-                                    setRowToDisableButtons(row._id)
-                                    setShowOverlay(true)
-
-                                    return
-                                    if (variant === inactive) {
-                                      await handleDeactivationAndDeletion(
-                                        [row._id],
-                                        remove,
-                                      )
-                                    }
-                                    if (variant === active) {
-                                      await handleDeactivationAndDeletion(
-                                        [row._id],
-                                        deactivate,
-                                      )
-                                    }
-                                    setRowToDisableButtons('')
-                                  }}
-                                  startIcon={<DeleteIcon />}
-                                >
-                                  {variant === inactive
-                                    ? deleteBtnText
-                                    : deactivateBtnText}
-                                </Button>
-                                {variant === inactive && (
-                                  <Button
-                                    color="secondary"
-                                    className="button"
-                                    disabled={row._id === rowToDisableButtons}
-                                    onClick={async () => {
-                                      //Just another check to prevent Typescript error
-                                      if (!row._id) return
-
-                                      setRowToDisableButtons(row._id)
-
-                                      if (validationError)
-                                        setValidationError('')
-                                      if (staleAd) setStaleAd('')
-
-                                      try {
-                                        await date.validate(row.date)
-                                      } catch (e) {
-                                        setStaleAd(row._id)
-                                        setValidationError(validationErrorMsg)
-                                        return
-                                      }
-
-                                      setRowToDisableButtons('')
-
-                                      await handleDeactivationAndDeletion(
-                                        [row._id],
-                                        activate,
-                                      )
-                                    }}
-                                    startIcon={<DeleteIcon />}
-                                  >
-                                    {activateBtnText}
-                                  </Button>
-                                )}
-                              </Box>
-                            </TableCell>
-                            <TableCell>
-                              <Box
-                                component="span"
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  flexWrap: 'wrap',
-                                  fontWeight: 'fontWeightLight',
-                                }}
-                              >
-                                <VisibilityIcon sx={{ fontSize: '1.25rem' }} />
-                                <Box component="span" sx={{ p: '4px 8px' }}>
-                                  {row.viewCount}
-                                </Box>
-                              </Box>
-                            </TableCell>
-                          </TableRow>
-                          {row._id === staleAd ? <ErrorComponent /> : null}
-                        </TableBody>
-                      </Table>
+                    <TableCell>
+                      {dayjs(row.date).locale('ru').format('D MMMM')}
+                    </TableCell>
+                    <TableCell>
+                      {dayjs(row.date).locale('ru').format('HH:mm')}
+                    </TableCell>
+                    <TableCell>
+                      {row.location?.structured_formatting.main_text}
+                    </TableCell>
+                    <TableCell>
+                      {
+                        //though we know that the type of row.waste is object here,
+                        //we use type narrowing to prevent Typescript error
+                        typeof row.waste !== 'string'
+                          ? row.waste.name
+                          : row.waste
+                      }
                     </TableCell>
                   </TableRow>
+                  <TableRow className={'noBorder'} data-id={row._id}>
+                    <TableCell colSpan={3}>
+                      <Box className={'actions'}>
+                        <Button
+                          color="secondary"
+                          href={
+                            variant === inactive
+                              ? `${editRoute}${row._id}?${new URLSearchParams(
+                                  isInactive,
+                                )}`
+                              : `${editRoute}${row._id}`
+                          }
+                          disabled={row._id === rowToDisableButtons}
+                          className="button"
+                          startIcon={<EditIcon />}
+                        >
+                          {editBtnText}
+                        </Button>
+                        <Button
+                          color="secondary"
+                          className="button"
+                          // disabled={
+                          //   row._id === rowToDisableButtons
+                          // }
+                          onClick={async () => {
+                            //Just another check to prevent Typescript error
+                            if (!row._id) return
+                            // console.log('row id ' + row._id)
+                            setRowToDisableButtons(row._id)
+                            setShowOverlay(true)
+
+                            return
+                            if (variant === inactive) {
+                              await handleDeactivationAndDeletion(
+                                [row._id],
+                                remove,
+                              )
+                            }
+                            if (variant === active) {
+                              await handleDeactivationAndDeletion(
+                                [row._id],
+                                deactivate,
+                              )
+                            }
+                            setRowToDisableButtons('')
+                          }}
+                          startIcon={<DeleteIcon />}
+                        >
+                          {variant === inactive
+                            ? deleteBtnText
+                            : deactivateBtnText}
+                        </Button>
+                        {variant === inactive && (
+                          <Button
+                            color="secondary"
+                            className="button"
+                            disabled={row._id === rowToDisableButtons}
+                            onClick={async () => {
+                              //Just another check to prevent Typescript error
+                              if (!row._id) return
+                              if (showOverlay) setShowOverlay(false)
+                              setRowToDisableButtons(row._id)
+
+                              if (validationError) setValidationError('')
+                              if (staleAd) setStaleAd('')
+
+                              try {
+                                await date.validate(row.date)
+                              } catch (e) {
+                                setStaleAd(row._id)
+                                setValidationError(validationErrorMsg)
+                                return
+                              }
+
+                              await handleDeactivationAndDeletion(
+                                [row._id],
+                                activate,
+                              )
+
+                              setRowToDisableButtons('')
+                            }}
+                            startIcon={<DeleteIcon />}
+                          >
+                            {activateBtnText}
+                          </Button>
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        component="span"
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          fontWeight: 'fontWeightLight',
+                        }}
+                      >
+                        <VisibilityIcon sx={{ fontSize: '1.25rem' }} />
+                        <Box component="span" sx={{ p: '4px 8px' }}>
+                          {row.viewCount}
+                        </Box>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                  {row._id === staleAd ? <ErrorComponent id={row._id} /> : null}
                   {/*No spacer after the last row*/}
                   {index !== rows.length - 1 && <Spacer />}
                 </React.Fragment>
