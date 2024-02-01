@@ -56,6 +56,79 @@ const Spacer = () => {
   )
 }
 
+const Overlay = ({ rowsToDisableButtons, rowRefs, overlayRefs }) => {
+  let elements: ReactElement[] = []
+
+  for (const _id in rowsToDisableButtons) {
+    let actionText =
+      rowsToDisableButtons[_id] === activate
+        ? 'Объявление активировано'
+        : rowsToDisableButtons[_id] === deactivate
+        ? 'Объявление деактивировано'
+        : 'Объявление удалено'
+
+    const item: ReactElement = (
+      <Box
+        key={_id}
+        className="shim"
+        //ToDo: how to say to assistant technology that this is just overlay
+        ref={(el: HTMLDivElement | null) =>
+          el && (overlayRefs.current[_id] = el)
+        }
+        sx={{
+          position: 'absolute',
+          width: '100%',
+          left: rowRefs.current[_id].offsetLeft,
+          top: rowRefs.current[_id].offsetTop,
+          height: 0,
+          visibility: 'hidden',
+          opacity: 0,
+          overflow: 'hidden',
+          background: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '18px',
+          transition: 'opacity 1s',
+        }}
+      >
+        <Typography component="span" sx={{ color: 'red' }}>
+          {actionText}
+        </Typography>
+      </Box>
+    )
+
+    elements.push(item)
+  }
+
+  // rowsToDisableButtons.forEach((_id) => {
+
+  // })
+
+  // for (const _id in rowRefs.current) {
+  // }
+
+  return elements
+}
+
+const ErrorComponent = ({ id }) => {
+  return (
+    <TableRow className={'noBorder'} data-id={id}>
+      <TableCell colSpan={4}>
+        <Typography
+          component="div"
+          variant="body2"
+          sx={{ color: 'error.main' }}
+        >
+          {validationErrorMsg}
+        </Typography>
+      </TableCell>
+    </TableRow>
+  )
+}
+
 type EventsTableProps = {
   variant: Variant
   rows: Event[]
@@ -78,6 +151,50 @@ const editBtnText = 'Редактировать'
 const activateBtnText = 'Активировать'
 const editRoute = '/my/events/edit/'
 let timeout: ReturnType<typeof setTimeout>
+
+const overlayResizeHandler = (options) => {
+  //debounce recalculating overlay styles when resize window to prevent perfomance issues
+  clearTimeout(timeout)
+
+  timeout = setTimeout(() => {
+    adjustOverlay(options)
+  }, 200)
+}
+
+function adjustOverlay(options) {
+  const {
+    rowRefs,
+    overlayRefs,
+    // showOverlay,
+    rowsToDisableButtons,
+    // selectedRows,
+  } = options
+
+  for (const _id in overlayRefs.current) {
+    let source = rowRefs.current[_id]
+    let target = overlayRefs.current[_id]
+
+    //prevent memory leak of increasing rowRefs and overlayRefs size when the user changes variant, deletes or paginates through events
+    //we basically remove refs for rows which are not visible
+    if (!source) delete rowRefs.current[_id]
+    if (!target) delete overlayRefs.current[_id]
+
+    if (!target || !source) continue
+
+    // if (showOverlay && rowsToDisableButtons[_id]) {
+    //   setOverlayStylesVisible(target, source)
+    // } else if (showOverlay && selectedRows.includes(_id)) {
+    //   setOverlayStylesVisible(target, source)
+    // } else if (!showOverlay || (showOverlay && !rowsToDisableButtons[_id])) {
+    //   setOverlayStylesHidden(target)
+    // }
+    if (rowsToDisableButtons[_id]) {
+      setOverlayStylesVisible(target, source)
+    } else {
+      setOverlayStylesHidden(target)
+    }
+  }
+}
 
 const setOverlayStylesVisible = (
   target: HTMLDivElement,
@@ -106,6 +223,19 @@ const setOverlayStylesHidden = (target: HTMLDivElement) => {
   target.style.visibility = 'hidden'
 }
 
+const makeNewRowsToDisableButtons = (
+  rowsToDisableButtons,
+  setRowsToDisableButtons,
+  rowToRestore,
+) => {
+  if (!rowToRestore) return
+
+  const newRows = { ...rowsToDisableButtons }
+  delete newRows[rowToRestore]
+
+  setRowsToDisableButtons(newRows)
+}
+
 export default function EventsTable({
   variant,
   rows,
@@ -119,112 +249,56 @@ export default function EventsTable({
   const [validationError, setValidationError] = useState('')
   const [staleAd, setStaleAd] = useState('')
   const [showOverlay, setShowOverlay] = useState(false)
-  const rowRefs = useRef<Record<string, HTMLTableRowElement>>({})
-  const overlayRefs = useRef<Record<string, HTMLDivElement>>({})
-  const [rowToDisableButtons, setRowToDisableButtons] = useState('')
+  const rowRefs = useRef<Record<string, HTMLTableRowElement | null>>({})
+  const overlayRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const [rowsToDisableButtons, setRowsToDisableButtons] = useState<
+    Record<string, keyof EventActions>
+  >({})
+  // const [rowToRestore, setRowToRestore] = useState<string>('')
 
-  function adjustOverlay() {
-    //debounce setting overlay styles to prevent perfomance issues
-    timeout = setTimeout(() => {
-      let source: HTMLTableRowElement
-      let target: HTMLDivElement
-
-      if (
-        showOverlay &&
-        rowToDisableButtons &&
-        rowRefs.current[rowToDisableButtons] &&
-        overlayRefs.current[rowToDisableButtons]
-      ) {
-        source = rowRefs.current[rowToDisableButtons]
-        target = overlayRefs.current[rowToDisableButtons]
-        setOverlayStylesVisible(target, source)
-        return
-      }
-
-      for (const _id in overlayRefs.current) {
-        source = rowRefs.current[_id]
-        target = overlayRefs.current[_id]
-        //prevent memory leak (increasing overlayRefs size) when the user changes variant, deletes or paginates through events
-        //here we basically remove refs for rows which are not visible
-        if (!target) {
-          delete overlayRefs.current[_id]
-          continue
-        }
-
-        if (showOverlay && selectedRows.includes(_id)) {
-          setOverlayStylesVisible(target, source)
-        }
-        if (!showOverlay) {
-          setOverlayStylesHidden(target)
-        }
-      }
-    }, 200)
-
-    return timeout
+  const options = {
+    rowRefs,
+    overlayRefs,
+    // showOverlay,
+    rowsToDisableButtons,
+    // selectedRows,
   }
 
   useEffect(() => {
-    clearTimeout(timeout)
-    timeout = adjustOverlay()
-    return () => clearTimeout(timeout)
-  }, [showOverlay, rowToDisableButtons, selectedRows])
+    adjustOverlay(options)
+  }, [/*showOverlay,*/ rowsToDisableButtons, selectedRows])
+
+  /*useEffect(() => {
+    if (!rowToRestore) return
+    // const newRows = rowsToDisableButtons.filter(
+    //   (item) => item._id !== rowToRestore,
+    // )
+    const newRows = { ...rowsToDisableButtons }
+    delete newRows[rowToRestore]
+    setRowsToDisableButtons(newRows)
+    if (Object.keys(newRows).length === 0) {
+      setRowToRestore('')
+      // setShowOverlay(false)
+    }
+  }, [rowToRestore])*/
 
   useLayoutEffect(() => {
-    window.addEventListener('resize', adjustOverlay)
-    clearTimeout(timeout)
-    timeout = adjustOverlay()
+    window.addEventListener('resize', () => {
+      overlayResizeHandler(options)
+    })
+
+    overlayResizeHandler(options)
+
     return () => {
-      clearTimeout(timeout)
-      window.removeEventListener('resize', adjustOverlay)
+      window.removeEventListener('resize', () => {
+        overlayResizeHandler(options)
+      })
     }
-  })
-
-  const Overlay = () => {
-    let elements: ReactElement[] = []
-    //prevent memory leak (increasing rowRefs size) when the user changes variant, deletes or paginates through events
-    //here we basically remove refs for rows which are not visible
-    for (const _id in rowRefs.current) {
-      if (!rowRefs.current[_id]) {
-        delete rowRefs.current[_id]
-        continue
-      }
-
-      const item: ReactElement = (
-        <Box
-          key={_id}
-          // className="shim"
-          //ToDo: how to say to assistant technology that this is just overlay
-          ref={(el: HTMLDivElement) => (overlayRefs.current[_id] = el)}
-          sx={{
-            position: 'absolute',
-            width: '100%',
-            left: rowRefs.current[_id].offsetLeft,
-            top: rowRefs.current[_id].offsetTop,
-            height: 0,
-            visibility: 'hidden',
-            opacity: 0,
-            overflow: 'hidden',
-            background: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            fontWeight: 'bold',
-            fontSize: '18px',
-            transition: 'opacity 1s',
-          }}
-        >
-          <Typography component="span" sx={{ color: 'red' }}>
-            Row deleted
-          </Typography>
-        </Box>
-      )
-
-      elements.push(item)
-    }
-
-    return elements
-  }
+  }, [
+    /*rowRefs, overlayRefs, showOverlay,*/
+    rowsToDisableButtons,
+    selectedRows,
+  ])
 
   const getHeader = useCallback<() => ReactNode | 'Дата'>(() => {
     if (selectedRows.length > 0) {
@@ -235,17 +309,17 @@ export default function EventsTable({
       return (
         <Button
           color="secondary"
-          disabled={dropAllDisabled || !!rowToDisableButtons}
+          disabled={
+            dropAllDisabled || Object.keys(rowsToDisableButtons).length > 0
+          }
           onClick={async () => {
-            if (rowToDisableButtons) setRowToDisableButtons('')
+            // if (rowsToDisableButtons) setRowsToDisableButtons('')
             setShowOverlay(true)
             setDropAllDisabled(true)
-            setTimeout(() => {
-              setDropAllDisabled(false)
-              setShowOverlay(false)
-            }, 10000)
             //ToDo: correct code
-            // await handleDeactivationAndDeletion(selectedRows, action)
+            await handleDeactivationAndDeletion(selectedRows, action)
+            setDropAllDisabled(false)
+            setShowOverlay(false)
           }}
         >
           {buttonText}
@@ -254,22 +328,6 @@ export default function EventsTable({
     }
     return 'Дата'
   }, [variant, rows, selectedRows, dropAllDisabled])
-
-  const ErrorComponent = ({ id }) => {
-    return (
-      <TableRow className={'noBorder'} data-id={id}>
-        <TableCell colSpan={4}>
-          <Typography
-            component="div"
-            variant="body2"
-            sx={{ color: 'error.main' }}
-          >
-            {validationErrorMsg}
-          </Typography>
-        </TableCell>
-      </TableRow>
-    )
-  }
 
   return (
     <Root>
@@ -303,11 +361,11 @@ export default function EventsTable({
               if (!row._id) return
               const labelId = `enhanced-table-checkbox-${index}`
               const isItemSelected = isSelected(row._id)
-
+              if (row._id === undefined) return
               return (
                 <React.Fragment key={index}>
                   <TableRow
-                    ref={(el) => (rowRefs.current[row._id] = el)}
+                    ref={(el) => el && (rowRefs.current[row._id!] = el)}
                     //ToDo: check css for no border
                     className={clsx('noBorder', 'dataRow')}
                     data-id={row._id}
@@ -358,7 +416,7 @@ export default function EventsTable({
                                 )}`
                               : `${editRoute}${row._id}`
                           }
-                          disabled={row._id === rowToDisableButtons}
+                          disabled={!!rowsToDisableButtons[row._id]}
                           className="button"
                           startIcon={<EditIcon />}
                         >
@@ -367,30 +425,51 @@ export default function EventsTable({
                         <Button
                           color="secondary"
                           className="button"
-                          // disabled={
-                          //   row._id === rowToDisableButtons
-                          // }
+                          disabled={!!rowsToDisableButtons[row._id]}
                           onClick={async () => {
                             //Just another check to prevent Typescript error
                             if (!row._id) return
-                            // console.log('row id ' + row._id)
-                            setRowToDisableButtons(row._id)
-                            setShowOverlay(true)
+
+                            const action =
+                              variant === inactive ? remove : deactivate
+
+                            if (!rowsToDisableButtons[row._id]) {
+                              setRowsToDisableButtons({
+                                ...rowsToDisableButtons,
+                                [row._id]: action,
+                              })
+                            } else {
+                              return
+                            }
+
+                            // if (!showOverlay) setShowOverlay(true)
+
+                            setTimeout(() => {
+                              // const newRows = rowsToDisableButtons.filter(
+                              //   (item) => item !== rowToRestore,
+                              // )
+                              // setRowsToDisableButtons(newRows)
+                              // setRowToRestore(row._id!)
+                              makeNewRowsToDisableButtons(
+                                rowsToDisableButtons,
+                                setRowsToDisableButtons,
+                                row._id,
+                              )
+                            }, 3000)
 
                             return
-                            if (variant === inactive) {
-                              await handleDeactivationAndDeletion(
-                                [row._id],
-                                remove,
-                              )
-                            }
-                            if (variant === active) {
-                              await handleDeactivationAndDeletion(
-                                [row._id],
-                                deactivate,
-                              )
-                            }
-                            setRowToDisableButtons('')
+                            await handleDeactivationAndDeletion(
+                              [row._id],
+                              action,
+                            )
+
+                            // if (showOverlay) setShowOverlay(false)
+                            // setRowToRestore(row._id)
+                            makeNewRowsToDisableButtons(
+                              rowsToDisableButtons,
+                              setRowsToDisableButtons,
+                              row._id,
+                            )
                           }}
                           startIcon={<DeleteIcon />}
                         >
@@ -402,30 +481,43 @@ export default function EventsTable({
                           <Button
                             color="secondary"
                             className="button"
-                            disabled={row._id === rowToDisableButtons}
+                            disabled={!!rowsToDisableButtons[row._id]}
                             onClick={async () => {
                               //Just another check to prevent Typescript error
                               if (!row._id) return
-                              if (showOverlay) setShowOverlay(false)
-                              setRowToDisableButtons(row._id)
+                              // if (showOverlay) setShowOverlay(false)
 
+                              //ToDo: check these errors
                               if (validationError) setValidationError('')
                               if (staleAd) setStaleAd('')
 
                               try {
                                 await date.validate(row.date)
+
+                                if (!rowsToDisableButtons[row._id]) {
+                                  setRowsToDisableButtons({
+                                    ...rowsToDisableButtons,
+                                    [row._id]: activate,
+                                  })
+                                } else {
+                                  return
+                                }
+                                //ToDo: separately catch errors for deactivationAndDeletion
+                                await handleDeactivationAndDeletion(
+                                  [row._id],
+                                  activate,
+                                )
                               } catch (e) {
                                 setStaleAd(row._id)
                                 setValidationError(validationErrorMsg)
-                                return
                               }
-
-                              await handleDeactivationAndDeletion(
-                                [row._id],
-                                activate,
+                              //ToDo: Add if statement
+                              // setRowToRestore(row._id)
+                              makeNewRowsToDisableButtons(
+                                rowsToDisableButtons,
+                                setRowsToDisableButtons,
+                                row._id,
                               )
-
-                              setRowToDisableButtons('')
                             }}
                             startIcon={<DeleteIcon />}
                           >
@@ -459,7 +551,13 @@ export default function EventsTable({
             })}
           </TableBody>
         </Table>
-        <Overlay />
+        {Object.keys(rowsToDisableButtons).length > 0 && (
+          <Overlay
+            rowsToDisableButtons={rowsToDisableButtons}
+            rowRefs={rowRefs}
+            overlayRefs={overlayRefs}
+          />
+        )}
       </TableContainer>
     </Root>
   )
