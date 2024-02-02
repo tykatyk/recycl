@@ -61,30 +61,29 @@ export default function UserMenu(props) {
     },
   ]
 
-  const showSubmenu = (item, startPadding = 4, index) => {
+  const showSubmenu = (item, index) => {
     if (item.items) {
-      startPadding += 4
       return (
-        <List component="div">
-          <ListItem>
-            <ListItemText
-              style={{
-                color: theme.palette.secondary.main,
-                textTransform: 'uppercase',
-              }}
-              secondary={item.text}
-            />
-          </ListItem>
+        <ListItem sx={{ flexDirection: 'column' }}>
+          <ListItemText
+            sx={{
+              color: theme.palette.secondary.main,
+              textTransform: 'uppercase',
+              width: '100%',
+            }}
+            secondary={item.text}
+          />
+
           <MenuList disablePadding>
             {item.items.map((i, k) => {
-              return showSubmenu(i, startPadding, k)
+              return showSubmenu(i, k)
             })}
           </MenuList>
-        </List>
+        </ListItem>
       )
     } else {
       return (
-        <MenuItem sx={{ pl: startPadding }} onClick={handleClose} key={index}>
+        <MenuItem onClick={handleClose} key={index}>
           <Link
             href={item.href}
             onClick={preventDefault}
