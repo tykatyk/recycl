@@ -67,8 +67,6 @@ const eventQueries = {
     const pageInt = parseInt(String(page), 10)
     const pageSizeInt = parseInt(String(pageSize), 10)
 
-    console.log(typeof pageSize)
-
     if (!user || !variant) return result
 
     const select = getSelectQuery(variant, user)

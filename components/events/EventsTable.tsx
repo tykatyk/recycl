@@ -103,13 +103,6 @@ const Overlay = ({ rowsToDisableButtons, rowRefs, overlayRefs }) => {
     elements.push(item)
   }
 
-  // rowsToDisableButtons.forEach((_id) => {
-
-  // })
-
-  // for (const _id in rowRefs.current) {
-  // }
-
   return elements
 }
 
@@ -139,6 +132,14 @@ type EventsTableProps = {
     eventIds: string[] | undefined,
     action: keyof EventActions,
   ) => Promise<void>
+  fetcher: () => Promise<any>
+  setData: React.Dispatch<
+    React.SetStateAction<{
+      total: number
+      events: Event[]
+      currentPage: number
+    }>
+  >
 }
 
 const { activate, deactivate, remove } = eventActions
@@ -162,13 +163,7 @@ const overlayResizeHandler = (options) => {
 }
 
 function adjustOverlay(options) {
-  const {
-    rowRefs,
-    overlayRefs,
-    // showOverlay,
-    rowsToDisableButtons,
-    // selectedRows,
-  } = options
+  const { rowRefs, overlayRefs, rowsToDisableButtons } = options
 
   for (const _id in overlayRefs.current) {
     let source = rowRefs.current[_id]
@@ -181,13 +176,6 @@ function adjustOverlay(options) {
 
     if (!target || !source) continue
 
-    // if (showOverlay && rowsToDisableButtons[_id]) {
-    //   setOverlayStylesVisible(target, source)
-    // } else if (showOverlay && selectedRows.includes(_id)) {
-    //   setOverlayStylesVisible(target, source)
-    // } else if (!showOverlay || (showOverlay && !rowsToDisableButtons[_id])) {
-    //   setOverlayStylesHidden(target)
-    // }
     if (rowsToDisableButtons[_id]) {
       setOverlayStylesVisible(target, source)
     } else {
@@ -223,17 +211,15 @@ const setOverlayStylesHidden = (target: HTMLDivElement) => {
   target.style.visibility = 'hidden'
 }
 
-const makeNewRowsToDisableButtons = (
-  rowsToDisableButtons,
-  setRowsToDisableButtons,
-  rowToRestore,
-) => {
+const makeNewRowsToDisableButtons = (setRowsToDisableButtons, rowToRestore) => {
   if (!rowToRestore) return
 
-  const newRows = { ...rowsToDisableButtons }
-  delete newRows[rowToRestore]
+  setRowsToDisableButtons((prevRows) => {
+    const newRows = { ...prevRows }
 
-  setRowsToDisableButtons(newRows)
+    delete newRows[rowToRestore]
+    return newRows
+  })
 }
 
 export default function EventsTable({
@@ -243,44 +229,27 @@ export default function EventsTable({
   handleSelect,
   handleSelectAll,
   handleDeactivationAndDeletion,
+  fetcher,
+  setData,
 }: EventsTableProps) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
-  const [dropAllDisabled, setDropAllDisabled] = useState(false)
   const [validationError, setValidationError] = useState('')
   const [staleAd, setStaleAd] = useState('')
-  const [showOverlay, setShowOverlay] = useState(false)
   const rowRefs = useRef<Record<string, HTMLTableRowElement | null>>({})
   const overlayRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const [rowsToDisableButtons, setRowsToDisableButtons] = useState<
     Record<string, keyof EventActions>
   >({})
-  // const [rowToRestore, setRowToRestore] = useState<string>('')
 
   const options = {
     rowRefs,
     overlayRefs,
-    // showOverlay,
     rowsToDisableButtons,
-    // selectedRows,
   }
 
   useEffect(() => {
     adjustOverlay(options)
-  }, [/*showOverlay,*/ rowsToDisableButtons, selectedRows])
-
-  /*useEffect(() => {
-    if (!rowToRestore) return
-    // const newRows = rowsToDisableButtons.filter(
-    //   (item) => item._id !== rowToRestore,
-    // )
-    const newRows = { ...rowsToDisableButtons }
-    delete newRows[rowToRestore]
-    setRowsToDisableButtons(newRows)
-    if (Object.keys(newRows).length === 0) {
-      setRowToRestore('')
-      // setShowOverlay(false)
-    }
-  }, [rowToRestore])*/
+  }, [rowsToDisableButtons])
 
   useLayoutEffect(() => {
     window.addEventListener('resize', () => {
@@ -294,11 +263,7 @@ export default function EventsTable({
         overlayResizeHandler(options)
       })
     }
-  }, [
-    /*rowRefs, overlayRefs, showOverlay,*/
-    rowsToDisableButtons,
-    selectedRows,
-  ])
+  }, [rowsToDisableButtons])
 
   const getHeader = useCallback<() => ReactNode | 'Дата'>(() => {
     if (selectedRows.length > 0) {
@@ -309,17 +274,27 @@ export default function EventsTable({
       return (
         <Button
           color="secondary"
-          disabled={
-            dropAllDisabled || Object.keys(rowsToDisableButtons).length > 0
-          }
+          disabled={Object.keys(rowsToDisableButtons).length > 0}
           onClick={async () => {
-            // if (rowsToDisableButtons) setRowsToDisableButtons('')
-            setShowOverlay(true)
-            setDropAllDisabled(true)
-            //ToDo: correct code
+            //ToDo: add typings
+            const newRowsToDisableButtons = {}
+            selectedRows.forEach((item) => {
+              newRowsToDisableButtons[item] = action
+            })
+            setRowsToDisableButtons(newRowsToDisableButtons)
+
             await handleDeactivationAndDeletion(selectedRows, action)
-            setDropAllDisabled(false)
-            setShowOverlay(false)
+              .then(() => {
+                return fetcher()
+              })
+              .then((data) => {
+                setRowsToDisableButtons({})
+
+                setData(data)
+              })
+              .catch(() => {
+                setRowsToDisableButtons({})
+              })
           }}
         >
           {buttonText}
@@ -327,7 +302,7 @@ export default function EventsTable({
       )
     }
     return 'Дата'
-  }, [variant, rows, selectedRows, dropAllDisabled])
+  }, [variant, rows, selectedRows])
 
   return (
     <Root>
@@ -396,7 +371,7 @@ export default function EventsTable({
                     </TableCell>
                     <TableCell>
                       {
-                        //though we know that the type of row.waste is object here,
+                        //Though we know that the type of row.waste is object here,
                         //we use type narrowing to prevent Typescript error
                         typeof row.waste !== 'string'
                           ? row.waste.name
@@ -416,7 +391,7 @@ export default function EventsTable({
                                 )}`
                               : `${editRoute}${row._id}`
                           }
-                          disabled={!!rowsToDisableButtons[row._id]}
+                          // disabled={!!rowsToDisableButtons[row._id]}
                           className="button"
                           startIcon={<EditIcon />}
                         >
@@ -425,7 +400,7 @@ export default function EventsTable({
                         <Button
                           color="secondary"
                           className="button"
-                          disabled={!!rowsToDisableButtons[row._id]}
+                          // disabled={!!rowsToDisableButtons[row._id]}
                           onClick={async () => {
                             //Just another check to prevent Typescript error
                             if (!row._id) return
@@ -434,42 +409,39 @@ export default function EventsTable({
                               variant === inactive ? remove : deactivate
 
                             if (!rowsToDisableButtons[row._id]) {
-                              setRowsToDisableButtons({
-                                ...rowsToDisableButtons,
-                                [row._id]: action,
-                              })
+                              setRowsToDisableButtons(
+                                (prevRowsToDisableButtons) => {
+                                  return {
+                                    ...prevRowsToDisableButtons,
+                                    [row._id]: action,
+                                  }
+                                },
+                              )
                             } else {
                               return
                             }
 
-                            // if (!showOverlay) setShowOverlay(true)
-
-                            setTimeout(() => {
-                              // const newRows = rowsToDisableButtons.filter(
-                              //   (item) => item !== rowToRestore,
-                              // )
-                              // setRowsToDisableButtons(newRows)
-                              // setRowToRestore(row._id!)
-                              makeNewRowsToDisableButtons(
-                                rowsToDisableButtons,
-                                setRowsToDisableButtons,
-                                row._id,
-                              )
-                            }, 3000)
-
-                            return
                             await handleDeactivationAndDeletion(
                               [row._id],
                               action,
                             )
+                              .then(() => {
+                                return fetcher()
+                              })
+                              .then((data) => {
+                                makeNewRowsToDisableButtons(
+                                  setRowsToDisableButtons,
+                                  row._id,
+                                )
 
-                            // if (showOverlay) setShowOverlay(false)
-                            // setRowToRestore(row._id)
-                            makeNewRowsToDisableButtons(
-                              rowsToDisableButtons,
-                              setRowsToDisableButtons,
-                              row._id,
-                            )
+                                setData(data)
+                              })
+                              .catch(() => {
+                                makeNewRowsToDisableButtons(
+                                  setRowsToDisableButtons,
+                                  row._id,
+                                )
+                              })
                           }}
                           startIcon={<DeleteIcon />}
                         >
@@ -481,11 +453,10 @@ export default function EventsTable({
                           <Button
                             color="secondary"
                             className="button"
-                            disabled={!!rowsToDisableButtons[row._id]}
+                            // disabled={!!rowsToDisableButtons[row._id]}
                             onClick={async () => {
                               //Just another check to prevent Typescript error
                               if (!row._id) return
-                              // if (showOverlay) setShowOverlay(false)
 
                               //ToDo: check these errors
                               if (validationError) setValidationError('')
@@ -493,31 +464,43 @@ export default function EventsTable({
 
                               try {
                                 await date.validate(row.date)
-
-                                if (!rowsToDisableButtons[row._id]) {
-                                  setRowsToDisableButtons({
-                                    ...rowsToDisableButtons,
-                                    [row._id]: activate,
-                                  })
-                                } else {
-                                  return
-                                }
-                                //ToDo: separately catch errors for deactivationAndDeletion
-                                await handleDeactivationAndDeletion(
-                                  [row._id],
-                                  activate,
-                                )
                               } catch (e) {
                                 setStaleAd(row._id)
                                 setValidationError(validationErrorMsg)
+                                return
                               }
-                              //ToDo: Add if statement
-                              // setRowToRestore(row._id)
-                              makeNewRowsToDisableButtons(
-                                rowsToDisableButtons,
-                                setRowsToDisableButtons,
-                                row._id,
+
+                              if (!rowsToDisableButtons[row._id]) {
+                                setRowsToDisableButtons({
+                                  ...rowsToDisableButtons,
+                                  [row._id]: activate,
+                                })
+                              } else {
+                                return
+                              }
+                              //ToDo: separately catch errors for deactivationAndDeletion
+                              await handleDeactivationAndDeletion(
+                                [row._id],
+                                activate,
                               )
+                                .then(() => {
+                                  return fetcher()
+                                })
+                                .then((data) => {
+                                  setTimeout(() => {
+                                    makeNewRowsToDisableButtons(
+                                      setRowsToDisableButtons,
+                                      row._id,
+                                    )
+                                    setData(data)
+                                  }, 1000)
+                                })
+                                .catch(() => {
+                                  makeNewRowsToDisableButtons(
+                                    setRowsToDisableButtons,
+                                    row._id,
+                                  )
+                                })
                             }}
                             startIcon={<DeleteIcon />}
                           >

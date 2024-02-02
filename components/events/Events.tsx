@@ -39,7 +39,11 @@ export default function Events(props: { variant: Variant }) {
   const [variant, setVariant] = useState<Variant>(initialVariant)
   const [direction, setDirection] = useState('')
   const [backendError, setBackendError] = useState('')
-  const [data, setData] = useState<Event[]>([])
+  const [data, setData] = useState<{
+    total: number
+    events: Event[]
+    currentPage: number
+  }>({ total: 0, events: [], currentPage: 0 })
   const [loading, setLoading] = useState(false)
 
   const handleVariantChange = (
@@ -92,8 +96,8 @@ export default function Events(props: { variant: Variant }) {
     })
       .then((response) => {
         if (response.status === 200) {
-          setDirection('next')
-          fetcher()
+          setSelected([])
+          // fetcher()
         }
       })
       .catch((error) => {
@@ -124,7 +128,7 @@ export default function Events(props: { variant: Variant }) {
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = data.map((row) => row._id as string)
+      const newSelected = data.events.map((row) => row._id as string)
       setSelected(newSelected)
       return
     }
@@ -132,8 +136,7 @@ export default function Events(props: { variant: Variant }) {
   }
 
   const fetcher = useCallback(async () => {
-    setLoading(true)
-    await fetch(
+    const data = await fetch(
       `${api}?${new URLSearchParams({
         variant,
         direction,
@@ -149,20 +152,37 @@ export default function Events(props: { variant: Variant }) {
       .then((response) => {
         return response.json()
       })
-      .then((data) => {
-        setData(data.events)
-        setNumRows(data.total)
-        setPage(data.currentPage)
+      .then((newData) => {
+        return newData
+        // setData(data.events)
+        // setNumRows(data.total)
+        // setPage(data.currentPage)
       })
       .catch((error) => {
         setBackendError(errorMessage)
+        // return null
       })
-    setLoading(false)
+
+    return data
   }, [variant, page, pageSize])
 
   useEffect(() => {
+    setLoading(true)
     fetcher()
+      .then((data) => {
+        setData(data)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [variant, page, pageSize])
+
+  useEffect(() => {
+    if (!data) return
+
+    setNumRows(data.total)
+    setPage(data.currentPage)
+  }, [data])
 
   const handlePageChange = (_: unknown, newPage: number) => {
     if (numRows === 0) return
@@ -189,16 +209,18 @@ export default function Events(props: { variant: Variant }) {
 
   if (backendError) content = <Error />
 
-  if (data && data.length > 0) {
+  if (data && data.events.length > 0) {
     content = (
       <>
         <EventsTable
           variant={variant}
-          rows={data}
+          rows={data.events}
           selectedRows={selected}
           handleSelect={handleSelect}
           handleSelectAll={handleSelectAll}
           handleDeactivationAndDeletion={handleDeactivationAndDeletion}
+          fetcher={fetcher}
+          setData={setData}
         />
         <DataGridFooter
           numRows={numRows}
