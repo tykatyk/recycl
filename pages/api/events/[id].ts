@@ -8,7 +8,6 @@ import {
   perFormErrorResponse,
 } from '../../../lib/helpers/responses'
 import dbConnect from '../../../lib/db/connection'
-import type { IsInactive } from '../../../lib/types/event'
 
 export default async function UpdateEvent(
   req: NextApiRequest,
@@ -28,9 +27,7 @@ export default async function UpdateEvent(
 
     const event = req.body
 
-    type UpdateEventQuery = { id?: string } & Pick<IsInactive, 'isInactive'>
-
-    const { isInactive, id }: UpdateEventQuery = req.query
+    const { id }: { id?: string } = req.query
 
     try {
       await eventValidationSchema.validate(event, {
@@ -40,8 +37,6 @@ export default async function UpdateEvent(
       console.log(error)
       return errorResponse(error, res)
     }
-
-    if (isInactive) event.isActive = false
 
     try {
       await eventModel.updateOne({ _id: id, user: userId }, event)

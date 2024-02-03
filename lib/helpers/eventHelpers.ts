@@ -85,7 +85,7 @@ export const eventVariants = {
 export const getEventTableStyles = (theme) => ({
   width: '100%',
 
-  '& .noBorder>td, & .spacer': {
+  '& .noBorder>td, & .noBorder>th': {
     borderBottom: 'none',
     borderTop: 'none',
   },
@@ -102,13 +102,8 @@ export const getEventTableStyles = (theme) => ({
     },
   },
 
-  '& .actionsRow td': {
-    border: 'none',
-  },
-
-  '& .header>th': {
+  '& th': {
     textTransform: 'uppercase',
-    borderBottom: 'none',
   },
 
   '& tbody td:not(.spacer)': {
@@ -120,3 +115,90 @@ export const getEventTableStyles = (theme) => ({
     textTransform: 'none',
   },
 })
+
+export type ConfigOptions = {
+  rowRefs: Record<string, HTMLTableRowElement | null>
+  overlayRefs: Record<string, HTMLDivElement | null>
+  rowsToDisableButtons: Record<string, keyof EventActions>
+}
+
+export type Options = {
+  rowRefs: React.MutableRefObject<ConfigOptions['rowRefs']>
+  overlayRefs: React.MutableRefObject<ConfigOptions['overlayRefs']>
+  rowsToDisableButtons: ConfigOptions['rowsToDisableButtons']
+}
+
+export const adjustOverlay = (options: Options) => {
+  const { rowRefs, overlayRefs, rowsToDisableButtons } = options
+
+  for (const _id in overlayRefs.current) {
+    let source = rowRefs.current[_id]
+    let target = overlayRefs.current[_id]
+
+    //prevent memory leak of increasing rowRefs and overlayRefs size when the user changes variant, deletes or paginates through events
+    //we basically remove refs for rows which are not visible
+    if (!source) delete rowRefs.current[_id]
+    if (!target) delete overlayRefs.current[_id]
+
+    if (!target || !source) continue
+
+    if (rowsToDisableButtons[_id]) {
+      setOverlayStylesVisible(target, source)
+    } else {
+      setOverlayStylesHidden(target)
+    }
+  }
+}
+
+export const setOverlayStylesVisible = (
+  target: HTMLDivElement,
+  source: HTMLTableRowElement,
+) => {
+  let height = 0
+  const _id = source.getAttribute('data-id')
+  const elements = document.querySelectorAll<HTMLTableRowElement>(
+    `[data-id="${_id}"]`,
+  )
+
+  elements.forEach((element) => {
+    height += element.offsetHeight
+  })
+
+  target.style.left = `${source.offsetLeft}px`
+  target.style.top = `${source.offsetTop}px`
+  target.style.height = `${height}px`
+  target.style.visibility = 'visible'
+  target.style.opacity = '1'
+}
+
+export const setOverlayStylesHidden = (target: HTMLDivElement) => {
+  target.style.opacity = '0'
+  target.style.height = '0'
+  target.style.visibility = 'hidden'
+}
+
+let timeout: ReturnType<typeof setTimeout>
+export const overlayResizeHandler = (options: Options) => {
+  //debounce recalculating overlay styles when window is resizing to prevent perfomance issues
+  clearTimeout(timeout)
+
+  timeout = setTimeout(() => {
+    adjustOverlay(options)
+  }, 200)
+}
+
+export const makeNewRowsToDisableButtons = (
+  setRowsToDisableButtons: React.Dispatch<
+    React.SetStateAction<Record<string, keyof EventActions>>
+  >,
+  rowToRestore: string,
+) => {
+  if (!rowToRestore) return
+
+  setRowsToDisableButtons((prevRows) => {
+    const newRows = { ...prevRows }
+
+    delete newRows[rowToRestore]
+    return newRows
+  })
+}

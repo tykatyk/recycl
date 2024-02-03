@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, ReactElement } from 'react'
 import { Grid, Typography } from '@mui/material'
 import Layout from '../layouts/Layout'
 import Tabs from '../uiParts/Tabs'
@@ -8,6 +8,7 @@ import Error from '../uiParts/Error'
 import EventsTable from './EventsTable'
 import type {
   Event,
+  EventPaginationData,
   Variant,
   Direction,
   EventActions,
@@ -28,6 +29,11 @@ const deletionRoute = 'delete'
 const api = '/api/events/'
 const activeEventsRoute = '/my/events'
 const inactiveEventsRoute = '/my/events/inactive'
+const initialData: EventPaginationData = {
+  total: 0,
+  events: [],
+  currentPage: 0,
+}
 
 export default function Events(props: { variant: Variant }) {
   const { variant: initialVariant } = props
@@ -39,11 +45,7 @@ export default function Events(props: { variant: Variant }) {
   const [variant, setVariant] = useState<Variant>(initialVariant)
   const [direction, setDirection] = useState('')
   const [backendError, setBackendError] = useState('')
-  const [data, setData] = useState<{
-    total: number
-    events: Event[]
-    currentPage: number
-  }>({ total: 0, events: [], currentPage: 0 })
+  const [data, setData] = useState<EventPaginationData>(initialData)
   const [loading, setLoading] = useState(false)
 
   const handleVariantChange = (
@@ -62,11 +64,11 @@ export default function Events(props: { variant: Variant }) {
     }
   }
 
-  const handleDeactivationAndDeletion = async (
-    eventIds: string[] = [],
+  const handleActivationDeactivationAndDeletion = async (
+    eventIds: string[],
     action: keyof EventActions,
   ) => {
-    if (eventIds.length === 0) return
+    if (!eventIds || eventIds.length === 0) return
 
     let actionRoute = ''
 
@@ -83,7 +85,7 @@ export default function Events(props: { variant: Variant }) {
       default:
         return
     }
-    setLoading(true)
+
     await fetch(`${api}${actionRoute}`, {
       method: 'POST',
       body:
@@ -97,13 +99,11 @@ export default function Events(props: { variant: Variant }) {
       .then((response) => {
         if (response.status === 200) {
           setSelected([])
-          // fetcher()
         }
       })
       .catch((error) => {
         setBackendError(errorMessage)
       })
-    setLoading(false)
   }
 
   const handleSelect = (row: Event) => {
@@ -135,7 +135,7 @@ export default function Events(props: { variant: Variant }) {
     setSelected([])
   }
 
-  const fetcher = useCallback(async () => {
+  const fetcher = useCallback(async (): Promise<EventPaginationData> => {
     const data = await fetch(
       `${api}?${new URLSearchParams({
         variant,
@@ -154,35 +154,34 @@ export default function Events(props: { variant: Variant }) {
       })
       .then((newData) => {
         return newData
-        // setData(data.events)
-        // setNumRows(data.total)
-        // setPage(data.currentPage)
       })
       .catch((error) => {
         setBackendError(errorMessage)
-        // return null
       })
 
     return data
   }, [variant, page, pageSize])
 
+  const setParams = useCallback(
+    (data: EventPaginationData) => {
+      setData(data)
+      setNumRows(data.total)
+      setPage(data.currentPage)
+    },
+    [data],
+  )
+
   useEffect(() => {
     setLoading(true)
+    setData(initialData)
     fetcher()
       .then((data) => {
-        setData(data)
+        setParams(data)
       })
       .finally(() => {
         setLoading(false)
       })
   }, [variant, page, pageSize])
-
-  useEffect(() => {
-    if (!data) return
-
-    setNumRows(data.total)
-    setPage(data.currentPage)
-  }, [data])
 
   const handlePageChange = (_: unknown, newPage: number) => {
     if (numRows === 0) return
@@ -203,13 +202,13 @@ export default function Events(props: { variant: Variant }) {
     setDirection('')
   }
 
-  let content = <NoRows />
+  let content: ReactElement | null = null
 
-  if (loading) content = <PageLoadingCircle />
-
-  if (backendError) content = <Error />
-
-  if (data && data.events.length > 0) {
+  if (loading) {
+    content = <PageLoadingCircle />
+  } else if (backendError) {
+    content = <Error />
+  } else if (data && data.events.length > 0) {
     content = (
       <>
         <EventsTable
@@ -218,9 +217,11 @@ export default function Events(props: { variant: Variant }) {
           selectedRows={selected}
           handleSelect={handleSelect}
           handleSelectAll={handleSelectAll}
-          handleDeactivationAndDeletion={handleDeactivationAndDeletion}
+          handleActivationDeactivationAndDeletion={
+            handleActivationDeactivationAndDeletion
+          }
           fetcher={fetcher}
-          setData={setData}
+          setParams={setParams}
         />
         <DataGridFooter
           numRows={numRows}
@@ -232,6 +233,8 @@ export default function Events(props: { variant: Variant }) {
         />
       </>
     )
+  } else {
+    content = <NoRows />
   }
 
   return (

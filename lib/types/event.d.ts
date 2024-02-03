@@ -27,6 +27,12 @@ export type Event = {
   viewCount?: number
 }
 
+export type EventPaginationData = {
+  total: number
+  events: Event[]
+  currentPage: number
+}
+
 export type IsInactive = {
   isInactive?: '1'
 }
