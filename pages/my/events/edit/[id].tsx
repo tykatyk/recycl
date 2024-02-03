@@ -3,6 +3,7 @@ import { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 import type { Event } from '../../../../lib/types/event'
 import type { Waste } from '../../../../lib/types/waste'
 import queries from '../../../../lib/db/queries'
+import eventModel from '../../../../lib/db/models/eventModel'
 import dbConnect from '../../../../lib/db/connection'
 import { getSession } from 'next-auth/react'
 import { ParsedUrlQuery } from 'querystring'
@@ -32,7 +33,7 @@ export const getServerSideProps = (async (context) => {
   const { id } = context.params as Params
   //ToDo: add user authorization
   await dbConnect()
-  const event = await queries.eventQueries.get(id)
+  const event = await eventModel.findById(id)
   if (!event) {
     return {
       notFound: true,
