@@ -42,6 +42,10 @@ export const Overlay = ({ rowsToDisableButtons, rowRefs, overlayRefs }) => {
         ref={(el: HTMLDivElement | null) =>
           el && (overlayRefs.current[_id] = el)
         }
+        tabIndex={-1}
+        aria-role={'status'}
+        aria-live={'assertive'}
+        aria-atomic={true}
         sx={{
           position: 'absolute',
           width: '100%',
