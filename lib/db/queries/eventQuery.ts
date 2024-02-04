@@ -4,7 +4,7 @@ import { eventVariants } from '../../helpers/eventHelpers'
 import type { Variant, Direction, Event as EventType } from '../../types/event'
 const { active } = eventVariants
 
-type Sort = 'date' | 'wasteType' | 'location'
+type Sort = 'date' | 'wasteType' | 'location' | 'updatedAt'
 
 type QueryParams = {
   variant?: Variant
@@ -44,9 +44,10 @@ interface SortQuery {
 }
 
 const getSortQuery = (sort?: Sort): SortQuery => {
-  const sortQuery: SortQuery = { _id: -1 }
+  const sortQuery: SortQuery = {}
 
-  if (!sort) sortQuery['date'] = -1
+  if (sort) sortQuery[sort] = -1
+  sortQuery['_id'] = -1
 
   return sortQuery
 }
@@ -62,7 +63,12 @@ const eventQueries = {
       events: [],
       currentPage: 0,
     }
-    const { page = 0, pageSize = 0, variant, sortOrder = 'date' } = queryParams
+    const {
+      page = 0,
+      pageSize = 0,
+      variant,
+      sortOrder = 'updatedAt',
+    } = queryParams
 
     const pageInt = parseInt(String(page), 10)
     const pageSizeInt = parseInt(String(pageSize), 10)
