@@ -14,6 +14,7 @@ import type {
   IsInactive,
 } from '../../lib/types/event'
 import { useRouter } from 'next/router'
+import { Box, Typography } from '@mui/material'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 const api = '/api/events'
@@ -107,7 +108,10 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
   }
 
   return (
-    <div>
+    <Box>
+      <Typography paragraph variant="h4">
+        Объявление о вывозе отходов
+      </Typography>
       <Formik
         enableReinitialize
         initialValues={initialValues}
@@ -130,6 +134,6 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
           setNotification('')
         }}
       />
-    </div>
+    </Box>
   )
 }

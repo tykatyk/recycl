@@ -33,11 +33,6 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
         }}
       >
         <Grid item xs={12}>
-          <Typography gutterBottom variant="h4" sx={{ marginBottom: 0 }}>
-            Предложение о вывозе отходов
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
           <Field
             id="location"
             name="location"

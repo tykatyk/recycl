@@ -74,7 +74,7 @@ function ShowData(props: { applicationData: RecycleEvent }) {
       <Grid container item spacing={2} direction="column" xs sx={{ mb: 4 }}>
         <Grid item xs sx={{ mb: 4 }}>
           <Typography component="h1" variant="h3" gutterBottom>
-            Предложение о вывозе отходов
+            Объявление о вывозе отходов
           </Typography>
           <Box
             sx={{

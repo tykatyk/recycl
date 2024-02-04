@@ -14,7 +14,6 @@ import type {
   EventActions,
 } from '../../lib/types/event'
 import { eventActions } from '../../lib/helpers/eventHelpers'
-import { _id } from '@next-auth/mongodb-adapter'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
@@ -22,7 +21,7 @@ const { activate, deactivate, remove } = eventActions
 const active: Variant = 'active'
 const prev: Direction = 'prev'
 const next: Direction = 'next'
-const titleHeading = 'Мои предложения о вывозе отходов'
+const titleHeading = 'Мои объявления о вывозе отходов'
 const errorMessage = 'Неизвестная ошибка'
 const changeActivityRoute = 'changeActivity'
 const deletionRoute = 'delete'
