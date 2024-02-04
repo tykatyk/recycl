@@ -31,9 +31,9 @@ export const getServerSideProps = (async (context) => {
     }
 
   const { id } = context.params as Params
-  //ToDo: add user authorization
+
   await dbConnect()
-  const event = await eventModel.findById(id)
+  const event = await eventModel.findOne({ _id: id, user: session.id })
   if (!event) {
     return {
       notFound: true,
