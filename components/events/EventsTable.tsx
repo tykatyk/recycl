@@ -251,8 +251,7 @@ export default function EventsTable({
                                 )}`
                               : `${editRoute}${row._id}`
                           }
-                          //ToDo: handle disabled
-                          // disabled={!!rowsToDisableButtons[row._id]}
+                          disabled={!!rowsToDisableButtons[row._id]}
                           className="button"
                           startIcon={<EditIcon />}
                         >
@@ -261,7 +260,7 @@ export default function EventsTable({
                         <Button
                           color="secondary"
                           className="button"
-                          // disabled={!!rowsToDisableButtons[row._id]}
+                          disabled={!!rowsToDisableButtons[row._id]}
                           onClick={async () => {
                             //Just another check to prevent Typescript error
                             if (!row._id) return
@@ -294,7 +293,7 @@ export default function EventsTable({
                           <Button
                             color="secondary"
                             className="button"
-                            // disabled={!!rowsToDisableButtons[row._id]}
+                            disabled={!!rowsToDisableButtons[row._id]}
                             onClick={async () => {
                               //Just another check to prevent Typescript error
                               if (!row._id) return
