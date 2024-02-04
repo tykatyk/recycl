@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, ReactElement } from 'react'
+import React, { useEffect, useState, ReactElement } from 'react'
 import { Grid, Typography } from '@mui/material'
 import Layout from '../layouts/Layout'
 import Tabs from '../uiParts/Tabs'
@@ -135,7 +135,7 @@ export default function Events(props: { variant: Variant }) {
     setSelected([])
   }
 
-  const fetcher = useCallback(async (): Promise<EventPaginationData> => {
+  const fetcher = async (): Promise<EventPaginationData> => {
     const data = await fetch(
       `${api}?${new URLSearchParams({
         variant,
@@ -160,16 +160,13 @@ export default function Events(props: { variant: Variant }) {
       })
 
     return data
-  }, [variant, page, pageSize])
+  }
 
-  const setParams = useCallback(
-    (data: EventPaginationData) => {
-      setData(data)
-      setNumRows(data.total)
-      setPage(data.currentPage)
-    },
-    [data],
-  )
+  const setParams = (data: EventPaginationData) => {
+    setData(data)
+    setNumRows(data.total)
+    setPage(data.currentPage)
+  }
 
   useEffect(() => {
     setLoading(true)

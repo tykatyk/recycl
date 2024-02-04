@@ -1,7 +1,6 @@
 import React, {
   useState,
   useRef,
-  useCallback,
   ReactNode,
   useEffect,
   useLayoutEffect,
@@ -69,6 +68,7 @@ const deactivateBtnText = 'Деактивировать'
 const selectAllBtnText = 'Выбрать все'
 const editBtnText = 'Редактировать'
 const activateBtnText = 'Активировать'
+const dateText = 'Дата'
 const editRoute = '/my/events/edit/'
 
 export default function EventsTable({
@@ -114,24 +114,21 @@ export default function EventsTable({
     }
   }, [rowsToDisableButtons])
 
-  const handleRowAction = useCallback(
-    async (row: Event, action: keyof EventActions) => {
-      await handleActivationDeactivationAndDeletion([row._id!], action)
-        .then(() => {
-          return fetcher()
-        })
-        .then((data: EventPaginationData) => {
-          makeNewRowsToDisableButtons(setRowsToDisableButtons, row._id!)
-          setParams(data)
-        })
-        .catch(() => {
-          makeNewRowsToDisableButtons(setRowsToDisableButtons, row._id!)
-        })
-    },
-    [],
-  )
+  const handleRowAction = async (row: Event, action: keyof EventActions) => {
+    await handleActivationDeactivationAndDeletion([row._id!], action)
+      .then(() => {
+        return fetcher()
+      })
+      .then((data: EventPaginationData) => {
+        makeNewRowsToDisableButtons(setRowsToDisableButtons, row._id!)
+        setParams(data)
+      })
+      .catch(() => {
+        makeNewRowsToDisableButtons(setRowsToDisableButtons, row._id!)
+      })
+  }
 
-  const getHeader = useCallback<() => ReactNode | 'Дата'>(() => {
+  const getHeader = (): ReactNode | typeof dateText => {
     if (selectedRows.length > 0) {
       const action = variant === inactive ? remove : deactivate
       const buttonText =
@@ -165,8 +162,8 @@ export default function EventsTable({
         </Button>
       )
     }
-    return 'Дата'
-  }, [variant, rows, selectedRows])
+    return dateText
+  }
 
   return (
     <Root>
