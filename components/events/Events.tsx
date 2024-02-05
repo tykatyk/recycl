@@ -48,7 +48,7 @@ export default function Events(props: { variant: Variant }) {
   const [backendError, setBackendError] = useState('')
   const [data, setData] = useState<EventPaginationData>(initialData)
   const [loading, setLoading] = useState(false)
-  const [sortOrder, setSortOrder] = React.useState<SortOrder>('asc')
+  const [sortOrder, setSortOrder] = React.useState<SortOrder>('desc')
   const [orderBy, setOrderBy] = React.useState<OrderBy>('updatedAt')
 
   const handleVariantChange = (

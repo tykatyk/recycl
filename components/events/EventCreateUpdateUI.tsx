@@ -24,7 +24,7 @@ const indexRoute = '/my/events'
 const inactiveEventsRoute = '/my/events/inactive'
 
 export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
-  const { event, userPhone } = props
+  const { event, userPhone, wasteTypes } = props
   const [severity, setSeverity] = useState<string>('success')
   const router = useRouter()
   const { isInactive }: IsInactive = router.query
@@ -38,12 +38,12 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
   ) => {
     setSubmitting(true)
 
-    const normailizedValues = getNormalizedValues(values)
+    const normalizedValues = getNormalizedValues(values)
 
     fetch(createRoute, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(normailizedValues),
+      body: JSON.stringify(normalizedValues),
     })
       .then((response) => {
         return response.json()
@@ -124,7 +124,7 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
           }
         }}
       >
-        <EventForm {...props} />
+        <EventForm wasteTypes={wasteTypes} />
       </Formik>
       <Snackbar
         severity={severity}

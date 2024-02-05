@@ -10,8 +10,7 @@ const eventSchema = new Schema(
     },
     location: { type: locationSchema, required: true },
     waste: {
-      type: Schema.Types.ObjectId,
-      ref: 'WasteType',
+      type: String,
       required: true,
     },
     date: { type: Date, required: true },

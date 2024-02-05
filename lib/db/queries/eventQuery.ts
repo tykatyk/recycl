@@ -50,16 +50,13 @@ interface SortQuery {
 
 const getSortQuery = (
   orderBy: OrderBy = 'updatedAt',
-  sortOrder: SortOrder = 'asc',
+  sortOrder: SortOrder = 'desc',
 ): SortQuery => {
   const sortQuery: SortQuery = {}
-  console.log(orderBy)
   const sort = sortOrder === 'asc' ? 1 : -1
 
   if (orderBy === 'location') {
     sortQuery['location.description'] = sort
-  } else if (orderBy === 'waste') {
-    sortQuery['waste.name'] = sort
   } else {
     sortQuery[orderBy] = sort
   }
