@@ -43,7 +43,7 @@ export const Overlay = ({ rowsToDisableButtons, rowRefs, overlayRefs }) => {
           el && (overlayRefs.current[_id] = el)
         }
         tabIndex={-1}
-        aria-role={'status'}
+        role={'status'}
         aria-live={'assertive'}
         aria-atomic={true}
         sx={{
