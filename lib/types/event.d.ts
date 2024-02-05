@@ -42,3 +42,6 @@ export type EventActions = {
   deactivate: 'deactivate'
   remove: 'remove'
 }
+
+export type SortOrder = 'asc' | 'desc'
+export type OrderBy = 'date' | 'waste' | 'location' | 'updatedAt'

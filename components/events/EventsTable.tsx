@@ -16,6 +16,7 @@ import {
   TableRow,
   Button,
   Box,
+  TableSortLabel,
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
@@ -27,6 +28,7 @@ import type {
   EventPaginationData,
   IsInactive,
   EventActions,
+  SortOrder,
 } from '../../lib/types/event'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
@@ -41,6 +43,7 @@ import {
 import type { Options, ConfigOptions } from '../../lib/helpers/eventHelpers'
 import { date } from '../../lib/validation/atomicValidators'
 import { Root, Spacer, Overlay, Error } from '../uiParts/EventTableParts'
+import { visuallyHidden } from '@mui/utils'
 
 const isInactive: IsInactive = {
   isInactive: '1',
@@ -56,8 +59,11 @@ type EventsTableProps = {
     eventIds: string[] | undefined,
     action: keyof EventActions,
   ) => Promise<void>
+  handleSort: (event: React.MouseEvent<unknown>, property: any) => void
   fetcher: () => Promise<EventPaginationData>
   setParams: (data: EventPaginationData) => void
+  orderBy: string
+  sortOrder: SortOrder
 }
 
 const { activate, deactivate, remove } = eventActions
@@ -77,9 +83,12 @@ export default function EventsTable({
   selectedRows,
   handleSelect,
   handleSelectAll,
+  handleSort,
   handleActivationDeactivationAndDeletion,
   fetcher,
   setParams,
+  orderBy,
+  sortOrder,
 }: EventsTableProps) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
   const [validationError, setValidationError] = useState('')
@@ -171,21 +180,44 @@ export default function EventsTable({
         <Table>
           <TableHead>
             <TableRow className={'noBorder'}>
+              <TableCell>
+                <Checkbox
+                  color="secondary"
+                  checked={rows && selectedRows.length > 0}
+                  inputProps={{
+                    'aria-label': selectAllBtnText,
+                  }}
+                  onChange={(e) => {
+                    handleSelectAll(e)
+                  }}
+                />
+              </TableCell>
+
               {getColumns(getHeader).map((column) => (
-                <TableCell key={column.id} sx={{ minWidth: column.width }}>
-                  {column.id !== 'checkbox' ? (
+                <TableCell
+                  key={column.id}
+                  sx={{ minWidth: column.width }}
+                  sortDirection={orderBy === column.id ? sortOrder : false}
+                >
+                  {column.id === 'time' ? (
                     column.headerName
                   ) : (
-                    <Checkbox
-                      color="secondary"
-                      checked={rows && selectedRows.length > 0}
-                      inputProps={{
-                        'aria-label': selectAllBtnText,
+                    <TableSortLabel
+                      active={orderBy === column.id}
+                      direction={orderBy === column.id ? sortOrder : 'asc'}
+                      onClick={(event) => {
+                        handleSort(event, column.id)
                       }}
-                      onChange={(e) => {
-                        handleSelectAll(e)
-                      }}
-                    />
+                    >
+                      {column.headerName}
+                      {orderBy === column.id ? (
+                        <Box component="span" sx={visuallyHidden}>
+                          {sortOrder === 'desc'
+                            ? 'sorted descending'
+                            : 'sorted ascending'}
+                        </Box>
+                      ) : null}
+                    </TableSortLabel>
                   )}
                 </TableCell>
               ))}

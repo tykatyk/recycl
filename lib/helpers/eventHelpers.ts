@@ -42,11 +42,6 @@ export function getColumns(
 ): ColumnHeader[] {
   return [
     {
-      id: 'checkbox',
-      headerName: 'Выбрать',
-      width: 70,
-    },
-    {
       id: 'date',
       headerName: getHeader(),
       width: 150,
@@ -63,7 +58,7 @@ export function getColumns(
       width: 170,
     },
     {
-      id: 'wasteType',
+      id: 'waste',
       headerName: 'Тип отходов',
       width: 200,
       headerAlign: 'center',

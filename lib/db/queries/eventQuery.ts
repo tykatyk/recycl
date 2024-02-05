@@ -1,17 +1,22 @@
 import { Event } from '../models/index'
 import { _id } from '@next-auth/mongodb-adapter'
 import { eventVariants } from '../../helpers/eventHelpers'
-import type { Variant, Direction, Event as EventType } from '../../types/event'
+import type {
+  Variant,
+  Direction,
+  Event as EventType,
+  SortOrder,
+  OrderBy,
+} from '../../types/event'
 const { active } = eventVariants
 
-type Sort = 'date' | 'wasteType' | 'location' | 'updatedAt'
-
 type QueryParams = {
-  variant?: Variant
-  direction?: Direction
-  page?: string
-  pageSize?: string
-  sortOrder?: Sort
+  variant: Variant
+  direction: Direction
+  page: string
+  pageSize: string
+  sortOrder?: SortOrder
+  orderBy?: OrderBy
 }
 
 interface SelectQuery {
@@ -43,10 +48,22 @@ interface SortQuery {
   [key: string]: SortOption
 }
 
-const getSortQuery = (sort?: Sort): SortQuery => {
+const getSortQuery = (
+  orderBy: OrderBy = 'updatedAt',
+  sortOrder: SortOrder = 'asc',
+): SortQuery => {
   const sortQuery: SortQuery = {}
+  console.log(orderBy)
+  const sort = sortOrder === 'asc' ? 1 : -1
 
-  if (sort) sortQuery[sort] = -1
+  if (orderBy === 'location') {
+    sortQuery['location.description'] = sort
+  } else if (orderBy === 'waste') {
+    sortQuery['waste.name'] = sort
+  } else {
+    sortQuery[orderBy] = sort
+  }
+
   sortQuery['_id'] = -1
 
   return sortQuery
@@ -63,12 +80,7 @@ const eventQueries = {
       events: [],
       currentPage: 0,
     }
-    const {
-      page = 0,
-      pageSize = 0,
-      variant,
-      sortOrder = 'updatedAt',
-    } = queryParams
+    const { page = 0, pageSize = 0, variant, orderBy, sortOrder } = queryParams
 
     const pageInt = parseInt(String(page), 10)
     const pageSizeInt = parseInt(String(pageSize), 10)
@@ -77,7 +89,7 @@ const eventQueries = {
 
     const select = getSelectQuery(variant, user)
     const countAll = getCountQuery(variant, user)
-    const sort = getSortQuery(sortOrder)
+    const sort = getSortQuery(orderBy, sortOrder)
 
     const total = await Event.countDocuments(countAll)
     let skip = pageInt * pageSizeInt

@@ -12,6 +12,8 @@ import type {
   Variant,
   Direction,
   EventActions,
+  SortOrder,
+  OrderBy,
 } from '../../lib/types/event'
 import { eventActions } from '../../lib/helpers/eventHelpers'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
@@ -46,6 +48,8 @@ export default function Events(props: { variant: Variant }) {
   const [backendError, setBackendError] = useState('')
   const [data, setData] = useState<EventPaginationData>(initialData)
   const [loading, setLoading] = useState(false)
+  const [sortOrder, setSortOrder] = React.useState<SortOrder>('asc')
+  const [orderBy, setOrderBy] = React.useState<OrderBy>('updatedAt')
 
   const handleVariantChange = (
     event: React.SyntheticEvent,
@@ -134,6 +138,12 @@ export default function Events(props: { variant: Variant }) {
     setSelected([])
   }
 
+  const handleSort = (event: React.MouseEvent<unknown>, property) => {
+    const isAsc = orderBy === property && sortOrder === 'asc'
+    setSortOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
   const fetcher = async (): Promise<EventPaginationData> => {
     const data = await fetch(
       `${api}?${new URLSearchParams({
@@ -141,6 +151,8 @@ export default function Events(props: { variant: Variant }) {
         direction,
         page: String(page),
         pageSize: String(pageSize),
+        orderBy,
+        sortOrder,
       })}`,
       {
         headers: {
@@ -177,7 +189,7 @@ export default function Events(props: { variant: Variant }) {
       .finally(() => {
         setLoading(false)
       })
-  }, [variant, page, pageSize])
+  }, [variant, page, pageSize, orderBy, sortOrder])
 
   const handlePageChange = (_: unknown, newPage: number) => {
     if (numRows === 0) return
@@ -216,8 +228,11 @@ export default function Events(props: { variant: Variant }) {
           handleActivationDeactivationAndDeletion={
             handleActivationDeactivationAndDeletion
           }
+          handleSort={handleSort}
           fetcher={fetcher}
           setParams={setParams}
+          orderBy={orderBy}
+          sortOrder={sortOrder}
         />
         <DataGridFooter
           numRows={numRows}
