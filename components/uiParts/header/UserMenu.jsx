@@ -15,6 +15,8 @@ import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 
+const authenticated = 'authenticated'
+
 const PREFIX = 'UserMenu'
 
 const classes = {
@@ -109,7 +111,7 @@ export default function UserMenu(props) {
     </Link>
   )
 
-  if (status === 'authenticated') {
+  if (status === authenticated) {
     logIn = (
       <Link
         href="/"
@@ -148,7 +150,7 @@ export default function UserMenu(props) {
           <Paper>
             <ClickAwayListener onClickAway={handleClose}>
               <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                {status === 'authenticated' && (
+                {status === authenticated && (
                   <ListItem divider>
                     <ListItemText
                       style={{
@@ -159,9 +161,10 @@ export default function UserMenu(props) {
                     />
                   </ListItem>
                 )}
-                {menuItems.map((item, index) => {
-                  return showSubmenu(item, index)
-                })}
+                {status === authenticated &&
+                  menuItems.map((item, index) => {
+                    return showSubmenu(item, index)
+                  })}
                 <MenuItem onClick={handleClose}>{logIn}</MenuItem>
               </MenuList>
             </ClickAwayListener>
