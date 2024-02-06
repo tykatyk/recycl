@@ -1,12 +1,10 @@
 import React from 'react'
-import { Button } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
+import { Button, Box } from '@mui/material'
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import { useRouter } from 'next/router'
 
 export default function BackButton(props) {
-  const theme = useTheme()
   const { text = 'Назад', to } = props
   const router = useRouter()
   const handleClick = () => {
@@ -19,15 +17,19 @@ export default function BackButton(props) {
   }
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: 'flex',
-        margin: theme.spacing(2),
+        margin: 2,
       }}
     >
-      <Button onClick={handleClick} startIcon={<ArrowBackIosIcon />}>
+      <Button
+        onClick={handleClick}
+        color={'secondary'}
+        startIcon={<ArrowBackIosIcon />}
+      >
         {text}
       </Button>
-    </div>
+    </Box>
   )
 }
