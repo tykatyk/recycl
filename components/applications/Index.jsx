@@ -33,7 +33,7 @@ const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
         cursor: 'pointer',
       },
     },
-  })
+  }),
 )
 
 const columns = [
@@ -106,7 +106,7 @@ export default function Index(props) {
     rows = data.getRemovalApplications.map((item) => {
       const newItem = {}
       newItem.id = item['_id']
-      newItem.wasteType = item.wasteType.name
+      newItem.wasteType = item.wasteType
       newItem.wasteLocation = item.wasteLocation.description
       newItem.quantity = item.quantity
 
@@ -143,15 +143,15 @@ export default function Index(props) {
               onCellClick={(params, event) => {
                 Router.push(`/applications/${params.id}`)
               }}
-              components={{
-                Footer: function Footer(props) {
+              slots={{
+                footer: function Footer(props) {
                   return <DataGridFooter {...props} />
                 },
-                Pagination: TablePagination,
-                NoRowsOverlay: DataGridNoRowsOverlay,
-                ErrorOverlay: DataGridErrorOverlay,
+                pagination: TablePagination,
+                noRowsOverlay: DataGridNoRowsOverlay,
+                errorOverlay: DataGridErrorOverlay,
               }}
-              componentsProps={{
+              slotProps={{
                 footer: {
                   numRows: rows.length,
                   handlePageChange,

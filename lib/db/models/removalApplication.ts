@@ -18,8 +18,7 @@ const removalApplicationSchema = new Schema(
     wasteLocation,
 
     wasteType: {
-      type: Schema.Types.ObjectId,
-      ref: 'WasteType',
+      type: String,
       required: true,
     },
     quantity: Number,

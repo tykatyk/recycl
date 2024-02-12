@@ -101,7 +101,7 @@ const columns = [
 export default function RemovalApplications(props) {
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(1)
   const [backendError, setBackendError] = useState(null)
   const { status } = useSession()
   const { asPath } = useRouter()
@@ -142,7 +142,7 @@ export default function RemovalApplications(props) {
       rows = data.getRemovalApplicationsWithMessageCount.map((item) => {
         const newItem = {}
         newItem.id = item.document['_id']
-        newItem.wasteType = item.document.wasteType.name
+        newItem.wasteType = item.document.wasteType
         newItem.wasteLocation = item.document.wasteLocation.description
         newItem.quantity = item.document.quantity
         newItem.messageCount = item.messageCount
@@ -158,7 +158,7 @@ export default function RemovalApplications(props) {
 
     return (
       <Root>
-        <Layout title="Мои заявки на вывоз | Recycl">
+        <Layout title="Мои объявления о наличии отходов| Recycl">
           <Grid
             container
             direction="column"
@@ -168,7 +168,7 @@ export default function RemovalApplications(props) {
             }}
           >
             <Typography gutterBottom variant="h4">
-              Заявки на вывоз отходов
+              Мои объявления о наличии отходов
             </Typography>
             <div style={{ width: '100%' }}>
               <DataGrid
@@ -192,18 +192,18 @@ export default function RemovalApplications(props) {
                   if (params.field !== '__check__')
                     Router.push(`/applications/${params.id}`)
                 }}
-                onSelectionModelChange={(params) => {
+                onRowSelectionModelChange={(params) => {
                   setSelected(params)
                 }}
-                components={{
-                  Footer: function Footer(props) {
+                slots={{
+                  footer: function Footer(props) {
                     return <DataGridFooter showDeleteButton={true} {...props} />
                   },
-                  Pagination: TablePagination,
-                  NoRowsOverlay: DataGridNoRowsOverlay,
-                  ErrorOverlay: DataGridErrorOverlay,
+                  pagination: TablePagination,
+                  noRowsOverlay: DataGridNoRowsOverlay,
+                  errorOverlay: DataGridErrorOverlay,
                 }}
-                componentsProps={{
+                slotProps={{
                   footer: {
                     deleteHandler,
                     deleting,

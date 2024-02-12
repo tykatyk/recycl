@@ -61,7 +61,6 @@ const initialValues = getInitialValues()
 const fields = Object.keys(initialValues)
 
 export default function RemovalForm(props) {
-  const theme = useTheme()
   const router = useRouter()
   const { data: session } = useSession()
   const { id: userId } = session
@@ -113,7 +112,9 @@ export default function RemovalForm(props) {
     updateMutation({
       variables: { id: applicationId, newValues: normalizedValues },
     })
-      .then((data) => {})
+      .then((data) => {
+        router.push('/my/applications')
+      })
       .catch((err) => {
         setBackendError('Возникла ошибка при сохранении заявки')
       })
@@ -143,7 +144,7 @@ export default function RemovalForm(props) {
           setFieldValue(
             field,
             applicationData.getRemovalApplication[field],
-            false
+            false,
           )
         })
       }
