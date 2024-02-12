@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Snackbar from '../uiParts/Snackbars'
+import Error from '../uiParts/Error'
 import EventForm from './EventForm'
 import { Formik, FormikHelpers } from 'formik'
 import {
@@ -30,6 +31,9 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
   const { isInactive }: IsInactive = router.query
   const [notification, setNotification] = useState<string>('')
   const initialValues = getInitialValues(event, userPhone)
+
+  //show error if no wasteTypes found
+  if (!wasteTypes) return <Error />
 
   //ToDo: refactor to helper function, since this handler can also be used for creating removalApplications
   const createHandler = (
