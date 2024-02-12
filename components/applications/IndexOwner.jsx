@@ -8,8 +8,8 @@ import Layout from '../layouts/Layout'
 import Snackbar from '../uiParts/Snackbars'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import DataGridFooter from '../uiParts/DataGridFooter'
-import DataGridNoRowsOverlay from '../uiParts/DataGridNoRowsOverlay'
-import DataGridErrorOverlay from '../uiParts/DataGridErrorOverlay'
+import NoRows from '../uiParts/NoRows'
+import Error from '../uiParts/Error'
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSession } from 'next-auth/react'
@@ -200,8 +200,8 @@ export default function RemovalApplications(props) {
                     return <DataGridFooter showDeleteButton={true} {...props} />
                   },
                   pagination: TablePagination,
-                  noRowsOverlay: DataGridNoRowsOverlay,
-                  errorOverlay: DataGridErrorOverlay,
+                  noRowsOverlay: NoRows,
+                  errorOverlay: Error,
                 }}
                 slotProps={{
                   footer: {

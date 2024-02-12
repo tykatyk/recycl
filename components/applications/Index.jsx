@@ -5,8 +5,8 @@ import Layout from '../layouts/Layout'
 import Snackbar from '../uiParts/Snackbars'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import DataGridFooter from '../uiParts/DataGridFooter'
-import DataGridNoRowsOverlay from '../uiParts/DataGridNoRowsOverlay'
-import DataGridErrorOverlay from '../uiParts/DataGridErrorOverlay'
+import NoRows from '../uiParts/NoRows'
+import Error from '../uiParts/Error'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery } from '@apollo/client'
@@ -148,8 +148,8 @@ export default function Index(props) {
                   return <DataGridFooter {...props} />
                 },
                 pagination: TablePagination,
-                noRowsOverlay: DataGridNoRowsOverlay,
-                errorOverlay: DataGridErrorOverlay,
+                noRowsOverlay: NoRows,
+                errorOverlay: Error,
               }}
               slotProps={{
                 footer: {
