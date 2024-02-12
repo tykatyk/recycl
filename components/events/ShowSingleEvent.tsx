@@ -67,7 +67,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 function ShowData(props: { applicationData: RecycleEvent }) {
   const { applicationData } = props
   const user = applicationData.user as PopulatedProp
-  const waste = applicationData.waste as PopulatedProp
+  const waste = applicationData.waste as string
 
   return (
     <Grid container spacing={2} direction="column" item xs>
@@ -115,7 +115,7 @@ function ShowData(props: { applicationData: RecycleEvent }) {
             <Typography variant="h6" gutterBottom>
               Тип отходов
             </Typography>
-            <Typography>{waste.name}</Typography>
+            <Typography>{waste}</Typography>
           </StyledPaper>
         </Grid>
         <Grid item xs>
