@@ -66,7 +66,7 @@ export default function UserMenu(props) {
   const showSubmenu = (item, index) => {
     if (item.items) {
       return (
-        <ListItem sx={{ flexDirection: 'column' }}>
+        <ListItem sx={{ flexDirection: 'column' }} key={index}>
           <ListItemText
             sx={{
               color: theme.palette.secondary.main,
