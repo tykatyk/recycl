@@ -25,7 +25,7 @@ export default function ResetLayout(props) {
             alignItems="center"
             justifyContent="center"
           >
-            <Alert variant="filled" severity={severity}>
+            <Alert variant="filled" severity={severity} sx={{ color: '#fff' }}>
               {message}
             </Alert>
           </Grid>
