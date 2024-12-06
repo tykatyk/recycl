@@ -15,7 +15,11 @@ import {
 const apolloClient = initializeApollo()
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
+  if (!req.method === 'POST') {
+    console.log('Only POST method is allowed')
+    perFormErrorResponse('Only POST method is allowed', res)
+  }
+
     const { name, email, password, confirmPassword, role, recaptcha } = req.body
 
     const captchaPassed = await checkCaptcha(recaptcha)
@@ -31,7 +35,7 @@ export default async function handler(req, res) {
           confirmPassword,
           role,
         },
-        { abortEarly: false }
+      { abortEarly: false },
       )
     } catch (error) {
       console.log(error)
@@ -48,7 +52,8 @@ export default async function handler(req, res) {
     } catch (error) {
       console.log(JSON.stringify(error, null, 2))
       perFormErrorResponse(
-        'Возникла ошибка при проверке существования пользователя'
+      'Возникла ошибка при проверке существования пользователя',
+      res,
       )
       return
     }
@@ -106,7 +111,7 @@ export default async function handler(req, res) {
             email,
             password: await hash(
               password,
-              parseInt(process.env.HASHING_ROUNDS, 10)
+            parseInt(process.env.HASHING_ROUNDS, 10),
             ),
             roles: [role],
           },
@@ -114,12 +119,16 @@ export default async function handler(req, res) {
       })
     } catch (error) {
       console.log(error)
-      perFormErrorResponse('Возникла ошибка при создании пользователя')
+    perFormErrorResponse('Возникла ошибка при создании пользователя', res)
       return
     }
 
-    if (user.data && user.data.createUser) {
-      // send email
+  //check if user created correctly
+  if (!user.data || !user.data.createUser) {
+    perFormErrorResponse('Неизвестная ошибка сервера', res)
+  }
+
+  // send email to complete registration
       const actionUrl = `${process.env.NEXT_PUBLIC_URL}auth/confirmemail/${user.data.createUser.confirmEmailToken}`
       const dynamicTemplateData = {
         name: user.data.createUser.name,
