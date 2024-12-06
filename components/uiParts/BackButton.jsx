@@ -19,14 +19,13 @@ export default function BackButton(props) {
   return (
     <Box
       sx={{
-        display: 'flex',
         margin: 2,
       }}
     >
       <Button
         onClick={handleClick}
-        color={'secondary'}
         startIcon={<ArrowBackIosIcon />}
+        sx={{ color: '#fff' }}
       >
         {text}
       </Button>
