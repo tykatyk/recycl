@@ -59,35 +59,10 @@ export default async function handler(req, res) {
     }
 
     if (result && result.data && result.data.getUserByEmail) {
+    //User already exists
       const { _id, emailConfirmed, confirmEmailExpires } =
         result.data.getUserByEmail
 
-      //User exists and didn't confrim his email and confirmation time expired
-      if (
-        !emailConfirmed &&
-        typeof confirmEmailExpires != undefined &&
-        new Date(confirmEmailExpires * 1000) >= Date.now()
-      ) {
-        //delete this user
-        try {
-          await apolloClient.mutate({
-            mutation: DELETE_NOT_CONFIRMED_USER,
-            variables: { id: _id },
-          })
-        } catch (error) {
-          console.log(error)
-          perFormErrorResponse('Невозможно создать пользователя')
-          return
-        }
-      }
-
-      //User exists but confirmation didn't expired yet
-      if (
-        emailConfirmed ||
-        (!emailConfirmed &&
-          typeof confirmEmailExpires != undefined &&
-          new Date(confirmEmailExpires * 1000) < Date.now())
-      ) {
         res.status(422).json({
           error: {
             type: 'perField',
@@ -97,7 +72,6 @@ export default async function handler(req, res) {
           },
         })
         return
-      }
     }
 
     //if user doesn't exist, create one
