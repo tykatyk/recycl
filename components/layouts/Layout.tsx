@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
-import { Box, Container } from '@mui/material'
+import { ReactNode } from 'react'
+import {Container } from '@mui/material'
 import Wrapper from '../uiParts/Wrapper'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
