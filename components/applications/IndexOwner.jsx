@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import { Grid, Typography, Badge, TablePagination } from '@mui/material'
 import Link from '../uiParts/Link'
+import Box from '@mui/material/Box'
 import MailIcon from '@mui/icons-material/Mail'
 import CreateIcon from '@mui/icons-material/Create'
 import Layout from '../layouts/Layout'
@@ -125,7 +126,7 @@ export default function RemovalApplications(props) {
   let rows = []
 
   if (loading) return <PageLoadingCircle />
-  // ToDo: Add error overlay and no data overlay
+  // ToDo: Add error overlay
   if (status === 'unauthenticated') {
     Router.push({
       pathname: '/auth/login',
@@ -136,9 +137,9 @@ export default function RemovalApplications(props) {
   }
 
   if (status === 'authenticated') {
-    if (!error) {
+    if (!error && data && data.getRemovalApplicationsWithMessageCount) {
       //ToDo: Refactor returned data, so that data contain objects in needed form
-      //so that to avoid mapping
+      //to avoid mapping
       rows = data.getRemovalApplicationsWithMessageCount.map((item) => {
         const newItem = {}
         newItem.id = item.document['_id']
@@ -167,57 +168,65 @@ export default function RemovalApplications(props) {
               padding: '16px',
             }}
           >
-            <Typography gutterBottom variant="h4">
+            <Typography gutterBottom variant="h4" align="center">
               Мои объявления о наличии отходов
             </Typography>
-            <div style={{ width: '100%' }}>
-              <DataGrid
-                classes={{ root: classes.root, row: classes.row }}
-                autoHeight
-                error={error}
-                rows={rows}
-                columns={columns}
-                pagination
-                page={page}
-                pageSize={pageSize}
-                checkboxSelection
-                disableSelectionOnClick
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
-                onCellClick={(params, event) => {
-                  if (params.field === 'messages') {
-                    Router.push(`/messages`)
-                    return
-                  }
-                  if (params.field !== '__check__')
-                    Router.push(`/applications/${params.id}`)
-                }}
-                onRowSelectionModelChange={(params) => {
-                  setSelected(params)
-                }}
-                slots={{
-                  footer: function Footer(props) {
-                    return <DataGridFooter showDeleteButton={true} {...props} />
-                  },
-                  pagination: TablePagination,
-                  noRowsOverlay: NoRows,
-                  errorOverlay: Error,
-                }}
-                slotProps={{
-                  footer: {
-                    deleteHandler,
-                    deleting,
-                    numSelected: selected.length,
-                    numRows: rows && rows.length ? rows.length : 0,
-                    handlePageChange,
-                    handlePageSizeChange,
-                    pageSize,
-                    page,
-                  },
-                  checkbox: { color: 'secondary' },
-                }}
-              />
-            </div>
+            {rows.length > 0 ? (
+              <div style={{ width: '100%' }}>
+                <DataGrid
+                  classes={{ root: classes.root, row: classes.row }}
+                  autoHeight
+                  error={error}
+                  rows={rows}
+                  columns={columns}
+                  pagination
+                  page={page}
+                  pageSize={pageSize}
+                  checkboxSelection
+                  disableSelectionOnClick
+                  onPageChange={handlePageChange}
+                  onPageSizeChange={handlePageSizeChange}
+                  onCellClick={(params, event) => {
+                    if (params.field === 'messages') {
+                      Router.push(`/messages`)
+                      return
+                    }
+                    if (params.field !== '__check__')
+                      Router.push(`/applications/${params.id}`)
+                  }}
+                  onRowSelectionModelChange={(params) => {
+                    setSelected(params)
+                  }}
+                  slots={{
+                    footer: function Footer(props) {
+                      return (
+                        <DataGridFooter showDeleteButton={true} {...props} />
+                      )
+                    },
+                    pagination: TablePagination,
+                    noRowsOverlay: NoRows,
+                    errorOverlay: Error,
+                  }}
+                  slotProps={{
+                    footer: {
+                      deleteHandler,
+                      deleting,
+                      numSelected: selected.length,
+                      numRows: rows && rows.length ? rows.length : 0,
+                      handlePageChange,
+                      handlePageSizeChange,
+                      pageSize,
+                      page,
+                    },
+                    checkbox: { color: 'secondary' },
+                  }}
+                />
+              </div>
+            ) : (
+              <Box mt={2} mb={2}>
+                <NoRows />
+              </Box>
+            )}
           </Grid>
         </Layout>
         <Snackbar
@@ -231,5 +240,6 @@ export default function RemovalApplications(props) {
       </Root>
     )
   }
+  //default return nothing if status neither authenticated nor unathenticated
   return ''
 }

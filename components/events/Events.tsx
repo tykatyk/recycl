@@ -174,6 +174,7 @@ export default function Events(props: { variant: Variant }) {
   }
 
   const setParams = (data: EventPaginationData) => {
+    if (!data) return
     setData(data)
     setNumRows(data.total)
     setPage(data.currentPage)
