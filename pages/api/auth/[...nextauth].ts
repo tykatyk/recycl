@@ -2,7 +2,9 @@ import NextAuth from 'next-auth'
 import type { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import EmailProvider from 'next-auth/providers/email'
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
+import { html, text } from '../../../lib/helpers/emailHelpers'
 import { compare } from 'bcrypt'
 import {
   GET_USER_BY_EMAIL,
@@ -13,6 +15,7 @@ import { loginSchema } from '../../../lib/validation/index'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/helpers/nextAuthClientPromise'
 import { URL } from 'url'
+import { createTransport } from 'nodemailer'
 
 const apolloClient = initializeApollo()
 
@@ -31,9 +34,50 @@ export const authOptions: NextAuthOptions = {
   },
   // Configure one or more authentication providers
   providers: [
+    EmailProvider({
+      server: 'smtp-pulse.com',
+      /*server: {
+        host: 'smtp-pulse.com',
+        port: 2525,
+        auth: {
+          user: 'tykatyk@gmail.com',
+          pass: 'MXo8Ca4AQo',
+        },
+      },*/
+      from: 'notify@yoused.com.ua',
+      sendVerificationRequest: async (params) => {
+        const { identifier, url, provider } = params
+        const { host } = new URL(url)
+        // NOTE: You are not required to use `nodemailer`, use whatever you want.
+        const transport = createTransport({
+          host: provider.server,
+          port: 2525,
+
+          auth: {
+            user: 'tykatyk@gmail.com',
+            pass: 'MXo8Ca4AQo',
+          },
+          logger: true,
+          transactionLog: true, // include SMTP traffic in the logs
+          allowInternalNetworkInterfaces: false,
+        })
+        const result = await transport.sendMail({
+          to: identifier,
+          from: provider.from,
+          subject: `Sign in to ${host}`,
+          text: text({ url, host }),
+          html: html({ url, host }),
+        })
+        const failed = result.rejected.concat(result.pending).filter(Boolean)
+        if (failed.length) {
+          throw new Error(`Email(s) (${failed.join(', ')}) could not be sent`)
+        }
+      },
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
       credentials: {},
@@ -46,14 +90,13 @@ export const authOptions: NextAuthOptions = {
 
         const { email, password } = credentials
 
-        //check correctness of data needed to ligin a user
+        //check correctness of data needed to login a user
         try {
           await loginSchema.validate(
             {
               email,
-              password,
             },
-            { abortEarly: false }
+            { abortEarly: false },
           )
         } catch (error) {
           console.log('Error during validation request body')
@@ -69,19 +112,19 @@ export const authOptions: NextAuthOptions = {
                   type: 'perField',
                   message: mappedErrors,
                 },
-              })
+              }),
             )
           } else {
             throw new Error(
               JSON.stringify({
                 type: 'perForm',
                 message: 'Возникла ошибка при проверке данных формы',
-              })
+              }),
             )
           }
         }
 
-        //if data is correct, check if user exists
+        //check if user exists
         let result
         try {
           result = await apolloClient.query({
@@ -95,55 +138,21 @@ export const authOptions: NextAuthOptions = {
               type: 'perForm',
               message:
                 'Возникла ошибка при проверке существования пользователя',
-            })
+            }),
           )
         }
 
         if (result.data && !result.data.getUserByEmail) {
-          console.log('error while getting user from the database')
           throw new Error(
             JSON.stringify({
               type: 'perForm',
               message: 'Пользователь с такими учетными данными не найден',
-            })
+            }),
           )
         }
 
         const user = result.data.getUserByEmail
         const { _id, emailConfirmed, confirmEmailExpires } = user
-
-        if (
-          !emailConfirmed &&
-          typeof confirmEmailExpires != undefined &&
-          new Date(confirmEmailExpires * 1000) >= new Date()
-        ) {
-          //delete this user
-          await apolloClient.mutate({
-            mutation: DELETE_NOT_CONFIRMED_USER,
-            variables: { id: _id },
-          })
-          throw new Error(
-            JSON.stringify({
-              type: 'perForm',
-              message: 'Пользователь с такими учетными данными не найден',
-            })
-          )
-        }
-
-        let checkPassword = false
-        if (user.password) {
-          checkPassword = await compare(password, user.password)
-        }
-
-        if (!checkPassword) {
-          console.log('error while checing password')
-          throw new Error(
-            JSON.stringify({
-              type: 'perForm',
-              message: 'Пользователь с такими учетными данными не найден',
-            })
-          )
-        }
 
         return {
           email: user.email,

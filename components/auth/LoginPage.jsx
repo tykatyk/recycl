@@ -48,7 +48,8 @@ const Root = styled('div')(({ theme }) => ({
 
 export default function SignIn() {
   const theme = useTheme()
-  const [backendError, setBackendError] = useState(null)
+  const [notificatioin, setNotification] = useState('')
+  const [notificatioinType, setNotificationType] = useState('success')
   const router = useRouter()
   const [recaptcha, setRecaptcha] = useState(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
@@ -83,39 +84,48 @@ export default function SignIn() {
                   setSubmitting(false)
                   return
                 }
-               
+
                 if (!recaptcha) {
                   setSubmitting(false)
                   return
                 }
-                
-                signIn('credentials', {
+
+                // signIn('credentials', {
+                //   email: values.email,
+                //   password: values.password,
+                //   redirect: false,
+                // })
+                signIn('email', {
                   email: values.email,
-                  password: values.password,
                   redirect: false,
                 })
                   .then((data) => {
                     if (data.error) {
                       setSubmitting(false)
+                      setNotificationType('error')
                       showErrorMessages(
                         JSON.parse(data.error),
                         setErrors,
-                        setBackendError
+                        setNotification,
                       )
                       return
                     }
-                    
-                    if (router.query && router.query.from) {
-                      router.push(router.query.from)
-                    } else {
-                      router.push('/')
-                    }
+                    setNotificationType('success')
+                    setNotification(
+                      'На вашу электронную почту отправлена ссылка для входа',
+                    )
+                    // if (router.query && router.query.from) {
+                    //   router.push(router.query.from)
+                    // } else {
+                    //   router.push('/')
+                    // }
                   })
                   .catch((error) => {
-                    setBackendError('Неизвестная ошибка')
-                    setSubmitting(false)
+                    setNotificationType('error')
+                    setNotification('Неизвестная ошибка')
                   })
                   .finally(() => {
+                    setSubmitting(false)
                     if (recaptchaRef && recaptchaRef.current) {
                       recaptchaRef.current.reset()
                     }
@@ -135,17 +145,7 @@ export default function SignIn() {
                       name="email"
                       component={TextFieldFormik}
                     />
-                    <Field
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      name="password"
-                      label="Пароль"
-                      type="password"
-                      id="password"
-                      component={TextFieldFormik}
-                    />
+
                     <Button
                       type="submit"
                       fullWidth
@@ -233,11 +233,11 @@ export default function SignIn() {
         </Container>
       </AuthLayout>
       <Snackbar
-        severity="error"
-        open={!!backendError}
-        message={backendError}
+        severity={notificatioinType}
+        open={!!notificatioin}
+        message={notificatioin}
         handleClose={() => {
-          setBackendError(null)
+          setNotification('')
         }}
       />
     </Root>
