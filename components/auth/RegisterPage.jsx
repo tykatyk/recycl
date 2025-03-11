@@ -129,28 +129,6 @@ export default function SignUp() {
                     name="email"
                     component={TextFieldFormik}
                   />
-                  <Field
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Пароль"
-                    type="password"
-                    id="password"
-                    component={TextFieldFormik}
-                  />
-                  <Field
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="confirmPassword"
-                    label="Пароль повторно"
-                    type="password"
-                    id="confirmPassword"
-                    component={TextFieldFormik}
-                  />
                   <Button
                     type="submit"
                     fullWidth

@@ -1,13 +1,10 @@
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
-import { hash } from 'bcrypt'
 import {
   CREATE_USER,
-  DELETE_NOT_CONFIRMED_USER,
   GET_USER_BY_EMAIL,
 } from '../../../lib/graphql/queries/user'
 import { registerSchema } from '../../../lib/validation'
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
-// import sendEmail from '../../../lib/helpers/sendEmail'
 import { perFormErrorResponse } from '../../../lib/helpers/responses'
 import { emailSenderSendpulse } from '../../../lib/helpers/mailer'
 import {
@@ -33,8 +30,7 @@ export default async function handler(req, res) {
       {
         name,
         email,
-        password,
-        confirmPassword,
+
         role,
       },
       { abortEarly: false },
@@ -85,10 +81,7 @@ export default async function handler(req, res) {
         user: {
           name,
           email,
-          password: await hash(
-            password,
-            parseInt(process.env.HASHING_ROUNDS, 10),
-          ),
+
           roles: [role],
         },
       },
