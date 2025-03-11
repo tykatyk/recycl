@@ -63,7 +63,7 @@ export default async function viewCounter(
             uid = cryptoRandomString({ length: 32 })
             res.setHeader(
               'Set-Cookie',
-              `visitorId=${uid}; httpOnly=true; maxAge=31536000`, // 1-year expiration
+              `visitorId=${uid}; httpOnly=true; Max-Age=31536000`, // 1-year expiration
             )
             await incrementViewCount(ad, uid)
           }
