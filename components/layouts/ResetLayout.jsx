@@ -7,11 +7,7 @@ export default function ResetLayout(props) {
   const { title, message, severity = 'error' } = props
 
   return (
-    <AuthLayout
-      title={title ? `${title} | Recycl` : 'Recycl'}
-      backButtonText="На Главную"
-      backButtonTo="/"
-    >
+    <AuthLayout title={title ? `${title} | Recycl` : 'Recycl'}>
       <Grid
         container
         alignItems="center"

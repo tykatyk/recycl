@@ -8,12 +8,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { Box } from '@mui/material'
 
-export default function AuthLayout({
-  children,
-  title,
-  backButtonTo,
-  backButtonText,
-}) {
+export default function AuthLayout({ children, title }) {
   const { status } = useSession()
   const router = useRouter()
 
@@ -22,7 +17,7 @@ export default function AuthLayout({
       <>
         <Head title={title} />
         <Wrapper>
-          <BackButton to={backButtonTo} text={backButtonText} />
+          <BackButton />
           <Box component="main" sx={{ width: '100%' }}>
             {children}
           </Box>
