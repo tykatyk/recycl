@@ -52,11 +52,7 @@ export default async function viewCounter(
           const sessionId = session?.id
 
           if (uid && !ad.viewedBy.includes(uid)) {
-            if (sessionId && !ad.viewedBy.includes(sessionId)) {
-              await incrementViewCount(ad, uid)
-            } else if (!sessionId) {
-              await incrementViewCount(ad, uid)
-            }
+            await incrementViewCount(ad, uid)
           } else if (!uid && sessionId && !ad.viewedBy.includes(sessionId)) {
             await incrementViewCount(ad, sessionId)
           } else if (!uid && !sessionId) {
