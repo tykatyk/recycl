@@ -8,7 +8,7 @@ import Snackbar from '../uiParts/Snackbars'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { passwordSchema } from '../../lib/validation'
 import AuthLayout from '../layouts/AuthLayout'
-import showErrorMessages from '../../lib/helpers/showErrorMessages'
+import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 
 const PREFIX = 'ResetPasswordForm'
 

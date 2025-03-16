@@ -10,7 +10,7 @@ import Snackbar from '../uiParts/Snackbars'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { signIn } from 'next-auth/react'
 import { loginSchema } from '../../lib/validation'
-import showErrorMessages from '../../lib/helpers/showErrorMessages'
+import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import AuthLayout from '../layouts/AuthLayout'
 import ReCAPTCHA from 'react-google-recaptcha'
 
