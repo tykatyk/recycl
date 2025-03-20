@@ -5,17 +5,16 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import EmailProvider from 'next-auth/providers/email'
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 import { html, text } from '../../../lib/helpers/emailHelpers'
-import { compare } from 'bcrypt'
-import {
-  GET_USER_BY_EMAIL,
-  DELETE_NOT_CONFIRMED_USER,
-} from '../../../lib/graphql/queries/user'
+import dbConnect from '../../../lib/db/connection'
+import userModel from '../../../lib/db/models/user'
+import { GET_USER_BY_EMAIL } from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation/index'
 // import nextAuthDbAdapter from '../../../lib/helpers/nextAuthDbAdapter'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/helpers/nextAuthClientPromise'
 import { URL } from 'url'
 import { createTransport } from 'nodemailer'
+import { colors as theme } from '../../../lib/helpers/themeStub'
 
 const apolloClient = initializeApollo()
 
@@ -36,14 +35,7 @@ export const authOptions: NextAuthOptions = {
   providers: [
     EmailProvider({
       server: 'smtp-pulse.com',
-      /*server: {
-        host: 'smtp-pulse.com',
-        port: 2525,
-        auth: {
-          user: 'tykatyk@gmail.com',
-          pass: 'MXo8Ca4AQo',
-        },
-      },*/
+
       from: 'notify@yoused.com.ua',
       sendVerificationRequest: async (params) => {
         const { identifier, url, provider } = params
@@ -64,9 +56,9 @@ export const authOptions: NextAuthOptions = {
         const result = await transport.sendMail({
           to: identifier,
           from: provider.from,
-          subject: `Sign in to ${host}`,
+          subject: `Вход в учётную запись ${host}`,
           text: text({ url, host }),
-          html: html({ url, host }),
+          html: html({ url, host, theme }),
         })
         const failed = result.rejected.concat(result.pending).filter(Boolean)
         if (failed.length) {
@@ -88,9 +80,9 @@ export const authOptions: NextAuthOptions = {
         // throw new Error('error message') // Redirect to error page
         // throw '/path/to/redirect'        // Redirect to a URL
 
-        const { email, password } = credentials
+        const { email } = credentials
 
-        //check correctness of data needed to login a user
+        //check correctness of the data needed to login a user
         try {
           await loginSchema.validate(
             {
@@ -152,7 +144,6 @@ export const authOptions: NextAuthOptions = {
         }
 
         const user = result.data.getUserByEmail
-        const { _id, emailConfirmed, confirmEmailExpires } = user
 
         return {
           email: user.email,
@@ -196,6 +187,24 @@ export const authOptions: NextAuthOptions = {
       }
 
       return url
+    },
+    async signIn({ user, account, profile, email, credentials }) {
+      return await dbConnect()
+        .then(() => {
+          return userModel
+            .findOne({
+              email: user.email,
+            })
+            .exec()
+        })
+        .then((userFromDb) => {
+          if (userFromDb) return true
+          return false
+        })
+        .catch((err) => {
+          console.log(err)
+          return false
+        })
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

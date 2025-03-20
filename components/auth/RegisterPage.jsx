@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { styled, useTheme } from '@mui/material/styles'
 import { Avatar, Button, Grid, Typography, Container } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
@@ -56,7 +56,6 @@ export default function SignUp() {
   })
   const [recaptcha, setRecaptcha] = useState(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
-  const recaptchaRef = useRef(null)
 
   const handleChange = (token) => {
     setRecaptcha(token)
@@ -83,14 +82,11 @@ export default function SignUp() {
               role: data.getRoleId,
               name: '',
               email: '',
-              password: '',
-              confirmPassword: '',
             }}
             validationSchema={registerSchema}
             onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
               const options = {
                 recaptcha,
-                recaptchaRef,
                 showRecaptcha,
                 values,
                 endpointUrl: '/api/auth/signup/',
@@ -158,7 +154,7 @@ export default function SignUp() {
                 variant="body2"
                 style={{ color: `${theme.palette.text.secondary}` }}
               >
-                Уже есть аккаунт?
+                Войти
               </Link>
             </Grid>
           </Grid>
@@ -170,7 +166,6 @@ export default function SignUp() {
             }}
           >
             <ReCAPTCHA
-              ref={recaptchaRef}
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
               onChange={handleChange}
             />

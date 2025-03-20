@@ -1,6 +1,5 @@
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { styled, useTheme } from '@mui/material/styles'
-import { useRouter } from 'next/router'
 import { Avatar, Button, Grid, Typography, Container } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
@@ -14,7 +13,15 @@ import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import AuthLayout from '../layouts/AuthLayout'
 import ReCAPTCHA from 'react-google-recaptcha'
 
+const USER_NOT_FOUND = 'Пользователь с таким email не найден'
+const LINK_SENT = 'На вашу электронную почту отправлена ссылка для входа'
+const LOGIN_WITH_GOOGLE = 'Войти с аккаунтом Google'
+const EMAIL_LABEL = 'Электронная почта'
+const SIGN_IN = 'Войти'
+const SIGN_UP = 'Регистрация'
 const PREFIX = 'LoginPage'
+const REGISTER_URL = '/auth/register'
+const CALLBACK_URL = `${process.env.NEXTAUTH_URL}/api/auth/callback/google`
 
 const classes = {
   paper: `${PREFIX}-paper`,
@@ -50,10 +57,8 @@ export default function SignIn() {
   const theme = useTheme()
   const [notificatioin, setNotification] = useState('')
   const [notificatioinType, setNotificationType] = useState('success')
-  const router = useRouter()
   const [recaptcha, setRecaptcha] = useState(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
-  const recaptchaRef = useRef(null)
 
   const handleChange = (token) => {
     setRecaptcha(token)
@@ -73,10 +78,9 @@ export default function SignIn() {
             <Formik
               initialValues={{
                 email: '',
-                password: '',
               }}
               validationSchema={loginSchema}
-              onSubmit={(values, { setSubmitting, setErrors }) => {
+              onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                 setSubmitting(true)
 
                 if (!showRecaptcha) {
@@ -90,11 +94,6 @@ export default function SignIn() {
                   return
                 }
 
-                // signIn('credentials', {
-                //   email: values.email,
-                //   password: values.password,
-                //   redirect: false,
-                // })
                 signIn('email', {
                   email: values.email,
                   redirect: false,
@@ -103,32 +102,28 @@ export default function SignIn() {
                     if (data.error) {
                       setSubmitting(false)
                       setNotificationType('error')
+
+                      let modifiedError = data.error
+
+                      if (data.error === 'AccessDenied') {
+                        modifiedError = {
+                          type: 'perForm',
+                          message: USER_NOT_FOUND,
+                        }
+                      }
                       showErrorMessages(
-                        JSON.parse(data.error),
+                        modifiedError,
                         setErrors,
                         setNotification,
                       )
                       return
                     }
                     setNotificationType('success')
-                    setNotification(
-                      'На вашу электронную почту отправлена ссылка для входа',
-                    )
-                    // if (router.query && router.query.from) {
-                    //   router.push(router.query.from)
-                    // } else {
-                    //   router.push('/')
-                    // }
-                  })
-                  .catch((error) => {
-                    setNotificationType('error')
-                    setNotification('Неизвестная ошибка')
+                    setNotification(LINK_SENT)
+                    resetForm()
                   })
                   .finally(() => {
                     setSubmitting(false)
-                    if (recaptchaRef && recaptchaRef.current) {
-                      recaptchaRef.current.reset()
-                    }
                   })
               }}
             >
@@ -141,7 +136,7 @@ export default function SignIn() {
                       required
                       fullWidth
                       id="email"
-                      label="Электронная почта"
+                      label={EMAIL_LABEL}
                       name="email"
                       component={TextFieldFormik}
                     />
@@ -154,7 +149,7 @@ export default function SignIn() {
                       className={classes.submit}
                       disabled={isSubmitting}
                     >
-                      Войти
+                      {SIGN_IN}
                       {isSubmitting && <ButtonSubmittingCircle />}
                     </Button>
                   </Form>
@@ -163,7 +158,7 @@ export default function SignIn() {
             </Formik>
             <Formik
               initialValues={{
-                callbackUrl: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
+                callbackUrl: CALLBACK_URL,
               }}
               onSubmit={async (values, { setSubmitting }) => {
                 setSubmitting(true)
@@ -188,7 +183,7 @@ export default function SignIn() {
                       className={classes.submit}
                       disabled={isSubmitting}
                     >
-                      Войти с аккаунтом Google
+                      {LOGIN_WITH_GOOGLE}
                       {isSubmitting && <ButtonSubmittingCircle />}
                     </Button>
                   </Form>
@@ -196,23 +191,20 @@ export default function SignIn() {
               }}
             </Formik>
 
-            <Grid container style={{ marginBottom: theme.spacing(4) }}>
-              <Grid item xs>
-                <Link
-                  href="/auth/forgetpassword"
-                  variant="body2"
-                  style={{ color: `${theme.palette.text.secondary}` }}
-                >
-                  Забыли пароль?
-                </Link>
-              </Grid>
+            <Grid
+              container
+              style={{
+                marginBottom: theme.spacing(4),
+                justifyContent: 'flex-end',
+              }}
+            >
               <Grid item>
                 <Link
-                  href="/auth/register"
+                  href={REGISTER_URL}
                   variant="body2"
                   style={{ color: `${theme.palette.text.secondary}` }}
                 >
-                  Нет аккаунта?
+                  {SIGN_UP}
                 </Link>
               </Grid>
             </Grid>
@@ -224,7 +216,6 @@ export default function SignIn() {
               }}
             >
               <ReCAPTCHA
-                ref={recaptchaRef}
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
                 onChange={handleChange}
               />

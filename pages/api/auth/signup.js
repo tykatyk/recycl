@@ -6,7 +6,6 @@ import {
 import { registerSchema } from '../../../lib/validation'
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
 import { perFormErrorResponse } from '../../../lib/helpers/responses'
-import { emailSenderSendpulse } from '../../../lib/helpers/mailer'
 import {
   errorResponse,
   captchaNotPassedResponse,
@@ -19,7 +18,7 @@ export default async function handler(req, res) {
     perFormErrorResponse('Only POST method is allowed', res)
   }
 
-  const { name, email, password, confirmPassword, role, recaptcha } = req.body
+  const { name, email, role, recaptcha } = req.body
 
   const captchaPassed = await checkCaptcha(recaptcha)
   if (!captchaPassed) return captchaNotPassedResponse(res)
@@ -58,8 +57,6 @@ export default async function handler(req, res) {
 
   if (result && result.data && result.data.getUserByEmail) {
     //User already exists
-    const { _id, emailConfirmed, confirmEmailExpires } =
-      result.data.getUserByEmail
 
     res.status(422).json({
       error: {
@@ -105,32 +102,7 @@ export default async function handler(req, res) {
     actionUrl,
     date: new Date().getFullYear(),
   }
-  const frontendMessage =
-    'Для завершения регистрации перейдите по ссылке из письма, которое отправлено на ваш почтовый ящик'
-
-  //ToDo: Maybe don't return to frontend since response may contain sensetive data
-  /*return await sendEmail(res, {
-        to: email,
-        frontendMessage,
-        templateId: 'd-88f884602ecc4588805b1f99d715bd22',
-        dynamicTemplateData,
-      })*/
-
-  await emailSenderSendpulse({
-    // "html": "PHA+RXhhbXBsZSB0ZXh0PC9wPg==",
-    text: `Для завершения регистрации перейдите по ссылке: ${actionUrl}`,
-    subject: 'Завершение регистрации на сайте recycl',
-    from: {
-      name: 'recycl',
-      email: 'notify@yoused.com.ua',
-    },
-    to: [
-      {
-        // "name": "Recipient1 name",
-        email: email,
-      },
-    ],
-  })
+  const frontendMessage = 'Регистрация прошла успешно. Теперь вы можете войти'
   res.status(200).json({
     message: frontendMessage,
   })

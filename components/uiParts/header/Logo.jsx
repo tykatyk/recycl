@@ -1,5 +1,5 @@
-import React from 'react'
 import Link from '../Link'
+import { colors } from '../../../lib/helpers/themeStub'
 
 export default function Logo() {
   return (
@@ -12,7 +12,7 @@ export default function Logo() {
         fontWeight: 'bold',
         lineHeight: '1.334',
         letterSpacing: 0,
-        color: '#adce5d',
+        color: colors.brand,
       }}
     >
       recycl

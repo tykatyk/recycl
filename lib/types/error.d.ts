@@ -1,6 +1,6 @@
 import { FormikErrors, FormikValues } from 'formik'
 
-export type ApiError =
+export type FormValidationError =
   | {
       type: 'perForm'
       message: string

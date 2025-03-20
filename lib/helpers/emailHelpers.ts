@@ -1,3 +1,7 @@
+//https://next-auth.js.org/providers/email#customizing-emails
+
+import { ThemeColors } from '../types/themeColors'
+
 /**
  * Email HTML body
  * Insert invisible space into domains from being turned into a hyperlink by email
@@ -6,47 +10,111 @@
  *
  * @note We don't add the email address to avoid needing to escape it, if you do, remember to sanitize it!
  */
-export const html = (params: { url: string; host: string }) => {
-  const { url, host } = params
+
+const brandName = 'Recycl'
+const welcomeText = 'Для входа в учетную запись перейдите по ссылке'
+const wrongLetterText =
+  'Если запрос на вход отправлялся не вами, просто проигнорируйте данное письмо.'
+const signInText = 'Войти'
+const logoPath = '../../public/images/logo.png'
+
+export function html(params: {
+  url: string
+  host: string
+  theme: ThemeColors
+}) {
+  const { url, host, theme } = params
 
   const escapedHost = host.replace(/\./g, '&#8203;.')
 
-  const brandColor = '#346df1'
-  const color = {
-    background: '#f9f9f9',
-    text: '#444',
-    mainBackground: '#fff',
-    buttonBackground: brandColor,
-    buttonBorder: brandColor,
-    buttonText: '#fff',
-  }
-
   return `
-  <body style="background: ${color.background};">
-    <table width="100%" border="0" cellspacing="20" cellpadding="0"
-      style="background: ${color.mainBackground}; max-width: 600px; margin: auto; border-radius: 10px;">
+  <body style="font-family: 'Roboto', sans-serif">
+    <table
+      role="presentation"
+      width="100%"
+      border="0"
+      cellspacing="20"
+      cellpadding="0"
+      style="
+        background:${theme.background};
+        max-width: 600px;
+        margin: auto;
+        border-radius: 10px;
+      "
+    >
       <tr>
-        <td align="center"
-          style="padding: 10px 0px; font-size: 22px; font-family: Helvetica, Arial, sans-serif; color: ${color.text};">
-          Sign in to <strong>${escapedHost}</strong>
+        <td align="center" style="padding: 10px 0px; color: ${theme.text}">
+          <a
+            href="${escapedHost}"
+            style="display: inline-block; text-decoration: none"
+          >
+            <table role="presentation">
+              <tr>
+                <td style="color:${theme.text}">
+                  <img
+                    src="${logoPath}"
+                    alt="Logo"
+                    width="30"
+                    style="display: block; border: 0"
+                  />
+                </td>
+                <td
+                  style="
+                    font-size: 24px;
+                    font-weight: bold;
+                    letter-spacing: 0;
+                    color:${theme.brand};
+                  "
+                >
+                 ${brandName}
+                </td>
+              </tr>
+            </table>
+          </a>
         </td>
       </tr>
       <tr>
-        <td align="center" style="padding: 20px 0;">
-          <table border="0" cellspacing="0" cellpadding="0">
+        <td
+          align="center"
+          style="font-size: 16px; font-weight: bold; color: #fff"
+        >
+          ${welcomeText}
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="padding: 20px 0">
+          <table role="presentation" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td align="center" style="border-radius: 5px;" bgcolor="${color.buttonBackground}"><a href="${url}"
+              <td
+                align="center"
+                style="border-radius: 5px; background-color:${theme.secondary}"
+              >
+                <a
+                  href="${url}"
                   target="_blank"
-                  style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: ${color.buttonText}; text-decoration: none; border-radius: 5px; padding: 10px 20px; border: 1px solid ${color.buttonBorder}; display: inline-block; font-weight: bold;">Sign
-                  in</a></td>
+                  style="
+                    color: ${theme.buttonText};
+                    font-size: 18px;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    padding: 10px 20px;
+                    display: inline-block;
+                    font-weight: bold;
+                  "
+                >
+                  ${signInText}
+                </a>
+              </td>
             </tr>
           </table>
         </td>
       </tr>
       <tr>
-        <td align="center"
-          style="padding: 0px 0px 10px 0px; font-size: 16px; line-height: 22px; font-family: Helvetica, Arial, sans-serif; color: ${color.text};">
-          If you did not request this email you can safely ignore it.
+        <td
+          align="center"
+          style="padding: 0px 0px 10px 0px; font-size: 16px; color: ${theme.text}"
+        >
+          ${wrongLetterText}
         </td>
       </tr>
     </table>
@@ -55,6 +123,6 @@ export const html = (params: { url: string; host: string }) => {
 }
 
 /** Email Text body (fallback for email clients that don't render HTML, e.g. feature phones) */
-export const text = ({ url, host }: { url: string; host: string }) => {
-  return `Sign in to ${host}\n${url}\n\n`
+export function text({ url, host }: { url: string; host: string }) {
+  return `Для входа в учетную запись на сайте ${host} перейдите по ссылке\n${url}\n\n`
 }
