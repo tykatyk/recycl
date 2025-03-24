@@ -7,6 +7,7 @@ import eventModel from '../../../../lib/db/models/eventModel'
 import dbConnect from '../../../../lib/db/connection'
 import { getSession } from 'next-auth/react'
 import { ParsedUrlQuery } from 'querystring'
+import { isValidObjectId } from 'mongoose'
 
 interface Params extends ParsedUrlQuery {
   id: string
@@ -31,6 +32,11 @@ export const getServerSideProps = (async (context) => {
     }
 
   const { id } = context.params as Params
+  if (!isValidObjectId(id)) {
+    return {
+      notFound: true,
+    }
+  }
 
   await dbConnect()
   const event = await eventModel.findOne({ _id: id, user: session.id })
