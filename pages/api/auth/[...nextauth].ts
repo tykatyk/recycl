@@ -156,6 +156,7 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: '/auth/login',
+    error: '/auth/error',
   },
   adapter: MongoDBAdapter(clientPromise),
   callbacks: {
