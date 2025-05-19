@@ -7,7 +7,7 @@ const removalEventSubscriptionSchema = new Schema(
       ref: 'Event',
       required: true,
     },
-    subscriptions: [
+    elements: [
       {
         wasteType: 'String',
         city: 'String',
