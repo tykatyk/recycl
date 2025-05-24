@@ -1,10 +1,19 @@
+import { min } from 'lodash'
 import dbConnect from '../db/connection'
 import removalEventModel from '../db/models/eventModel'
 import removalEventNotificationModel from '../db/models/removalEventNotification'
 import removalEventSubscriptionModel from '../db/models/removalEventSubscription'
 import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration' // ES 2015
 
-async function notifyEventSubscription() {
+dayjs.extend(duration)
+
+import sendpulse from 'sendpulse-api'
+
+const hourLimit = 2500 //email за годину
+const minuteLimit = 1000 //запитів за хвилину
+
+export async function notifyEventSubscription() {
   await dbConnect()
   const startingQuery = await getStartingQuery()
 
@@ -33,17 +42,29 @@ async function getStartingQuery() {
 }
 
 async function processSubscriptions(subscriptionCursor, startingQuery) {
-  let subscriptionsToNotify: any[] = []
-  let counter = 0
-
   for (
     let subscription = await subscriptionCursor.next();
     subscription != null;
     subscription = await subscriptionCursor.next()
   ) {
-    const o: any = {}
-    o.user = subscription.user
-    o.notifications = []
+    //Структура subscriptionNotification
+    //  {
+    //     user: {
+    //       _id
+    //       email
+    //    },
+    //     notifications: [
+    //       {
+    //         city,
+    //         wasteType,
+    //         removalEvents: removalEventsForSubscriptionElement,
+    //       },
+    //     ]
+    //   },
+    subscription.populate('user', 'email')
+    const subscriptionNotification: any = {}
+    subscriptionNotification.user = subscription.user
+    subscriptionNotification.notifications = []
 
     //користувач може бути підписаний на отримання сповіщень про вивезення різних видів відходів в різних населених пунктах
     for (const element of subscription.elements) {
@@ -61,39 +82,70 @@ async function processSubscriptions(subscriptionCursor, startingQuery) {
         removalEvent != null;
         removalEvent = await removalEventsCursor.next()
       ) {
-        const { user, date, phone } = removalEvent
-        removalEventsForSubscriptionElement.push({ user, date, phone })
+        const { user: removalAgent, date, phone } = removalEvent
+        removalEventsForSubscriptionElement.push({ removalAgent, date, phone })
       }
-      const b = {
+      const notification = {
         city,
         wasteType,
         removalEvents: removalEventsForSubscriptionElement,
       }
 
-      o.notifications.push(b)
+      subscriptionNotification.notifications.push(notification)
     }
 
-    counter++
-    subscriptionsToNotify.push(o)
+    let minuteCounter = 0
+    let hourCounter = 0
+    let minuteAgo = dayjs()
+    let hourAgo = minuteAgo
+    let canSendMinutely = true
+    let canSendHourly = true
 
-    // subscriptionsToNotify.push({
-    //   user: subscription.user,
-    //   notifications: [
-    //     {
-    //       city,
-    //       wasteType,
-    //       removalEvents: removalEventsForSubscriptionElement,
-    //     },
-    //   ],
-    // })
-
-    //відправляємо емаіл одразу для 100 підписок, а не для кожної окремо, чим підвищуємо продуктивність
-    if (counter == 100) {
-      counter = 0
-      subscriptionsToNotify = []
-      //ToDo: Send emails
+    if (dayjs.duration(dayjs().diff(minuteAgo)).minutes() < 1) {
+      if (minuteCounter >= minuteLimit) {
+        canSendMinutely = false
+      }
+    } else {
+      minuteCounter = 0
+      minuteAgo = dayjs()
+      canSendMinutely = true
     }
+
+    if (!canSendMinutely) {
+      //ToDo: wait
+    }
+
+    // subscriptionNotification
+    if (dayjs.duration(dayjs().diff(hourAgo)).hours() < 1) {
+      if (hourCounter >= hourLimit) {
+        canSendHourly = false
+      }
+    } else {
+      hourCounter = 0
+      hourAgo = dayjs()
+      canSendHourly = true
+    }
+
+    if (!canSendHourly) {
+      //ToDo: wait
+    }
+
+    sendRemovalSubscriptionEmails(subscriptionNotification)
   }
 }
 
-function processEvents(removalEvent) {}
+//  if (minuteCounter < minuteLimit) {
+//         if (hourCounter < hourLimit) {
+//           //process
+//         } else {
+//           //ToDo: wait
+//           hourCounter = 0
+//           hourAgo = dayjs()
+//         }
+//       } else {
+//         //ToDo: wait
+//         minuteCounter = 0
+//         minuteAgo = dayjs()
+//       }
+
+function sendRemovalSubscriptionEmails(subscriptionNotification) {}
