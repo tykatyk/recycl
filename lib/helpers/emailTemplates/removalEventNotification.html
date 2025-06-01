@@ -1,35 +1,9 @@
-<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Page Title</title>
-    <meta name="description" content="Webpage for xxxx" />
-    <!-- http://meyerweb.com/eric/tools/css/reset/ -->
-    <link rel="stylesheet" href="css/reset/reset.css" />
-    <!--[if lt IE 9]>
-      <script
-        src="//html5shiv.googlecode.com/svn/trunk/html5.js"
-        type="text/javascript"
-      ></script>
-    <![endif]-->
-    <style>
-      ul,
-      li {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      li {
-        padding-left: 16px;
-      }
-      a {
-        text-decoration: none;
-        color: #f8bc45;
-      }
-    </style>
+    <title>Список событий вывоза отходов NNN в городе ККК</title>
   </head>
-  <body style="font-family: 'Roboto', sans-serif; background: #fff">
+  <body style="font-family: Arial, Helvetica, sans-serif; color: #fff">
     <table
       role="presentation"
       width="100%"
@@ -37,10 +11,10 @@
       cellspacing="20"
       cellpadding="0"
       style="
+        border-radius: 10px;
         background: #223c4a;
         max-width: 600px;
         margin: auto;
-        border-radius: 10px;
       "
     >
       <tr>
@@ -77,11 +51,12 @@
       <tr>
         <td
           align="center"
-          style="font-size: 24px; font-weight: bold; color: #fff"
+          style="font-size: 24px; font-weight: bold; color: #ccc"
         >
           Информируем вас о вывозе отходов, на которые вы подписаны
         </td>
       </tr>
+      <!--waste type row-->
       <tr>
         <td style="padding: 24px 0">
           <!--waste type table-->
@@ -90,52 +65,87 @@
             border="0"
             cellspacing="0"
             cellpadding="0"
-            style="color: #ccc; text-align: left"
+            style="color: #fff; text-align: left"
             width="100%"
           >
             <tr>
               <th style="font-size: 32px; padding-bottom: 24px">Металлолом</th>
             </tr>
+            <!--city row-->
+            <!--в останньому рядку не повинно бути padding-bottom: 16px-->
             <tr>
-              <td>
+              <td style="padding-bottom: 16px">
                 <!--city table-->
-                <table style="padding-bottom: 16px">
+                <table>
                   <tr>
-                    <th style="font-size: 24px; padding: 0 0 16px 8px">
+                    <th
+                      align="left"
+                      style="
+                        font-size: 24px;
+                        padding: 0 0 16px 8px;
+                        color: #fff;
+                      "
+                    >
                       Винница
                     </th>
                   </tr>
                   <tr>
-                    <td style="padding-bottom: 8px">
-                      <ul>
-                        <li>Время: 12.05.2025, 9:00</li>
-                        <li>Место: ул. 600-летия, 24.</li>
-                        <li>Переработчик: ФОП Качужный В.Ф.,</li>
-                        <li>
-                          <a
-                            style="display: inline-block; padding-top: 4px"
-                            href="#"
-                            >Подробнее</a
-                          >
-                        </li>
-                      </ul>
+                    <td style="padding-bottom: 16px; padding-left: 16px">
+                      <table>
+                        <tr>
+                          <td>Время: 12.05.2025, 9:00</td>
+                        </tr>
+                        <tr>
+                          <td>Место: ул. 600-летия, 24.</td>
+                        </tr>
+                        <tr>
+                          <td>Переработчик: ФОП Качужный В.Ф.,</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <a
+                              style="
+                                display: inline-block;
+                                padding-top: 4px;
+                                text-decoration: none;
+                                color: #f8bc45;
+                              "
+                              href="#"
+                              >Подробнее</a
+                            >
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
-
+                  <!--в останньому рядку event row не повинно бути padding-bottom: 16px-->
                   <tr>
-                    <td>
-                      <ul>
-                        <li>Время: 13.05.2025, 8:00</li>
-                        <li>Место: ул. Пирогова, 13.</li>
-                        <li>Переработчик: ПП Сивак,</li>
-                        <li>
-                          <a
-                            style="display: inline-block; padding-top: 4px"
-                            href="#"
-                            >Подробнее</a
-                          >
-                        </li>
-                      </ul>
+                    <td style="padding-left: 16px">
+                      <table>
+                        <tr>
+                          <td>Время: 13.05.2025, 8:00</td>
+                        </tr>
+                        <tr>
+                          <td>Место: ул. Пирогова, 13.</td>
+                        </tr>
+                        <tr>
+                          <td>Переработчик: ПП Сивак,</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <a
+                              style="
+                                display: inline-block;
+                                padding-top: 4px;
+                                text-decoration: none;
+                                color: #f8bc45;
+                              "
+                              href="#"
+                              >Подробнее</a
+                            >
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                   <tr>
@@ -147,37 +157,10 @@
                       "
                     >
                       <a
-                        style="color: #ccc; text-decoration: underline"
+                        style="color: #fff; text-decoration: underline"
                         href="#"
                         >Смотреть еще +10 событий</a
                       >
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <tr>
-              <!--city row-->
-              <td>
-                <table>
-                  <tr>
-                    <th>Днепр</th>
-                  </tr>
-                  <tr>
-                    <td>
-                      <table>
-                        <tr>
-                          <td style="">Время: 07.05.2025, 9:00</td>
-                        </tr>
-                        <tr>
-                          <td style="">Место: ул. Лумумбы, 24.</td>
-                        </tr>
-
-                        <tr>
-                          <td style="">Переработчик: ООО Лямбда В,</td>
-                        </tr>
-                      </table>
                     </td>
                   </tr>
                 </table>
@@ -189,9 +172,19 @@
       <tr>
         <td
           align="center"
-          style="padding: 0px 0px 10px 0px; font-size: 16px; color: #fff"
+          style="padding: 0px 0px 10px 0px; font-size: 14px; color: #ccc"
         >
-          Если вы не хотите получать подобные уведомления, нажмите отписаться.
+          Если вы не хотите получать подобные уведомления, нажмите
+          <br /><a
+            href="#"
+            style="
+              display: inline-block;
+              padding-top: 4px;
+              color: #ccc;
+              text-decoration: underline;
+            "
+            >отписаться</a
+          >.
         </td>
       </tr>
     </table>
