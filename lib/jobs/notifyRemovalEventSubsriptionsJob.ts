@@ -42,6 +42,13 @@ async function getStartingQuery() {
 }
 
 async function processSubscriptions(subscriptionCursor, startingQuery) {
+  let minuteCounter = 0
+  let hourCounter = 0
+  let minuteAgo = dayjs()
+  let hourAgo = minuteAgo
+  const oneMinute = 60
+  const oneHour = 60 * 60
+
   for (
     let subscription = await subscriptionCursor.next();
     subscription != null;
@@ -94,40 +101,29 @@ async function processSubscriptions(subscriptionCursor, startingQuery) {
       subscriptionNotification.notifications.push(notification)
     }
 
-    let minuteCounter = 0
-    let hourCounter = 0
-    let minuteAgo = dayjs()
-    let hourAgo = minuteAgo
-    let canSendMinutely = true
-    let canSendHourly = true
-
-    if (dayjs.duration(dayjs().diff(minuteAgo)).minutes() < 1) {
+    const deltaMinutes = dayjs.duration(dayjs().diff(minuteAgo)).seconds()
+    if (deltaMinutes <= oneMinute) {
       if (minuteCounter >= minuteLimit) {
-        canSendMinutely = false
+        //ToDo: wait
+        minuteCounter = 0
+        minuteAgo = dayjs()
       }
     } else {
       minuteCounter = 0
       minuteAgo = dayjs()
-      canSendMinutely = true
     }
 
-    if (!canSendMinutely) {
-      //ToDo: wait
-    }
-
+    const deltaHours = dayjs.duration(dayjs().diff(hourAgo)).seconds()
     // subscriptionNotification
-    if (dayjs.duration(dayjs().diff(hourAgo)).hours() < 1) {
+    if (deltaHours <= oneHour) {
       if (hourCounter >= hourLimit) {
-        canSendHourly = false
+        //ToDo: wait
+        hourCounter = 0
+        hourAgo = dayjs()
       }
     } else {
       hourCounter = 0
       hourAgo = dayjs()
-      canSendHourly = true
-    }
-
-    if (!canSendHourly) {
-      //ToDo: wait
     }
 
     sendRemovalSubscriptionEmails(subscriptionNotification)
