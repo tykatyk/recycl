@@ -1,23 +1,26 @@
-import { min } from 'lodash'
 import dbConnect from '../db/connection'
 import removalEventModel from '../db/models/eventModel'
 import removalEventNotificationModel from '../db/models/removalEventNotification'
 import removalEventSubscriptionModel from '../db/models/removalEventSubscription'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration' // ES 2015
+import sendpulse from 'sendpulse-api'
 
 dayjs.extend(duration)
 
-import sendpulse from 'sendpulse-api'
-
 const hourLimit = 2500 //email за годину
 const minuteLimit = 1000 //запитів за хвилину
+const dispatcher = {
+  canSendNext: true,
+}
 
-export async function notifyEventSubscription() {
+export async function notify() {
   await dbConnect()
   const startingQuery = await getStartingQuery()
 
-  const subscriptionCursor = removalEventSubscriptionModel.find().cursor()
+  const subscriptionCursor = removalEventSubscriptionModel
+    .find({ isActive: true })
+    .cursor()
 
   processSubscriptions(subscriptionCursor, startingQuery)
 }
@@ -42,106 +45,51 @@ async function getStartingQuery() {
 }
 
 async function processSubscriptions(subscriptionCursor, startingQuery) {
-  let minuteCounter = 0
-  let hourCounter = 0
-  let minuteAgo = dayjs()
-  let hourAgo = minuteAgo
-  const oneMinute = 60
-  const oneHour = 60 * 60
+  if (!dispatcher.canSendNext) {
+    setTimeout(async () => {
+      await processSubscriptions(subscriptionCursor, startingQuery)
+    }, 100)
+    return
+  }
 
-  for (
-    let subscription = await subscriptionCursor.next();
-    subscription != null;
-    subscription = await subscriptionCursor.next()
-  ) {
-    //Структура subscriptionNotification
-    //  {
-    //     user: {
-    //       _id
-    //       email
-    //    },
-    //     notifications: [
-    //       {
-    //         city,
-    //         wasteType,
-    //         removalEvents: removalEventsForSubscriptionElement,
-    //       },
-    //     ]
-    //   },
-    subscription.populate('user', 'email')
-    const subscriptionNotification: any = {}
-    subscriptionNotification.user = subscription.user
-    subscriptionNotification.notifications = []
+  const subscription = await subscriptionCursor.next()
 
-    //користувач може бути підписаний на отримання сповіщень про вивезення різних видів відходів в різних населених пунктах
-    for (const element of subscription.elements) {
-      const { city, wasteType } = element
-      const query = { ...startingQuery, city, wasteType }
+  if (!subscription) return
 
-      const removalEventsForSubscriptionElement: any[] = []
+  subscription.populate('user', 'email')
+  const notification: any = {}
+  notification.receiver = subscription.user
+  notification.locations = []
+  const removalEventsPerCity: any = {}
 
-      //ці івенти бажано закинути одразу в redis і потім витягувати з кешу для підвищення продуктивності
+  //користувач може бути підписаний на отримання сповіщень про вивезення різних видів відходів в різних населених пунктах
+  for (const element of subscription.elements) {
+    const { city, wasteTypes } = element
+    const removalEventsPerWasteType: any = {}
+
+    for (const wasteType in wasteTypes) {
+      const query = { ...startingQuery, city, wasteType, isActive: true }
       const removalEventsCursor = removalEventModel.find(query).cursor()
+      const removalEvents: any[] = []
 
       //в кожному населеному пункті певний тип відходів може вивозитись декількома переробниками
       for (
-        let removalEvent = await removalEventsCursor.next();
-        removalEvent != null;
-        removalEvent = await removalEventsCursor.next()
+        //ці івенти бажано закинути одразу в redis і потім витягувати з кешу для підвищення продуктивності
+        let removalEvent = await removalEventsCursor.next(), counter = 0;
+        removalEvent != null && counter <= 2;
+        removalEvent = await removalEventsCursor.next(), counter++
       ) {
         const { user: removalAgent, date, phone } = removalEvent
-        removalEventsForSubscriptionElement.push({ removalAgent, date, phone })
-      }
-      const notification = {
-        city,
-        wasteType,
-        removalEvents: removalEventsForSubscriptionElement,
+        removalEvents.push({ removalAgent, date, phone })
       }
 
-      subscriptionNotification.notifications.push(notification)
+      removalEventsPerWasteType.wasteType = removalEvents
     }
-
-    const deltaMinutes = dayjs.duration(dayjs().diff(minuteAgo)).seconds()
-    if (deltaMinutes <= oneMinute) {
-      if (minuteCounter >= minuteLimit) {
-        //ToDo: wait
-        minuteCounter = 0
-        minuteAgo = dayjs()
-      }
-    } else {
-      minuteCounter = 0
-      minuteAgo = dayjs()
-    }
-
-    const deltaHours = dayjs.duration(dayjs().diff(hourAgo)).seconds()
-    // subscriptionNotification
-    if (deltaHours <= oneHour) {
-      if (hourCounter >= hourLimit) {
-        //ToDo: wait
-        hourCounter = 0
-        hourAgo = dayjs()
-      }
-    } else {
-      hourCounter = 0
-      hourAgo = dayjs()
-    }
-
-    sendRemovalSubscriptionEmails(subscriptionNotification)
+    removalEventsPerCity.city = removalEventsPerWasteType
   }
+  notification.locations = removalEventsPerCity
+  sendEmail(notification)
+  await processSubscriptions(subscriptionCursor, startingQuery)
 }
 
-//  if (minuteCounter < minuteLimit) {
-//         if (hourCounter < hourLimit) {
-//           //process
-//         } else {
-//           //ToDo: wait
-//           hourCounter = 0
-//           hourAgo = dayjs()
-//         }
-//       } else {
-//         //ToDo: wait
-//         minuteCounter = 0
-//         minuteAgo = dayjs()
-//       }
-
-function sendRemovalSubscriptionEmails(subscriptionNotification) {}
+function sendEmail(notification) {}
