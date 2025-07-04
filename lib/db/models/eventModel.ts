@@ -1,4 +1,4 @@
-import { Schema, models, model, InferSchemaType } from 'mongoose'
+import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
 import { contactPhone, locationSchema } from '../../helpers/dbModelCommons'
 
 const eventSchema = new Schema(
@@ -13,7 +13,10 @@ const eventSchema = new Schema(
       type: String,
       required: true,
     },
+    street: { type: String, required: true },
     date: { type: Date, required: true },
+    phone: { ...contactPhone, required: true },
+
     viewCount: {
       type: Number,
       default: 0,
@@ -21,13 +24,13 @@ const eventSchema = new Schema(
     viewedBy: {
       type: Array,
     },
-    phone: { ...contactPhone, required: true },
     isActive: { type: Boolean, default: true },
     comment: String,
   },
   { timestamps: true },
 )
 
-export type EventModel = InferSchemaType<typeof eventSchema>
+export type EventType = InferSchemaType<typeof eventSchema>
 
-export default models.Event || model<Event>('Event', eventSchema)
+export default (models.Event as Model<EventType>) ||
+  model<EventType>('Event', eventSchema)
