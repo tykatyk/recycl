@@ -1,21 +1,51 @@
 import dbConnect from '../db/connection'
 import removalEventModel from '../db/models/eventModel'
-import removalEventSubscriptionModel from '../db/models/removalEventSubscription'
+import removalApplicationModel from '../db/models/removalApplication'
+import subscriptionModel, {
+  wasteRemovalSubscription,
+} from '../db/models/subscription'
 import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
+import { Types } from 'mongoose'
+
+type RemovalEventForNotification = {
+  agentId: Types.ObjectId
+  agentName: string
+  agentStreet: string
+  agentDate: Date
+  agentPhone: string
+}
+
+type Removal = {
+  [wasteName: string]: RemovalEventForNotification[]
+}
+
+type Locations = {
+  [place_id: string]: {
+    structured_formatting: {
+      main_text: string
+    }
+    waste_types: Removal
+  }
+}
+
+type Notification = {
+  receiverEmail: string
+  locations: Locations
+}
 
 class Dispatcher {
   hourLimit: number
   minuteLimit: number
   timestamps: number[]
   queue: any[]
-  timeout: any
+  timeout: NodeJS.Timeout | undefined
 
   constructor() {
     this.hourLimit = 2500 //запитів за годину
     this.minuteLimit = 1000 //запитів за хвилину
     this.timestamps = []
     this.queue = []
-    this.timeout = null
+    this.timeout = undefined
   }
 
   canSendNext() {
@@ -29,7 +59,7 @@ class Dispatcher {
     return lastMinuteCount < this.minuteLimit && lastHourCount < this.hourLimit
   }
 
-  addTask(task: any) {
+  addTask(task: (...args: [any]) => any): void {
     this.queue.push(task)
     this.processTask()
   }
@@ -56,8 +86,8 @@ class Dispatcher {
 
 export async function processSubscriptions() {
   await dbConnect()
-  const subscriptionCursor = removalEventSubscriptionModel
-    .find({ isActive: true })
+  const subscriptionCursor = subscriptionModel
+    .find({ isActive: true, name: wasteRemovalSubscription })
     .cursor()
   const dispatcher = new Dispatcher()
 
@@ -65,63 +95,84 @@ export async function processSubscriptions() {
   /*const obj = {
     locationName,
     locationId,
-    removalEvents = [
-      { wasteName, agents: [{_id, name, street, removalDate, phone, }, {}, {}] },
+    removals = [
+      { wasteName, events: [{_id, name, street, removalDate, phone, }, {}, {}] },
     ],
   }*/
 
   await subscriptionCursor.eachAsync(async (subscription) => {
-    subscription.populate('user', 'email')
-    const notification: any = {}
-    notification.receiver = subscription.user
-    notification.locations = []
+    const populatedSubscription = await subscription.populate<{
+      user: { email: string }
+    }>('user', 'email')
 
-    //Підписка складається з елементів. Кожен елемент це окремий населений пункт
-    for (const element of subscription.elements) {
-      const { city, wasteTypes } = element
-
-      const eventsPerLocation: any = {}
-      eventsPerLocation.locationName = city.description
-      eventsPerLocation.locationId = city.place_id
-      eventsPerLocation.removalEvents = []
-
-      //В кожному населеному пункті користувач може бути підписаний на вивіз різних типів відходів
-      for (const wasteType in wasteTypes) {
-        const removalEventsCursor = removalEventModel
-          .find({ wasteType, city, date: { $gte: Date.now() }, isActive: true })
-          .cursor()
-
-        const agents: any[] = []
-
-        //Певний тип відходів може вивозитись різними переробниками, які публікують оголошення про вивіз відходів (removalEvent)
-        for (
-          //ці івенти бажано закинути одразу в redis і потім витягувати з кешу для підвищення продуктивності
-          let ev = await removalEventsCursor.next(), counter = 0;
-          ev != null && counter <= 2;
-          ev = await removalEventsCursor.next(), counter++
-        ) {
-          agents.push({
-            _id: ev.user._id,
-            name: ev.user.name,
-            street: ev.street,
-            removalDate: ev.date,
-            phone: ev.phone,
-          })
-        }
-
-        const eventstPerWasteType: any = {}
-        eventstPerWasteType.wasteName = wasteType
-        eventstPerWasteType.agents = agents
-
-        eventsPerLocation.removalEvents.push(eventstPerWasteType)
-      }
-      notification.locations.push(eventsPerLocation)
+    const locations: Locations = {}
+    const notification: Notification = {
+      receiverEmail: populatedSubscription.user.email,
+      locations,
     }
-    dispatcher.addTask(sendEmail(notification))
+
+    const removalApplications = await removalApplicationModel.find({
+      user: subscription.user._id,
+      isActive: true,
+    })
+
+    for (const ra of removalApplications) {
+      const place_id = ra.wasteLocation.place_id
+      const wasteType = ra.wasteType
+
+      if (locations[place_id] && locations[place_id][wasteType]) continue
+
+      const removalEventsCursor = removalEventModel
+        .find({
+          wasteType: wasteType,
+          city: place_id,
+          date: { $gte: Date.now() },
+          isActive: true,
+        })
+        .cursor()
+
+      const events: any[] = []
+
+      //Певний тип відходів може вивозитись різними переробниками, які публікують оголошення про вивіз відходів (removalEvent)
+      for (
+        //ці івенти бажано закинути одразу в redis і потім витягувати з кешу для підвищення продуктивності
+        let ev = await removalEventsCursor.next(), counter = 0;
+        ev != null && counter <= 2;
+        ev = await removalEventsCursor.next(), counter++
+      ) {
+        const populatedEv = await ev.populate<{ user: { name: string } }>(
+          'user',
+          'name',
+        )
+        events.push({
+          _id: ev.user._id,
+          name: populatedEv.user.name,
+          street: ev.street,
+          removalDate: ev.date,
+          phone: ev.phone,
+        })
+      }
+
+      if (events.length === 0) continue
+
+      if (!locations[place_id]) {
+        locations[place_id] = {
+          structured_formatting: {
+            main_text: ra.wasteLocation.structured_formatting.main_text,
+          },
+          waste_types: {},
+        }
+      }
+      locations[place_id]['wasteTypes'][wasteType] = events
+    }
+
+    dispatcher.addTask(() => {
+      sendEmail(notification)
+    })
   })
 }
 
-function prepareEmailText(notification) {
+function prepareEmailText(notification: Notification) {
   const host = 'localhost:3000'
   const yellow = ' #f8bc45'
   let emailHtml = `<html>
@@ -184,7 +235,7 @@ function prepareEmailText(notification) {
       </tr>
 `
 
-  notification.locations.forEach((location) => {
+  for (const place_id in notification.locations) {
     emailHtml += `      <!--city row-->
       <tr>
         <td style="padding: 24px 0">
@@ -198,11 +249,11 @@ function prepareEmailText(notification) {
             width="100%"
           >
             <tr>
-              <th style="font-size: 32px; padding-bottom: 24px">${location.description.split(',')[0]}</th>
+              <th style="font-size: 32px; padding-bottom: 24px">${notification.locations[place_id].structured_formatting.main_text}</th>
             </tr>
       `
-    location.removalEvents.forEach((re) => {
-      const { wasteName, agents } = { ...re }
+
+    for (const waste_type in notification.locations[place_id].waste_types) {
       emailHtml += ` <!--waste type row-->
             <tr>
               <td style="padding-bottom: 16px">
@@ -217,25 +268,27 @@ function prepareEmailText(notification) {
                         color: #fff;
                       "
                     >
-                     ${wasteName}
+                     ${waste_type}
                     </th>
                   </tr>
                 `
 
       let counter = 0
-      agents.forEach((agnt) => {
-        const { removalEvent, date, name } = { ...agnt }
+      const removals = notification.locations[place_id].waste_types[waste_type]
+
+      removals.forEach((ev) => {
+        const { agentDate, agentName, agentStreet } = { ...ev }
         emailHtml += `  <tr>
-                    <td style="${counter === agents.length - 1 ? '' : 'padding-bottom: 16px'}; padding-left: 16px">
+                    <td style="${counter === removals.length - 1 ? '' : 'padding-bottom: 16px'}; padding-left: 16px">
                       <table>
                         <tr>
-                          <td>${removalEvent.date}</td>
+                          <td>${agentDate}</td>
                         </tr>
                         <tr>
-                          <td>${removalEvent.street}</td>
+                          <td>${agentStreet}</td>
                         </tr>
                         <tr>
-                          <td>${agnt.name}</td>
+                          <td>${agentName}</td>
                         </tr>
                         <tr>
                           <td>
@@ -246,7 +299,7 @@ function prepareEmailText(notification) {
                                 text-decoration: none;
                                 color:${yellow};
                               "
-                              href="${host}/removalEvents/?agent=${agnt.name}&city=${location}"
+                              href="${host}/removalEvents/?agent=${agentName}&city=${location}"
                               >Подробнее</a
                             >
                           </td>
@@ -260,12 +313,13 @@ function prepareEmailText(notification) {
       emailHtml += `</table>
               </td>
             </tr>`
-    })
+    }
+
     emailHtml += `</table>
         </td>
       </tr>`
-  })
-  emailHtml += `
+
+    emailHtml += `
       <tr>
         <td
           align="center"
@@ -287,7 +341,8 @@ function prepareEmailText(notification) {
     </table>
   </body>
 </html>`
-  return emailHtml
+    return emailHtml
+  }
 }
 
 async function sendEmail(notification) {
