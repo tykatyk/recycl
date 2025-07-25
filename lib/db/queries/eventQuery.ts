@@ -89,11 +89,10 @@ const eventQueries = {
     const sort = getSortQuery(orderBy, sortOrder)
 
     const total = await Event.countDocuments(countAll)
-    let skip = pageInt * pageSizeInt
-
     if (total === 0) return result
 
-    if (skip > total) skip = total - pageSizeInt
+    let skip = pageInt * pageSizeInt
+    if (skip >= total) skip = total - pageSizeInt
     if (skip < 0) skip = 0
 
     const events: EventType[] = await Event.find(select)
