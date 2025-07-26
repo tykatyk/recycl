@@ -10,7 +10,7 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { signIn } from 'next-auth/react'
 import { loginSchema } from '../../lib/validation'
 import { showErrorMessages } from '../../lib/helpers/errorHelpers'
-import AuthLayout from '../layouts/AuthLayout'
+import LayoutWithoutHeader from '../layouts/LayoutWithoutHeader'
 import ReCAPTCHA from 'react-google-recaptcha'
 
 const USER_NOT_FOUND = 'Пользователь с таким email не найден'
@@ -66,7 +66,7 @@ export default function SignIn() {
 
   return (
     <Root>
-      <AuthLayout title="Recycl | Вход">
+      <LayoutWithoutHeader title="Вход | Recycl">
         <Container component="main" maxWidth="xs">
           <div className={classes.paper}>
             <Avatar className={classes.avatar}>
@@ -222,7 +222,8 @@ export default function SignIn() {
             </div>
           </div>
         </Container>
-      </AuthLayout>
+      </LayoutWithoutHeader>
+
       <Snackbar
         severity={notificatioinType}
         open={!!notificatioin}

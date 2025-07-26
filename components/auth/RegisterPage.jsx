@@ -11,7 +11,7 @@ import Link from '../uiParts/Link'
 import { GET_ROLE_ID } from '../../lib/graphql/queries/userRole'
 import { useQuery } from '@apollo/client'
 import { registerSchema } from '../../lib/validation'
-import AuthLayout from '../layouts/AuthLayout'
+import LayoutWithoutHeader from '../layouts/LayoutWithoutHeader'
 import ReCAPTCHA from 'react-google-recaptcha'
 import submitWithCapthca from '../../lib/helpers/submitWithCaptcha'
 
@@ -69,7 +69,7 @@ export default function SignUp() {
 
   return (
     <Root>
-      <AuthLayout title="Recycl | Регистрация">
+      <LayoutWithoutHeader title="Recycl | Регистрация">
         <Container className={classes.root} component="main" maxWidth="xs">
           <Avatar className={classes.avatar}>
             <LockOutlinedIcon />
@@ -171,7 +171,7 @@ export default function SignUp() {
             />
           </div>
         </Container>
-      </AuthLayout>
+      </LayoutWithoutHeader>
       <Snackbar
         severity={severity}
         open={!!notification}
