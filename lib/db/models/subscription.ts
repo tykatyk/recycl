@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb'
 import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
 
 export const wasteRemovalSubscription = 'wasteRemoval'
@@ -15,18 +14,11 @@ const subscriptionElements = new Schema(
   { timestamps: true },
 )
 
-const userSchema = new Schema({
-  _id: {
-    type: ObjectId,
-    required: true,
-  },
-  email: { type: String, required: true },
-})
-
 const subscriptionSchema = new Schema(
   {
     user: {
-      type: userSchema,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
     elements: [subscriptionElements],
