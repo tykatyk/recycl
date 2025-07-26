@@ -1,6 +1,6 @@
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { Avatar, Box, Button, Typography, Container } from '@mui/material'
-import AuthLayout from '../layouts/AuthLayout'
+import LayoutWithoutHeader from '../layouts/LayoutWithoutHeader'
 
 const GO_HOME_TEXT = 'На главную'
 const CANT_ENTER_TEXT = 'Не удалось выполнить вход'
@@ -9,7 +9,7 @@ const HOME_URL = '/'
 
 export default function ErrorPage() {
   return (
-    <AuthLayout title="Recycl | Ошибка входа">
+    <LayoutWithoutHeader title="Recycl | Ошибка входа">
       <Container component="div" maxWidth="sm" sx={{ p: 2 }}>
         <Box
           sx={{
@@ -44,6 +44,6 @@ export default function ErrorPage() {
           </Box>
         </Box>
       </Container>
-    </AuthLayout>
+    </LayoutWithoutHeader>
   )
 }
