@@ -4,7 +4,7 @@ import { TextField, Button, Typography } from '@mui/material'
 import { Formik, Form, ErrorMessage, useFormikContext } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import { quantitySchema } from '../../lib/validation'
-import mapErrors from '../../lib/helpers/mapErrors'
+import { mapErrors } from '../../lib/helpers/errorHelpers'
 
 const PREFIX = 'MapSidebarQuantityForm'
 

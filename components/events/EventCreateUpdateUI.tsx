@@ -8,7 +8,7 @@ import {
   getNormalizedValues,
 } from '../../lib/helpers/eventHelpers'
 import { eventSchema } from '../../lib/validation'
-import showErrorMessages from '../../lib/helpers/showErrorMessages'
+import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import type {
   Event,
   EventCreateUpdateProps,

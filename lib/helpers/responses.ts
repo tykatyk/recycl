@@ -1,13 +1,13 @@
 import { NextApiResponse } from 'next'
-import mapErrors from './mapErrors'
-import type { ApiError } from '../types/error'
+import { mapErrors } from './errorHelpers'
+import type { FormValidationError } from '../types/error'
 import type { ValidationError } from 'yup'
 
-type ErrorResponse = { error: ApiError }
+type ErrorResponse = { error: FormValidationError }
 
 export const perFormErrorResponse = function (
   message = 'Неизвестная ошибка',
-  res: NextApiResponse<ErrorResponse>
+  res: NextApiResponse<ErrorResponse>,
 ) {
   res.status(500).json({
     error: {
@@ -19,7 +19,7 @@ export const perFormErrorResponse = function (
 
 export const errorResponse = function (
   error: ValidationError,
-  res: NextApiResponse<ErrorResponse>
+  res: NextApiResponse<ErrorResponse>,
 ) {
   let mappedErrors = mapErrors(error)
   if (mappedErrors) {
@@ -35,7 +35,7 @@ export const errorResponse = function (
 }
 
 export const captchaNotPassedResponse = function (
-  res: NextApiResponse<ErrorResponse>
+  res: NextApiResponse<ErrorResponse>,
 ) {
   return res.status(401).json({
     error: {
