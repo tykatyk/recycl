@@ -20,6 +20,11 @@ let loading = false
 export default function ShowSingleEvent(props: { event: RecycleEvent | null }) {
   const { event } = props
   const content = event ? <ShowData applicationData={event} /> : <NoRows />
+
+  const title = event
+    ? `Прием отходов | ${event.waste} | ${event.location?.description.split(',')[0]} | ${event.user.name}`
+    : `Объявление не найдено`
+
   const { data: session } = useSession()
 
   //update the counter of number of times the ad was viewed
@@ -55,9 +60,7 @@ export default function ShowSingleEvent(props: { event: RecycleEvent | null }) {
       })
   }, [])
 
-  return (
-    <Layout title="Предложение о вывозе отходов | Recycl">{content}</Layout>
-  )
+  return <Layout title={title}>{content}</Layout>
 }
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -68,13 +71,14 @@ function ShowData(props: { applicationData: RecycleEvent }) {
   const { applicationData } = props
   const user = applicationData.user as PopulatedProp
   const waste = applicationData.waste as string
+  const h1 = `Вывоз отходов. ${applicationData.waste}. ${applicationData.location?.description}`
 
   return (
     <Grid container spacing={2} direction="column" item xs>
       <Grid container item spacing={2} direction="column" xs sx={{ mb: 4 }}>
         <Grid item xs sx={{ mb: 4 }}>
-          <Typography component="h1" variant="h3" gutterBottom>
-            Объявление о вывозе отходов
+          <Typography component="h1" variant="h4" gutterBottom>
+            {h1}
           </Typography>
           <Box
             sx={{
