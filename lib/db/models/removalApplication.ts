@@ -1,10 +1,9 @@
-import { Schema, models, model, InferSchemaType } from 'mongoose'
+import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
 import {
   contactPhone,
-  wasteLocation,
+  locationSchema,
   expires,
 } from '../../helpers/dbModelCommons'
-import { RemovalApplication } from '.'
 
 const removalApplicationSchema = new Schema(
   {
@@ -15,7 +14,10 @@ const removalApplicationSchema = new Schema(
       required: true,
     },
     //ToDo: refactor wasteLocation schema. Use locationSchema from dbModelCommons
-    wasteLocation,
+    wasteLocation: {
+      type: locationSchema,
+      required: true,
+    },
 
     wasteType: {
       type: String,
@@ -37,5 +39,5 @@ const removalApplicationSchema = new Schema(
 )
 type RemovalApplication = InferSchemaType<typeof removalApplicationSchema>
 
-export default models.RemovalApplication ||
+export default (models.RemovalApplication as Model<RemovalApplication>) ||
   model<RemovalApplication>('RemovalApplication', removalApplicationSchema)
