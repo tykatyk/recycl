@@ -62,7 +62,7 @@ type EventsTableProps = {
   handleSort: (event: React.MouseEvent<unknown>, property: any) => void
   fetcher: () => Promise<EventPaginationData>
   setParams: (data: EventPaginationData) => void
-  orderBy: string
+  sortProperty: string
   sortOrder: SortOrder
 }
 
@@ -74,8 +74,14 @@ const deactivateBtnText = 'Деактивировать'
 const selectAllBtnText = 'Выбрать все'
 const editBtnText = 'Редактировать'
 const activateBtnText = 'Активировать'
-const dateText = 'Дата'
+const wasteTypeText = 'Тип отходов'
 const editRoute = '/my/events/edit/'
+const actionBtnStyles = {
+  color: '#fff',
+  '&:hover': {
+    color: '#f8bc45',
+  },
+}
 
 export default function EventsTable({
   variant,
@@ -87,7 +93,7 @@ export default function EventsTable({
   handleActivationDeactivationAndDeletion,
   fetcher,
   setParams,
-  orderBy,
+  sortProperty,
   sortOrder,
 }: EventsTableProps) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
@@ -137,7 +143,7 @@ export default function EventsTable({
       })
   }
 
-  const getHeader = (): ReactNode | typeof dateText => {
+  const getHeader = (): ReactNode | string => {
     if (selectedRows.length > 0) {
       const action = variant === inactive ? remove : deactivate
       const buttonText =
@@ -171,7 +177,7 @@ export default function EventsTable({
         </Button>
       )
     }
-    return dateText
+    return wasteTypeText
   }
 
   return (
@@ -197,20 +203,20 @@ export default function EventsTable({
                 <TableCell
                   key={column.id}
                   sx={{ minWidth: column.width }}
-                  sortDirection={orderBy === column.id ? sortOrder : false}
+                  sortDirection={sortProperty === column.id ? sortOrder : false}
                 >
-                  {column.id === 'time' ? (
+                  {column.id === 'waste' ? (
                     column.headerName
                   ) : (
                     <TableSortLabel
-                      active={orderBy === column.id}
-                      direction={orderBy === column.id ? sortOrder : 'asc'}
+                      active={sortProperty === column.id}
+                      direction={sortProperty === column.id ? sortOrder : 'asc'}
                       onClick={(event) => {
                         handleSort(event, column.id)
                       }}
                     >
                       {column.headerName}
-                      {orderBy === column.id ? (
+                      {sortProperty === column.id ? (
                         <Box component="span" sx={visuallyHidden}>
                           {sortOrder === 'desc'
                             ? 'sorted descending'
@@ -229,7 +235,7 @@ export default function EventsTable({
               if (!row._id) return
               const labelId = `enhanced-table-checkbox-${index}`
               const isItemSelected = isSelected(row._id)
-              if (row._id === undefined) return
+              // if (row._id === undefined) return
               return (
                 <React.Fragment key={index}>
                   <TableRow
@@ -251,16 +257,6 @@ export default function EventsTable({
                         }}
                       />
                     </TableCell>
-
-                    <TableCell>
-                      {dayjs(row.date).locale('ru').format('D MMMM')}
-                    </TableCell>
-                    <TableCell>
-                      {dayjs(row.date).locale('ru').format('HH:mm')}
-                    </TableCell>
-                    <TableCell>
-                      {row.location?.structured_formatting.main_text}
-                    </TableCell>
                     <TableCell>
                       {
                         //Though we know that the type of row.waste is object here,
@@ -270,12 +266,21 @@ export default function EventsTable({
                           : row.waste
                       }
                     </TableCell>
+
+                    <TableCell>
+                      {row.location?.structured_formatting.main_text}
+                    </TableCell>
+
+                    <TableCell>
+                      {dayjs(row.date).locale('ru').format('D MMMM, HH:mm')}
+                    </TableCell>
                   </TableRow>
                   <TableRow className={'noBorder'} data-id={row._id}>
-                    <TableCell colSpan={3}>
+                    <TableCell colSpan={2}>
                       <Box className={'actions'}>
                         <Button
-                          color="secondary"
+                          // color="secondary"
+                          sx={actionBtnStyles}
                           href={
                             variant === inactive
                               ? `${editRoute}${row._id}?${new URLSearchParams(
@@ -290,7 +295,8 @@ export default function EventsTable({
                           {editBtnText}
                         </Button>
                         <Button
-                          color="secondary"
+                          // color="secondary"
+                          sx={actionBtnStyles}
                           className="button"
                           disabled={!!rowsToDisableButtons[row._id]}
                           onClick={async () => {
@@ -323,7 +329,8 @@ export default function EventsTable({
                         </Button>
                         {variant === inactive && (
                           <Button
-                            color="secondary"
+                            // color="secondary"
+                            sx={actionBtnStyles}
                             className="button"
                             disabled={!!rowsToDisableButtons[row._id]}
                             onClick={async () => {

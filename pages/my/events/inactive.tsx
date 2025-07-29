@@ -1,4 +1,4 @@
-import Events from '../../../components/events/Events'
+import Events from '../../../components/events/MyEvents'
 import type { Variant } from '../../../lib/types/event'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 

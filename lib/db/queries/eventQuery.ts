@@ -92,8 +92,8 @@ const eventQueries = {
     if (total === 0) return result
 
     let skip = pageInt * pageSizeInt
-    if (skip >= total) skip = total - pageSizeInt
-    if (skip < 0) skip = 0
+    // if (skip >= total) skip = total - pageSizeInt
+    // if (skip < 0) skip = 0
 
     const events: EventType[] = await Event.find(select)
       .sort(sort)
@@ -101,11 +101,11 @@ const eventQueries = {
       .limit(pageSizeInt)
       .populate('waste')
 
-    const currentPage = Math.ceil(skip / pageSizeInt)
+    // const currentPage = Math.ceil(skip / pageSizeInt)
 
     result.total = total
     result.events = events
-    result.currentPage = currentPage
+    // result.currentPage = currentPage
 
     return result
   },

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, TablePagination } from '@mui/material'
+import { Button, TablePagination, Pagination } from '@mui/material'
 
 export default function DataGridFooter(props) {
   const {
@@ -32,7 +32,7 @@ export default function DataGridFooter(props) {
         </Button>
       )}
 
-      <TablePagination
+      {/*<TablePagination
         component="div"
         count={numRows}
         page={page}
@@ -40,7 +40,12 @@ export default function DataGridFooter(props) {
         rowsPerPageOptions={[1, 2, 3]}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handlePageSizeChange}
-      />
+      />*/}
+      <Pagination
+        count={Math.ceil(numRows / pageSize)}
+        page={page}
+        onChange={handlePageChange}
+      ></Pagination>
     </div>
   )
 }

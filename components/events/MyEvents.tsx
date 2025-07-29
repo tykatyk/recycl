@@ -21,8 +21,6 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
 const { activate, deactivate, remove } = eventActions
 const active: Variant = 'active'
-const prev: Direction = 'prev'
-const next: Direction = 'next'
 const titleHeading = 'Мои объявления о вывозе отходов'
 const errorMessage = 'Неизвестная ошибка'
 const changeActivityRoute = 'changeActivity'
@@ -33,30 +31,28 @@ const inactiveEventsRoute = '/my/events/inactive'
 const initialData: EventPaginationData = {
   total: 0,
   events: [],
-  currentPage: 0,
+  // currentPage: 0,
 }
 
 export default function Events(props: { variant: Variant }) {
   const { variant: initialVariant } = props
 
   const [selected, setSelected] = useState<string[]>([])
-  const [page, setPage] = useState(0)
+  const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(1)
   const [numRows, setNumRows] = useState(0)
   const [variant, setVariant] = useState<Variant>(initialVariant)
-  const [direction, setDirection] = useState('')
   const [backendError, setBackendError] = useState('')
-  const [data, setData] = useState<EventPaginationData>(initialData)
+  const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [sortOrder, setSortOrder] = React.useState<SortOrder>('desc')
-  const [orderBy, setOrderBy] = React.useState<OrderBy>('updatedAt')
+  const [sortProperty, setSortProperty] = React.useState<OrderBy>('updatedAt')
 
   const handleVariantChange = (
     event: React.SyntheticEvent,
     newVariant: Variant,
   ) => {
-    setDirection('')
-    setPage(0)
+    setPage(1)
     setVariant(newVariant)
     setSelected([])
 
@@ -139,19 +135,19 @@ export default function Events(props: { variant: Variant }) {
   }
 
   const handleSort = (event: React.MouseEvent<unknown>, property) => {
-    const isAsc = orderBy === property && sortOrder === 'asc'
+    const isAsc = sortProperty === property && sortOrder === 'asc'
     setSortOrder(isAsc ? 'desc' : 'asc')
-    setOrderBy(property)
+    setSortProperty(property)
+    setPage(1)
   }
 
   const fetcher = async (): Promise<EventPaginationData> => {
     const data = await fetch(
       `${api}?${new URLSearchParams({
         variant,
-        direction,
-        page: String(page),
+        page: String(page - 1),
         pageSize: String(pageSize),
-        orderBy,
+        orderBy: sortProperty,
         sortOrder,
       })}`,
       {
@@ -175,14 +171,23 @@ export default function Events(props: { variant: Variant }) {
 
   const setParams = (data: EventPaginationData) => {
     if (!data) return
-    setData(data)
+    // if (page !== data.currentPage) {
+    //   setPage(data.currentPage + 1)
+    //   return
+    // }
+    const lastPage = Math.ceil(data.total / pageSize)
+
+    if (data.total > 0 && page < lastPage && data.events.length < pageSize) {
+      setPage(lastPage)
+      return
+    }
+    setData(data.events)
     setNumRows(data.total)
-    setPage(data.currentPage)
   }
 
   useEffect(() => {
     setLoading(true)
-    setData(initialData)
+    // setData(initialData)
     fetcher()
       .then((data) => {
         setParams(data)
@@ -190,16 +195,11 @@ export default function Events(props: { variant: Variant }) {
       .finally(() => {
         setLoading(false)
       })
-  }, [variant, page, pageSize, orderBy, sortOrder])
+  }, [variant, page, pageSize, sortProperty, sortOrder])
 
   const handlePageChange = (_: unknown, newPage: number) => {
     if (numRows === 0) return
 
-    if (newPage - page > 0) {
-      setDirection(next)
-    } else {
-      setDirection(prev)
-    }
     setPage(newPage)
   }
 
@@ -207,8 +207,7 @@ export default function Events(props: { variant: Variant }) {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPageSize(parseInt(event.target.value, 10))
-    setPage(0)
-    setDirection('')
+    setPage(1)
   }
 
   let content: ReactElement | null = null
@@ -217,12 +216,12 @@ export default function Events(props: { variant: Variant }) {
     content = <PageLoadingCircle />
   } else if (backendError) {
     content = <Error />
-  } else if (data && data.events.length > 0) {
+  } else if (data.length > 0) {
     content = (
       <>
         <EventsTable
           variant={variant}
-          rows={data.events}
+          rows={data}
           selectedRows={selected}
           handleSelect={handleSelect}
           handleSelectAll={handleSelectAll}
@@ -232,7 +231,7 @@ export default function Events(props: { variant: Variant }) {
           handleSort={handleSort}
           fetcher={fetcher}
           setParams={setParams}
-          orderBy={orderBy}
+          sortProperty={sortProperty}
           sortOrder={sortOrder}
         />
         <DataGridFooter

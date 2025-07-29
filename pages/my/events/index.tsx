@@ -1,11 +1,11 @@
-import Events from '../../../components/events/Events'
+import MyEvents from '../../../components/events/MyEvents'
 import { Variant } from '../../../lib/types/event'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 
-export default function ActiveEvents({
+export default function ShowMyEvents({
   variant,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  return <Events variant={variant} />
+  return <MyEvents variant={variant} />
 }
 
 export const getServerSideProps = (async () => {
