@@ -1,72 +1,47 @@
-import { Button, Pagination, Typography, Box } from '@mui/material'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import Box from '@mui/material/Box'
+import Pagination from '@mui/material/Pagination'
+import PaginationItem from '@mui/material/PaginationItem'
+import Select from '@mui/material/Select'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
+import Link from './Link'
 
 export default function DataGridFooter(props) {
-  const {
-    showDeleteButton = false,
-    deleting = false,
-    numSelected = 0,
-    deleteHandler = () => {},
-    numRows,
-    handlePageChange,
-    handlePageSizeChange,
-    pageSize,
-    page,
-  } = props
+  const { numRows, handlePageChange, handlePageSizeChange, pageSize, page } =
+    props
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        padding: '0.5em',
-      }}
-    >
-      {showDeleteButton && (
-        <Button
-          color="secondary"
-          disabled={deleting || numSelected < 1}
-          onClick={(event) => deleteHandler(event)}
-        >
-          Удалить отмеченные
-        </Button>
-      )}
-
-      {/*<TablePagination
-        component="div"
-        count={numRows}
-        page={page}
-        rowsPerPage={pageSize}
-        rowsPerPageOptions={[1, 2, 3]}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handlePageSizeChange}
-      />*/}
-      <Box sx={{ display: 'flex' }}>
-        <Typography sx={{ mr: 1 }}>Строк на странице</Typography>
-        <Box sx={{ minWidth: 120, mr: 1 }}>
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-helper-label">Age</InputLabel>
-            <Select
-              labelId="demo-simple-select-helper-label"
-              id="demo-simple-select-helper"
-              label="Age"
-            >
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-
-        <Pagination
-          count={Math.ceil(numRows / pageSize)}
-          page={page}
-          onChange={handlePageChange}
-        ></Pagination>
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2, pb: 2 }}>
+      <Box sx={{ minWidth: 120, mr: 1 }}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="rowsPerPageLabel">Показывать по</InputLabel>
+          <Select
+            labelId="rowsPerPageLabel"
+            id="rowsPerPage"
+            label="Показывать по"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+          >
+            <MenuItem value={1}>1</MenuItem>
+            <MenuItem value={2}>2</MenuItem>
+            <MenuItem value={3}>3</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
-    </div>
+
+      <Pagination
+        count={Math.ceil(numRows / pageSize)}
+        page={page}
+        onChange={handlePageChange}
+        renderItem={(item) => (
+          <PaginationItem
+            component={Link}
+            href={`/my/events${item.page === 1 ? '' : `?page=${item.page}&limit=${pageSize}`}`}
+            {...item}
+          />
+        )}
+      ></Pagination>
+    </Box>
   )
 }
