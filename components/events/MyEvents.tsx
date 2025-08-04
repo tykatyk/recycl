@@ -1,22 +1,24 @@
 import React, { useEffect, useState, ReactElement } from 'react'
-import { Grid, Typography } from '@mui/material'
+import PaginationItem from '@mui/material/PaginationItem'
+
+import { Grid, Typography, PaginationRenderItemParams } from '@mui/material'
 import Layout from '../layouts/Layout'
 import Tabs from '../uiParts/Tabs'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import NoRows from '../uiParts/NoRows'
 import Error from '../uiParts/Error'
+import Link from '../uiParts/Link'
+// import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
+
 import EventsTable from './EventsTable'
 import type {
   Event,
-  EventPaginationData,
   Variant,
-  Direction,
   EventActions,
   SortOrder,
   OrderBy,
 } from '../../lib/types/event'
 import { eventActions } from '../../lib/helpers/eventHelpers'
-import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
 const { activate, deactivate, remove } = eventActions
@@ -25,36 +27,47 @@ const titleHeading = 'Мои объявления о вывозе отходов
 const errorMessage = 'Неизвестная ошибка'
 const changeActivityRoute = 'changeActivity'
 const deletionRoute = 'delete'
-const api = '/api/events/'
+const apiPrefix = '/api/events/'
+const apiGetTotal = `${apiPrefix}total/`
 const activeEventsRoute = '/my/events'
 const inactiveEventsRoute = '/my/events/inactive'
-const initialData: EventPaginationData = {
-  total: 0,
-  events: [],
-  // currentPage: 0,
-}
 
-export default function Events(props: { variant: Variant }) {
-  const { variant: initialVariant } = props
+export default function MyEvents(props: {
+  variant: Variant
+  initialPage: number
+  initialPageSize: number
+}) {
+  const { variant: initialVariant, initialPage, initialPageSize } = props
 
-  const [selected, setSelected] = useState<string[]>([])
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(1)
-  const [numRows, setNumRows] = useState(0)
+  const [selectedRows, setSelectedRows] = useState<string[]>([])
+  const [page, setPage] = useState(initialPage)
+  const [pageSize, setPageSize] = useState(initialPageSize)
+  const [total, setTotal] = useState(0)
   const [variant, setVariant] = useState<Variant>(initialVariant)
   const [backendError, setBackendError] = useState('')
-  const [data, setData] = useState([])
+  const [data, setData] = useState<Event[]>([])
   const [loading, setLoading] = useState(false)
   const [sortOrder, setSortOrder] = React.useState<SortOrder>('desc')
   const [sortProperty, setSortProperty] = React.useState<OrderBy>('updatedAt')
+  const [changedRows, setChangedRows] = useState<string[]>([])
+  const [rowAction, setRowAction] = useState<keyof EventActions | ''>('')
+  const [shouldReload, setShouldReload] = useState(Date.now())
+  console.log(page)
+  const renderItem = (item: PaginationRenderItemParams) => {
+    const activity = variant === active ? '' : '/inactive'
+    const href = `/my/events${activity}${item.page === 1 ? '' : `?page=${item.page}&pageSize=${pageSize}`}`
+
+    return <PaginationItem component={Link} href={href} {...item} />
+  }
 
   const handleVariantChange = (
     event: React.SyntheticEvent,
     newVariant: Variant,
   ) => {
+    setChangedRows([])
+    setSelectedRows([])
     setPage(1)
     setVariant(newVariant)
-    setSelected([])
 
     if (newVariant === active) {
       window.history.pushState(null, '', activeEventsRoute)
@@ -64,10 +77,10 @@ export default function Events(props: { variant: Variant }) {
   }
 
   const handleActivationDeactivationAndDeletion = async (
-    eventIds: string[],
+    ids: string[],
     action: keyof EventActions,
   ) => {
-    if (!eventIds || eventIds.length === 0) return
+    if (!ids || ids.length === 0) return
 
     let actionRoute = ''
 
@@ -85,69 +98,109 @@ export default function Events(props: { variant: Variant }) {
         return
     }
 
-    await fetch(`${api}${actionRoute}`, {
+    await fetch(`${apiPrefix}${actionRoute}`, {
       method: 'POST',
       body:
         action === activate || action === deactivate
-          ? JSON.stringify({ eventIds, action })
-          : JSON.stringify({ eventIds }),
+          ? JSON.stringify({ eventIds: ids, action })
+          : JSON.stringify({ ids }),
       headers: {
         'Content-Type': 'application/json',
       },
     })
-      .then((response) => {
-        if (response.status === 200) {
-          setSelected([])
-        }
+  }
+
+  const handleAction = async (ids: string[], action: keyof EventActions) => {
+    setRowAction(action)
+    await handleActivationDeactivationAndDeletion(ids, action)
+      .then(() => {
+        setChangedRows(ids)
+        setTimeout(() => {
+          setSelectedRows((prevSelected) => {
+            return prevSelected.filter((element) => {
+              return ids.indexOf(element) >= 0
+            })
+          })
+          setChangedRows([])
+          setShouldReload(Date.now())
+        }, 500)
       })
-      .catch((error) => {
+      .catch(() => {
         setBackendError(errorMessage)
+        setChangedRows([])
+      })
+      .finally(() => {
+        setRowAction('')
       })
   }
 
   const handleSelect = (row: Event) => {
-    const selectedIndex = selected.indexOf(row._id as string)
+    const selectedIndex = selectedRows.indexOf(row._id as string)
     let newSelected: string[] = []
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, row._id as string)
+      newSelected = newSelected.concat(selectedRows, row._id as string)
     } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1))
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1))
+      newSelected = newSelected.concat(selectedRows.slice(1))
+    } else if (selectedIndex === selectedRows.length - 1) {
+      newSelected = newSelected.concat(selectedRows.slice(0, -1))
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selectedRows.slice(0, selectedIndex),
+        selectedRows.slice(selectedIndex + 1),
       )
     }
 
-    setSelected(newSelected)
+    setSelectedRows(newSelected)
   }
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = data.events.map((row) => row._id as string)
-      setSelected(newSelected)
+      const newSelected = data.map((row) => row._id as string)
+      setSelectedRows(newSelected)
       return
     }
-    setSelected([])
+    setSelectedRows([])
   }
 
-  const handleSort = (event: React.MouseEvent<unknown>, property) => {
+  const handleSort = (event: React.MouseEvent<unknown>, property: OrderBy) => {
     const isAsc = sortProperty === property && sortOrder === 'asc'
     setSortOrder(isAsc ? 'desc' : 'asc')
     setSortProperty(property)
     setPage(1)
   }
 
-  const fetcher = async (): Promise<EventPaginationData> => {
-    const data = await fetch(
-      `${api}?${new URLSearchParams({
+  const fetchTotal = async (): Promise<number> => {
+    return await fetch(
+      `${apiGetTotal}?${new URLSearchParams({
+        variant,
+      })}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+      .then((response) => {
+        return response.json()
+      })
+      .then((total) => {
+        return total
+      })
+      .catch((error) => {
+        setBackendError(errorMessage)
+        return 0
+      })
+  }
+
+  const fetchEvents = async (): Promise<Event[]> => {
+    return await fetch(
+      `${apiPrefix}?${new URLSearchParams({
         variant,
         page: String(page - 1),
         pageSize: String(pageSize),
-        orderBy: sortProperty,
+        orderBy: sortProperty, //ToDo: change orderBy to sortProperty
         sortOrder,
       })}`,
       {
@@ -159,47 +212,41 @@ export default function Events(props: { variant: Variant }) {
       .then((response) => {
         return response.json()
       })
-      .then((newData) => {
+      .then((newData: Event[]) => {
         return newData
       })
-      .catch((error) => {
+      .catch((_) => {
         setBackendError(errorMessage)
+        return []
       })
-
-    return data
-  }
-
-  const setParams = (data: EventPaginationData) => {
-    if (!data) return
-    // if (page !== data.currentPage) {
-    //   setPage(data.currentPage + 1)
-    //   return
-    // }
-    const lastPage = Math.ceil(data.total / pageSize)
-
-    if (data.total > 0 && page < lastPage && data.events.length < pageSize) {
-      setPage(lastPage)
-      return
-    }
-    setData(data.events)
-    setNumRows(data.total)
   }
 
   useEffect(() => {
+    setSelectedRows([])
+    setChangedRows([])
     setLoading(true)
-    // setData(initialData)
-    fetcher()
+
+    fetchTotal().then((total) => {
+      setTotal(total)
+    })
+    fetchEvents()
       .then((data) => {
-        setParams(data)
+        if (!data) return
+
+        const lastPage = Math.ceil(total / pageSize)
+
+        if (total > 0 && page != lastPage && data.length < pageSize) {
+          setPage(lastPage)
+          return
+        }
+        setData(data)
       })
       .finally(() => {
         setLoading(false)
       })
-  }, [variant, page, pageSize, sortProperty, sortOrder])
+  }, [variant, page, pageSize, sortProperty, sortOrder, shouldReload])
 
   const handlePageChange = (_: unknown, newPage: number) => {
-    if (numRows === 0) return
-
     setPage(newPage)
   }
 
@@ -210,7 +257,7 @@ export default function Events(props: { variant: Variant }) {
     setPage(1)
   }
 
-  let content: ReactElement | null = null
+  let content: ReactElement = <NoRows />
 
   if (loading) {
     content = <PageLoadingCircle />
@@ -222,50 +269,46 @@ export default function Events(props: { variant: Variant }) {
         <EventsTable
           variant={variant}
           rows={data}
-          selectedRows={selected}
+          selectedRows={selectedRows}
           handleSelect={handleSelect}
           handleSelectAll={handleSelectAll}
-          handleActivationDeactivationAndDeletion={
-            handleActivationDeactivationAndDeletion
-          }
+          handleAction={handleAction}
           handleSort={handleSort}
-          fetcher={fetcher}
-          setParams={setParams}
+          fetcher={fetchEvents}
           sortProperty={sortProperty}
           sortOrder={sortOrder}
+          changedRows={changedRows}
+          rowAction={rowAction}
         />
         <DataGridFooter
-          numRows={numRows}
+          numRows={total}
           page={page}
           pageSize={pageSize}
-          numSelected={selected.length}
+          numSelected={selectedRows.length}
           handlePageChange={handlePageChange}
           handlePageSizeChange={handlePageSizeChange}
+          renderItem={renderItem}
         />
       </>
     )
-  } else {
-    content = <NoRows />
   }
 
   return (
-    <RedirectUnathenticatedUser>
-      <Layout title={`${titleHeading} | Recycl`}>
-        <Grid
-          container
-          direction="column"
-          sx={{
-            margin: '0 auto',
-          }}
-        >
-          <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
-            {titleHeading}
-          </Typography>
-          <Tabs value={variant} handleChange={handleVariantChange}>
-            {content}
-          </Tabs>
-        </Grid>
-      </Layout>
-    </RedirectUnathenticatedUser>
+    <Layout title={`${titleHeading} | Recycl`}>
+      <Grid
+        container
+        direction="column"
+        sx={{
+          margin: '0 auto',
+        }}
+      >
+        <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
+          {titleHeading}
+        </Typography>
+        <Tabs value={variant} handleChange={handleVariantChange}>
+          {content}
+        </Tabs>
+      </Grid>
+    </Layout>
   )
 }
