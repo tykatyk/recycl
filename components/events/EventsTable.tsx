@@ -25,7 +25,6 @@ import clsx from 'clsx'
 import type {
   Variant,
   Event,
-  EventPaginationData,
   IsInactive,
   EventActions,
   SortOrder,
@@ -38,7 +37,6 @@ import {
   eventVariants,
   adjustOverlay,
   overlayResizeHandler,
-  makeNewRowsToDisableButtons,
 } from '../../lib/helpers/eventHelpers'
 import type { Options, ConfigOptions } from '../../lib/helpers/eventHelpers'
 import { date } from '../../lib/validation/atomicValidators'
@@ -55,15 +53,13 @@ type EventsTableProps = {
   selectedRows: string[]
   handleSelect: (row: Event) => void
   handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
-  handleActivationDeactivationAndDeletion: (
-    eventIds: string[] | undefined,
-    action: keyof EventActions,
-  ) => Promise<void>
+  handleAction: (ids: string[], action: keyof EventActions) => Promise<void>
   handleSort: (event: React.MouseEvent<unknown>, property: any) => void
-  fetcher: () => Promise<EventPaginationData>
-  setParams: (data: EventPaginationData) => void
+  // fetcher: () => Promise<Event[]>
   sortProperty: string
   sortOrder: SortOrder
+  changedRows: string[]
+  rowAction: keyof EventActions | ''
 }
 
 const { activate, deactivate, remove } = eventActions
@@ -90,30 +86,27 @@ export default function EventsTable({
   handleSelect,
   handleSelectAll,
   handleSort,
-  handleActivationDeactivationAndDeletion,
-  fetcher,
-  setParams,
+  handleAction,
   sortProperty,
   sortOrder,
+  changedRows,
+  rowAction,
 }: EventsTableProps) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
   const [validationError, setValidationError] = useState('')
   const [staleAd, setStaleAd] = useState('')
   const rowRefs = useRef<ConfigOptions['rowRefs']>({})
   const overlayRefs = useRef<ConfigOptions['overlayRefs']>({})
-  const [rowsToDisableButtons, setRowsToDisableButtons] = useState<
-    ConfigOptions['rowsToDisableButtons']
-  >({})
 
   const options: Options = {
     rowRefs,
     overlayRefs,
-    rowsToDisableButtons,
+    rowsToDisableButtons: changedRows,
   }
 
   useEffect(() => {
     adjustOverlay(options)
-  }, [rowsToDisableButtons])
+  }, [changedRows])
 
   useLayoutEffect(() => {
     window.addEventListener('resize', () => {
@@ -127,21 +120,7 @@ export default function EventsTable({
         overlayResizeHandler(options)
       })
     }
-  }, [rowsToDisableButtons])
-
-  const handleRowAction = async (row: Event, action: keyof EventActions) => {
-    await handleActivationDeactivationAndDeletion([row._id!], action)
-      .then(() => {
-        return fetcher()
-      })
-      .then((data: EventPaginationData) => {
-        makeNewRowsToDisableButtons(setRowsToDisableButtons, row._id!)
-        setParams(data)
-      })
-      .catch(() => {
-        makeNewRowsToDisableButtons(setRowsToDisableButtons, row._id!)
-      })
-  }
+  }, [changedRows])
 
   const getHeader = (): ReactNode | string => {
     if (selectedRows.length > 0) {
@@ -152,25 +131,9 @@ export default function EventsTable({
       return (
         <Button
           color="secondary"
-          disabled={Object.keys(rowsToDisableButtons).length > 0}
+          disabled={changedRows.length > 0}
           onClick={async () => {
-            const newRowsToDisableButtons: typeof rowsToDisableButtons = {}
-            selectedRows.forEach((item) => {
-              newRowsToDisableButtons[item] = action
-            })
-            setRowsToDisableButtons(newRowsToDisableButtons)
-
-            await handleActivationDeactivationAndDeletion(selectedRows, action)
-              .then(() => {
-                return fetcher()
-              })
-              .then((data) => {
-                setRowsToDisableButtons({})
-                setParams(data)
-              })
-              .catch(() => {
-                setRowsToDisableButtons({})
-              })
+            await handleAction(selectedRows, action)
           }}
         >
           {buttonText}
@@ -288,7 +251,7 @@ export default function EventsTable({
                                 )}`
                               : `${editRoute}${row._id}`
                           }
-                          disabled={!!rowsToDisableButtons[row._id]}
+                          disabled={!!changedRows[row._id]}
                           className="button"
                           startIcon={<EditIcon />}
                         >
@@ -298,7 +261,7 @@ export default function EventsTable({
                           // color="secondary"
                           sx={actionBtnStyles}
                           className="button"
-                          disabled={!!rowsToDisableButtons[row._id]}
+                          disabled={!!changedRows[row._id]}
                           onClick={async () => {
                             //Just another check to prevent Typescript error
                             if (!row._id) return
@@ -306,20 +269,7 @@ export default function EventsTable({
                             const action =
                               variant === inactive ? remove : deactivate
 
-                            if (!rowsToDisableButtons[row._id]) {
-                              setRowsToDisableButtons(
-                                (prevRowsToDisableButtons) => {
-                                  return {
-                                    ...prevRowsToDisableButtons,
-                                    [row._id!]: action,
-                                  }
-                                },
-                              )
-                            } else {
-                              return
-                            }
-
-                            await handleRowAction(row, action)
+                            await handleAction([row._id], action)
                           }}
                           startIcon={<DeleteIcon />}
                         >
@@ -332,7 +282,7 @@ export default function EventsTable({
                             // color="secondary"
                             sx={actionBtnStyles}
                             className="button"
-                            disabled={!!rowsToDisableButtons[row._id]}
+                            disabled={!!changedRows[row._id]}
                             onClick={async () => {
                               //Just another check to prevent Typescript error
                               if (!row._id) return
@@ -348,16 +298,10 @@ export default function EventsTable({
                                 return
                               }
 
-                              if (!rowsToDisableButtons[row._id]) {
-                                setRowsToDisableButtons({
-                                  ...rowsToDisableButtons,
-                                  [row._id]: activate,
-                                })
-                              } else {
-                                return
-                              }
-
-                              await handleRowAction(row, activate)
+                              const ids = rows.map((row) => {
+                                return row._id
+                              })
+                              await handleAction(ids as string[], activate)
                             }}
                             startIcon={<DeleteIcon />}
                           >
@@ -393,9 +337,10 @@ export default function EventsTable({
             })}
           </TableBody>
         </Table>
-        {Object.keys(rowsToDisableButtons).length > 0 && (
+        {changedRows.length > 0 && (
           <Overlay
-            rowsToDisableButtons={rowsToDisableButtons}
+            action={rowAction}
+            rowsToDisableButtons={changedRows}
             rowRefs={rowRefs}
             overlayRefs={overlayRefs}
           />
