@@ -50,14 +50,13 @@ export default function MyEvents(props: { variant: Variant }) {
   const [sortProperty, setSortProperty] = React.useState<OrderBy>(updatedAt)
   const [changedRows, setChangedRows] = useState<string[]>([])
   const [rowAction, setRowAction] = useState<keyof EventActions | ''>('')
-  const [shouldReload, setShouldReload] = useState(Date.now())
+  const [shouldReload, setShouldReload] = useState(false)
 
   const renderItem = (item: PaginationRenderItemParams) => {
     const href = getHref({ page: item.page || 1 })
 
     return <PaginationItem component={Link} href={href} {...item} />
   }
-  // console.log(page)
 
   const getHref = (options) => {
     const {
@@ -68,12 +67,25 @@ export default function MyEvents(props: { variant: Variant }) {
     } = options
     const activity = variant === active ? '' : '/inactive'
     let hrefQuery = ''
-    if (qPage !== 1) hrefQuery = `${hrefQuery}&page=${qPage}`
-    if (qPageSize !== rowsPerPageOptions[0])
-      hrefQuery = `${hrefQuery}&pageSize=${qPageSize}`
-    if (qSortProperty !== updatedAt)
-      hrefQuery = `${hrefQuery}&updatedAt=${qSortProperty}`
-    if (qSortOrder !== desc) hrefQuery = `${hrefQuery}&sortOrder=${qSortOrder}`
+    if (qPage !== 1 || qPageSize !== rowsPerPageOptions[0]) {
+      hrefQuery = `${hrefQuery}&page=${qPage}&pageSize=${qPageSize}`
+    }
+    // console.log(qSortOrder)
+
+    if (qSortProperty !== updatedAt) {
+      // const isAsc = sortProperty === property && sortOrder === 'asc'
+      // setSortOrder(isAsc ? 'desc' : 'asc')
+
+      // hrefQuery = `${hrefQuery}&orderBy=${qSortProperty}`
+      hrefQuery = `${hrefQuery}&orderBy=${qSortProperty}&sortOrder=${qSortOrder}`
+      // } else {
+      //    hrefQuery = `${hrefQuery}&sortOrder=${qSortOrder}`
+      // }
+      // if (qSortOrder === desc) {
+      //   hrefQuery = `${hrefQuery}&sortOrder=asc`
+      // } else {
+      //   hrefQuery = `${hrefQuery}&sortOrder=${desc}`
+    }
     if (hrefQuery.length > 0) hrefQuery = `?${hrefQuery.substring(1)}`
 
     return `/my/events${activity}${hrefQuery}`
@@ -141,7 +153,7 @@ export default function MyEvents(props: { variant: Variant }) {
             })
           })
           setChangedRows([])
-          setShouldReload(Date.now())
+          setShouldReload(true)
         }, 500)
       })
       .catch(() => {
@@ -192,6 +204,7 @@ export default function MyEvents(props: { variant: Variant }) {
       sortProperty: property,
       sortOrder: isAsc ? 'desc' : 'asc',
     })
+    // console.log(href)
     router.push(href)
   }
 
@@ -232,118 +245,7 @@ export default function MyEvents(props: { variant: Variant }) {
       })
   }
 
-  /*useEffect(() => {
-    const {
-      page: initialPage,
-      pageSize: initialPageSize,
-      orderBy: initialOrderBy,
-      sortOrder: initialSortOrder,
-    } = query
-
-    const validSortOrder: SortOrder[] = ['asc', 'desc']
-    const validatedSortOrder =
-      typeof initialSortOrder === 'string' &&
-      validSortOrder.indexOf(initialSortOrder as SortOrder) > 0
-        ? validSortOrder[validSortOrder.indexOf(initialSortOrder as SortOrder)]
-        : 'desc'
-
-    const validOrderBy: OrderBy[] = ['date', 'location', 'updatedAt', 'waste']
-
-    const validatedOrderBy =
-      typeof initialOrderBy === 'string' &&
-      validOrderBy.indexOf(initialOrderBy as OrderBy) > 0
-        ? validOrderBy[validOrderBy.indexOf(initialOrderBy as OrderBy)]
-        : 'updatedAt'
-
-    const validatedPage =
-      typeof initialPage === 'string' &&
-      !Number.isNaN(parseInt(initialPage, 10))
-        ? Math.max(parseInt(initialPage, 10), 1)
-        : 1
-
-    const validatedPageSize =
-      typeof initialPageSize === 'string' &&
-      !Number.isNaN(parseInt(initialPageSize, 10)) &&
-      rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10)) > 0
-        ? rowsPerPageOptions[
-            rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10))
-          ]
-        : rowsPerPageOptions[0]
-
-    setSortOrder(validatedSortOrder)
-    setSortProperty(validatedOrderBy)
-    setPage(validatedPage)
-    setPageSize(validatedPageSize)
-  }, [query])*/
-
-  /*useEffect(() => {
-    console.log(data.length)
-    const lastPage = Math.ceil(total / pageSize)
-    if (total > 0 && page != lastPage && data.length < pageSize) {
-      const href = getHref({ page: lastPage })
-      router.push(href)
-    }
-  }, [data, total, page, pageSize])*/
-
   useEffect(() => {
-    /*const {
-      page: initialPage,
-      pageSize: initialPageSize,
-      orderBy: initialOrderBy,
-      sortOrder: initialSortOrder,
-    } = query
-
-    const validSortOrder: SortOrder[] = ['asc', 'desc']
-    const validatedSortOrder =
-      typeof initialSortOrder === 'string' &&
-      validSortOrder.indexOf(initialSortOrder as SortOrder) > 0
-        ? validSortOrder[validSortOrder.indexOf(initialSortOrder as SortOrder)]
-        : 'desc'
-
-    const validOrderBy: OrderBy[] = ['date', 'location', 'updatedAt', 'waste']
-
-    const validatedOrderBy =
-      typeof initialOrderBy === 'string' &&
-      validOrderBy.indexOf(initialOrderBy as OrderBy) > 0
-        ? validOrderBy[validOrderBy.indexOf(initialOrderBy as OrderBy)]
-        : 'updatedAt'
-
-    const validatedPage =
-      typeof initialPage === 'string' &&
-      !Number.isNaN(parseInt(initialPage, 10))
-        ? Math.max(parseInt(initialPage, 10), 1)
-        : 1
-
-    const validatedPageSize =
-      typeof initialPageSize === 'string' &&
-      !Number.isNaN(parseInt(initialPageSize, 10)) &&
-      rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10)) > 0
-        ? rowsPerPageOptions[
-            rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10))
-          ]
-        : rowsPerPageOptions[0]
-
-    setSortOrder(validatedSortOrder)
-    setSortProperty(validatedOrderBy)
-    setPage(validatedPage)
-    setPageSize(validatedPageSize)
-
-    setSelectedRows([])
-    setChangedRows([])
-    setLoading(true)
-    fetchEvents()
-      .then((data) => {
-        setData(data)
-      })
-      .then(() => {
-        return fetchTotal()
-      })
-      .then((total) => {
-        setTotal(total)
-      })
-      .finally(() => {
-        setLoading(false)
-      })*/
     const prc = async () => {
       const {
         page: initialPage,
@@ -351,21 +253,25 @@ export default function MyEvents(props: { variant: Variant }) {
         orderBy: initialOrderBy,
         sortOrder: initialSortOrder,
       } = query
-
       const validSortOrder: SortOrder[] = ['asc', 'desc']
+      // console.log(
+      //   validSortOrder[validSortOrder.indexOf(initialSortOrder as SortOrder)],
+      // )
+
       const validatedSortOrder =
         typeof initialSortOrder === 'string' &&
-        validSortOrder.indexOf(initialSortOrder as SortOrder) > 0
+        validSortOrder.indexOf(initialSortOrder as SortOrder) >= 0
           ? validSortOrder[
               validSortOrder.indexOf(initialSortOrder as SortOrder)
             ]
           : 'desc'
-
+      // console.log(initialSortOrder)
+      // console.log(validSortOrder.indexOf('asc' as SortOrder) > 0)
       const validOrderBy: OrderBy[] = ['date', 'location', 'updatedAt', 'waste']
 
       const validatedOrderBy =
         typeof initialOrderBy === 'string' &&
-        validOrderBy.indexOf(initialOrderBy as OrderBy) > 0
+        validOrderBy.indexOf(initialOrderBy as OrderBy) >= 0
           ? validOrderBy[validOrderBy.indexOf(initialOrderBy as OrderBy)]
           : 'updatedAt'
 
@@ -378,7 +284,7 @@ export default function MyEvents(props: { variant: Variant }) {
       const validatedPageSize =
         typeof initialPageSize === 'string' &&
         !Number.isNaN(parseInt(initialPageSize, 10)) &&
-        rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10)) > 0
+        rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10)) >= 0
           ? rowsPerPageOptions[
               rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10))
             ]
@@ -402,12 +308,20 @@ export default function MyEvents(props: { variant: Variant }) {
       })
       setLoading(false)
 
-      const lastPage = Math.ceil(total / pageSize)
-      if (total > 0 && page != lastPage && data.length < pageSize) {
-        const href = getHref({ page: lastPage })
-        router.push(href)
-        return
+      if (shouldReload) {
+        const lastPage = Math.ceil(total / validatedPageSize)
+        if (
+          total > 0 &&
+          validatedPage != lastPage &&
+          data.length < validatedPageSize
+        ) {
+          const href = getHref({ page: lastPage })
+          router.push(href)
+          // return
+        }
+        setShouldReload(false)
       }
+
       setSelectedRows([])
       setChangedRows([])
 
