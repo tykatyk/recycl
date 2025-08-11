@@ -196,15 +196,22 @@ export default function MyEvents(props: { variant: Variant }) {
 
   const handleSort = (event: React.MouseEvent<unknown>, property: OrderBy) => {
     const isAsc = sortProperty === property && sortOrder === 'asc'
-    // setSortOrder(isAsc ? 'desc' : 'asc')
-    // setSortProperty(property)
-    // setPage(1)
-    const href = getHref({
-      page: 1,
-      sortProperty: property,
-      sortOrder: isAsc ? 'desc' : 'asc',
-    })
-    // console.log(href)
+
+    let href = ''
+    if (sortProperty === updatedAt) {
+      href = getHref({
+        page: 1,
+        sortProperty: property,
+        sortOrder: 'desc',
+      })
+    } else {
+      href = getHref({
+        page: 1,
+        sortProperty: isAsc ? updatedAt : property,
+        sortOrder: isAsc ? 'desc' : 'asc',
+      })
+    }
+
     router.push(href)
   }
 
