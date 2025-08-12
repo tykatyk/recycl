@@ -37,34 +37,27 @@ type ColumnHeader = {
   width: number
 }
 
-export function getColumns(
-  getHeader: () => ReactNode | 'Дата',
-): ColumnHeader[] {
-  return [
-    {
-      id: 'date',
-      headerName: getHeader(),
-      width: 150,
-    },
-    {
-      id: 'time',
-      headerName: 'Время',
-      width: 150,
-      headerAlign: 'center',
-    },
-    {
-      id: 'location',
-      headerName: 'Место',
-      width: 170,
-    },
-    {
-      id: 'waste',
-      headerName: 'Тип отходов',
-      width: 200,
-      headerAlign: 'center',
-    },
-  ]
-}
+export const columns: ColumnHeader[] = [
+  {
+    id: 'waste',
+    headerName: 'Тип отходов',
+    width: 220,
+    headerAlign: 'center',
+  },
+  {
+    id: 'location',
+    headerName: 'Место',
+    width: 220,
+    headerAlign: 'center',
+  },
+  {
+    id: 'date',
+    headerName: 'Дата и время',
+    width: 150,
+  },
+]
+
+export const rowsPerPageOptions = [1, 2, 3]
 
 export const eventActions: EventActions = {
   activate: 'activate',
@@ -114,7 +107,7 @@ export const getEventTableStyles = (theme) => ({
 export type ConfigOptions = {
   rowRefs: Record<string, HTMLTableRowElement | null>
   overlayRefs: Record<string, HTMLDivElement | null>
-  rowsToDisableButtons: Record<string, keyof EventActions>
+  rowsToDisableButtons: string[]
 }
 
 export type Options = {
@@ -137,7 +130,7 @@ export const adjustOverlay = (options: Options) => {
 
     if (!target || !source) continue
 
-    if (rowsToDisableButtons[_id]) {
+    if (rowsToDisableButtons.indexOf(_id) >= 0) {
       setOverlayStylesVisible(target, source)
     } else {
       setOverlayStylesHidden(target)
@@ -180,20 +173,4 @@ export const overlayResizeHandler = (options: Options) => {
   timeout = setTimeout(() => {
     adjustOverlay(options)
   }, 200)
-}
-
-export const makeNewRowsToDisableButtons = (
-  setRowsToDisableButtons: React.Dispatch<
-    React.SetStateAction<Record<string, keyof EventActions>>
-  >,
-  rowToRestore: string,
-) => {
-  if (!rowToRestore) return
-
-  setRowsToDisableButtons((prevRows) => {
-    const newRows = { ...prevRows }
-
-    delete newRows[rowToRestore]
-    return newRows
-  })
 }

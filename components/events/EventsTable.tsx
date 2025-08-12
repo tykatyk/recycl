@@ -32,7 +32,7 @@ import type {
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 import {
-  getColumns,
+  columns,
   eventActions,
   eventVariants,
   adjustOverlay,
@@ -55,7 +55,6 @@ type EventsTableProps = {
   handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
   handleAction: (ids: string[], action: keyof EventActions) => Promise<void>
   handleSort: (event: React.MouseEvent<unknown>, property: any) => void
-  // fetcher: () => Promise<Event[]>
   sortProperty: string
   sortOrder: SortOrder
   changedRows: string[]
@@ -123,24 +122,20 @@ export default function EventsTable({
   }, [changedRows])
 
   const getHeader = (): ReactNode | string => {
-    if (selectedRows.length > 0) {
-      const action = variant === inactive ? remove : deactivate
-      const buttonText =
-        variant === inactive ? deleteBtnText : deactivateBtnText
+    const action = variant === inactive ? remove : deactivate
+    const buttonText = variant === inactive ? deleteBtnText : deactivateBtnText
 
-      return (
-        <Button
-          color="secondary"
-          disabled={changedRows.length > 0}
-          onClick={async () => {
-            await handleAction(selectedRows, action)
-          }}
-        >
-          {buttonText}
-        </Button>
-      )
-    }
-    return wasteTypeText
+    return (
+      <Button
+        color="secondary"
+        disabled={changedRows.length > 0}
+        onClick={async () => {
+          await handleAction(selectedRows, action)
+        }}
+      >
+        {buttonText}
+      </Button>
+    )
   }
 
   return (
@@ -162,14 +157,14 @@ export default function EventsTable({
                 />
               </TableCell>
 
-              {getColumns(getHeader).map((column) => (
+              {columns.map((column) => (
                 <TableCell
                   key={column.id}
                   sx={{ minWidth: column.width }}
                   sortDirection={sortProperty === column.id ? sortOrder : false}
                 >
-                  {column.id === 'waste' ? (
-                    column.headerName
+                  {column.id === 'waste' && selectedRows.length > 0 ? (
+                    getHeader()
                   ) : (
                     <TableSortLabel
                       active={sortProperty === column.id}
@@ -198,7 +193,7 @@ export default function EventsTable({
               if (!row._id) return
               const labelId = `enhanced-table-checkbox-${index}`
               const isItemSelected = isSelected(row._id)
-              // if (row._id === undefined) return
+
               return (
                 <React.Fragment key={index}>
                   <TableRow
@@ -242,7 +237,6 @@ export default function EventsTable({
                     <TableCell colSpan={2}>
                       <Box className={'actions'}>
                         <Button
-                          // color="secondary"
                           sx={actionBtnStyles}
                           href={
                             variant === inactive
@@ -258,7 +252,6 @@ export default function EventsTable({
                           {editBtnText}
                         </Button>
                         <Button
-                          // color="secondary"
                           sx={actionBtnStyles}
                           className="button"
                           disabled={!!changedRows[row._id]}
@@ -279,7 +272,6 @@ export default function EventsTable({
                         </Button>
                         {variant === inactive && (
                           <Button
-                            // color="secondary"
                             sx={actionBtnStyles}
                             className="button"
                             disabled={!!changedRows[row._id]}

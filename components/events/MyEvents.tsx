@@ -70,21 +70,9 @@ export default function MyEvents(props: { variant: Variant }) {
     if (qPage !== 1 || qPageSize !== rowsPerPageOptions[0]) {
       hrefQuery = `${hrefQuery}&page=${qPage}&pageSize=${qPageSize}`
     }
-    // console.log(qSortOrder)
 
     if (qSortProperty !== updatedAt) {
-      // const isAsc = sortProperty === property && sortOrder === 'asc'
-      // setSortOrder(isAsc ? 'desc' : 'asc')
-
-      // hrefQuery = `${hrefQuery}&orderBy=${qSortProperty}`
       hrefQuery = `${hrefQuery}&orderBy=${qSortProperty}&sortOrder=${qSortOrder}`
-      // } else {
-      //    hrefQuery = `${hrefQuery}&sortOrder=${qSortOrder}`
-      // }
-      // if (qSortOrder === desc) {
-      //   hrefQuery = `${hrefQuery}&sortOrder=asc`
-      // } else {
-      //   hrefQuery = `${hrefQuery}&sortOrder=${desc}`
     }
     if (hrefQuery.length > 0) hrefQuery = `?${hrefQuery.substring(1)}`
 
@@ -253,7 +241,7 @@ export default function MyEvents(props: { variant: Variant }) {
   }
 
   useEffect(() => {
-    const prc = async () => {
+    const processChanges = async () => {
       const {
         page: initialPage,
         pageSize: initialPageSize,
@@ -261,9 +249,6 @@ export default function MyEvents(props: { variant: Variant }) {
         sortOrder: initialSortOrder,
       } = query
       const validSortOrder: SortOrder[] = ['asc', 'desc']
-      // console.log(
-      //   validSortOrder[validSortOrder.indexOf(initialSortOrder as SortOrder)],
-      // )
 
       const validatedSortOrder =
         typeof initialSortOrder === 'string' &&
@@ -272,8 +257,7 @@ export default function MyEvents(props: { variant: Variant }) {
               validSortOrder.indexOf(initialSortOrder as SortOrder)
             ]
           : 'desc'
-      // console.log(initialSortOrder)
-      // console.log(validSortOrder.indexOf('asc' as SortOrder) > 0)
+
       const validOrderBy: OrderBy[] = ['date', 'location', 'updatedAt', 'waste']
 
       const validatedOrderBy =
@@ -324,7 +308,6 @@ export default function MyEvents(props: { variant: Variant }) {
         ) {
           const href = getHref({ page: lastPage })
           router.push(href)
-          // return
         }
         setShouldReload(false)
       }
@@ -335,14 +318,13 @@ export default function MyEvents(props: { variant: Variant }) {
       setData(data)
       setTotal(total)
     }
-    prc()
+    processChanges()
   }, [query, shouldReload])
 
   const handlePageChange = (_: unknown, newPage: number) => {
     const href = getHref({ page: newPage })
     router.push(href)
   }
-
   const handlePageSizeChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -370,7 +352,6 @@ export default function MyEvents(props: { variant: Variant }) {
           handleSelectAll={handleSelectAll}
           handleAction={handleAction}
           handleSort={handleSort}
-          // fetcher={fetchEvents}
           sortProperty={sortProperty}
           sortOrder={sortOrder}
           changedRows={changedRows}
