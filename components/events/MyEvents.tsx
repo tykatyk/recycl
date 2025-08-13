@@ -78,16 +78,10 @@ export default function MyEvents(props: { variant: Variant }) {
 
     return `/my/events${activity}${hrefQuery}`
   }
-
   const handleVariantChange = (
-    event: React.SyntheticEvent,
+    _: React.SyntheticEvent,
     newVariant: Variant,
   ) => {
-    setChangedRows([])
-    setSelectedRows([])
-    setPage(1)
-    setVariant(newVariant)
-
     if (newVariant === active) {
       router.push(activeEventsRoute)
     } else {
@@ -248,14 +242,10 @@ export default function MyEvents(props: { variant: Variant }) {
         orderBy: initialOrderBy,
         sortOrder: initialSortOrder,
       } = query
-      const validSortOrder: SortOrder[] = ['asc', 'desc']
 
       const validatedSortOrder =
-        typeof initialSortOrder === 'string' &&
-        validSortOrder.indexOf(initialSortOrder as SortOrder) >= 0
-          ? validSortOrder[
-              validSortOrder.indexOf(initialSortOrder as SortOrder)
-            ]
+        initialSortOrder === 'asc' || initialSortOrder === 'desc'
+          ? initialSortOrder
           : 'desc'
 
       const validOrderBy: OrderBy[] = ['date', 'location', 'updatedAt', 'waste']
