@@ -129,18 +129,11 @@ export default function MyEvents(props: { variant: Variant }) {
       .then(() => {
         setChangedRows(ids)
         setTimeout(() => {
-          setSelectedRows((prevSelected) => {
-            return prevSelected.filter((element) => {
-              return ids.indexOf(element) >= 0
-            })
-          })
-          setChangedRows([])
           setShouldReload(true)
         }, 500)
       })
       .catch(() => {
         setBackendError(errorMessage)
-        setChangedRows([])
       })
       .finally(() => {
         setRowAction('')
@@ -197,6 +190,20 @@ export default function MyEvents(props: { variant: Variant }) {
     router.push(href)
   }
 
+  const handlePageChange = (_: unknown, newPage: number) => {
+    const href = getHref({ page: newPage })
+    router.push(href)
+  }
+  const handlePageSizeChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const href = getHref({
+      page: 1,
+      pageSize: parseInt(event.target.value, 10),
+    })
+    router.push(href)
+  }
+
   const fetchTotal = async (options): Promise<number> => {
     return await fetch(`${apiGetTotal}?${new URLSearchParams(options)}`, {
       method: 'GET',
@@ -233,9 +240,10 @@ export default function MyEvents(props: { variant: Variant }) {
         return []
       })
   }
-
   useEffect(() => {
     const processChanges = async () => {
+      setLoading(true)
+
       const {
         page: initialPage,
         pageSize: initialPageSize,
@@ -271,59 +279,44 @@ export default function MyEvents(props: { variant: Variant }) {
             ]
           : rowsPerPageOptions[0]
 
-      setSortOrder(validatedSortOrder)
-      setSortProperty(validatedOrderBy)
-      setPage(validatedPage)
-      setPageSize(validatedPageSize)
-
-      setLoading(true)
-      const data = await fetchEvents({
+      const newData = await fetchEvents({
         variant,
         page: String(validatedPage - 1),
         pageSize: String(validatedPageSize),
         orderBy: validatedOrderBy, //ToDo: change orderBy to sortProperty
         sortOrder: validatedSortOrder,
       })
-      const total = await fetchTotal({
+      const newTotal = await fetchTotal({
         variant,
       })
-      setLoading(false)
 
       if (shouldReload) {
-        const lastPage = Math.ceil(total / validatedPageSize)
+        const lastPage = Math.ceil(newTotal / validatedPageSize)
         if (
-          total > 0 &&
+          newTotal > 0 &&
           validatedPage != lastPage &&
-          data.length < validatedPageSize
+          newData.length < validatedPageSize
         ) {
           const href = getHref({ page: lastPage })
           router.push(href)
         }
+
+        setChangedRows([])
         setShouldReload(false)
+        return
       }
 
+      setData(newData)
+      setTotal(newTotal)
       setSelectedRows([])
-      setChangedRows([])
-
-      setData(data)
-      setTotal(total)
+      setSortOrder(validatedSortOrder)
+      setSortProperty(validatedOrderBy)
+      setPage(validatedPage)
+      setPageSize(validatedPageSize)
+      setLoading(false)
     }
     processChanges()
   }, [query, shouldReload])
-
-  const handlePageChange = (_: unknown, newPage: number) => {
-    const href = getHref({ page: newPage })
-    router.push(href)
-  }
-  const handlePageSizeChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const href = getHref({
-      page: 1,
-      pageSize: parseInt(event.target.value, 10),
-    })
-    router.push(href)
-  }
 
   let content: ReactElement = <NoRows />
 
