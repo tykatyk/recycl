@@ -1,13 +1,24 @@
 import Box from '@mui/material/Box'
-import Pagination from '@mui/material/Pagination'
-import Select from '@mui/material/Select'
+import Pagination, { PaginationProps } from '@mui/material/Pagination'
+import Select, { SelectProps } from '@mui/material/Select'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import PaginationItem from '@mui/material/PaginationItem'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
 
-export default function DataGridFooter(props) {
+const labelText = 'Показывать по'
+
+interface DataGridFooterProps {
+  numRows: number
+  handlePageChange: NonNullable<PaginationProps['onChange']>
+  handlePageSizeChange: NonNullable<SelectProps['onChange']>
+  pageSize: number
+  page: number
+  renderItem: PaginationProps['renderItem']
+}
+
+export default function DataGridFooter(props: DataGridFooterProps) {
   const {
     numRows,
     handlePageChange,
@@ -21,11 +32,11 @@ export default function DataGridFooter(props) {
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2, pb: 2 }}>
       <Box sx={{ minWidth: 120, mr: 1 }}>
         <FormControl fullWidth size="small">
-          <InputLabel id="rowsPerPageLabel">Показывать по</InputLabel>
+          <InputLabel id="rowsPerPageLabel">{labelText}</InputLabel>
           <Select
             labelId="rowsPerPageLabel"
             id="rowsPerPage"
-            label="Показывать по"
+            label={labelText}
             value={pageSize}
             onChange={handlePageSizeChange}
           >
