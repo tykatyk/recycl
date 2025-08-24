@@ -1,14 +1,25 @@
 import React, { useEffect, useState, ReactElement } from 'react'
 import PaginationItem from '@mui/material/PaginationItem'
 import { useRouter } from 'next/router'
-import { Grid, Typography, PaginationRenderItemParams } from '@mui/material'
+import {
+  Grid,
+  Typography,
+  PaginationRenderItemParams,
+  SelectChangeEvent,
+} from '@mui/material'
 import Layout from '../layouts/Layout'
 import Tabs from '../uiParts/Tabs'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import NoRows from '../uiParts/NoRows'
-import Error from '../uiParts/Error'
+import ErrorComponet from '../uiParts/Error'
 import Link from '../uiParts/Link'
-import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
+import {
+  rowsPerPageOptions,
+  validOrderBy,
+  validSortOrder,
+  eventActions,
+  eventVariants,
+} from '../../lib/helpers/eventHelpers'
 
 import EventsTable from './EventsTable'
 import type {
@@ -17,37 +28,44 @@ import type {
   EventActions,
   SortOrder,
   OrderBy,
+  PaginationOptions,
+  HrefOptions,
 } from '../../lib/types/event'
-import { eventActions } from '../../lib/helpers/eventHelpers'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
+import Cookies from 'js-cookie'
 
 const { activate, deactivate, remove } = eventActions
-const active: Variant = 'active'
+
 const titleHeading = 'Мои объявления о вывозе отходов'
 const errorMessage = 'Неизвестная ошибка'
 const changeActivityRoute = 'changeActivity'
-const deletionRoute = 'delete'
 const apiPrefix = '/api/events/'
 const apiGetTotal = `${apiPrefix}total/`
 const activeEventsRoute = '/my/events'
+const deletionRoute = 'delete'
 const inactiveEventsRoute = '/my/events/inactive'
-const updatedAt = 'updatedAt'
-const desc = 'desc'
+const createdAt: OrderBy = 'createdAt'
+const { asc, desc } = validSortOrder
+const { active, inactive } = eventVariants
 
 export default function MyEvents(props: { variant: Variant }) {
+  const pageSizeCookie = Cookies.get('pageSize')
+  const defaultpageSize = pageSizeCookie
+    ? parseInt(pageSizeCookie, 10)
+    : rowsPerPageOptions[0]
+
   const router = useRouter()
   const query = router.query
-  const { variant: initialVariant } = props
+  const { variant } = props
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(rowsPerPageOptions[0])
+  const [pageSize, setPageSize] = useState(defaultpageSize)
   const [total, setTotal] = useState(0)
-  const [variant, setVariant] = useState<Variant>(initialVariant)
   const [backendError, setBackendError] = useState('')
   const [data, setData] = useState<Event[]>([])
   const [loading, setLoading] = useState(false)
   const [sortOrder, setSortOrder] = React.useState<SortOrder>(desc)
-  const [sortProperty, setSortProperty] = React.useState<OrderBy>(updatedAt)
+  const [sortProperty, setSortProperty] = React.useState<OrderBy>(createdAt)
   const [changedRows, setChangedRows] = useState<string[]>([])
   const [rowAction, setRowAction] = useState<keyof EventActions | ''>('')
   const [shouldReload, setShouldReload] = useState(false)
@@ -58,26 +76,28 @@ export default function MyEvents(props: { variant: Variant }) {
     return <PaginationItem component={Link} href={href} {...item} />
   }
 
-  const getHref = (options) => {
+  const getHref = (options: HrefOptions) => {
     const {
       page: qPage = page,
       pageSize: qPageSize = pageSize,
       sortProperty: qSortProperty = sortProperty,
       sortOrder: qSortOrder = sortOrder,
     } = options
-    const activity = variant === active ? '' : '/inactive'
+
+    const activity = variant === active ? '' : `/${inactive}`
     let hrefQuery = ''
     if (qPage !== 1 || qPageSize !== rowsPerPageOptions[0]) {
       hrefQuery = `${hrefQuery}&page=${qPage}&pageSize=${qPageSize}`
     }
 
-    if (qSortProperty !== updatedAt) {
+    if (qSortProperty !== createdAt) {
       hrefQuery = `${hrefQuery}&orderBy=${qSortProperty}&sortOrder=${qSortOrder}`
     }
     if (hrefQuery.length > 0) hrefQuery = `?${hrefQuery.substring(1)}`
 
     return `/my/events${activity}${hrefQuery}`
   }
+
   const handleVariantChange = (
     _: React.SyntheticEvent,
     newVariant: Variant,
@@ -128,9 +148,6 @@ export default function MyEvents(props: { variant: Variant }) {
     await handleActivationDeactivationAndDeletion(ids, action)
       .then(() => {
         setChangedRows(ids)
-        setTimeout(() => {
-          setShouldReload(true)
-        }, 500)
       })
       .catch(() => {
         setBackendError(errorMessage)
@@ -170,33 +187,36 @@ export default function MyEvents(props: { variant: Variant }) {
   }
 
   const handleSort = (event: React.MouseEvent<unknown>, property: OrderBy) => {
-    const isAsc = sortProperty === property && sortOrder === 'asc'
+    const isAsc = sortProperty === property && sortOrder === asc
 
     let href = ''
-    if (sortProperty === updatedAt) {
+    if (sortProperty === createdAt) {
       href = getHref({
         page: 1,
         sortProperty: property,
-        sortOrder: 'desc',
+        sortOrder: desc,
       })
     } else {
       href = getHref({
         page: 1,
-        sortProperty: isAsc ? updatedAt : property,
-        sortOrder: isAsc ? 'desc' : 'asc',
+        sortProperty: isAsc ? createdAt : property,
+        sortOrder: isAsc ? desc : asc,
       })
     }
 
     router.push(href)
   }
 
-  const handlePageChange = (_: unknown, newPage: number) => {
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    newPage: number,
+  ) => {
     const href = getHref({ page: newPage })
     router.push(href)
   }
-  const handlePageSizeChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handlePageSizeChange = (event: SelectChangeEvent) => {
+    Cookies.set('pageSize', event.target.value.toString())
+
     const href = getHref({
       page: 1,
       pageSize: parseInt(event.target.value, 10),
@@ -223,7 +243,9 @@ export default function MyEvents(props: { variant: Variant }) {
       })
   }
 
-  const fetchEvents = async (options): Promise<Event[]> => {
+  const fetchEvents = async (
+    options: Required<PaginationOptions> & { variant: Variant },
+  ) => {
     return await fetch(`${apiPrefix}?${new URLSearchParams(options)}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -232,14 +254,24 @@ export default function MyEvents(props: { variant: Variant }) {
       .then((response) => {
         return response.json()
       })
-      .then((newData: Event[]) => {
-        return newData
+      .then((result) => {
+        if (result.error) throw new Error(result.error.message)
+        return (result.data as Event[]) || []
       })
       .catch((_) => {
         setBackendError(errorMessage)
         return []
       })
   }
+
+  useEffect(() => {
+    if (changedRows.length > 0) {
+      setTimeout(() => {
+        setShouldReload(true)
+      }, 500)
+    }
+  }, [changedRows])
+
   useEffect(() => {
     const processChanges = async () => {
       setLoading(true)
@@ -252,17 +284,14 @@ export default function MyEvents(props: { variant: Variant }) {
       } = query
 
       const validatedSortOrder =
-        initialSortOrder === 'asc' || initialSortOrder === 'desc'
-          ? initialSortOrder
-          : 'desc'
-
-      const validOrderBy: OrderBy[] = ['date', 'location', 'updatedAt', 'waste']
+        typeof initialSortOrder === 'string' && validSortOrder[initialSortOrder]
+          ? validSortOrder[initialSortOrder]
+          : validSortOrder.desc
 
       const validatedOrderBy =
-        typeof initialOrderBy === 'string' &&
-        validOrderBy.indexOf(initialOrderBy as OrderBy) >= 0
-          ? validOrderBy[validOrderBy.indexOf(initialOrderBy as OrderBy)]
-          : 'updatedAt'
+        typeof initialOrderBy === 'string' && validOrderBy[initialOrderBy]
+          ? validOrderBy[initialOrderBy]
+          : validOrderBy.createdAt
 
       const validatedPage =
         typeof initialPage === 'string' &&
@@ -277,13 +306,15 @@ export default function MyEvents(props: { variant: Variant }) {
           ? rowsPerPageOptions[
               rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10))
             ]
-          : rowsPerPageOptions[0]
+          : pageSizeCookie
+            ? parseInt(pageSizeCookie, 10)
+            : rowsPerPageOptions[0]
 
       const newData = await fetchEvents({
         variant,
         page: String(validatedPage - 1),
         pageSize: String(validatedPageSize),
-        orderBy: validatedOrderBy, //ToDo: change orderBy to sortProperty
+        sortProperty: validatedOrderBy, //ToDo: change orderBy to sortProperty
         sortOrder: validatedSortOrder,
       })
       const newTotal = await fetchTotal({
@@ -313,6 +344,7 @@ export default function MyEvents(props: { variant: Variant }) {
       setSortProperty(validatedOrderBy)
       setPage(validatedPage)
       setPageSize(validatedPageSize)
+
       setLoading(false)
     }
     processChanges()
@@ -323,7 +355,7 @@ export default function MyEvents(props: { variant: Variant }) {
   if (loading) {
     content = <PageLoadingCircle />
   } else if (backendError) {
-    content = <Error />
+    content = <ErrorComponet />
   } else if (data.length > 0) {
     content = (
       <>
@@ -344,7 +376,6 @@ export default function MyEvents(props: { variant: Variant }) {
           numRows={total}
           page={page}
           pageSize={pageSize}
-          numSelected={selectedRows.length}
           handlePageChange={handlePageChange}
           handlePageSizeChange={handlePageSizeChange}
           renderItem={renderItem}

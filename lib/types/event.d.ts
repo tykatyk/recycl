@@ -4,8 +4,20 @@ import type { FormikEventValues } from '../validation/eventFormValidator'
 import type { Dayjs } from 'dayjs'
 
 export type Variant = 'inactive' | 'active'
+export type SortOrder = 'asc' | 'desc'
+export type OrderBy = 'date' | 'waste' | 'location' | 'createdAt'
 
-export type Direction = 'prev' | 'next'
+export type PaginationOptions = {
+  page?: string
+  pageSize?: string
+  sortProperty?: OrderBy
+  sortOrder?: SortOrder
+}
+
+export type HrefOptions = Omit<PaginationOptions, 'page' | 'pageSize'> & {
+  page?: number
+  pageSize?: number
+}
 
 export type SSProps = {
   props: EventProps
@@ -27,12 +39,6 @@ export type Event = {
   viewCount?: number
 }
 
-export type EventPaginationData = {
-  total: number
-  events: Event[]
-  currentPage: number
-}
-
 export type IsInactive = {
   isInactive?: '1'
 }
@@ -42,6 +48,3 @@ export type EventActions = {
   deactivate: 'deactivate'
   remove: 'remove'
 }
-
-export type SortOrder = 'asc' | 'desc'
-export type OrderBy = 'date' | 'waste' | 'location' | 'updatedAt'
