@@ -10,12 +10,38 @@ import {
   validSortOrder,
   eventVariants,
 } from '../../../lib/helpers/eventHelpers'
+import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { Variant, SortOrder, OrderBy } from '../../../lib/types/event'
 
-export default async function Events(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+const queryValidationSchema = yup.object({
+  page: yup
+    .number()
+    .transform((value) => (value === '' || isNaN(value) ? undefined : value))
+    .integer()
+    .min(0)
+    .default(0),
+  pageSize: yup
+    .number()
+    .transform((value) => (value === '' || isNaN(value) ? undefined : value))
+    .integer()
+    .min(rowsPerPageOptions[0])
+    .max(rowsPerPageOptions[Math.max(rowsPerPageOptions.length - 1, 0)])
+    .default(rowsPerPageOptions[0]),
+  sortOrder: yup
+    .string<SortOrder>()
+    .transform((value) => (validSortOrder[value] ? value : undefined))
+    .default(validSortOrder.desc),
+  sortProperty: yup
+    .string<OrderBy>()
+    .transform((value) => (validOrderBy[value] ? value : undefined))
+    .default(validOrderBy.createdAt),
+  variant: yup
+    .string<Variant>()
+    .transform((value) => (eventVariants[value] ? value : undefined))
+    .default(eventVariants.active),
+})
+
+async function eventsHanlder(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET')
     return res.status(405).json({ error: 'Method not allowed' })
 
@@ -25,50 +51,12 @@ export default async function Events(
 
   const userId = session.id
 
-  const querySchema = yup.object({
-    page: yup
-      .number()
-      .transform((value) => (value === '' || isNaN(value) ? undefined : value))
-      .integer()
-      .min(0)
-      .default(0),
-    pageSize: yup
-      .number()
-      .transform((value) => (value === '' || isNaN(value) ? undefined : value))
-      .integer()
-      .min(rowsPerPageOptions[0])
-      .max(rowsPerPageOptions[Math.max(rowsPerPageOptions.length - 1, 0)])
-      .default(rowsPerPageOptions[0]),
-    sortOrder: yup
-      .string<SortOrder>()
-      .transform((value) =>
-        validSortOrder.indexOf(value) >= 0 ? value : undefined,
-      )
-      .default('desc'),
-    sortProperty: yup
-      .string<OrderBy>()
-      .transform((value) =>
-        validOrderBy.indexOf(value) >= 0 ? value : undefined,
-      )
-      .default('createdAt'),
-    variant: yup
-      .string<Variant>()
-      .transform((value) => (eventVariants[value] ? value : undefined))
-      .default(eventVariants.active),
+  let validatedQuery = await queryValidationSchema.validate(req.query, {
+    stripUnknown: true,
   })
-
-  try {
-    let validatedQuery = await querySchema.validate(req.query, {
-      stripUnknown: true,
-    })
-    await dbConnect()
-    const data = await eventQueries.getAll(validatedQuery, userId)
-    return res.json(data)
-  } catch (err) {
-    if (err instanceof yup.ValidationError) {
-      return res.status(400).json({ error: err.errors })
-    }
-    console.log(err)
-    return res.status(500).json({ error: 'Internal server error' })
-  }
+  await dbConnect()
+  const data = await eventQueries.getAll(validatedQuery, userId)
+  res.json(data)
 }
+
+export default apiHandler(eventsHanlder)
