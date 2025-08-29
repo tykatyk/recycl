@@ -306,9 +306,7 @@ export default function MyEvents(props: { variant: Variant }) {
           ? rowsPerPageOptions[
               rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10))
             ]
-          : pageSizeCookie
-            ? parseInt(pageSizeCookie, 10)
-            : rowsPerPageOptions[0]
+          : defaultpageSize
 
       const newData = await fetchEvents({
         variant,

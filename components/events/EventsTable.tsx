@@ -1,9 +1,10 @@
-import React, {
+import {
   useState,
   useRef,
   ReactNode,
   useEffect,
   useLayoutEffect,
+  Fragment,
 } from 'react'
 
 import {
@@ -17,6 +18,8 @@ import {
   Button,
   Box,
   TableSortLabel,
+  Popper,
+  Paper,
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
@@ -37,6 +40,7 @@ import {
   eventVariants,
   adjustOverlay,
   overlayResizeHandler,
+  validSortOrder,
 } from '../../lib/helpers/eventHelpers'
 import type { Options, ConfigOptions } from '../../lib/helpers/eventHelpers'
 import { date } from '../../lib/validation/atomicValidators'
@@ -69,7 +73,7 @@ const deactivateBtnText = 'Деактивировать'
 const selectAllBtnText = 'Выбрать все'
 const editBtnText = 'Редактировать'
 const activateBtnText = 'Активировать'
-const wasteTypeText = 'Тип отходов'
+const reset = 'Сбросить'
 const editRoute = '/my/events/edit/'
 const actionBtnStyles = {
   color: '#fff',
@@ -96,6 +100,11 @@ export default function EventsTable({
   const [staleAd, setStaleAd] = useState('')
   const rowRefs = useRef<ConfigOptions['rowRefs']>({})
   const overlayRefs = useRef<ConfigOptions['overlayRefs']>({})
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const popoverRef = useRef<HTMLDivElement>(null)
+  const coordsRef = useRef({ x: 0, y: 0 })
+  const open = Boolean(anchorEl)
+  const id = open ? 'cleanViewCount' : undefined
 
   const options: Options = {
     rowRefs,
@@ -120,6 +129,45 @@ export default function EventsTable({
       })
     }
   }, [changedRows])
+
+  useEffect(() => {
+    const updateMousePosition = (e: MouseEvent) => {
+      coordsRef.current.x = e.clientX
+      coordsRef.current.y = e.clientY
+    }
+
+    window.addEventListener('mousemove', updateMousePosition)
+
+    return () => {
+      window.removeEventListener('mousemove', updateMousePosition)
+    }
+  }, [])
+
+  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMouseLeave = () => {
+    const popover = popoverRef.current
+    if (!popover) return
+
+    const popoverCoords = popover?.getBoundingClientRect()
+    const mouseCoords = coordsRef.current
+
+    if (popoverCoords.top >= mouseCoords.y) {
+      if (mouseCoords.y + 5 < popoverCoords.top) {
+        setAnchorEl(null)
+      }
+    } else {
+      if (mouseCoords.y - 5 > popoverCoords.bottom) {
+        setAnchorEl(null)
+      }
+    }
+  }
+
+  const handlePopperLeave = () => {
+    setAnchorEl(null)
+  }
 
   const getHeader = (): ReactNode | string => {
     const action = variant === inactive ? remove : deactivate
@@ -168,7 +216,11 @@ export default function EventsTable({
                   ) : (
                     <TableSortLabel
                       active={sortProperty === column.id}
-                      direction={sortProperty === column.id ? sortOrder : 'asc'}
+                      direction={
+                        sortProperty === column.id
+                          ? sortOrder
+                          : validSortOrder.asc
+                      }
                       onClick={(event) => {
                         handleSort(event, column.id)
                       }}
@@ -176,7 +228,7 @@ export default function EventsTable({
                       {column.headerName}
                       {sortProperty === column.id ? (
                         <Box component="span" sx={visuallyHidden}>
-                          {sortOrder === 'desc'
+                          {sortOrder === validSortOrder.desc
                             ? 'sorted descending'
                             : 'sorted ascending'}
                         </Box>
@@ -191,11 +243,11 @@ export default function EventsTable({
           <TableBody>
             {rows.map((row: Event, index: number) => {
               if (!row._id) return
-              const labelId = `enhanced-table-checkbox-${index}`
+              const labelId = `checkbox-${index}`
               const isItemSelected = isSelected(row._id)
 
               return (
-                <React.Fragment key={index}>
+                <Fragment key={index}>
                   <TableRow
                     ref={(el) => el && (rowRefs.current[row._id!] = el)}
                     className={clsx('noBorder', 'dataRow')}
@@ -306,17 +358,42 @@ export default function EventsTable({
                       <Box
                         component="span"
                         sx={{
-                          display: 'flex',
+                          display: 'inline-flex',
                           alignItems: 'center',
                           flexWrap: 'wrap',
                           fontWeight: 'fontWeightLight',
                         }}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        aria-expanded={!!open}
+                        aria-controls={id}
                       >
                         <VisibilityIcon sx={{ fontSize: '1.25rem' }} />
                         <Box component="span" sx={{ p: '4px 8px' }}>
                           {row.viewCount}
                         </Box>
                       </Box>
+                      <Popper
+                        id={id}
+                        open={open}
+                        anchorEl={anchorEl}
+                        ref={popoverRef}
+                        onMouseLeave={handlePopperLeave}
+                        sx={{
+                          zIndex: 1000,
+                        }}
+                      >
+                        <Paper sx={{ p: 2 }}>
+                          <Button
+                            variant="text"
+                            color="secondary"
+                            size="small"
+                            disableElevation
+                          >
+                            {reset}
+                          </Button>
+                        </Paper>
+                      </Popper>
                     </TableCell>
                   </TableRow>
                   {row._id === staleAd ? (
@@ -324,7 +401,7 @@ export default function EventsTable({
                   ) : null}
                   {/*No spacer after the last row*/}
                   {index !== rows.length - 1 && <Spacer />}
-                </React.Fragment>
+                </Fragment>
               )
             })}
           </TableBody>
