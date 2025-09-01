@@ -1,6 +1,5 @@
-import React from 'react'
 import { styled } from '@mui/material/styles'
-import { Container, Grid, List, ListItem, Typography } from '@mui/material'
+import { Container, Grid, List, ListItem, Typography, Box } from '@mui/material'
 import Link from './Link'
 import Logo from './header/Logo'
 
@@ -57,7 +56,9 @@ export default function Footer() {
             sm={3}
             style={{ paddingLeft: 16, paddingRight: 16, paddingBottom: 24 }}
           >
-            <Logo />
+            <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+              <Logo />
+            </Box>
           </Grid>
           <Grid
             container
