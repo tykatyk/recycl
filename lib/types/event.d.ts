@@ -43,7 +43,7 @@ export type IsInactive = {
   isInactive?: '1'
 }
 
-export type EventActions = {
+export type AdActions = {
   activate: 'activate'
   deactivate: 'deactivate'
   remove: 'remove'

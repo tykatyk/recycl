@@ -1,6 +1,12 @@
 import { ReactNode } from 'react'
 import dayjs from 'dayjs'
-import type { Event, EventActions } from '../types/event'
+import type {
+  Event,
+  AdActions,
+  OrderBy,
+  SortOrder,
+  Variant,
+} from '../types/event'
 
 export function getInitialValues(event?: Event, userPhone: string = ''): Event {
   return {
@@ -59,15 +65,27 @@ export const columns: ColumnHeader[] = [
 
 export const rowsPerPageOptions = [1, 2, 3]
 
-export const eventActions: EventActions = {
+export const eventActions: AdActions = {
   activate: 'activate',
   deactivate: 'deactivate',
   remove: 'remove',
 }
 
-export const eventVariants = {
+export const eventVariants: Record<Variant, Variant> = {
   active: 'active',
   inactive: 'inactive',
+}
+
+export const validSortOrder: Record<SortOrder, SortOrder> = {
+  asc: 'asc',
+  desc: 'desc',
+}
+
+export const validOrderBy: Record<OrderBy, OrderBy> = {
+  waste: 'waste',
+  location: 'location',
+  date: 'date',
+  createdAt: 'createdAt',
 }
 
 export const getEventTableStyles = (theme) => ({

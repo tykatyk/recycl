@@ -3,7 +3,7 @@ import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import eventModel from '../../../lib/db/models/eventModel'
 import dbConnect from '../../../lib/db/connection'
-import type { EventActions } from '../../../lib/types/event'
+import type { AdActions } from '../../../lib/types/event'
 import { eventActions } from '../../../lib/helpers/eventHelpers'
 
 const { activate } = eventActions
@@ -27,7 +27,7 @@ export default async function EventMassDeactivation(
       action,
     }: {
       eventIds: string[]
-      action: keyof Pick<EventActions, 'activate' | 'deactivate'>
+      action: keyof Pick<AdActions, 'activate' | 'deactivate'>
     } = req.body
 
     if (!Array.isArray(eventIds) || eventIds.length < 1) {
