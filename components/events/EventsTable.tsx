@@ -21,6 +21,7 @@ import {
   Popper,
   Paper,
 } from '@mui/material'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -29,8 +30,9 @@ import type {
   Variant,
   Event,
   IsInactive,
-  EventActions,
+  AdActions,
   SortOrder,
+  OrderBy,
 } from '../../lib/types/event'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
@@ -44,25 +46,35 @@ import {
 } from '../../lib/helpers/eventHelpers'
 import type { Options, ConfigOptions } from '../../lib/helpers/eventHelpers'
 import { date } from '../../lib/validation/atomicValidators'
-import { Root, Spacer, Overlay, Error } from '../uiParts/EventTableParts'
+import {
+  Root,
+  Spacer,
+  Overlay,
+  Error as ErrorComponent,
+} from '../uiParts/EventTableParts'
+
 import { visuallyHidden } from '@mui/utils'
 
 const isInactive: IsInactive = {
   isInactive: '1',
 }
 
-type EventsTableProps = {
+type TableProps<T> = {
   variant: Variant
-  rows: Event[]
+  rows: T[]
   selectedRows: string[]
-  handleSelect: (row: Event) => void
+  handleSelect: (row: T) => void
   handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
-  handleAction: (ids: string[], action: keyof EventActions) => Promise<void>
+  handleAction: (ids: string[], action: keyof AdActions) => Promise<void>
   handleSort: (event: React.MouseEvent<unknown>, property: any) => void
-  sortProperty: string
+  handleResetViewCount: (id: string) => Promise<void>
+  popperRow: T | null
+  setPopperRow: React.Dispatch<React.SetStateAction<T | null>>
+  fetching: boolean
+  sortProperty: OrderBy
   sortOrder: SortOrder
   changedRows: string[]
-  rowAction: keyof EventActions | ''
+  rowAction: keyof AdActions | ''
 }
 
 const { activate, deactivate, remove } = eventActions
@@ -90,22 +102,25 @@ export default function EventsTable({
   handleSelectAll,
   handleSort,
   handleAction,
+  handleResetViewCount,
+  setPopperRow,
+  popperRow,
+  fetching,
   sortProperty,
   sortOrder,
   changedRows,
   rowAction,
-}: EventsTableProps) {
+}: TableProps<Event>) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
   const [validationError, setValidationError] = useState('')
   const [staleAd, setStaleAd] = useState('')
   const rowRefs = useRef<ConfigOptions['rowRefs']>({})
   const overlayRefs = useRef<ConfigOptions['overlayRefs']>({})
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const popoverRef = useRef<HTMLDivElement>(null)
+  const popperRef = useRef<HTMLDivElement>(null)
   const coordsRef = useRef({ x: 0, y: 0 })
   const open = Boolean(anchorEl)
   const id = open ? 'cleanViewCount' : undefined
-
   const options: Options = {
     rowRefs,
     overlayRefs,
@@ -143,23 +158,24 @@ export default function EventsTable({
     }
   }, [])
 
-  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>, row) => {
+    setPopperRow(row)
     setAnchorEl(event.currentTarget)
   }
 
   const handleMouseLeave = () => {
-    const popover = popoverRef.current
-    if (!popover) return
+    const popper = popperRef.current
+    if (!popper) return
 
-    const popoverCoords = popover?.getBoundingClientRect()
+    const popperCoords = popper?.getBoundingClientRect()
     const mouseCoords = coordsRef.current
 
-    if (popoverCoords.top >= mouseCoords.y) {
-      if (mouseCoords.y + 5 < popoverCoords.top) {
+    if (popperCoords.top >= mouseCoords.y) {
+      if (mouseCoords.y + 5 < popperCoords.top) {
         setAnchorEl(null)
       }
     } else {
-      if (mouseCoords.y - 5 > popoverCoords.bottom) {
+      if (mouseCoords.y - 5 > popperCoords.bottom) {
         setAnchorEl(null)
       }
     }
@@ -356,14 +372,17 @@ export default function EventsTable({
                     </TableCell>
                     <TableCell>
                       <Box
-                        component="span"
+                        component="div"
                         sx={{
                           display: 'inline-flex',
                           alignItems: 'center',
                           flexWrap: 'wrap',
                           fontWeight: 'fontWeightLight',
+                          '&:hover': {
+                            cursor: 'pointer',
+                          },
                         }}
-                        onMouseEnter={handleMouseEnter}
+                        onMouseEnter={(e) => handleMouseEnter(e, row)}
                         onMouseLeave={handleMouseLeave}
                         aria-expanded={!!open}
                         aria-controls={id}
@@ -373,31 +392,10 @@ export default function EventsTable({
                           {row.viewCount}
                         </Box>
                       </Box>
-                      <Popper
-                        id={id}
-                        open={open}
-                        anchorEl={anchorEl}
-                        ref={popoverRef}
-                        onMouseLeave={handlePopperLeave}
-                        sx={{
-                          zIndex: 1000,
-                        }}
-                      >
-                        <Paper sx={{ p: 2 }}>
-                          <Button
-                            variant="text"
-                            color="secondary"
-                            size="small"
-                            disableElevation
-                          >
-                            {reset}
-                          </Button>
-                        </Paper>
-                      </Popper>
                     </TableCell>
                   </TableRow>
                   {row._id === staleAd ? (
-                    <Error id={row._id} message={validationErrorMsg} />
+                    <ErrorComponent id={row._id} message={validationErrorMsg} />
                   ) : null}
                   {/*No spacer after the last row*/}
                   {index !== rows.length - 1 && <Spacer />}
@@ -413,6 +411,32 @@ export default function EventsTable({
             rowRefs={rowRefs}
             overlayRefs={overlayRefs}
           />
+        )}
+        {open && popperRow && (
+          <Popper
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            ref={popperRef}
+            onMouseLeave={handlePopperLeave}
+            sx={{
+              zIndex: 1000,
+            }}
+          >
+            <Paper sx={{ p: 2 }}>
+              <Button
+                variant="text"
+                color="secondary"
+                size="small"
+                disableElevation
+                onClick={() => handleResetViewCount(popperRow._id as string)}
+                disabled={fetching || popperRow.viewCount === 0}
+                endIcon={<RestartAltIcon />}
+              >
+                <span>{reset}</span>
+              </Button>
+            </Paper>
+          </Popper>
         )}
       </TableContainer>
     </Root>

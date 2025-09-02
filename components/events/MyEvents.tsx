@@ -25,7 +25,7 @@ import EventsTable from './EventsTable'
 import type {
   Event,
   Variant,
-  EventActions,
+  AdActions,
   SortOrder,
   OrderBy,
   PaginationOptions,
@@ -39,6 +39,7 @@ const { activate, deactivate, remove } = eventActions
 const titleHeading = 'Мои объявления о вывозе отходов'
 const errorMessage = 'Неизвестная ошибка'
 const changeActivityRoute = 'changeActivity'
+const apiResetViewCount = '/api/resetViewCount'
 const apiPrefix = '/api/events/'
 const apiGetTotal = `${apiPrefix}total/`
 const activeEventsRoute = '/my/events'
@@ -67,8 +68,10 @@ export default function MyEvents(props: { variant: Variant }) {
   const [sortOrder, setSortOrder] = React.useState<SortOrder>(desc)
   const [sortProperty, setSortProperty] = React.useState<OrderBy>(createdAt)
   const [changedRows, setChangedRows] = useState<string[]>([])
-  const [rowAction, setRowAction] = useState<keyof EventActions | ''>('')
+  const [rowAction, setRowAction] = useState<keyof AdActions | ''>('')
   const [shouldReload, setShouldReload] = useState(false)
+  const [fetching, setFetching] = useState(false)
+  const [popperRow, setPopperRow] = useState<Event | null>(null)
 
   const renderItem = (item: PaginationRenderItemParams) => {
     const href = getHref({ page: item.page || 1 })
@@ -98,6 +101,35 @@ export default function MyEvents(props: { variant: Variant }) {
     return `/my/events${activity}${hrefQuery}`
   }
 
+  const handleResetViewCount = async (id: string) => {
+    setFetching(true)
+
+    await fetch(`${apiResetViewCount}`, {
+      method: 'POST',
+      body: JSON.stringify({ adId: id, adType: 'event' }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        return response.json()
+      })
+      .then((result) => {
+        if (result.error) throw new Error(errorMessage)
+        const newData = data.map((row) => {
+          if (row._id === id) {
+            row.viewCount = 0
+          }
+          return row
+        })
+        setData(newData)
+      })
+      .catch((error) => {
+        setBackendError(errorMessage)
+      })
+      .finally(() => setFetching(false))
+  }
+
   const handleVariantChange = (
     _: React.SyntheticEvent,
     newVariant: Variant,
@@ -111,7 +143,7 @@ export default function MyEvents(props: { variant: Variant }) {
 
   const handleActivationDeactivationAndDeletion = async (
     ids: string[],
-    action: keyof EventActions,
+    action: keyof AdActions,
   ) => {
     if (!ids || ids.length === 0) return
 
@@ -143,7 +175,7 @@ export default function MyEvents(props: { variant: Variant }) {
     })
   }
 
-  const handleAction = async (ids: string[], action: keyof EventActions) => {
+  const handleAction = async (ids: string[], action: keyof AdActions) => {
     setRowAction(action)
     await handleActivationDeactivationAndDeletion(ids, action)
       .then(() => {
@@ -255,7 +287,7 @@ export default function MyEvents(props: { variant: Variant }) {
         return response.json()
       })
       .then((result) => {
-        if (result.error) throw new Error(result.error.message)
+        if (result.error) throw new Error(result.error) //ToDo: change error message
         return (result.data as Event[]) || []
       })
       .catch((_) => {
@@ -365,6 +397,10 @@ export default function MyEvents(props: { variant: Variant }) {
           handleSelectAll={handleSelectAll}
           handleAction={handleAction}
           handleSort={handleSort}
+          handleResetViewCount={handleResetViewCount}
+          fetching={fetching}
+          setPopperRow={setPopperRow}
+          popperRow={popperRow}
           sortProperty={sortProperty}
           sortOrder={sortOrder}
           changedRows={changedRows}
