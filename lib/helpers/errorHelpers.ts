@@ -3,6 +3,7 @@ import { FormikErrors, FormikHelpers, FormikValues } from 'formik'
 import type { FormValidationError } from '../types/error'
 import { Dispatch, SetStateAction } from 'react'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { errorResponse } from './responses'
 
 export const INTERNAL_SERVER_ERROR = 'Ошибка сервера'
 export const METHOD_NOT_ALLOWED = 'Method not allowed'
@@ -51,6 +52,7 @@ export const apiHandler =
       req: NextApiRequest,
       res: NextApiResponse,
     ) => Promise<void | NextApiResponse<any>>,
+    allowValidationErrorsOnFrontend: boolean = false,
   ) =>
   async (req: NextApiRequest, res: NextApiResponse) => {
     try {
@@ -67,8 +69,8 @@ export const apiHandler =
         )
       }
 
-      if (e instanceof ValidationError) {
-        return res.status(422).json(e)
+      if (e instanceof ValidationError && allowValidationErrorsOnFrontend) {
+        return errorResponse(e, res)
       }
       res.status(500).json({
         error: INTERNAL_SERVER_ERROR,
