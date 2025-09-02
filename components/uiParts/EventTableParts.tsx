@@ -1,10 +1,11 @@
-import { ReactElement } from 'react'
+import { MutableRefObject, ReactElement } from 'react'
 import { TableRow, TableCell, Box, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import {
   eventActions,
   getEventTableStyles,
 } from '../../lib/helpers/eventHelpers'
+import { AdActions } from '../../lib/types/event'
 
 const { activate, deactivate } = eventActions
 const adActivated = 'Объявление активировано'
@@ -23,16 +24,28 @@ export const Spacer = () => {
   )
 }
 
-export const Overlay = ({ rowsToDisableButtons, rowRefs, overlayRefs }) => {
+type OverlayProps = {
+  rowsToDisableButtons: string[]
+  rowRefs: MutableRefObject<Record<string, HTMLTableRowElement | null>>
+  overlayRefs: MutableRefObject<Record<string, HTMLDivElement | null>>
+  action: '' | keyof AdActions
+}
+
+export const Overlay = ({
+  rowsToDisableButtons,
+  rowRefs,
+  overlayRefs,
+  action,
+}: OverlayProps) => {
   let elements: ReactElement[] = []
 
-  for (const _id in rowsToDisableButtons) {
+  rowsToDisableButtons.forEach((_id) => {
     let actionText =
-      rowsToDisableButtons[_id] === activate
+      action === activate
         ? adActivated
-        : rowsToDisableButtons[_id] === deactivate
-        ? adDeactivated
-        : adDeleted
+        : action === deactivate
+          ? adDeactivated
+          : adDeleted
 
     const item: ReactElement = (
       <Box
@@ -49,8 +62,8 @@ export const Overlay = ({ rowsToDisableButtons, rowRefs, overlayRefs }) => {
         sx={{
           position: 'absolute',
           width: '100%',
-          left: rowRefs.current[_id].offsetLeft,
-          top: rowRefs.current[_id].offsetTop,
+          left: rowRefs?.current[_id]?.offsetLeft,
+          top: rowRefs?.current[_id]?.offsetTop,
           height: 0,
           visibility: 'hidden',
           opacity: 0,
@@ -72,7 +85,7 @@ export const Overlay = ({ rowsToDisableButtons, rowRefs, overlayRefs }) => {
     )
 
     elements.push(item)
-  }
+  })
 
   return elements
 }
