@@ -288,7 +288,7 @@ export default function MyEvents(props: { variant: Variant }) {
       })
       .then((result) => {
         if (result.error) throw new Error(result.error) //ToDo: change error message
-        return (result.data as Event[]) || []
+        return (result as Event[]) || []
       })
       .catch((_) => {
         setBackendError(errorMessage)

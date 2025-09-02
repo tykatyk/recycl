@@ -1,23 +1,18 @@
 import { Event } from '../models/index'
 import { _id } from '@next-auth/mongodb-adapter'
-import { eventVariants } from '../../helpers/eventHelpers'
+import {
+  eventVariants,
+  validSortOrder,
+  validOrderBy,
+} from '../../helpers/eventHelpers'
 import type {
   Variant,
-  Direction,
-  Event as EventType,
   SortOrder,
   OrderBy,
+  HrefOptions,
 } from '../../types/event'
 const { active } = eventVariants
-
-type QueryParams = {
-  variant: Variant
-  direction: Direction
-  page: string
-  pageSize: string
-  sortOrder?: SortOrder
-  orderBy?: OrderBy
-}
+const { asc, desc } = validSortOrder
 
 interface SelectQuery {
   user: string
@@ -31,17 +26,6 @@ const getSelectQuery = (variant: Variant, user: string): SelectQuery => {
   return selectQuery
 }
 
-interface CountQuery {
-  user: string
-  isActive: boolean
-}
-const getCountQuery = (variant: Variant, user: string): CountQuery => {
-  const status = variant === active ? true : false
-  let countQuery: CountQuery = { user, isActive: status }
-
-  return countQuery
-}
-
 type SortOption = -1 | 1
 
 interface SortQuery {
@@ -49,16 +33,16 @@ interface SortQuery {
 }
 
 const getSortQuery = (
-  orderBy: OrderBy = 'updatedAt',
-  sortOrder: SortOrder = 'desc',
+  sortProperty: OrderBy | '_id' = '_id',
+  sortOrder: SortOrder = desc,
 ): SortQuery => {
   const sortQuery: SortQuery = {}
-  const sort = sortOrder === 'asc' ? 1 : -1
+  const sort = sortOrder === asc ? 1 : -1
 
-  if (orderBy === 'location') {
+  if (sortProperty === validOrderBy.location) {
     sortQuery['location.description'] = sort
   } else {
-    sortQuery[orderBy] = sort
+    sortQuery[sortProperty] = sort
   }
 
   sortQuery['_id'] = -1
@@ -67,47 +51,32 @@ const getSortQuery = (
 }
 
 const eventQueries = {
-  getAll: async (queryParams: QueryParams, user: string) => {
-    const result: {
-      total: number
-      events: EventType[]
-      currentPage: number
-    } = {
-      total: 0,
-      events: [],
-      currentPage: 0,
-    }
-    const { page = 0, pageSize = 0, variant, orderBy, sortOrder } = queryParams
+  getAll: async (
+    queryParams: HrefOptions & { variant: Variant },
+    user: string,
+  ) => {
+    const {
+      page = 0,
+      pageSize = 0,
+      variant,
+      sortOrder = desc,
+      sortProperty,
+    } = queryParams
 
     const pageInt = parseInt(String(page), 10)
     const pageSizeInt = parseInt(String(pageSize), 10)
 
-    if (!user || !variant) return result
+    if (!user || !variant) return []
 
     const select = getSelectQuery(variant, user)
-    const countAll = getCountQuery(variant, user)
-    const sort = getSortQuery(orderBy, sortOrder)
+    const sort = getSortQuery(sortProperty, sortOrder)
+    const skip = pageInt * pageSizeInt
 
-    const total = await Event.countDocuments(countAll)
-    if (total === 0) return result
-
-    let skip = pageInt * pageSizeInt
-    // if (skip >= total) skip = total - pageSizeInt
-    // if (skip < 0) skip = 0
-
-    const events: EventType[] = await Event.find(select)
+    return await Event.find(select)
       .sort(sort)
       .skip(skip)
       .limit(pageSizeInt)
       .populate('waste')
-
-    // const currentPage = Math.ceil(skip / pageSizeInt)
-
-    result.total = total
-    result.events = events
-    // result.currentPage = currentPage
-
-    return result
   },
 }
 export default eventQueries
