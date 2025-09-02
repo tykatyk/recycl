@@ -34,7 +34,7 @@ export default function ShowSingleEvent(props: { event: RecycleEvent | null }) {
     //if the user is viewing his own ad, don't increment the counter
     if (!event || (event.user as PopulatedProp)._id === session?.id) return
 
-    fetch('/api/num-views', {
+    fetch('/api/viewCount', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
