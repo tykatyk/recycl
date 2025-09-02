@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import eventModel from '../../lib/db/models/eventModel'
 import type { EventType } from '../../lib/db/models/eventModel'
 import dbConnect from '../../lib/db/connection'
+import { METHOD_NOT_ALLOWED } from '../../lib/helpers/errorHelpers'
 import cryptoRandomString from 'crypto-random-string'
 import dayjs from 'dayjs'
 import { HydratedDocument } from 'mongoose'
@@ -13,7 +14,7 @@ export default async function viewCounter(
   res: NextApiResponse,
 ) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    return res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 
   const session = await getServerSession(req, res, authOptions)

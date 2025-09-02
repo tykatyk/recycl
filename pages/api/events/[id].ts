@@ -7,6 +7,7 @@ import {
   errorResponse,
   perFormErrorResponse,
 } from '../../../lib/helpers/responses'
+import { METHOD_NOT_ALLOWED } from '../../../lib/helpers/errorHelpers'
 import dbConnect from '../../../lib/db/connection'
 
 export default async function UpdateEvent(
@@ -48,6 +49,6 @@ export default async function UpdateEvent(
 
     res.status(200).json({ message: 'Документ обновлен' })
   } else {
-    res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 }

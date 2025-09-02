@@ -5,6 +5,7 @@ import eventModel from '../../../lib/db/models/eventModel'
 import dbConnect from '../../../lib/db/connection'
 import type { AdActions } from '../../../lib/types/event'
 import { eventActions } from '../../../lib/helpers/eventHelpers'
+import { METHOD_NOT_ALLOWED } from '../../../lib/helpers/errorHelpers'
 
 const { activate } = eventActions
 
@@ -52,6 +53,6 @@ export default async function EventMassDeactivation(
 
     res.status(200).json({ message: 'Ads successfully deactivated' })
   } else {
-    res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 }

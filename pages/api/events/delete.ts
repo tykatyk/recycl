@@ -3,6 +3,7 @@ import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import eventModel from '../../../lib/db/models/eventModel'
 import dbConnect from '../../../lib/db/connection'
+import { METHOD_NOT_ALLOWED } from '../../../lib/helpers/errorHelpers'
 
 export default async function DeleteEvent(
   req: NextApiRequest,
@@ -44,6 +45,6 @@ export default async function DeleteEvent(
       .status(200)
       .json({ message: `${deletedCount} ads successfully deleted` })
   } else {
-    res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 }

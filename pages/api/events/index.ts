@@ -10,7 +10,10 @@ import {
   validSortOrder,
   eventVariants,
 } from '../../../lib/helpers/eventHelpers'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import {
+  apiHandler,
+  METHOD_NOT_ALLOWED,
+} from '../../../lib/helpers/errorHelpers'
 import { Variant, SortOrder, OrderBy } from '../../../lib/types/event'
 
 const queryValidationSchema = yup.object({
@@ -43,7 +46,7 @@ const queryValidationSchema = yup.object({
 
 async function eventsHanlder(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET')
-    return res.status(405).json({ error: 'Method not allowed' })
+    return res.status(405).json({ error: METHOD_NOT_ALLOWED })
 
   //check if user is authenticated
   const session = await getServerSession(req, res, authOptions)

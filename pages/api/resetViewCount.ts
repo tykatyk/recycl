@@ -6,11 +6,12 @@ import dbConnect from '../../lib/db/connection'
 import {
   apiHandler,
   INTERNAL_SERVER_ERROR,
+  METHOD_NOT_ALLOWED,
 } from '../../lib/helpers/errorHelpers'
 
 async function resetViewCount(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    return res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 
   const session = await getServerSession(req, res, authOptions)
