@@ -14,13 +14,13 @@ export default function CreateEvent({
 
 export const getServerSideProps = (async (context) => {
   const session = await getSession({ req: context.req })
-
-  if (!session?.user)
+  if (!session?.user) {
     return {
       redirect: {
         permanent: false,
-        destination: '/auth/login',
+        destination: `/auth/login?from=${encodeURIComponent(context.resolvedUrl)}`,
       },
+    }
     }
 
   await dbConnect()
