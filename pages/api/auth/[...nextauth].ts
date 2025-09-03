@@ -168,7 +168,7 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      if (token) {
+      if (token.id) {
         session.id = token.id
       }
       return session
@@ -177,17 +177,17 @@ export const authOptions: NextAuthOptions = {
       let myUrl: URL
       if (url.startsWith('/')) {
         myUrl = new URL(`${baseUrl}${url}`)
-      } else {
+      } else if (new URL(url).origin === baseUrl) {
         myUrl = new URL(url)
+      } else {
+        myUrl = new URL(baseUrl)
       }
 
       const from = myUrl.searchParams.get('from')
 
-      if (from) {
-        return from
-      }
+      if (from && from.startsWith('/')) return from
 
-      return url
+      return myUrl.toString()
     },
     async signIn({ user, account, profile, email, credentials }) {
       return await dbConnect()
