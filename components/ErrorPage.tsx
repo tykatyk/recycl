@@ -1,18 +1,20 @@
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { Avatar, Box, Button, Typography, Container } from '@mui/material'
-import LayoutWithouHeader from './layouts/LayoutWithoutHeader'
+import LayoutWithoutHeader from './layouts/LayoutWithoutHeader'
 
 const GO_HOME_TEXT = 'На главную'
-const PAGE_NOT_FOUND_HEADER_TEXT = 'Страница не найдена'
-const PAGE_NOT_FOUND_TEXT =
-  'Запрашиваемая вами страница не найдена на этом сервере'
 const HOME_URL = '/'
-const title = 'Страница не найдена | Recycl'
 
-export default function PageNotFound() {
+type ErrorPageProps = {
+  headerText: string
+  contentText: string
+  title: string
+}
+export default function ErrorPage(props: ErrorPageProps) {
+  const { headerText, contentText, title } = props
   return (
     <>
-      <LayoutWithouHeader title={title}>
+      <LayoutWithoutHeader title={title}>
         <Container maxWidth="sm" sx={{ p: 2 }}>
           <Box
             component="main"
@@ -31,10 +33,10 @@ export default function PageNotFound() {
               <ErrorOutlineIcon />
             </Avatar>
             <Typography component="h1" variant="h5" mb={3}>
-              {PAGE_NOT_FOUND_HEADER_TEXT}
+              {headerText}
             </Typography>
             <Typography component="div" align="center" mb={10}>
-              {PAGE_NOT_FOUND_TEXT}
+              {contentText}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -49,7 +51,7 @@ export default function PageNotFound() {
             </Box>
           </Box>
         </Container>
-      </LayoutWithouHeader>
+      </LayoutWithoutHeader>
     </>
   )
 }
