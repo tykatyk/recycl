@@ -184,9 +184,6 @@ export default function MyEvents(props: { variant: Variant }) {
       .catch(() => {
         setBackendError(errorMessage)
       })
-      .finally(() => {
-        setRowAction('')
-      })
   }
 
   const handleSelect = (row: Event) => {
@@ -374,7 +371,7 @@ export default function MyEvents(props: { variant: Variant }) {
       setSortProperty(validatedOrderBy)
       setPage(validatedPage)
       setPageSize(validatedPageSize)
-
+      setRowAction('')
       setLoading(false)
     }
     processChanges()

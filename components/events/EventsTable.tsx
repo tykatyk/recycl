@@ -361,7 +361,7 @@ export default function EventsTable({
                               const ids = rows.map((row) => {
                                 return row._id
                               })
-                              await handleAction(ids as string[], activate)
+                              await handleAction([row._id], activate)
                             }}
                             startIcon={<DeleteIcon />}
                           >
