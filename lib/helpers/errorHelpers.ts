@@ -2,7 +2,13 @@ import { ValidationError } from 'yup'
 import { FormikErrors, FormikHelpers, FormikValues } from 'formik'
 import type { FormValidationError } from '../types/error'
 import { Dispatch, SetStateAction } from 'react'
-import { NextApiRequest, NextApiResponse } from 'next'
+import {
+  NextApiRequest,
+  NextApiResponse,
+  GetServerSideProps,
+  GetServerSidePropsContext,
+} from 'next'
+
 import { errorResponse } from './responses'
 
 export const INTERNAL_SERVER_ERROR = 'Ошибка сервера'
@@ -77,3 +83,31 @@ export const apiHandler =
       })
     }
   }
+
+type Callback<P extends { [key: string]: any }> = (
+  context: GetServerSidePropsContext,
+) => ReturnType<GetServerSideProps<P>>
+
+export function getServerSidePropsHandler<P extends { [key: string]: any }>(
+  callback: Callback<P>,
+  redirectOnError?: string,
+): GetServerSideProps<P> {
+  return async (context: GetServerSidePropsContext) => {
+    try {
+      return await callback(context)
+    } catch (e) {
+      if (redirectOnError) {
+        return {
+          redirect: {
+            destination: redirectOnError,
+            permanent: false,
+          },
+        }
+      }
+
+      return {
+        props: {} as P,
+      }
+    }
+  }
+}
