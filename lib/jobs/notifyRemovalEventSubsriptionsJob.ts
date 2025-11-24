@@ -6,6 +6,9 @@ import subscriptionModel, {
 } from '../db/models/subscription'
 import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
 import { Types } from 'mongoose'
+import fs from 'fs'
+
+const path = 'subscriptionNotification.lock'
 
 type RemovalEventForNotification = {
   agentId: Types.ObjectId
@@ -82,94 +85,6 @@ class Dispatcher {
       this.processTask()
     }, 100)
   }
-}
-
-export async function processSubscriptions() {
-  await dbConnect()
-  const subscriptionCursor = subscriptionModel
-    .find({ isActive: true, name: wasteRemovalSubscription })
-    .cursor()
-  const dispatcher = new Dispatcher()
-
-  //Орієнтовна структура елемента масиву в  notification.locations
-  /*const obj = {
-    locationName,
-    locationId,
-    removals = [
-      { wasteName, events: [{_id, name, street, removalDate, phone, }, {}, {}] },
-    ],
-  }*/
-
-  await subscriptionCursor.eachAsync(async (subscription) => {
-    const populatedSubscription = await subscription.populate<{
-      user: { email: string }
-    }>('user', 'email')
-
-    const locations: Locations = {}
-    const notification: Notification = {
-      receiverEmail: populatedSubscription.user.email,
-      locations,
-    }
-
-    const removalApplications = await removalApplicationModel.find({
-      user: subscription.user._id,
-      isActive: true,
-    })
-
-    for (const ra of removalApplications) {
-      const place_id = ra.wasteLocation.place_id
-      const wasteType = ra.wasteType
-
-      if (locations[place_id] && locations[place_id][wasteType]) continue
-
-      const removalEventsCursor = removalEventModel
-        .find({
-          wasteType: wasteType,
-          city: place_id,
-          date: { $gte: Date.now() },
-          isActive: true,
-        })
-        .cursor()
-
-      const events: any[] = []
-
-      //Певний тип відходів може вивозитись різними переробниками, які публікують оголошення про вивіз відходів (removalEvent)
-      for (
-        //ці івенти бажано закинути одразу в redis і потім витягувати з кешу для підвищення продуктивності
-        let ev = await removalEventsCursor.next(), counter = 0;
-        ev != null && counter <= 2;
-        ev = await removalEventsCursor.next(), counter++
-      ) {
-        const populatedEv = await ev.populate<{ user: { name: string } }>(
-          'user',
-          'name',
-        )
-        events.push({
-          _id: ev.user._id,
-          name: populatedEv.user.name,
-          street: ev.street,
-          removalDate: ev.date,
-          phone: ev.phone,
-        })
-      }
-
-      if (events.length === 0) continue
-
-      if (!locations[place_id]) {
-        locations[place_id] = {
-          structured_formatting: {
-            main_text: ra.wasteLocation.structured_formatting.main_text,
-          },
-          waste_types: {},
-        }
-      }
-      locations[place_id]['wasteTypes'][wasteType] = events
-    }
-
-    dispatcher.addTask(() => {
-      sendEmail(notification)
-    })
-  })
 }
 
 function prepareEmailText(notification: Notification) {
@@ -348,4 +263,132 @@ function prepareEmailText(notification: Notification) {
 async function sendEmail(notification) {
   const emailHtml = prepareEmailText(notification)
   await emailSenderSendpulse(emailHtml)
+}
+
+async function processSubscriptions() {
+  await dbConnect()
+  const subscriptionCursor = subscriptionModel
+    .find({ isActive: true, name: wasteRemovalSubscription })
+    .cursor()
+  const dispatcher = new Dispatcher()
+
+  //Орієнтовна структура елемента масиву в  notification.locations
+  /*const obj = {
+    locationName,
+    locationId,
+    removals = [
+      { wasteName, events: [{_id, name, street, removalDate, phone, }, {}, {}] },
+    ],
+  }*/
+
+  await subscriptionCursor.eachAsync(async (subscription) => {
+    const populatedSubscription = await subscription.populate<{
+      user: { email: string }
+    }>('user', 'email')
+
+    const locations: Locations = {}
+    const notification: Notification = {
+      receiverEmail: populatedSubscription.user.email,
+      locations,
+    }
+
+    const removalApplications = await removalApplicationModel.find({
+      user: subscription.user._id,
+      isActive: true,
+      //where: receive notifications is true
+    })
+
+    //need to group removal applications by place and waste type before processing
+    for (const ra of removalApplications) {
+      const place_id = ra.wasteLocation.place_id
+      const wasteType = ra.wasteType
+
+      if (locations[place_id] && locations[place_id][wasteType]) continue
+
+      const removalEventsCursor = removalEventModel
+        .find({
+          wasteType: wasteType,
+          city: place_id,
+          date: { $gte: Date.now() },
+          isActive: true,
+        })
+        .cursor()
+
+      const events: any[] = []
+
+      //Певний тип відходів може вивозитись різними переробниками, які публікують оголошення про вивіз відходів (removalEvent)
+      for (
+        //ці івенти бажано закинути одразу в redis і потім витягувати з кешу для підвищення продуктивності
+        let ev = await removalEventsCursor.next(), counter = 0;
+        ev != null && counter <= 2;
+        ev = await removalEventsCursor.next(), counter++
+      ) {
+        const populatedEv = await ev.populate<{ user: { name: string } }>(
+          'user',
+          'name',
+        )
+        events.push({
+          _id: ev.user._id,
+          name: populatedEv.user.name,
+          street: ev.street,
+          removalDate: ev.date,
+          phone: ev.phone,
+        })
+      }
+
+      if (events.length === 0) continue
+
+      if (!locations[place_id]) {
+        locations[place_id] = {
+          structured_formatting: {
+            main_text: ra.wasteLocation.structured_formatting.main_text,
+          },
+          waste_types: {},
+        }
+      }
+      locations[place_id]['wasteTypes'][wasteType] = events
+    }
+
+    dispatcher.addTask(() => {
+      sendEmail(notification)
+    })
+  })
+}
+
+function createLock() {
+  try {
+    fs.writeFileSync(path, '', { flag: 'wx' })
+    return true
+  } catch (err) {
+    if (err.code === 'EEXIST') {
+      console.log('Lock file already exists')
+    }
+    return false
+  }
+}
+
+function removeLock() {
+  if (fs.existsSync(path)) fs.unlinkSync(path)
+}
+
+process.on('SIGINT', removeLock) // Ctrl+C
+process.on('SIGTERM', removeLock) // kill
+process.on('exit', removeLock) // graceful exit
+
+async function runJob() {
+  if (!createLock()) return
+
+  try {
+    console.log('Job started.')
+
+    // ---- your actual job logic here ----
+    await processSubscriptions()
+    // -------------------------------------
+
+    console.log('Job finished.')
+  } catch (err) {
+    console.error('Job failed:', err)
+  } finally {
+    removeLock()
+  }
 }
