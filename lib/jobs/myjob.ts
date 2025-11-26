@@ -7,8 +7,10 @@ import subscriptionModel, {
 import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
 import { Types } from 'mongoose'
 import fs from 'fs'
+import { CronJob } from 'cron'
 
 const path = 'subscriptionNotification.lock'
+const dbUrl = 'mongodb://127.0.0.1:27017/recycldb2'
 
 type RemovalEventForNotification = {
   agentId: Types.ObjectId
@@ -256,17 +258,17 @@ function prepareEmailText(notification: Notification) {
     </table>
   </body>
 </html>`
-    return emailHtml
   }
+  return emailHtml
 }
 
-async function sendEmail(notification) {
+async function sendEmail(notification: Notification) {
   const emailHtml = prepareEmailText(notification)
   await emailSenderSendpulse(emailHtml)
 }
 
 async function processSubscriptions() {
-  await dbConnect()
+  await dbConnect(dbUrl)
   const subscriptionCursor = subscriptionModel
     .find({ isActive: true, name: wasteRemovalSubscription })
     .cursor()
@@ -303,7 +305,12 @@ async function processSubscriptions() {
       const place_id = ra.wasteLocation.place_id
       const wasteType = ra.wasteType
 
-      if (locations[place_id] && locations[place_id][wasteType]) continue
+      if (
+        locations.place_id &&
+        locations.place_id.waste_types &&
+        locations.place_id.waste_types.waste_type
+      )
+        continue
 
       const removalEventsCursor = removalEventModel
         .find({
@@ -346,7 +353,7 @@ async function processSubscriptions() {
           waste_types: {},
         }
       }
-      locations[place_id]['wasteTypes'][wasteType] = events
+      locations[place_id]['waste_types'][wasteType] = events
     }
 
     dispatcher.addTask(() => {
@@ -359,7 +366,7 @@ function createLock() {
   try {
     fs.writeFileSync(path, '', { flag: 'wx' })
     return true
-  } catch (err) {
+  } catch (err: any) {
     if (err.code === 'EEXIST') {
       console.log('Lock file already exists')
     }
@@ -381,9 +388,7 @@ async function runJob() {
   try {
     console.log('Job started.')
 
-    // ---- your actual job logic here ----
     await processSubscriptions()
-    // -------------------------------------
 
     console.log('Job finished.')
   } catch (err) {
@@ -392,3 +397,14 @@ async function runJob() {
     removeLock()
   }
 }
+
+const notifyRemovalSubscriptionsJob = new CronJob(
+  '0 * * * * *', // cronTime
+  async function () {
+    await runJob()
+  }, // onTick
+  null, // onComplete
+  true, // start
+)
+
+export default notifyRemovalSubscriptionsJob

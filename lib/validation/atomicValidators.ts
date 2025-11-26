@@ -29,7 +29,7 @@ export const password = yup
 export const confirmPassword = yup
   .string()
   .required(required)
-  .oneOf([yup.ref('password'), null], 'Пароли не совпадают!')
+  .oneOf([yup.ref('password')], 'Пароли не совпадают!')
 
 export const email = yup.string().required(required).email(emailMsg)
 
