@@ -4,9 +4,7 @@ import { Button, Box } from '@mui/material'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import { useRouter } from 'next/router'
 
-export default function BackButton() {
-  const text = 'Назад'
-
+export default function BackButton({ text = 'Назад' }) {
   const router = useRouter()
   const handleClick = () => router.back()
 

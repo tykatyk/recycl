@@ -12,6 +12,7 @@ import { loginSchema } from '../../lib/validation'
 import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import LayoutWithoutHeader from '../layouts/LayoutWithoutHeader'
 import ReCAPTCHA from 'react-google-recaptcha'
+import { useSearchParams } from 'next/navigation'
 
 const USER_NOT_FOUND = 'Пользователь с таким email не найден'
 const LINK_SENT = 'На вашу электронную почту отправлена ссылка для входа'
@@ -21,7 +22,7 @@ const SIGN_IN = 'Войти'
 const SIGN_UP = 'Регистрация'
 const PREFIX = 'LoginPage'
 const REGISTER_URL = '/auth/register'
-const CALLBACK_URL = `${process.env.NEXTAUTH_URL}/api/auth/callback/google`
+const GOOGLE_AUTH_CALLBACK = `${process.env.NEXTAUTH_URL}/api/auth/callback/google`
 
 const classes = {
   paper: `${PREFIX}-paper`,
@@ -59,6 +60,10 @@ export default function SignIn() {
   const [notificatioinType, setNotificationType] = useState('success')
   const [recaptcha, setRecaptcha] = useState(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
+  const searchParams = useSearchParams()
+  const from = searchParams.get('from')
+  const validFrom = from && from[0] === '/' ? from : null
+  const callbackUrl = validFrom ? validFrom : process.env.NEXT_PUBLIC_URL
 
   const handleChange = (token) => {
     setRecaptcha(token)
@@ -66,7 +71,7 @@ export default function SignIn() {
 
   return (
     <Root>
-      <LayoutWithoutHeader title="Вход | Recycl">
+      <LayoutWithoutHeader title="Вход | Recycl" backButtonText={'На главную'}>
         <Container component="main" maxWidth="xs">
           <div className={classes.paper}>
             <Avatar className={classes.avatar}>
@@ -97,6 +102,7 @@ export default function SignIn() {
                 signIn('email', {
                   email: values.email,
                   redirect: false,
+                  callbackUrl,
                 })
                   .then((data) => {
                     if (data.error) {
@@ -158,11 +164,13 @@ export default function SignIn() {
             </Formik>
             <Formik
               initialValues={{
-                callbackUrl: CALLBACK_URL,
+                googleAuthCallback: GOOGLE_AUTH_CALLBACK,
               }}
               onSubmit={async (values, { setSubmitting }) => {
                 setSubmitting(true)
-                await signIn('google')
+                await signIn('google', {
+                  callbackUrl,
+                })
                 setSubmitting(false)
               }}
             >
@@ -170,7 +178,7 @@ export default function SignIn() {
                 return (
                   <Form className={classes.form} noValidate autoComplete="off">
                     <Field
-                      name="callbackUrl"
+                      name="googleAuthCallback"
                       type="hidden"
                       component={TextFieldFormik}
                     />

@@ -112,7 +112,7 @@ export default function Header(props) {
             {status === 'authenticated' && (
               <div className={classes.gutter}>
                 <CreateButton />
-                <UnreadDialogsCounter currentDialogId={currentDialogId} />
+                {/* <UnreadDialogsCounter currentDialogId={currentDialogId} /> */}
               </div>
             )}
             <UserAvatar handleMenu={handleMenu} />

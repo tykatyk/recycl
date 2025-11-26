@@ -173,22 +173,6 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
-    async redirect({ url, baseUrl }) {
-      let myUrl: URL
-      if (url.startsWith('/')) {
-        myUrl = new URL(`${baseUrl}${url}`)
-      } else if (new URL(url).origin === baseUrl) {
-        myUrl = new URL(url)
-      } else {
-        myUrl = new URL(baseUrl)
-      }
-
-      const from = myUrl.searchParams.get('from')
-
-      if (from && from.startsWith('/')) return from
-
-      return myUrl.toString()
-    },
     async signIn({ user, account, profile, email, credentials }) {
       return await dbConnect()
         .then(() => {
