@@ -4,12 +4,17 @@ export const wasteRemovalSubscription = 'wasteRemoval'
 
 const subscriptionElements = new Schema(
   {
-    isActive: { type: Boolean, required: true },
     name: {
-      type: 'String',
-      enum: [wasteRemovalSubscription],
+      type: Schema.Types.ObjectId,
+      ref: 'SubscriptionVariant',
       required: true,
     },
+    description: {
+      type: Schema.Types.ObjectId,
+      ref: 'SubscriptionVariant',
+      required: true,
+    },
+    isActive: { type: Boolean, required: true },
   },
   { timestamps: true },
 )

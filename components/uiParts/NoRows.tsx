@@ -1,7 +1,7 @@
 import InfoIcon from '@mui/icons-material/Info'
 import { Box } from '@mui/material'
 
-export default function NoRows() {
+export default function NoRows({ text = 'Нет данных' }) {
   return (
     <Box
       sx={{
@@ -17,7 +17,7 @@ export default function NoRows() {
           color: 'secondary.main',
         }}
       >
-        Нет данных
+        {text}
       </Box>
     </Box>
   )
