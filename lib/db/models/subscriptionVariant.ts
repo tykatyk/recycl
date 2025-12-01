@@ -11,9 +11,9 @@ const subscriptionVariantSchema = new Schema({
   },
 })
 
-export type subscriptionVariant = InferSchemaType<
+export type SubscriptionVariant = InferSchemaType<
   typeof subscriptionVariantSchema
 >
 
-export default models.subscriptionVariant ||
-  model<subscriptionVariant>('subscriptionVariant', subscriptionVariantSchema)
+export default models.SubscriptionVariant ||
+  model<SubscriptionVariant>('SubscriptionVariant', subscriptionVariantSchema)
