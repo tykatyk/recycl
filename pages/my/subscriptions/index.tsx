@@ -1,174 +1,172 @@
 import {
   Grid,
   Typography,
-  Tabs,
-  Box,
   FormControlLabel,
   Switch,
   Button,
 } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
 import Layout from '../../../components/layouts/Layout'
-import NoRows from '../../../components/uiParts/NoRows'
-const mobileStationAvailable = `Получать уведомления о появлении передвижных пунктов приема отходов из мох обьявлений о наличии отходов`
-const wasteAvailable = `Получать уведомления о добавлении новых объявлений о наличии отходов`
-const titleHeading = 'Мои подписки на получение уведомлений'
-const wasteAvailableHref = '/my/subscriptions/wasteAvailable'
+import PageLoadingCircle from '../../../components/uiParts/PageLoadingCircle'
 import SettingsIcon from '@mui/icons-material/Settings'
+import Snackbars from '../../../components/uiParts/Snackbars'
 import { useEffect, useMemo, useState } from 'react'
+const loadingErrorText = 'Ошибка при загрузке данных'
+const updatingErrorText = 'Ошибка при обновлении данных'
+const titleHeadingText = 'Мои подписки на получение уведомлений'
+const enabledText = 'Включено'
+const disabledText = 'Выключено'
+const configText = 'Настроить'
+const allSubsApi = '/api/subscriptions/variant'
+const userSubsApi = '/api/subscriptions'
+const wasteAvailable = 'wasteAvailable'
+const wasteAvailableHref = '/my/subscriptions/wasteAvailable'
+
+type SubscriptionVariant = {
+  name: String
+  description: String
+}
 
 export default function MySubscriptions() {
-  const [checked, setChecked] = useState(false)
-  const [allSubs, setAllSubs] = useState([])
-  const [userSubs, setUserSubs] = useState([])
+  const [backendError, setBackendError] = useState('')
+  const [allSubs, setAllSubs] = useState<SubscriptionVariant[]>([])
+  const [userSubs, setUserSubs] = useState<String[]>([])
+  const [loading, setLoading] = useState(false)
   const userSubsForSearch = useMemo(() => {
     return new Set(userSubs)
   }, [userSubs])
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked)
+  const handleClose = () => setBackendError('')
+
+  const handleChange = async (subName: String) => {
+    let updatedSubs: String[] = []
+    if (userSubsForSearch.has(subName)) {
+      updatedSubs = userSubs.filter((item) => {
+        return item !== subName
+      })
+    } else {
+      updatedSubs = [...userSubs, subName]
+    }
+    setUserSubs(updatedSubs)
+    await updateUserSubscriptions(updatedSubs)
   }
 
-  async function fetchAllSubs() {
-    return await fetch('/api/subscriptions/variant', {
+  async function fetchAllSubscriptions() {
+    return await fetch(allSubsApi, {
+      method: 'GET',
+    })
+      .then((respone) => {
+        return respone.json()
+      })
+      .then((result: SubscriptionVariant[]) => {
+        return result
+      })
+  }
+
+  async function fetchUserSubscriptions() {
+    return await fetch(userSubsApi, {
       method: 'GET',
     })
       .then((respone) => {
         return respone.json()
       })
       .then((result) => {
-        setAllSubs(result)
+        return result || []
       })
-      .catch((err) => console.log(err))
   }
 
-  async function fetchUserSubs() {
-    return await fetch('/api/subscriptions', {
-      method: 'GET',
-    })
-      .then((respone) => {
-        return respone.json()
-      })
-      .then((result) => {
-        setUserSubs(result.elements || [])
-      })
-      .catch((err) => console.log(err))
-  }
-
-  async function updateUserSubs(userSubs) {
-    return await fetch('/api/subscriptions', {
+  async function updateUserSubscriptions(updatedSubs: typeof userSubs) {
+    await fetch(userSubsApi, {
       method: 'POST',
-      body: JSON.stringify({ userSubs }),
+      body: JSON.stringify({ updatedSubs }),
       headers: { 'Content-Type': 'application/json' },
-    })
-      .then((respone) => {
-        return respone.json()
-      })
-      .then((result) => {
-        console.log('updated user sub')
-        console.log(result)
-      })
-      .catch((err) => console.log(err))
+    }).catch((_) => setBackendError(updatingErrorText))
   }
 
   useEffect(() => {
-    fetchUserSubs()
-    fetchAllSubs()
+    async function setSubs() {
+      setLoading(true)
+      try {
+        const allSubs = await fetchAllSubscriptions()
+        setAllSubs(allSubs)
+        const userSubs = await fetchUserSubscriptions()
+        setUserSubs(userSubs)
+      } catch (_) {
+        setBackendError(loadingErrorText)
+      }
+
+      setLoading(false)
+    }
+    setSubs()
   }, [])
 
-  useEffect(() => {})
+  let content: React.ReactNode = null
 
-  return (
-    <Layout title={`${titleHeading} | Recycl`}>
-      <Typography gutterBottom variant="h4" component="h1" sx={{ mb: 8 }}>
-        {titleHeading}
-      </Typography>
-
-      {allSubs.map((sub, index) => {
-        return (
-          <Grid
-            key={index}
-            container
-            spacing={1}
-            sx={{
-              alignItems: 'center',
-              borderTop: '1px solid #fff',
-              borderBottom: '1px solid #fff',
-              pt: 2,
-              pb: 2,
-            }}
-          >
-            <Grid item xs={12}>
-              <Typography>{sub.description}</Typography>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Box>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      color="secondary"
-                      checked={userSubsForSearch.has(sub.name)}
-                      onChange={async (e) => {
-                        handleChange(e)
-                        let updatedSubs
-                        if (userSubsForSearch.has(sub.name)) {
-                          updatedSubs = userSubs.filter((subToFilter) => {
-                            return subToFilter.name !== sub.name
-                          })
-                        } else {
-                          updatedSubs = [...userSubs, sub.name]
-                        }
-                        setUserSubs(updatedSubs)
-
-                        await updateUserSubs(updatedSubs)
-                      }}
-                      inputProps={{ 'aria-label': 'controlled' }}
-                    />
-                  }
-                  label="Включено"
-                />
-              </Box>
-            </Grid>
-          </Grid>
-        )
-      })}
-
+  const data = allSubs.map((sub, index) => {
+    return (
       <Grid
+        key={index}
         container
         spacing={1}
         sx={{
           alignItems: 'center',
-          // borderTop: '1px solid #fff',
-          borderBottom: '1px solid #fff',
-          pt: 2,
-          pb: 2,
+          borderBottom: '1px solid #7d7d7d',
+          pt: 3,
+          pb: 3,
         }}
       >
         <Grid item xs={12}>
-          <Typography> {wasteAvailable}</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Box>
-            <FormControlLabel
-              control={<Switch defaultChecked color="secondary" />}
-              label="Включено"
-            />
-          </Box>
+          <Typography>{sub.description}</Typography>
         </Grid>
 
         <Grid item xs={12}>
-          <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                color="secondary"
+                checked={userSubsForSearch.has(sub.name)}
+                onChange={async (e) => {
+                  await handleChange(sub.name)
+                }}
+                inputProps={{ 'aria-label': 'controlled' }}
+              />
+            }
+            label={userSubsForSearch.has(sub.name) ? enabledText : disabledText}
+          />
+        </Grid>
+        {sub.name === wasteAvailable ? (
+          <Grid item xs={12}>
             <Button
               startIcon={<SettingsIcon />}
               color="secondary"
               href={wasteAvailableHref}
+              disabled={userSubsForSearch.has(sub.name) ? false : true}
             >
-              Настроить
+              {configText}
             </Button>
-          </Box>
-        </Grid>
+          </Grid>
+        ) : null}
       </Grid>
+    )
+  })
+
+  if (loading) {
+    content = <PageLoadingCircle />
+  } else {
+    content = data
+  }
+
+  return (
+    <Layout title={`${titleHeadingText} | Recycl`}>
+      <Typography gutterBottom variant="h4" component="h1" sx={{ mb: 8 }}>
+        {titleHeadingText}
+      </Typography>
+      {content}
+      <Snackbars
+        severity="error"
+        message={backendError}
+        open={!!backendError}
+        handleClose={handleClose}
+      />
     </Layout>
   )
 }

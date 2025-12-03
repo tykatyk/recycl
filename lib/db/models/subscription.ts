@@ -1,7 +1,5 @@
 import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
 
-export const wasteRemovalSubscription = 'wasteRemoval'
-
 const subscriptionElements = new Schema({
   name: {
     type: Schema.Types.ObjectId,
@@ -23,7 +21,7 @@ const subscriptionSchema = new Schema(
       ref: 'User',
       required: true,
     },
-    elements: [subscriptionElements],
+    elements: [String],
   },
   { timestamps: true },
 )
