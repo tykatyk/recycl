@@ -424,7 +424,7 @@ export default function MyEvents(props: { variant: Variant }) {
           margin: '0 auto',
         }}
       >
-        <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
+        <Typography gutterBottom variant="h4" component="h1" sx={{ mb: 4 }}>
           {titleHeading}
         </Typography>
         <Tabs value={variant} handleChange={handleVariantChange}>
