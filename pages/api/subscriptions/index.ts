@@ -3,12 +3,9 @@ import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import SubscriptionModel from '../../../lib/db/models/subscription'
 import dbConnect from '../../../lib/db/connection'
-import {
-  apiHandler,
-  METHOD_NOT_ALLOWED,
-} from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../lib/helpers/errorHelpers'
 
-async function getSubscriptions(req: NextApiRequest, res: NextApiResponse) {
+async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.id) return res.status(401).end()
@@ -20,7 +17,7 @@ async function getSubscriptions(req: NextApiRequest, res: NextApiResponse) {
       user: session.id,
     })
 
-    return res.json(subscriptions.elements)
+    return res.json(subscriptions?.elements || [])
   }
 
   if (req.method === 'POST') {
@@ -39,4 +36,4 @@ async function getSubscriptions(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default apiHandler(getSubscriptions)
+export default apiHandler(mySubscriptions)

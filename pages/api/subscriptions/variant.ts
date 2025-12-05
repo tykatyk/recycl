@@ -8,10 +8,7 @@ import {
   METHOD_NOT_ALLOWED,
 } from '../../../lib/helpers/errorHelpers'
 
-async function getSubscriptionVariants(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+async function subscriptionVariants(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
@@ -25,4 +22,4 @@ async function getSubscriptionVariants(
   return res.json(subscriptionVariants)
 }
 
-export default apiHandler(getSubscriptionVariants)
+export default apiHandler(subscriptionVariants)

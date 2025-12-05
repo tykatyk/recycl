@@ -1,19 +1,4 @@
 import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
-
-const subscriptionElements = new Schema({
-  name: {
-    type: Schema.Types.ObjectId,
-    ref: 'SubscriptionVariant',
-    required: true,
-  },
-  description: {
-    type: Schema.Types.ObjectId,
-    ref: 'SubscriptionVariant',
-    required: true,
-  },
-  isActive: { type: Boolean, required: true },
-})
-
 const subscriptionSchema = new Schema(
   {
     user: {
