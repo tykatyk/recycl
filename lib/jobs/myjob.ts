@@ -1,11 +1,9 @@
 import dbConnect from '../db/connection'
 import removalEventModel from '../db/models/eventModel'
 import removalApplicationModel from '../db/models/removalApplication'
-import subscriptionModel, {
-  wasteRemovalSubscription,
-} from '../db/models/subscription'
+import { Subscription } from '../db/models'
 import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
-import { Types } from 'mongoose'
+import mongoose, { Types } from 'mongoose'
 import fs from 'fs'
 import { CronJob } from 'cron'
 
@@ -269,9 +267,17 @@ async function sendEmail(notification: Notification) {
 
 async function processSubscriptions() {
   await dbConnect(dbUrl)
-  const subscriptionCursor = subscriptionModel
-    .find({ isActive: true, name: wasteRemovalSubscription })
-    .cursor()
+  const users = await Subscription.find({
+    elements: 'mobileStationAvailable',
+  })
+    .populate({ path: 'user', select: 'email -_id' })
+    // .populate('user', 'email')
+    .select('user')
+
+  // .exec()
+  // .select('user')
+  // .cursor()
+  console.log(users)
   const dispatcher = new Dispatcher()
 
   //Орієнтовна структура елемента масиву в  notification.locations
@@ -283,7 +289,13 @@ async function processSubscriptions() {
     ],
   }*/
 
-  await subscriptionCursor.eachAsync(async (subscription) => {
+  const removalApplications = await removalApplicationModel.find({
+    user: { $in: users },
+    isActive: true,
+    //where: receive notifications is true
+  })
+
+  /*await users.eachAsync(async (subscription) => {
     const populatedSubscription = await subscription.populate<{
       user: { email: string }
     }>('user', 'email')
@@ -294,11 +306,7 @@ async function processSubscriptions() {
       locations,
     }
 
-    const removalApplications = await removalApplicationModel.find({
-      user: subscription.user._id,
-      isActive: true,
-      //where: receive notifications is true
-    })
+ 
 
     //need to group removal applications by place and waste type before processing
     for (const ra of removalApplications) {
@@ -321,7 +329,7 @@ async function processSubscriptions() {
         })
         .cursor()
 
-      const events: any[] = []
+      const events: any[] = [] //ToDo: change any to smth more meaningful
 
       //Певний тип відходів може вивозитись різними переробниками, які публікують оголошення про вивіз відходів (removalEvent)
       for (
@@ -359,10 +367,10 @@ async function processSubscriptions() {
     dispatcher.addTask(() => {
       sendEmail(notification)
     })
-  })
+  })*/
 }
 
-function createLock() {
+/*function createLock() {
   try {
     fs.writeFileSync(path, '', { flag: 'wx' })
     return true
@@ -407,4 +415,7 @@ const notifyRemovalSubscriptionsJob = new CronJob(
   true, // start
 )
 
-export default notifyRemovalSubscriptionsJob
+// export default notifyRemovalSubscriptionsJob
+// export default runJob()
+*/
+export default processSubscriptions()
