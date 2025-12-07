@@ -1,4 +1,5 @@
-import { Schema, models, model } from 'mongoose'
+import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
+import type { ValidatorProps } from 'mongoose'
 import cryptoRandomString from 'crypto-random-string'
 import {
   phone as phoneValidator,
@@ -6,7 +7,7 @@ import {
 } from '../../validation/atomicValidators'
 
 //validates email
-const checkEmail = (v) => {
+const checkEmail = (v: string) => {
   try {
     return !!emailValidator.validateSync(v)
   } catch (error) {
@@ -25,7 +26,7 @@ const locationSchema = new Schema({
   },
 })
 
-const userSchema = Schema(
+const userSchema = new Schema(
   {
     name: {
       type: String,
@@ -37,14 +38,15 @@ const userSchema = Schema(
     phone: {
       type: String,
       validate: {
-        validator: (v) => {
+        validator: (v: string) => {
           try {
             return !!phoneValidator.validateSync(v)
           } catch (error) {
             return false
           }
         },
-        message: (props) => `${props.value} Недействительный номер телефона!`,
+        message: (props: ValidatorProps) =>
+          `${props.value} Недействительный номер телефона!`,
       },
     },
     email: {
@@ -53,7 +55,7 @@ const userSchema = Schema(
       unique: true,
       validate: {
         validator: checkEmail,
-        message: (props) =>
+        message: (props: ValidatorProps) =>
           `${props.value} Недействительный адрес электронной почты!`,
       },
       lowercase: true,
@@ -64,7 +66,7 @@ const userSchema = Schema(
       unique: false,
       validate: {
         validator: checkEmail,
-        message: (props) =>
+        message: (props: ValidatorProps) =>
           `${props.value} Недействительный адрес электронной почты!`,
       },
       lowercase: true,
@@ -126,5 +128,7 @@ userSchema.methods.generateEmailConfirm = function (length = 128) {
   this.confirmEmailToken = cryptoRandomString({ length, type: 'url-safe' })
   this.confirmEmailExpires = Date.now() + 3600000
 }
+export type UserType = InferSchemaType<typeof userSchema>
 
-export default models.User || model('User', userSchema)
+export default (models.User as Model<UserType>) ||
+  model<UserType>('User', userSchema)
