@@ -8,6 +8,7 @@ import mongoose, { Types } from 'mongoose'
 import fs from 'fs'
 import { CronJob } from 'cron'
 import { wasteLocation } from '../helpers/dbModelCommons'
+import subscription from '../db/models/subscription'
 
 const path = 'subscriptionNotification.lock'
 const dbUrl = 'mongodb://127.0.0.1:27017/recycldb2'
@@ -276,8 +277,10 @@ async function processSubscriptions() {
     .populate<{ user: UserType & { _id: mongoose.ObjectId } }>('user', 'email') // populate user but only include the email field
     .select('-_id user') // select only the user field from Subscription
 
-  const emailAddresses = subscriptions.map((s) => s.user.email)
   const users = subscriptions.map((s) => s.user._id)
+  const userMap = new Map(
+    subscriptions.map((s) => [s.user._id.toString(), s.user.email]),
+  )
 
   const dispatcher = new Dispatcher()
 
@@ -292,7 +295,7 @@ async function processSubscriptions() {
 
   const removalApplications = await removalApplicationModel.aggregate([
     {
-      $match: { user: { $in: users } },
+      $match: { user: { $in: subscriptions.map((s) => s.user._id) } },
     }, // isActive: true,//<---Should add isActive or expires filter for removal applications
     {
       $group: {
@@ -313,8 +316,13 @@ async function processSubscriptions() {
       },
     },
   ])
-  console.log('removal applications')
-  console.log(removalApplications[0].docs)
+
+  const result = removalApplications.map((r) => ({
+    ...r,
+    email: userMap.get(r._id.toString()),
+  }))
+
+  console.log(result)
 
   /*await users.eachAsync(async (subscription) => {
     const populatedSubscription = await subscription.populate<{
