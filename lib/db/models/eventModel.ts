@@ -13,7 +13,7 @@ const eventSchema = new Schema(
       type: String,
       required: true,
     },
-    street: { type: String, required: true },
+    street: { type: String /*required: true*/ },
     date: { type: Date, required: true },
     phone: { ...contactPhone, required: true },
 

@@ -13,29 +13,26 @@ import subscription from '../db/models/subscription'
 const path = 'subscriptionNotification.lock'
 const dbUrl = 'mongodb://127.0.0.1:27017/recycldb2'
 
-type RemovalEventForNotification = {
+interface Agent {
   agentId: Types.ObjectId
   agentName: string
-  agentStreet: string
-  agentDate: Date
-  agentPhone: string
+  date: Date
 }
 
 type Removal = {
-  [wasteName: string]: RemovalEventForNotification[]
+  [wasteName: string]: Agent[]
 }
 
 type Locations = {
-  [place_id: string]: {
-    structured_formatting: {
-      main_text: string
-    }
-    waste_types: Removal
+  [locationId: string]: {
+    locationName: string
+    wasteTypes: Removal
   }
 }
 
 type Notification = {
   receiverEmail: string
+  receiverName: string
   locations: Locations
 }
 
@@ -89,14 +86,16 @@ class Dispatcher {
     }, 100)
   }
 }
-
+//
 function prepareEmailText(notification: Notification) {
-  const host = 'localhost:3000'
+  const host = 'http://localhost:3000'
   const yellow = ' #f8bc45'
+  const logoPath = '../public/images/logo.png'
+  // const logoPath = 'http://localhost:3000/logo.png'
   let emailHtml = `<html>
   <head>
     <meta charset="utf-8" />
-    <title>Список событий вывоза отходов </title>
+    <title>Список событий по приему вторсырья </title>
   </head>
   <body style="font-family: Arial, Helvetica, sans-serif; color: #fff">
     <table
@@ -114,47 +113,45 @@ function prepareEmailText(notification: Notification) {
     >
       <tr>
         <td align="center" style="padding: 10px 0px; color: #fff">
-          <a
-            href="http://localhost:3000"
-            style="display: inline-block; text-decoration: none"
-          >
-            <table role="presentation">
-              <tr>
-                <td style="color: #fff">
-                  <img
-                    src="../../../public/images/logo.png"
-                    alt="Logo"
-                    width="30"
-                    style="display: block; border: 0"
-                  />
-                </td>
-                <td
-                  style="
-                    font-size: 24px;
-                    font-weight: bold;
-                    letter-spacing: 0;
-                    color: #adce5d;
-                  "
-                >
-                  Recycl
-                </td>
-              </tr>
-            </table>
-          </a>
+         <a href="${host}" style="display: inline-block; text-decoration: none; color: #adce5d;">
+          <table role="presentation">
+            <tr>
+              <td>
+                <img
+                  src="${logoPath}"
+                  alt="Logo"
+                  width="30"
+                  style="display: block; border: 0"
+                />
+              </td>
+              <td
+                style="
+                  font-size: 24px;
+                  font-weight: bold;
+                  letter-spacing: 0;
+                "
+              >
+                Recycl
+              </td>
+            </tr>
+          </table>
+         
+         </a>
+         
         </td>
       </tr>
       <tr>
         <td
           align="center"
-          style="font-size: 24px; font-weight: bold; color: #ccc"
+          style="font-size: 32px; font-weight: bold;"
         >
-          Информируем вас о событиях по вывозу отходов, на которые вы подписаны
+          Информируем вас о предстоящих событиях по сбору вторсырья в вашем населенном пункте
         </td>
       </tr>
 `
 
   for (const place_id in notification.locations) {
-    emailHtml += `      <!--city row-->
+    emailHtml += `<!--city row-->
       <tr>
         <td style="padding: 24px 0">
           <!--city table-->
@@ -167,64 +164,67 @@ function prepareEmailText(notification: Notification) {
             width="100%"
           >
             <tr>
-              <th style="font-size: 32px; padding-bottom: 24px">${notification.locations[place_id].structured_formatting.main_text}</th>
+              <th style="font-size: 24px; padding-bottom: 16px">Населенный пункт: ${notification.locations[place_id].locationName}</th>
             </tr>
       `
 
-    for (const waste_type in notification.locations[place_id].waste_types) {
+    for (const waste_type in notification.locations[place_id].wasteTypes) {
       emailHtml += ` <!--waste type row-->
             <tr>
-              <td style="padding-bottom: 16px">
+              <td style="padding-bottom: 8px">
                 <!--waste type table-->
-                <table>
+                <table style="font-size: 16px; color: #fff;">
                  <tr>
                     <th
                       align="left"
-                      style="
-                        font-size: 24px;
-                        padding: 0 0 16px 8px;
-                        color: #fff;
-                      "
+                      style="padding: 0 0 16px 8px;"
                     >
-                     ${waste_type}
+                     Тип собираемого вторсырья: ${waste_type}
                     </th>
                   </tr>
                 `
 
       let counter = 0
-      const removals = notification.locations[place_id].waste_types[waste_type]
+      const removals = notification.locations[place_id].wasteTypes[waste_type]
+      const locationName = notification.locations[place_id].locationName
 
       removals.forEach((ev) => {
-        const { agentDate, agentName, agentStreet } = { ...ev }
-        emailHtml += `  <tr>
-                    <td style="${counter === removals.length - 1 ? '' : 'padding-bottom: 16px'}; padding-left: 16px">
-                      <table>
-                        <tr>
-                          <td>${agentDate}</td>
-                        </tr>
-                        <tr>
-                          <td>${agentStreet}</td>
-                        </tr>
-                        <tr>
-                          <td>${agentName}</td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <a
-                              style="
-                                display: inline-block;
-                                padding-top: 4px;
-                                text-decoration: none;
-                                color:${yellow};
-                              "
-                              href="${host}/removalEvents/?agent=${agentName}&city=${location}"
-                              >Подробнее</a
-                            >
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>`
+        const { date: agentDate, agentName } = { ...ev }
+        const detailsHref = new URL(`${host}/removalEvents`)
+        detailsHref.searchParams.set('agent', agentName)
+        detailsHref.searchParams.set('location', locationName)
+        const year = agentDate.getFullYear()
+        const month = (agentDate.getMonth() + 1).toString().padStart(2, '0')
+        const day = agentDate.getDate().toString().padStart(2, '0')
+        const hours = agentDate.getHours().toString().padStart(2, '0')
+        const minutes = agentDate.getMinutes().toString().padStart(2, '0')
+
+        emailHtml += `<tr style="color: #ccc; line-height: 1.1">
+                        <td style="${counter === removals.length - 1 ? '' : 'padding-bottom: 16px'};padding-left: 8px">
+                          <table>
+                            <tr>
+                              <td>Дата и время: ${day}-${month}-${year}, ${hours}:${minutes}</td>
+                            </tr>
+                            <tr>
+                              <td>Организатор: ${agentName}</td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <a
+                                  style="
+                                    display: inline-block;
+                                    padding-top: 4px;
+                                    text-decoration: none;
+                                    color:${yellow};
+                                  "
+                                  href="${detailsHref}"
+                                  >Подробнее</a
+                                >
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>`
         counter++
       })
 
@@ -264,8 +264,27 @@ function prepareEmailText(notification: Notification) {
 }
 
 async function sendEmail(notification: Notification) {
+  if (!notification.receiverEmail) {
+    console.log('No receiver email')
+    return
+  }
+
   const emailHtml = prepareEmailText(notification)
-  await emailSenderSendpulse(emailHtml)
+  const emailObj = {
+    html: emailHtml,
+    subject: 'Предстоящие события по сбору вторсырья в вашем городе',
+    from: {
+      name: 'Recycl',
+      email: 'notify@yoused.com.ua',
+    },
+    to: [
+      {
+        name: notification.receiverName,
+        email: notification.receiverEmail,
+      },
+    ],
+  }
+  await emailSenderSendpulse(emailObj)
 }
 
 async function processSubscriptions() {
@@ -274,12 +293,15 @@ async function processSubscriptions() {
     elements: 'mobileStationAvailable',
   })
 
-    .populate<{ user: UserType & { _id: mongoose.ObjectId } }>('user', 'email') // populate user but only include the email field
-    .select('-_id user') // select only the user field from Subscription
+    .populate<{ user: UserType & { _id: mongoose.ObjectId } }>('user', 'email') //include only the email field
+    .select('-_id user')
 
   const users = subscriptions.map((s) => s.user._id)
   const userMap = new Map(
-    subscriptions.map((s) => [s.user._id.toString(), s.user.email]),
+    subscriptions.map((s) => [
+      s.user._id.toString(),
+      { email: s.user.email, name: s.user.name },
+    ]),
   )
 
   const dispatcher = new Dispatcher()
@@ -292,111 +314,207 @@ async function processSubscriptions() {
       { wasteName, events: [{_id, name, street, removalDate, phone, }, {}, {}] },
     ],
   }*/
+  interface AggregatedApplication {
+    userId: mongoose.Types.ObjectId
+    // email: string
+    docs: [{ locationId: string; locationName: string; wasteTypes: string[] }]
+  }
+  const aggregatedRemovalApplications =
+    await removalApplicationModel.aggregate<AggregatedApplication>([
+      {
+        $match: { user: { $in: subscriptions.map((s) => s.user._id) } },
+      }, // isActive: true,//<---Should add isActive or expires filter for removal applications
+      {
+        $group: {
+          _id: {
+            userId: '$user',
+            locationId: '$wasteLocation.place_id',
+          },
+          locationName: {
+            $first: '$wasteLocation.structured_formatting.main_text',
+          },
+          docs: {
+            $addToSet: '$wasteType',
+          },
+        },
+      },
 
-  const removalApplications = await removalApplicationModel.aggregate([
+      {
+        $group: {
+          _id: '$_id.userId',
+          docs: {
+            $push: {
+              locationId: '$_id.locationId',
+              locationName: '$locationName',
+              wasteTypes: '$docs',
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: '$_id',
+          docs: '$docs',
+        },
+      },
+    ])
+
+  const removalApplications = aggregatedRemovalApplications.map((r) => {
+    const user = userMap.get(r.userId.toString())
+    return {
+      ...r,
+      userEmail: user?.email || '',
+      userName: user?.name || '',
+    }
+  })
+
+  interface EventByWasteType {
+    wasteType: string
+    agents: Agent[]
+  }
+
+  interface AggregatedEvent {
+    locationId: string
+    locationName: string
+    eventsByWasteType: EventByWasteType[]
+  }
+  const removalEvents = await removalEventModel.aggregate<AggregatedEvent>([
     {
-      $match: { user: { $in: subscriptions.map((s) => s.user._id) } },
-    }, // isActive: true,//<---Should add isActive or expires filter for removal applications
+      $match: {
+        isActive: true,
+        // date: { $gte: new Date() },
+        'location.structured_formatting.main_text': 'Сумы',
+      },
+    },
+
+    {
+      $sort: {
+        date: 1,
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'populatedUser',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+            },
+          },
+        ],
+      },
+    },
+    { $unwind: '$populatedUser' },
     {
       $group: {
         _id: {
-          user: '$user',
-          wasteLocation: '$wasteLocation.structured_formatting.main_text',
+          userId: '$user',
+          locationId: '$location.place_id',
+          wasteType: '$waste',
         },
+        locationName: { $first: '$location.structured_formatting.main_text' },
+        agentName: { $first: '$populatedUser.name' },
+        date: { $first: '$date' },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          locationId: '$_id.locationId',
+          wasteType: '$_id.wasteType',
+        },
+        locationName: { $first: '$locationName' },
+        agentsByWasteType: {
+          $push: {
+            agentId: '$_id.userId',
+            agentName: '$agentName',
+            date: '$date',
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: '$_id',
+        locationName: '$locationName',
+        agentsByWasteType: {
+          $slice: ['$agentsByWasteType', 3], //only 3 agents to avoid long emails
+        },
+      },
+    },
+    {
+      $group: {
+        _id: '$_id.locationId',
+        locationName: { $first: '$locationName' },
         docs: {
-          $push: { wasteType: '$wasteType' },
+          $push: { wasteType: '$_id.wasteType', agents: '$agentsByWasteType' },
         },
       },
     },
 
     {
-      $group: {
-        _id: '$_id.user',
-        docs: { $push: { wasteLocation: '$_id.wasteLocation', subs: '$docs' } },
+      $project: {
+        _id: 0,
+        locationId: '$_id',
+        locationName: '$locationName',
+        eventsByWasteType: '$docs',
       },
     },
   ])
 
-  const result = removalApplications.map((r) => ({
-    ...r,
-    email: userMap.get(r._id.toString()),
-  }))
+  const removalEventsMap = new Map(
+    removalEvents.map((re) => {
+      const { locationId, eventsByWasteType, locationName } = re
+      const eventsMap = new Map(
+        eventsByWasteType.map((doc) => [doc.wasteType, doc.agents]),
+      )
+      return [locationId, { eventsMap, locationName }]
+    }),
+  )
 
-  console.log(result)
-
-  /*await users.eachAsync(async (subscription) => {
-    const populatedSubscription = await subscription.populate<{
-      user: { email: string }
-    }>('user', 'email')
-
+  removalApplications.forEach(async (application) => {
     const locations: Locations = {}
     const notification: Notification = {
-      receiverEmail: populatedSubscription.user.email,
+      receiverEmail: application.userEmail,
+      receiverName: application.userName,
       locations,
     }
 
- 
+    for (const doc of application.docs) {
+      const locationId = doc.locationId
+      let agents: Agent[] | undefined = []
 
-    //need to group removal applications by place and waste type before processing
-    for (const ra of removalApplications) {
-      const place_id = ra.wasteLocation.place_id
-      const wasteType = ra.wasteType
+      const allEventsByLocation = removalEventsMap.get(doc.locationId)
+      if (!allEventsByLocation) continue
 
-      if (
-        locations.place_id &&
-        locations.place_id.waste_types &&
-        locations.place_id.waste_types.waste_type
-      )
-        continue
+      const removalbleWasteTypes: Record<string, Agent[]> = {}
+      for (const wasteType of doc.wasteTypes) {
+        agents = allEventsByLocation.eventsMap.get(wasteType)
+        if (!agents || agents.length === 0) continue
 
-      const removalEventsCursor = removalEventModel
-        .find({
-          wasteType: wasteType,
-          city: place_id,
-          date: { $gte: Date.now() },
-          isActive: true,
-        })
-        .cursor()
-
-      const events: any[] = [] //ToDo: change any to smth more meaningful
-
-      //Певний тип відходів може вивозитись різними переробниками, які публікують оголошення про вивіз відходів (removalEvent)
-      for (
-        //ці івенти бажано закинути одразу в redis і потім витягувати з кешу для підвищення продуктивності
-        let ev = await removalEventsCursor.next(), counter = 0;
-        ev != null && counter <= 2;
-        ev = await removalEventsCursor.next(), counter++
-      ) {
-        const populatedEv = await ev.populate<{ user: { name: string } }>(
-          'user',
-          'name',
-        )
-        events.push({
-          _id: ev.user._id,
-          name: populatedEv.user.name,
-          street: ev.street,
-          removalDate: ev.date,
-          phone: ev.phone,
-        })
-      }
-
-      if (events.length === 0) continue
-
-      if (!locations[place_id]) {
-        locations[place_id] = {
-          structured_formatting: {
-            main_text: ra.wasteLocation.structured_formatting.main_text,
-          },
-          waste_types: {},
+        if (!locations[locationId]) {
+          locations[locationId] = {
+            locationName: doc.locationName,
+            wasteTypes: {} as Removal,
+          }
         }
+
+        removalbleWasteTypes[wasteType] = agents
+
+        locations[locationId].wasteTypes = removalbleWasteTypes
       }
-      locations[place_id]['waste_types'][wasteType] = events
+      //ToDo: check if wasteTypes has smth.
     }
 
     dispatcher.addTask(() => {
       sendEmail(notification)
     })
-  })*/
+  })
 }
 
 /*function createLock() {
@@ -447,4 +565,5 @@ const notifyRemovalSubscriptionsJob = new CronJob(
 // export default notifyRemovalSubscriptionsJob
 // export default runJob()
 */
+
 export default processSubscriptions()
