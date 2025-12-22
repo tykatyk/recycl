@@ -1,6 +1,6 @@
 //https://next-auth.js.org/providers/email#customizing-emails
 
-import { ThemeColors } from '../types/themeColors'
+import { ThemeColors } from '../../types/themeColors'
 
 /**
  * Email HTML body
