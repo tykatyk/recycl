@@ -1,4 +1,10 @@
-import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
+import mongoose, {
+  Schema,
+  models,
+  model,
+  InferSchemaType,
+  Model,
+} from 'mongoose'
 import type { ValidatorProps } from 'mongoose'
 import cryptoRandomString from 'crypto-random-string'
 import {
@@ -79,7 +85,6 @@ const userSchema = new Schema(
     image: {
       type: String,
     },
-
     resetEmailToken: {
       type: String,
       required: false,
@@ -106,6 +111,11 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    subscriptions: [
+      {
+        type: String,
+      },
+    ],
     roles: [
       {
         type: Schema.Types.ObjectId,

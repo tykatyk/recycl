@@ -1,75 +1,26 @@
 import dbConnect from '../db/connection'
 import removalEventModel from '../db/models/eventModel'
 import removalApplicationModel from '../db/models/removalApplication'
-import { Subscription } from '../db/models'
-import { UserType } from '../db/models/user'
+import { User } from '../db/models'
+import type { UserType } from '../db/models/user'
 import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
 import prepareEmailText from '../helpers/email/wasteRemovalSubscriptionEmail'
 import mongoose, { Types } from 'mongoose'
 import fs from 'fs'
 import { CronJob } from 'cron'
 import { wasteLocation } from '../helpers/dbModelCommons'
-import subscription from '../db/models/subscription'
+import EmailSendingDispatcher from '../helpers/email/emailSendingDispatcher'
 import type {
   Agent,
   WasteRemovalEvents,
   WasteRemovalByLocation,
   WasteRemovalNotification,
 } from '../helpers/email/types/wasteRemovalNotification'
+import type { RequestInit, Response } from 'node-fetch'
+import { default as fetch } from 'node-fetch'
 
 const path = 'subscriptionNotification.lock'
 const dbUrl = 'mongodb://127.0.0.1:27017/recycldb2'
-
-class Dispatcher {
-  hourLimit: number
-  minuteLimit: number
-  timestamps: number[]
-  queue: any[]
-  timeout: NodeJS.Timeout | undefined
-
-  constructor() {
-    this.hourLimit = 2500 //запитів за годину
-    this.minuteLimit = 1000 //запитів за хвилину
-    this.timestamps = []
-    this.queue = []
-    this.timeout = undefined
-  }
-
-  canSendNext() {
-    this.timestamps = this.timestamps.filter((timestamp) => {
-      Date.now() - timestamp <= 3600 * 1000
-    })
-    const lastMinuteCount = this.timestamps.filter((timestamp) => {
-      Date.now() - timestamp <= 60 * 1000
-    }).length
-    const lastHourCount = this.timestamps.length
-    return lastMinuteCount < this.minuteLimit && lastHourCount < this.hourLimit
-  }
-
-  addTask(task: (...args: [any]) => any): void {
-    this.queue.push(task)
-    this.processTask()
-  }
-
-  processTask() {
-    if (this.queue.length === 0) {
-      clearTimeout(this.timeout)
-      return
-    }
-
-    if (this.canSendNext()) {
-      const task = this.queue.shift()
-      this.timestamps.push(Date.now())
-      task()
-    }
-
-    clearTimeout(this.timeout)
-
-    this.timeout = setTimeout(() => {
-      this.processTask()
-    }, 100)
-  }
-}
 
 async function sendEmail(notification: WasteRemovalNotification) {
   return
@@ -99,24 +50,44 @@ async function sendEmail(notification: WasteRemovalNotification) {
   }
   await emailSenderSendpulse(email)
 }
+const view = 'subscriptions'
+
+async function getSubscribedUsers() {
+  type SubscribedUser = Pick<
+    UserType & { _id: string },
+    '_id' | 'name' | 'email'
+  >
+
+  const userAPIEndpoint = 'http://localhost:3000/api/users'
+  const url = new URL(userAPIEndpoint)
+  url.search = new URLSearchParams({ view }).toString()
+
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    console.error("Can't fetch user data")
+    return []
+  }
+  return (await response.json()) as SubscribedUser[]
+}
+
+const getAggregatedRemovalApplications = async () => {}
 
 async function processSubscriptions() {
-  await dbConnect(dbUrl)
-  const subscriptions = await Subscription.find({
-    elements: 'mobileStationAvailable',
-  })
+  // await dbConnect(dbUrl)
 
-    .populate<{ user: UserType & { _id: mongoose.ObjectId } }>('user', 'email') //include only the email field
-    .select('-_id user')
+  const subscribedUsers = await getSubscribedUsers()
+
+  if (subscribedUsers.length === 0) return
 
   const userMap = new Map(
-    subscriptions.map((s) => [
-      s.user._id.toString(),
-      { email: s.user.email, name: s.user.name },
+    subscribedUsers.map((u) => [
+      u._id.toString(),
+      { email: u.email, name: u.name },
     ]),
   )
 
-  const dispatcher = new Dispatcher()
+  const dispatcher = new EmailSendingDispatcher()
 
   interface AggregatedApplication {
     userId: mongoose.Types.ObjectId
@@ -126,7 +97,7 @@ async function processSubscriptions() {
     await removalApplicationModel.aggregate<AggregatedApplication>([
       {
         $match: {
-          user: { $in: subscriptions.map((s) => s.user._id) },
+          user: { $in: subscribedUsers.map((u) => u._id) },
           expires: { $gte: new Date() },
         },
       },
