@@ -16,9 +16,8 @@ const titleHeadingText = 'Мои подписки на получение уве
 const enabledText = 'Включено'
 const disabledText = 'Выключено'
 const configText = 'Настроить'
-const allSubsApi = '/api/subscriptions/variant'
-const getUserSubsApi = '/api/subscriptions'
-const updateUserSubsApi = '/api/users'
+const subscriptionVariantsApi = '/api/subscriptions/variant'
+const subscriptionsApi = '/api/subscriptions'
 const wasteAvailable = 'wasteAvailable'
 const wasteAvailableHref = '/my/subscriptions/wasteAvailable'
 
@@ -52,7 +51,7 @@ export default function MySubscriptions() {
   }
 
   async function fetchAllSubscriptions() {
-    return await fetch(allSubsApi, {
+    return await fetch(subscriptionVariantsApi, {
       method: 'GET',
     })
       .then((respone) => {
@@ -64,7 +63,7 @@ export default function MySubscriptions() {
   }
 
   async function fetchUserSubscriptions() {
-    return await fetch(getUserSubsApi, {
+    return await fetch(subscriptionsApi, {
       method: 'GET',
     })
       .then((respone) => {
@@ -76,7 +75,7 @@ export default function MySubscriptions() {
   }
 
   async function updateUserSubscriptions(updatedSubs: typeof userSubs) {
-    await fetch(updateUserSubsApi, {
+    await fetch(subscriptionsApi, {
       method: 'POST',
       body: JSON.stringify({ updatedSubs }),
       headers: { 'Content-Type': 'application/json' },
