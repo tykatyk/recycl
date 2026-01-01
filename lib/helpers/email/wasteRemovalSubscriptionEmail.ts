@@ -1,25 +1,27 @@
-import type { WasteRemovalNotification } from './types/wasteRemovalNotification'
+import type { WasteRemovalNotification } from '../../types/subscription'
+
+const host = 'http://localhost:3000'
+const brandName = 'Recycl'
+const yellow = ' #f8bc45'
+const logoPath = '../public/images/logo.png'
+
+const getDetailsUrl = (agent: string, location: string) => {
+  const url = new URL(`${host}/removalEvents`)
+  url.searchParams.set('agent', agent)
+  url.searchParams.set('location', location)
+  return url.toString()
+}
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  console.log(typeof date)
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}, ${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
 
 export default function prepareEmailText(
   notification: WasteRemovalNotification,
 ) {
-  const host = 'http://localhost:3000'
-  const brandName = 'Recycl'
-  const yellow = ' #f8bc45'
-  const logoPath = '../public/images/logo.png'
-
-  const getDetailsUrl = (agent: string, location: string) => {
-    const url = new URL(`${host}/removalEvents`)
-    url.searchParams.set('agent', agent)
-    url.searchParams.set('location', location)
-    return url.toString()
-  }
-
-  const formatDate = (date: Date) => {
-    const pad = (n: number) => n.toString().padStart(2, '0')
-    return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}, ${pad(date.getHours())}:${pad(date.getMinutes())}`
-  }
-
   let emailHtml = ''
   const content = `
   <html>

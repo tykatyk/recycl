@@ -1,100 +1,33 @@
-import dbConnect from '../db/connection'
-import removalEventModel from '../db/models/eventModel'
-import removalApplicationModel from '../db/models/removalApplication'
-import { User } from '../db/models'
-import type { UserType } from '../db/models/user'
-import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
-import prepareEmailText from '../helpers/email/wasteRemovalSubscriptionEmail'
-import mongoose, { Types } from 'mongoose'
-import fs from 'fs'
-import { CronJob } from 'cron'
-import { wasteLocation } from '../helpers/dbModelCommons'
-import EmailSendingDispatcher from '../helpers/email/emailSendingDispatcher'
+import { NextApiRequest, NextApiResponse } from 'next'
+import dbConnect from '../../../lib/db/connection'
+import { User, Event, RemovalApplication } from '../../../lib/db/models'
+import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import type {
+  SubscribedUser,
+  AggregatedApplication,
+  AggregatedEvent,
   Agent,
   WasteRemovalEvents,
   WasteRemovalByLocation,
   WasteRemovalNotification,
-} from '../helpers/email/types/wasteRemovalNotification'
-import type { RequestInit, Response } from 'node-fetch'
-import { default as fetch } from 'node-fetch'
+} from '../../../lib/types/subscription'
 
-const path = 'subscriptionNotification.lock'
 const dbUrl = 'mongodb://127.0.0.1:27017/recycldb2'
-
-async function sendEmail(notification: WasteRemovalNotification) {
-  return
-  if (!notification.receiverEmail) {
-    console.log('No receiver email')
-    return
-  }
-
-  if (!notification.receiverName) {
-    notification.receiverName = notification.receiverEmail
-  }
-
-  const emailHtml = prepareEmailText(notification)
-  const email = {
-    html: emailHtml,
-    subject: 'Предстоящие события по сбору вторсырья в вашем городе',
-    from: {
-      name: 'Recycl',
-      email: 'notify@yoused.com.ua',
-    },
-    to: [
-      {
-        name: notification.receiverName,
-        email: notification.receiverEmail,
-      },
-    ],
-  }
-  await emailSenderSendpulse(email)
-}
-const view = 'subscriptions'
+const subscriptionType = 'mobileStationAvailable'
 
 async function getSubscribedUsers() {
-  type SubscribedUser = Pick<
-    UserType & { _id: string },
-    '_id' | 'name' | 'email'
-  >
-
-  const userAPIEndpoint = 'http://localhost:3000/api/users'
-  const url = new URL(userAPIEndpoint)
-  url.search = new URLSearchParams({ view }).toString()
-
-  const response = await fetch(url)
-
-  if (!response.ok) {
-    console.error("Can't fetch user data")
-    return []
-  }
-  return (await response.json()) as SubscribedUser[]
+  return await User.find({
+    isBanned: false,
+    isActive: true,
+    subscriptions: subscriptionType,
+  })
+    .select('_id name email')
+    .lean<SubscribedUser[]>()
 }
 
-const getAggregatedRemovalApplications = async () => {}
-
-async function processSubscriptions() {
-  // await dbConnect(dbUrl)
-
-  const subscribedUsers = await getSubscribedUsers()
-
-  if (subscribedUsers.length === 0) return
-
-  const userMap = new Map(
-    subscribedUsers.map((u) => [
-      u._id.toString(),
-      { email: u.email, name: u.name },
-    ]),
-  )
-
-  const dispatcher = new EmailSendingDispatcher()
-
-  interface AggregatedApplication {
-    userId: mongoose.Types.ObjectId
-    docs: [{ locationId: string; locationName: string; wasteTypes: string[] }]
-  }
+const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
   const aggregatedRemovalApplications =
-    await removalApplicationModel.aggregate<AggregatedApplication>([
+    await RemovalApplication.aggregate<AggregatedApplication>([
       {
         $match: {
           user: { $in: subscribedUsers.map((u) => u._id) },
@@ -136,27 +69,11 @@ async function processSubscriptions() {
         },
       },
     ])
+  return aggregatedRemovalApplications
+}
 
-  const removalApplications = aggregatedRemovalApplications.map((r) => {
-    const user = userMap.get(r.userId.toString())
-    return {
-      ...r,
-      userEmail: user?.email || '',
-      userName: user?.name || '',
-    }
-  })
-
-  interface EventByWasteType {
-    wasteType: string
-    agents: Agent[]
-  }
-
-  interface AggregatedEvent {
-    locationId: string
-    locationName: string
-    eventsByWasteType: EventByWasteType[]
-  }
-  const removalEvents = await removalEventModel.aggregate<AggregatedEvent>([
+const getRemovalEvents = async () => {
+  const removalEvents = await Event.aggregate<AggregatedEvent>([
     {
       $match: {
         isActive: true,
@@ -232,7 +149,6 @@ async function processSubscriptions() {
         },
       },
     },
-
     {
       $project: {
         _id: 0,
@@ -243,6 +159,21 @@ async function processSubscriptions() {
     },
   ])
 
+  return removalEvents
+}
+
+const getNotifications = async () => {
+  await dbConnect(process.env.DATABASE_URL)
+
+  const subscribedUsers = await getSubscribedUsers()
+
+  if (subscribedUsers.length === 0) return []
+
+  const aggregatedRemovalApplications =
+    await getRemovalApplications(subscribedUsers)
+
+  const removalEvents = await getRemovalEvents()
+
   const removalEventsMap = new Map(
     removalEvents.map((re) => {
       const { locationId, eventsByWasteType, locationName } = re
@@ -252,6 +183,30 @@ async function processSubscriptions() {
       return [locationId, { eventsMap, locationName }]
     }),
   )
+
+  const userMap = new Map(
+    subscribedUsers.map((u) => [
+      u._id.toString(),
+      { email: u.email, name: u.name },
+    ]),
+  )
+
+  const removalApplications = aggregatedRemovalApplications.map(
+    (application) => {
+      const { userId, docs } = application
+      const userIdString = userId.toString()
+      const user = userMap.get(userIdString)
+
+      return {
+        userId: userIdString,
+        userName: user?.name || '',
+        userEmail: user?.email || '',
+        docs,
+      }
+    },
+  )
+
+  const notifications: WasteRemovalNotification[] = []
 
   removalApplications.forEach(async (application) => {
     const locations: WasteRemovalByLocation = {}
@@ -287,59 +242,21 @@ async function processSubscriptions() {
 
     if (Object.keys(notification.locations).length === 0) return
 
-    dispatcher.addTask(() => {
-      sendEmail(notification)
-    })
+    notifications.push(notification)
   })
+
+  return notifications
 }
 
-/*function createLock() {
-  try {
-    fs.writeFileSync(path, '', { flag: 'wx' })
-    return true
-  } catch (err: any) {
-    if (err.code === 'EEXIST') {
-      console.log('Lock file already exists')
-    }
-    return false
+async function notifications(req: NextApiRequest, res: NextApiResponse) {
+  //ToDo: Add token authorization
+  if (req.method !== 'GET') {
+    return res.status(405).end()
   }
+
+  const notifications = await getNotifications()
+
+  return res.json(notifications)
 }
 
-function removeLock() {
-  if (fs.existsSync(path)) fs.unlinkSync(path)
-}
-
-process.on('SIGINT', removeLock) // Ctrl+C
-process.on('SIGTERM', removeLock) // kill
-process.on('exit', removeLock) // graceful exit
-
-async function runJob() {
-  if (!createLock()) return
-
-  try {
-    console.log('Job started.')
-
-    await processSubscriptions()
-
-    console.log('Job finished.')
-  } catch (err) {
-    console.error('Job failed:', err)
-  } finally {
-    removeLock()
-  }
-}
-
-const notifyRemovalSubscriptionsJob = new CronJob(
-  '0 * * * * *', // cronTime
-  async function () {
-    await runJob()
-  }, // onTick
-  null, // onComplete
-  true, // start
-)
-
-// export default notifyRemovalSubscriptionsJob
-// export default runJob()
-*/
-
-export default processSubscriptions()
+export default apiHandler(notifications)
