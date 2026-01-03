@@ -1,47 +1,22 @@
 import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
-import prepareEmailText from '../helpers/email/wasteRemovalSubscriptionEmail'
+import {
+  prepareEmailHtml,
+  prepareEmailObj,
+} from '../helpers/email/wasteRemovalSubscriptionEmail'
 import fs from 'fs'
 import { CronJob } from 'cron'
 import EmailSendingDispatcher from '../helpers/email/emailSendingDispatcher'
+import EmailSendingMetrics from '../helpers/email/emailSendingMetrics'
 import { WasteRemovalNotification } from '../types/subscription'
-import { default as fetch } from 'node-fetch'
-
-const brandName = 'Recycl'
-const emailFrom = 'notify@yoused.com.ua'
-const host = 'http://localhost:3000'
+import dotenv from 'dotenv'
+import path from 'path'
+dotenv.config()
+//ToDo refactor access to process.env
+const host = process.env.HOST
 const api = `${host}/api/jobs/notification`
 const subject = 'Предстоящие события по сбору вторсырья в вашем городе'
 const errorMessage = 'An error during processing subscription notifications'
-const lockPath = './subscriptionNotification.lock'
-
-async function sendEmail(notification: WasteRemovalNotification) {
-  return
-  if (!notification.receiverEmail) {
-    console.log('No receiver email')
-    return
-  }
-
-  if (!notification.receiverName) {
-    notification.receiverName = notification.receiverEmail
-  }
-
-  const emailHtml = prepareEmailText(notification)
-  const email = {
-    html: emailHtml,
-    subject,
-    from: {
-      name: brandName,
-      email: emailFrom,
-    },
-    to: [
-      {
-        name: notification.receiverName,
-        email: notification.receiverEmail,
-      },
-    ],
-  }
-  await emailSenderSendpulse(email)
-}
+const lockPath = path.join(process.cwd(), 'subscriptionNotification.lock')
 
 async function processSubscriptions() {
   try {
@@ -53,16 +28,28 @@ async function processSubscriptions() {
 
     //ToDo: try catch res.json()
     const notifications: WasteRemovalNotification[] = await response.json()
-
     const dispatcher = new EmailSendingDispatcher()
+    const metrics = new EmailSendingMetrics()
+
     notifications.forEach((notification) => {
-      dispatcher.addTask(() => {
-        sendEmail(notification)
+      if (!notification.receiverEmail) {
+        console.log('No receiver email')
+        return
+      }
+      dispatcher.addTask(async () => {
+        try {
+          const html = prepareEmailHtml(notification)
+          const email = prepareEmailObj(notification, subject, html)
+
+          return
+          await emailSenderSendpulse(email, metrics)
+        } catch (err) {
+          console.error('Failed to send email', err)
+        }
       })
     })
   } catch (error) {
-    console.log(errorMessage)
-    console.log(api)
+    console.error(errorMessage, error)
   }
 }
 
@@ -74,6 +61,7 @@ function createLock() {
     if (err.code === 'EEXIST') {
       console.log('Lock file already exists')
     }
+    console.log('Cannot create a lock')
     return false
   }
 }
@@ -111,5 +99,5 @@ const sendSubscriptionEmails = new CronJob(
   true, // start
 )
 
-// export default runJob()
-export default sendSubscriptionEmails
+export default runJob()
+// export default sendSubscriptionEmails

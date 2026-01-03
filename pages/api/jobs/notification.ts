@@ -12,7 +12,6 @@ import type {
   WasteRemovalNotification,
 } from '../../../lib/types/subscription'
 
-const dbUrl = 'mongodb://127.0.0.1:27017/recycldb2'
 const subscriptionType = 'mobileStationAvailable'
 
 async function getSubscribedUsers() {
@@ -40,6 +39,7 @@ const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
             userId: '$user',
             locationId: '$wasteLocation.place_id',
           },
+          //ToDo: change to locationId
           locationName: {
             $first: '$wasteLocation.structured_formatting.main_text',
           },

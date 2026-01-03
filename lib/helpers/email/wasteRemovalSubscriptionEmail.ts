@@ -1,12 +1,16 @@
+import dotenv from 'dotenv'
 import type { WasteRemovalNotification } from '../../types/subscription'
 
-const host = 'http://localhost:3000'
-const brandName = 'Recycl'
+dotenv.config({ path: '../../.env.local' })
+
+const brandName = process.env.BRAND_NAME
+const emailFrom = process.env.EMAIL_FROM
+const host = process.env.HOST
 const yellow = ' #f8bc45'
 const logoPath = '../public/images/logo.png'
 
 const getDetailsUrl = (agent: string, location: string) => {
-  const url = new URL(`${host}/removalEvents`)
+  const url = new URL(`${host}removalEvents`)
   url.searchParams.set('agent', agent)
   url.searchParams.set('location', location)
   return url.toString()
@@ -14,14 +18,35 @@ const getDetailsUrl = (agent: string, location: string) => {
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
-  console.log(typeof date)
   const pad = (n: number) => n.toString().padStart(2, '0')
   return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}, ${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
-export default function prepareEmailText(
+export function prepareEmailObj(
   notification: WasteRemovalNotification,
+  subject: string,
+  html: string,
 ) {
+  const receiverName = notification.receiverName ?? notification.receiverEmail
+
+  const emailObj = {
+    html,
+    subject,
+    from: {
+      name: brandName,
+      email: emailFrom,
+    },
+    to: [
+      {
+        name: receiverName,
+        email: notification.receiverEmail,
+      },
+    ],
+  }
+  return emailObj
+}
+
+export function prepareEmailHtml(notification: WasteRemovalNotification) {
   let emailHtml = ''
   const content = `
   <html>

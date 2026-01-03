@@ -40,6 +40,7 @@
     "cross-env": "^7.0.3",
     "crypto-random-string": "^5.0.0",
     "dayjs": "^1.11.9",
+    "dotenv": "^17.2.3",
     "fetch-jsonp": "^1.2.1",
     "formik": "^2.2.9",
     "formik-mui": "^5.0.0-alpha.0",
