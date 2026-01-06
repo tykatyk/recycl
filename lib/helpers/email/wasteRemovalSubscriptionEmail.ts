@@ -1,35 +1,33 @@
 import dotenv from 'dotenv'
+import { Email } from '../../types/email'
+import { formatDate } from '../dateFormatter'
 import type { WasteRemovalNotification } from '../../types/subscription'
 
 dotenv.config({ path: '../../.env.local' })
 
-const brandName = process.env.BRAND_NAME
-const emailFrom = process.env.EMAIL_FROM
-const host = process.env.HOST
 const yellow = ' #f8bc45'
 const logoPath = '../public/images/logo.png'
 
-const getDetailsUrl = (agent: string, location: string) => {
+const getDetailsUrl = (agent: string, location: string, host: string) => {
   const url = new URL(`${host}removalEvents`)
   url.searchParams.set('agent', agent)
   url.searchParams.set('location', location)
   return url.toString()
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const pad = (n: number) => n.toString().padStart(2, '0')
-  return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}, ${pad(date.getHours())}:${pad(date.getMinutes())}`
+type EmailParams = {
+  notification: WasteRemovalNotification
+  subject: string
+  html: string
+  brandName: string
+  emailFrom: string
 }
+export function prepareEmailObj(params: EmailParams) {
+  const { notification, subject, html, brandName, emailFrom } = params
 
-export function prepareEmailObj(
-  notification: WasteRemovalNotification,
-  subject: string,
-  html: string,
-) {
   const receiverName = notification.receiverName ?? notification.receiverEmail
 
-  const emailObj = {
+  const emailObj: Email = {
     html,
     subject,
     from: {
@@ -46,8 +44,62 @@ export function prepareEmailObj(
   return emailObj
 }
 
-export function prepareEmailHtml(notification: WasteRemovalNotification) {
-  let emailHtml = ''
+type PrepareEmailHtml = {
+  notification: WasteRemovalNotification
+  host: string
+  brandName: string
+}
+export function prepareEmailHtml(params: PrepareEmailHtml) {
+  const { notification, host, brandName } = params
+
+  const emailHtml = Object.entries(notification.locations)
+    .map(([_, loc]) => {
+      const wasteTypesHtml = Object.entries(loc.wasteRemovalEvents)
+        .map(([wasteType, removals]) => {
+          const removalsHtml = removals
+            .map(
+              (ev, idx) => `
+        <tr style="color: #ccc; line-height: 1.1">
+          <td style="${idx === removals.length - 1 ? '' : 'padding-bottom: 16px'}; padding-left: 8px">
+            <table>
+              <tr><td>Дата и время: ${formatDate(ev.date)}</td></tr>
+              <tr><td>Организатор: ${ev.agentName}</td></tr>
+              <tr>
+                <td>
+                  <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
+                     href="${getDetailsUrl(ev.agentName, loc.locationName, host)}">Подробнее</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>`,
+            )
+            .join('')
+
+          return `
+        <tr>
+          <td style="padding-bottom: 8px">
+            <table style="font-size: 16px; color: #fff;">
+              <tr><th align="left" style="padding: 0 0 16px 8px;">Тип вторсырья: ${wasteType}</th></tr>
+              ${removalsHtml}
+            </table>
+          </td>
+        </tr>`
+        })
+        .join('')
+
+      return `
+      <tr>
+        <td style="padding: 24px 0">
+          <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="color: #fff; text-align: left" width="100%">
+            <tr><th style="font-size: 24px; padding-bottom: 16px">Населенный пункт: ${loc.locationName}</th></tr>
+            ${wasteTypesHtml}
+          </table>
+        </td>
+      </tr>`
+    })
+    .join('')
+
   const content = `
   <html>
     <head>
@@ -126,53 +178,5 @@ export function prepareEmailHtml(notification: WasteRemovalNotification) {
     </body>
   </html>
   `
-
-  emailHtml = Object.entries(notification.locations)
-    .map(([_, loc]) => {
-      const wasteTypesHtml = Object.entries(loc.wasteRemovalEvents)
-        .map(([wasteType, removals]) => {
-          const removalsHtml = removals
-            .map(
-              (ev, idx) => `
-        <tr style="color: #ccc; line-height: 1.1">
-          <td style="${idx === removals.length - 1 ? '' : 'padding-bottom: 16px'}; padding-left: 8px">
-            <table>
-              <tr><td>Дата и время: ${formatDate(ev.date)}</td></tr>
-              <tr><td>Организатор: ${ev.agentName}</td></tr>
-              <tr>
-                <td>
-                  <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
-                     href="${getDetailsUrl(ev.agentName, loc.locationName)}">Подробнее</a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>`,
-            )
-            .join('')
-
-          return `
-        <tr>
-          <td style="padding-bottom: 8px">
-            <table style="font-size: 16px; color: #fff;">
-              <tr><th align="left" style="padding: 0 0 16px 8px;">Тип вторсырья: ${wasteType}</th></tr>
-              ${removalsHtml}
-            </table>
-          </td>
-        </tr>`
-        })
-        .join('')
-
-      return `
-      <tr>
-        <td style="padding: 24px 0">
-          <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="color: #fff; text-align: left" width="100%">
-            <tr><th style="font-size: 24px; padding-bottom: 16px">Населенный пункт: ${loc.locationName}</th></tr>
-            ${wasteTypesHtml}
-          </table>
-        </td>
-      </tr>`
-    })
-    .join('')
   return content
 }

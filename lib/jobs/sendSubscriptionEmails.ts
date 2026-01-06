@@ -1,25 +1,47 @@
 import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
+import prepareNotifications from '../helpers/email/prepareNotifications'
 import {
   prepareEmailHtml,
   prepareEmailObj,
 } from '../helpers/email/wasteRemovalSubscriptionEmail'
-import fs from 'fs'
-import { CronJob } from 'cron'
 import EmailSendingDispatcher from '../helpers/email/emailSendingDispatcher'
-import EmailSendingMetrics from '../helpers/email/emailSendingMetrics'
+import EmailSendingMetrics from '../helpers/email/emailSendingMetrix'
 import { WasteRemovalNotification } from '../types/subscription'
 import dotenv from 'dotenv'
-import path from 'path'
+import { Email } from '../types/email'
 dotenv.config()
-//ToDo refactor access to process.env
-const host = process.env.HOST
+
+const host = process.env.HOST || ''
+const brandName = process.env.BRAND || ''
+const emailFrom = process.env.EMAIL_FROM || ''
+
 const api = `${host}/api/jobs/notification`
 const subject = 'Предстоящие события по сбору вторсырья в вашем городе'
 const errorMessage = 'An error during processing subscription notifications'
-const lockPath = path.join(process.cwd(), 'subscriptionNotification.lock')
 
-async function processSubscriptions() {
+const canSendEmails = () => {
+  if (!host) {
+    console.log('host is undefined')
+    return false
+  }
+
+  if (!brandName) {
+    console.log('No brand name')
+    return false
+  }
+
+  if (!emailFrom) {
+    console.log('No email from address')
+    return false
+  }
+  return true
+}
+
+async function processSubscriptions(metrix: EmailSendingMetrics) {
+  if (!canSendEmails()) return
+
   try {
+    //ToDo: this should directly access Db
     const response = await fetch(api)
 
     if (!response.ok) {
@@ -27,77 +49,46 @@ async function processSubscriptions() {
     }
 
     //ToDo: try catch res.json()
-    const notifications: WasteRemovalNotification[] = await response.json()
+    const notifications = await prepareNotifications()
     const dispatcher = new EmailSendingDispatcher()
-    const metrics = new EmailSendingMetrics()
+    metrix.totalEmails = notifications.length
 
     notifications.forEach((notification) => {
       if (!notification.receiverEmail) {
         console.log('No receiver email')
         return
       }
+
+      const html = prepareEmailHtml({ notification, host, brandName })
+      const email = prepareEmailObj({
+        notification,
+        subject,
+        html,
+        brandName,
+        emailFrom,
+      })
+
       dispatcher.addTask(async () => {
         try {
-          const html = prepareEmailHtml(notification)
-          const email = prepareEmailObj(notification, subject, html)
-
-          return
-          await emailSenderSendpulse(email, metrics)
+          // return
+          // emailSenderSendpulse(email, metrix)
+          metrix.totalEmailsProcessed++
         } catch (err) {
           console.error('Failed to send email', err)
         }
       })
+      metrix.totalEmailsToProcess++
     })
+    while (metrix.totalEmailsToProcess != metrix.totalEmailsProcessed) {
+      setTimeout(() => {
+        console.log(
+          `Jobs added to dispatcher: ${metrix.totalEmailsToProcess}; jobs processed: ${metrix.totalEmailsProcessed}`,
+        )
+      }, 2000)
+    }
   } catch (error) {
     console.error(errorMessage, error)
   }
 }
 
-function createLock() {
-  try {
-    fs.writeFileSync(lockPath, '', { flag: 'wx' })
-    return true
-  } catch (err: any) {
-    if (err.code === 'EEXIST') {
-      console.log('Lock file already exists')
-    }
-    console.log('Cannot create a lock')
-    return false
-  }
-}
-
-function removeLock() {
-  if (fs.existsSync(lockPath)) fs.unlinkSync(lockPath)
-}
-
-process.on('SIGINT', removeLock) // Ctrl+C
-process.on('SIGTERM', removeLock) // kill
-process.on('exit', removeLock) // graceful exit
-
-async function runJob() {
-  if (!createLock()) return
-
-  try {
-    console.log('Job started.')
-
-    await processSubscriptions()
-
-    console.log('Job finished.')
-  } catch (err) {
-    console.error('Job failed:', err)
-  } finally {
-    removeLock()
-  }
-}
-
-const sendSubscriptionEmails = new CronJob(
-  '0 * * * * *', // cronTime
-  async function () {
-    await runJob()
-  }, // onTick
-  null, // onComplete
-  true, // start
-)
-
-export default runJob()
-// export default sendSubscriptionEmails
+export default processSubscriptions

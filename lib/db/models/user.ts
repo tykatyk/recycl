@@ -57,7 +57,7 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
+      required: true, //ToDo: email can be undefined if user is authenticated with OAuth
       unique: true,
       validate: {
         validator: checkEmail,
