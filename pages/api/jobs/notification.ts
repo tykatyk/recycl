@@ -1,20 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import path from 'path'
-import fs from 'fs'
+import fs from 'fs/promises'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
-import EmailSendingMetrix from '../../../lib/helpers/email/emailSendingMetrix'
-
+import dateFormatter from '../../../lib/helpers/dateFormatter'
+import EmailSendingMetrcs from '../../../lib/helpers/email/emailSendingMetrics'
 import processSubscriptions from '../../../lib/jobs/sendSubscriptionEmails'
-import { func } from 'prop-types'
 
 const lockPath = path.join(process.cwd(), 'subscriptionNotification.lock')
 
-const metrix = new EmailSendingMetrix()
-const metrixPath = path.join(process.cwd(), 'subscriptionNotification.lock')
+const metrics = new EmailSendingMetrcs()
+const metricsPath = 'logs/subscriptionEmailSendingMetrics'
 
-function createLock() {
+async function createLock() {
   try {
-    fs.writeFileSync(lockPath, '', { flag: 'wx' })
+    await fs.writeFile(lockPath, '', { flag: 'wx' })
     return true
   } catch (err: any) {
     if (err.code === 'EEXIST') {
@@ -25,24 +24,42 @@ function createLock() {
   }
 }
 
-function removeLock() {
-  if (fs.existsSync(lockPath)) fs.unlinkSync(lockPath)
+async function removeLock() {
+  await fs.unlink(lockPath)
 }
 
-//ToDo: not implemented correctly
-function writeMetrixToFile(metrixText: string) {
+async function ensureDirectoryExists(path: string) {
   try {
-    fs.writeFileSync(lockPath, '', { flag: 'wx' })
-  } catch (err: any) {
-    if (err.code === 'EEXIST') {
-      console.error('Metrix file already exists')
+    await fs.mkdir(path, { recursive: true })
+  } catch (error) {
+    if (error.code !== 'EEXIST') {
+      console.error(`Error creating directory: ${error.message}`)
     }
-    console.error('Cannot write a metrix file')
+    throw error
   }
 }
 
-function prepareMetrixText(metrix: EmailSendingMetrix) {
-  return Object.entries(metrix)
+async function writeMetrixToFile(metricsText: string) {
+  try {
+    await ensureDirectoryExists(metricsPath)
+
+    const jobStartedDateString = dateFormatter(metrics.jobStarted, 'T', '-')
+    const path = `${metricsPath}/${jobStartedDateString}.txt`
+
+    await fs.writeFile(path, metricsText, {
+      flag: 'wx',
+    })
+  } catch (err: any) {
+    console.log(err)
+    if (err.code === 'EEXIST') {
+      console.error('Metrix file already exists')
+    }
+    console.log(err)
+  }
+}
+
+function prepareMetrixText(metrics: EmailSendingMetrcs) {
+  return Object.entries(metrics)
     .map(([key, value]) => `${key}: ${value}`)
     .join('\n')
 }
@@ -53,26 +70,31 @@ async function notifications(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).end()
   }
 
-  if (!createLock()) {
+  if (!(await createLock())) {
     return res.status(500).json('Cannot create a lock file')
   }
 
   try {
     console.log('Job started.')
 
-    await processSubscriptions(metrix)
-    const metrixText = prepareMetrixText(metrix)
-    writeMetrixToFile(metrixText)
+    await processSubscriptions(metrics)
 
-    console.log('Job finished.')
+    const successMessage = 'Job finished succesfully'
+    console.log(successMessage)
 
-    res.json('Job finished succesfully')
+    res.json(successMessage)
   } catch (err) {
     console.error('Job failed:', err)
     res.status(500).json('An error while sending notification emails')
   } finally {
-    removeLock()
+    await removeLock()
   }
+
+  try {
+    const metricsText = prepareMetrixText(metrics)
+
+    writeMetrixToFile(metricsText)
+  } catch (err) {}
 }
 
 process.on('SIGINT', removeLock) // Ctrl+C

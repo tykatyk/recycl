@@ -5,19 +5,15 @@ import {
   prepareEmailObj,
 } from '../helpers/email/wasteRemovalSubscriptionEmail'
 import EmailSendingDispatcher from '../helpers/email/emailSendingDispatcher'
-import EmailSendingMetrics from '../helpers/email/emailSendingMetrix'
-import { WasteRemovalNotification } from '../types/subscription'
+import EmailSendingMetrics from '../helpers/email/emailSendingMetrics'
 import dotenv from 'dotenv'
-import { Email } from '../types/email'
-dotenv.config()
+dotenv.config({ path: '.env.local' })
 
 const host = process.env.HOST || ''
 const brandName = process.env.BRAND || ''
 const emailFrom = process.env.EMAIL_FROM || ''
 
-const api = `${host}/api/jobs/notification`
 const subject = 'Предстоящие события по сбору вторсырья в вашем городе'
-const errorMessage = 'An error during processing subscription notifications'
 
 const canSendEmails = () => {
   if (!host) {
@@ -37,57 +33,46 @@ const canSendEmails = () => {
   return true
 }
 
-async function processSubscriptions(metrix: EmailSendingMetrics) {
+async function processSubscriptions(metrics: EmailSendingMetrics) {
   if (!canSendEmails()) return
 
-  try {
-    //ToDo: this should directly access Db
-    const response = await fetch(api)
+  //ToDo: try catch res.json()
+  const notifications = await prepareNotifications()
+  const dispatcher = new EmailSendingDispatcher()
+  metrics.totalEmails = notifications.length
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
+  notifications.forEach((notification) => {
+    if (!notification.receiverEmail) {
+      console.log('No receiver email')
+      return
     }
 
-    //ToDo: try catch res.json()
-    const notifications = await prepareNotifications()
-    const dispatcher = new EmailSendingDispatcher()
-    metrix.totalEmails = notifications.length
-
-    notifications.forEach((notification) => {
-      if (!notification.receiverEmail) {
-        console.log('No receiver email')
-        return
-      }
-
-      const html = prepareEmailHtml({ notification, host, brandName })
-      const email = prepareEmailObj({
-        notification,
-        subject,
-        html,
-        brandName,
-        emailFrom,
-      })
-
-      dispatcher.addTask(async () => {
-        try {
-          // return
-          // emailSenderSendpulse(email, metrix)
-          metrix.totalEmailsProcessed++
-        } catch (err) {
-          console.error('Failed to send email', err)
-        }
-      })
-      metrix.totalEmailsToProcess++
+    const html = prepareEmailHtml({ notification, host, brandName })
+    const email = prepareEmailObj({
+      notification,
+      subject,
+      html,
+      brandName,
+      emailFrom,
     })
-    while (metrix.totalEmailsToProcess != metrix.totalEmailsProcessed) {
-      setTimeout(() => {
-        console.log(
-          `Jobs added to dispatcher: ${metrix.totalEmailsToProcess}; jobs processed: ${metrix.totalEmailsProcessed}`,
-        )
-      }, 2000)
-    }
-  } catch (error) {
-    console.error(errorMessage, error)
+
+    dispatcher.addTask(async () => {
+      try {
+        // return
+        emailSenderSendpulse(email, metrics)
+        metrics.totalEmailsProcessed++
+      } catch (err) {
+        console.error('Failed to send email', err)
+      }
+    })
+    metrics.totalEmailsToProcess++
+  })
+  while (metrics.totalEmailsToProcess != metrics.totalEmailsProcessed) {
+    setTimeout(() => {
+      console.log(
+        `Jobs added to dispatcher: ${metrics.totalEmailsToProcess}; jobs processed: ${metrics.totalEmailsProcessed}`,
+      )
+    }, 2000)
   }
 }
 

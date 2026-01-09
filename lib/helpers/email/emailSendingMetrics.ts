@@ -1,4 +1,4 @@
-export default class EmailSendingMetrix {
+export default class EmailSendingMetrcs {
   jobStarted: Date
   jobFinished: Date
   totalEmails: number

@@ -1,5 +1,5 @@
 import sendpulse from 'sendpulse-api'
-import EmailSendingMetrics from './emailSendingMetrix'
+import EmailSendingMetrics from './emailSendingMetrics'
 import { Email } from '../../types/email'
 
 /*
@@ -10,7 +10,6 @@ const API_SECRET = '87ceb5f698bdc1a85e93ac4a92a3358c'
 const TOKEN_STORAGE = './sendpulseTokenStorage'
 
 const callback = (data: any, metrics: EmailSendingMetrics) => {
-  //ToDo: check corectness of this function
   if (!data.is_error) return
 
   metrics.totalErrors++
@@ -35,7 +34,6 @@ const callback = (data: any, metrics: EmailSendingMetrics) => {
   console.log(errorMessage)
 }
 
-//ToDo: maybe change the type of email
 export const emailSenderSendpulse = (
   email: Email,
   metrics: EmailSendingMetrics,

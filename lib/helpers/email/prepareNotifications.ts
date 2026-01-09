@@ -17,6 +17,7 @@ async function getSubscribedUsers() {
     isBanned: false,
     isActive: true,
     subscriptions: subscriptionType,
+    email: { $exists: true, $nin: [null, ''] },
   })
     .select('_id name email')
     .lean<SubscribedUser[]>()
@@ -29,7 +30,6 @@ const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
         $match: {
           user: {
             $in: subscribedUsers.map((u) => u._id),
-            email: { $exists: true, $nin: [null, ''] },
           },
           expires: { $gte: new Date() },
         },
@@ -163,7 +163,7 @@ const getRemovalEvents = async () => {
   return removalEvents
 }
 
-const getNotifications = async () => {
+export default async function prepareNotifications() {
   await dbConnect(process.env.DATABASE_URL)
 
   const subscribedUsers = await getSubscribedUsers()
@@ -247,8 +247,4 @@ const getNotifications = async () => {
   })
 
   return notifications
-}
-
-export default async function prepareNotifications() {
-  return await getNotifications()
 }

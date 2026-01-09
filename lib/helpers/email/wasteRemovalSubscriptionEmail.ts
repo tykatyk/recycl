@@ -1,9 +1,6 @@
-import dotenv from 'dotenv'
 import { Email } from '../../types/email'
-import { formatDate } from '../dateFormatter'
+import formatDate from '../dateFormatter'
 import type { WasteRemovalNotification } from '../../types/subscription'
-
-dotenv.config({ path: '../../.env.local' })
 
 const yellow = ' #f8bc45'
 const logoPath = '../public/images/logo.png'
