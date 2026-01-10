@@ -1,7 +1,7 @@
 import type { UserType } from '../db/models/user'
 
 export interface Agent {
-  agentId: Types.ObjectId
+  eventId: string
   agentName: string
   date: string
 }

@@ -5,10 +5,8 @@ import type { WasteRemovalNotification } from '../../types/subscription'
 const yellow = ' #f8bc45'
 const logoPath = '../public/images/logo.png'
 
-const getDetailsUrl = (agent: string, location: string, host: string) => {
-  const url = new URL(`${host}removalEvents`)
-  url.searchParams.set('agent', agent)
-  url.searchParams.set('location', location)
+const getDetailsUrl = (eventId: string, host: string) => {
+  const url = new URL(`${host}events/${eventId}`)
   return url.toString()
 }
 
@@ -46,6 +44,7 @@ type PrepareEmailHtml = {
   host: string
   brandName: string
 }
+
 export function prepareEmailHtml(params: PrepareEmailHtml) {
   const { notification, host, brandName } = params
 
@@ -64,7 +63,7 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
               <tr>
                 <td>
                   <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
-                     href="${getDetailsUrl(ev.agentName, loc.locationName, host)}">Подробнее</a>
+                     href="${getDetailsUrl(ev.eventId, host)}">Подробнее</a>
                 </td>
               </tr>
             </table>

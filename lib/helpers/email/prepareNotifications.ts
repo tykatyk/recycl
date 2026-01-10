@@ -81,7 +81,6 @@ const getRemovalEvents = async () => {
         date: { $gte: new Date() },
       },
     },
-
     {
       $sort: {
         date: 1,
@@ -111,6 +110,7 @@ const getRemovalEvents = async () => {
           locationId: '$location.place_id',
           wasteType: '$waste',
         },
+        eventId: { $first: { $toString: '$_id' } },
         locationName: { $first: '$location.structured_formatting.main_text' },
         agentName: { $first: '$populatedUser.name' },
         date: { $first: '$date' },
@@ -125,7 +125,7 @@ const getRemovalEvents = async () => {
         locationName: { $first: '$locationName' },
         agentsByWasteType: {
           $push: {
-            agentId: '$_id.userId',
+            eventId: '$eventId',
             agentName: '$agentName',
             date: '$date',
           },

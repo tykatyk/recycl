@@ -11,6 +11,8 @@ const lockPath = path.join(process.cwd(), 'subscriptionNotification.lock')
 const metrics = new EmailSendingMetrcs()
 const metricsPath = 'logs/subscriptionEmailSendingMetrics'
 
+const successMessage = 'Job finished succesfully'
+
 async function createLock() {
   try {
     await fs.writeFile(lockPath, '', { flag: 'wx' })
@@ -39,7 +41,7 @@ async function ensureDirectoryExists(path: string) {
   }
 }
 
-async function writeMetrixToFile(metricsText: string) {
+async function writeMetricsToFile(metricsText: string) {
   try {
     await ensureDirectoryExists(metricsPath)
 
@@ -52,7 +54,7 @@ async function writeMetrixToFile(metricsText: string) {
   } catch (err: any) {
     console.log(err)
     if (err.code === 'EEXIST') {
-      console.error('Metrix file already exists')
+      console.error('Metrics file already exists')
     }
     console.log(err)
   }
@@ -78,10 +80,7 @@ async function notifications(req: NextApiRequest, res: NextApiResponse) {
     console.log('Job started.')
 
     await processSubscriptions(metrics)
-
-    const successMessage = 'Job finished succesfully'
     console.log(successMessage)
-
     res.json(successMessage)
   } catch (err) {
     console.error('Job failed:', err)
@@ -93,8 +92,10 @@ async function notifications(req: NextApiRequest, res: NextApiResponse) {
   try {
     const metricsText = prepareMetrixText(metrics)
 
-    writeMetrixToFile(metricsText)
-  } catch (err) {}
+    writeMetricsToFile(metricsText)
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 process.on('SIGINT', removeLock) // Ctrl+C
