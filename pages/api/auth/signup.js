@@ -95,7 +95,7 @@ export default async function handler(req, res) {
   }
 
   // send email to complete registration
-  const actionUrl = `${process.env.NEXT_PUBLIC_URL}auth/confirmemail/${user.data.createUser.confirmEmailToken}`
+  const actionUrl = `${process.env.NEXT_PUBLIC_URL}auth/confirm-email/${user.data.createUser.confirmEmailToken}`
   const dynamicTemplateData = {
     name: user.data.createUser.name,
     hostUrl: process.env.NEXT_PUBLIC_URL,
