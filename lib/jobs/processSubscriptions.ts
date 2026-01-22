@@ -36,7 +36,6 @@ const canSendEmails = () => {
 async function processSubscriptions(metrics: EmailSendingMetrics) {
   if (!canSendEmails()) return
 
-  //ToDo: try catch res.json()
   const notifications = await prepareNotifications()
   const dispatcher = new EmailSendingDispatcher()
   metrics.totalEmails = notifications.length
@@ -58,7 +57,6 @@ async function processSubscriptions(metrics: EmailSendingMetrics) {
 
     dispatcher.addTask(async () => {
       try {
-        // return
         emailSenderSendpulse(email, metrics)
         metrics.totalEmailsProcessed++
       } catch (err) {

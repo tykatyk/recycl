@@ -3,31 +3,42 @@ import path from 'path'
 import fs from 'fs/promises'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import dateFormatter from '../../../lib/helpers/dateFormatter'
-import EmailSendingMetrcs from '../../../lib/helpers/email/emailSendingMetrics'
-import processSubscriptions from '../../../lib/jobs/sendSubscriptionEmails'
+import EmailSendingMetrics from '../../../lib/helpers/email/emailSendingMetrics'
+import processSubscriptions from '../../../lib/jobs/processSubscriptions'
 
-const lockPath = path.join(process.cwd(), 'subscriptionNotification.lock')
+const lockDirectory = path.join(
+  __dirname,
+  '../../../locks/subscriptionNotification.lock',
+)
 
-const metrics = new EmailSendingMetrcs()
-const metricsPath = 'logs/subscriptionEmailSendingMetrics'
+const lockPath = `${lockDirectory}/subscriptionNotification.lock`
+
+const metricsDirectory = path.join(__dirname, '../../../logs')
+
+const metrics = new EmailSendingMetrics()
 
 const successMessage = 'Job finished succesfully'
 
 async function createLock() {
   try {
+    await ensureDirectoryExists(lockDirectory)
     await fs.writeFile(lockPath, '', { flag: 'wx' })
     return true
   } catch (err: any) {
     if (err.code === 'EEXIST') {
-      console.log('Lock file already exists')
+      console.error('Lock file already exists')
     }
-    console.log('Cannot create a lock')
+    console.error('Cannot create a lock')
     return false
   }
 }
 
 async function removeLock() {
-  await fs.unlink(lockPath)
+  try {
+    await fs.unlink(lockPath)
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 async function ensureDirectoryExists(path: string) {
@@ -43,10 +54,10 @@ async function ensureDirectoryExists(path: string) {
 
 async function writeMetricsToFile(metricsText: string) {
   try {
-    await ensureDirectoryExists(metricsPath)
+    await ensureDirectoryExists(metricsDirectory)
 
     const jobStartedDateString = dateFormatter(metrics.jobStarted, 'T', '-')
-    const path = `${metricsPath}/${jobStartedDateString}.txt`
+    const path = `${metricsDirectory}/${jobStartedDateString}.txt`
 
     await fs.writeFile(path, metricsText, {
       flag: 'wx',
@@ -60,16 +71,37 @@ async function writeMetricsToFile(metricsText: string) {
   }
 }
 
-function prepareMetrixText(metrics: EmailSendingMetrcs) {
-  return Object.entries(metrics)
+function prepareMetricsText(metrics: EmailSendingMetrics) {
+  const { errorMessages = [], ...rest } = metrics
+
+  const metricsText = Object.entries(rest)
     .map(([key, value]) => `${key}: ${value}`)
     .join('\n')
+
+  const errorsText = errorMessages.length
+    ? `errorMessages:\n${errorMessages.join('\n')}`
+    : 'errorMessages: none'
+
+  return [metricsText, errorsText].join('\n')
 }
 
 async function notifications(req: NextApiRequest, res: NextApiResponse) {
-  //ToDo: Add token authorization
   if (req.method !== 'GET') {
     return res.status(405).end()
+  }
+
+  const auth = req.headers['authorization']
+  if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
+    return res.status(401).end()
+  }
+
+  /*
+   *Remove stale lock which is modified more than 13 hours ago.
+   *13 hours = 30000 emails/2500 emails per hour as of Sendpulse limitations +1 extra hour
+   */
+  const stats = await fs.stat(lockPath).catch(() => null)
+  if (stats && Date.now() - stats.mtimeMs > 13 * 60 * 60 * 1000) {
+    await fs.unlink(lockPath)
   }
 
   if (!(await createLock())) {
@@ -90,16 +122,12 @@ async function notifications(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const metricsText = prepareMetrixText(metrics)
+    const metricsText = prepareMetricsText(metrics)
 
     writeMetricsToFile(metricsText)
   } catch (err) {
     console.error(err)
   }
 }
-
-process.on('SIGINT', removeLock) // Ctrl+C
-process.on('SIGTERM', removeLock) // kill
-process.on('exit', removeLock) // graceful exit
 
 export default apiHandler(notifications)

@@ -1,26 +1,26 @@
 import type { UserType } from '../db/models/user'
 
-export interface Agent {
+export interface EventByWasteType {
   eventId: string
   agentName: string
   date: string
 }
 
 export interface WasteRemovalEvents {
-  [wasteName: string]: Agent[]
+  wasteType: string
+  eventsByWasteType: EventByWasteType[]
 }
 
 export interface WasteRemovalByLocation {
-  [locationId: string]: {
-    locationName: string
-    wasteRemovalEvents: WasteRemovalEvents
-  }
+  locationId: string
+  locationName: string
+  eventsByLocation: WasteRemovalEvents[]
 }
 
 export interface WasteRemovalNotification {
   receiverEmail: string
   receiverName: string
-  locations: WasteRemovalByLocation
+  data: WasteRemovalByLocation[]
 }
 
 export type SubscribedUser = Pick<
@@ -28,18 +28,7 @@ export type SubscribedUser = Pick<
   '_id' | 'name' | 'email'
 >
 
-export interface EventByWasteType {
-  wasteType: string
-  agents: Agent[]
-}
-
 export interface AggregatedApplication {
   userId: mongoose.Types.ObjectId
   docs: [{ locationId: string; locationName: string; wasteTypes: string[] }]
-}
-
-export interface AggregatedEvent {
-  locationId: string
-  locationName: string
-  eventsByWasteType: EventByWasteType[]
 }

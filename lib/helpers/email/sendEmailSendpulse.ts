@@ -1,3 +1,4 @@
+import path from 'path'
 import sendpulse from 'sendpulse-api'
 import EmailSendingMetrics from './emailSendingMetrics'
 import { Email } from '../../types/email'
@@ -5,9 +6,7 @@ import { Email } from '../../types/email'
 /*
  * https://login.sendpulse.com/settings/#api
  */
-const API_USER_ID = '22d2e61be64bf734875895be82bf4de7'
-const API_SECRET = '87ceb5f698bdc1a85e93ac4a92a3358c'
-const TOKEN_STORAGE = './sendpulseTokenStorage'
+const tokenStorage = path.join(__dirname, '../../../sendpulseTokenStorage')
 
 const callback = (data: any, metrics: EmailSendingMetrics) => {
   if (!data.is_error) return
@@ -28,26 +27,31 @@ const callback = (data: any, metrics: EmailSendingMetrics) => {
 
   const errorMessage =
     parts.length > 0
-      ? parts.join(', ') + '\n'
+      ? parts.join(', ')
       : 'Message: unknown error while sending an email'
 
-  console.log(errorMessage)
+  metrics.errorMessages.push(errorMessage)
 }
 
 export const emailSenderSendpulse = (
   email: Email,
   metrics: EmailSendingMetrics,
 ) => {
-  sendpulse.init(API_USER_ID, API_SECRET, TOKEN_STORAGE, function (token: any) {
-    if (!token) {
-      console.log('No sendpulse email token')
-      return
-    }
-    if (token && token.is_error) {
-      console.log('Sendpulse email token error')
-      return
-    }
-  })
+  sendpulse.init(
+    process.env.SENDPULSE_ID,
+    process.env.SENDPULSE_SECRET,
+    tokenStorage,
+    function (token: any) {
+      if (!token) {
+        console.log('No sendpulse email token')
+        return
+      }
+      if (token && token.is_error) {
+        console.log('Sendpulse email token error')
+        return
+      }
+    },
+  )
 
   sendpulse.smtpSendMail((data: any) => {
     callback(data, metrics)

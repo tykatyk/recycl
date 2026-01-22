@@ -3,10 +3,8 @@ import { User, Event, RemovalApplication } from '../../../lib/db/models'
 import type {
   SubscribedUser,
   AggregatedApplication,
-  AggregatedEvent,
-  Agent,
-  WasteRemovalEvents,
   WasteRemovalByLocation,
+  WasteRemovalEvents,
   WasteRemovalNotification,
 } from '../../../lib/types/subscription'
 
@@ -40,7 +38,6 @@ const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
             userId: '$user',
             locationId: '$wasteLocation.place_id',
           },
-          //ToDo: change to locationId
           locationName: {
             $first: '$wasteLocation.structured_formatting.main_text',
           },
@@ -74,7 +71,7 @@ const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
 }
 
 const getRemovalEvents = async () => {
-  const removalEvents = await Event.aggregate<AggregatedEvent>([
+  const removalEvents = await Event.aggregate<WasteRemovalByLocation>([
     {
       $match: {
         isActive: true,
@@ -123,7 +120,7 @@ const getRemovalEvents = async () => {
           wasteType: '$_id.wasteType',
         },
         locationName: { $first: '$locationName' },
-        agentsByWasteType: {
+        eventsByWasteType: {
           $push: {
             eventId: '$eventId',
             agentName: '$agentName',
@@ -136,8 +133,8 @@ const getRemovalEvents = async () => {
       $project: {
         _id: '$_id',
         locationName: '$locationName',
-        agentsByWasteType: {
-          $slice: ['$agentsByWasteType', 3], //max 3 agents to avoid long emails
+        eventsByWasteType: {
+          $slice: ['$eventsByWasteType', 3], //max 3 events to avoid long emails
         },
       },
     },
@@ -146,7 +143,10 @@ const getRemovalEvents = async () => {
         _id: '$_id.locationId',
         locationName: { $first: '$locationName' },
         docs: {
-          $push: { wasteType: '$_id.wasteType', agents: '$agentsByWasteType' },
+          $push: {
+            wasteType: '$_id.wasteType',
+            eventsByWasteType: '$eventsByWasteType',
+          },
         },
       },
     },
@@ -155,7 +155,7 @@ const getRemovalEvents = async () => {
         _id: 0,
         locationId: '$_id',
         locationName: '$locationName',
-        eventsByWasteType: '$docs',
+        eventsByLocation: '$docs',
       },
     },
   ])
@@ -173,15 +173,15 @@ export default async function prepareNotifications() {
   const aggregatedRemovalApplications =
     await getRemovalApplications(subscribedUsers)
 
-  const removalEvents = await getRemovalEvents()
+  const aggregatedRemovalEvents = await getRemovalEvents()
 
   const removalEventsMap = new Map(
-    removalEvents.map((re) => {
-      const { locationId, eventsByWasteType, locationName } = re
-      const eventsMap = new Map(
-        eventsByWasteType.map((doc) => [doc.wasteType, doc.agents]),
+    aggregatedRemovalEvents.map((reByLocation) => {
+      const { locationId, locationName, eventsByLocation } = reByLocation
+      const eventsByWasteType = new Map(
+        eventsByLocation.map((doc) => [doc.wasteType, doc.eventsByWasteType]),
       )
-      return [locationId, { eventsMap, locationName }]
+      return [locationId, { locationName, eventsByWasteType }]
     }),
   )
 
@@ -210,39 +210,41 @@ export default async function prepareNotifications() {
   const notifications: WasteRemovalNotification[] = []
 
   removalApplications.forEach(async (application) => {
-    const locations: WasteRemovalByLocation = {}
     const notification: WasteRemovalNotification = {
       receiverEmail: application.userEmail,
       receiverName: application.userName,
-      locations,
+      data: [],
     }
 
     for (const doc of application.docs) {
-      const locationId = doc.locationId
+      const { locationId, locationName, wasteTypes } = doc
+      const location: WasteRemovalByLocation = {
+        locationId,
+        locationName,
+        eventsByLocation: [],
+      }
 
-      const allEventsByLocation = removalEventsMap.get(doc.locationId)
+      const allEventsByLocation = removalEventsMap.get(locationId)
       if (!allEventsByLocation) continue
 
-      const removalbleWasteTypes: Record<string, Agent[]> = {}
-      for (const wasteType of doc.wasteTypes) {
-        const agents = allEventsByLocation.eventsMap.get(wasteType)
-        if (!agents || agents.length === 0) continue
+      for (const wasteType of wasteTypes) {
+        const eventsByWasteType =
+          allEventsByLocation.eventsByWasteType.get(wasteType)
+        if (!eventsByWasteType || eventsByWasteType.length === 0) continue
 
-        if (!locations[locationId]) {
-          locations[locationId] = {
-            locationName: doc.locationName,
-            wasteRemovalEvents: {} as WasteRemovalEvents,
-          }
+        const removalbleWasteTypes: WasteRemovalEvents = {
+          wasteType,
+          eventsByWasteType,
         }
 
-        removalbleWasteTypes[wasteType] = agents
-
-        locations[locationId].wasteRemovalEvents = removalbleWasteTypes
+        location.eventsByLocation.push(removalbleWasteTypes)
       }
+
+      if (location.eventsByLocation.length === 0) continue
+      notification.data.push(location)
     }
 
-    if (Object.keys(notification.locations).length === 0) return
-
+    if (notification.data.length === 0) return
     notifications.push(notification)
   })
 

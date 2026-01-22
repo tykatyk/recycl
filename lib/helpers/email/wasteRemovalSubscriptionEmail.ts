@@ -48,22 +48,23 @@ type PrepareEmailHtml = {
 export function prepareEmailHtml(params: PrepareEmailHtml) {
   const { notification, host, brandName } = params
 
-  const emailHtml = Object.entries(notification.locations)
-    .map(([_, loc]) => {
-      const wasteTypesHtml = Object.entries(loc.wasteRemovalEvents)
-        .map(([wasteType, removals]) => {
-          const removalsHtml = removals
+  const emailHtml = notification.data
+    .map((loc) => {
+      const byLocationHtml = loc.eventsByLocation
+        .map((evByLocation) => {
+          const { wasteType, eventsByWasteType } = evByLocation
+          const byWasteTypeHtml = eventsByWasteType
             .map(
-              (ev, idx) => `
+              (evByWasteType, idx) => `
         <tr style="color: #ccc; line-height: 1.1">
-          <td style="${idx === removals.length - 1 ? '' : 'padding-bottom: 16px'}; padding-left: 8px">
+          <td style="${idx === eventsByWasteType.length - 1 ? '' : 'padding-bottom: 16px'}; padding-left: 8px">
             <table>
-              <tr><td>Дата и время: ${formatDate(ev.date)}</td></tr>
-              <tr><td>Организатор: ${ev.agentName}</td></tr>
+              <tr><td>Дата и время: ${formatDate(evByWasteType.date)}</td></tr>
+              <tr><td>Организатор: ${evByWasteType.agentName}</td></tr>
               <tr>
                 <td>
                   <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
-                     href="${getDetailsUrl(ev.eventId, host)}">Подробнее</a>
+                     href="${getDetailsUrl(evByWasteType.eventId, host)}">Подробнее</a>
                 </td>
               </tr>
             </table>
@@ -77,7 +78,7 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
           <td style="padding-bottom: 8px">
             <table style="font-size: 16px; color: #fff;">
               <tr><th align="left" style="padding: 0 0 16px 8px;">Тип вторсырья: ${wasteType}</th></tr>
-              ${removalsHtml}
+              ${byWasteTypeHtml}
             </table>
           </td>
         </tr>`
@@ -89,7 +90,7 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
         <td style="padding: 24px 0">
           <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="color: #fff; text-align: left" width="100%">
             <tr><th style="font-size: 24px; padding-bottom: 16px">Населенный пункт: ${loc.locationName}</th></tr>
-            ${wasteTypesHtml}
+            ${byLocationHtml}
           </table>
         </td>
       </tr>`
