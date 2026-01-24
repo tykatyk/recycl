@@ -48,12 +48,16 @@ export default function UserMenu(props) {
           href: '/my/applications',
         },
         {
-          text: 'Обьявления о вывозе отходов',
+          text: 'Обьявления о приеме отходов передвижными пунктами',
           href: '/my/events',
         },
         {
           text: 'Пункты приема отходов',
           href: '#',
+        },
+        {
+          text: 'Подписки на уведомления',
+          href: '/my/subscriptions',
         },
       ],
     },

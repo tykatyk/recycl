@@ -24,12 +24,16 @@ export default function CreateButton(props) {
       href: '/applications/create',
     },
     {
-      text: 'Объявление о вывозе отходов',
+      text: 'Объявление о приеме отходов передвижным пунктом',
       href: '/my/events/create',
     },
     {
-      text: 'Пункт приема отходов',
+      text: 'Стационарный пункт приема отходов',
       href: '#',
+    },
+    {
+      text: 'Подписку на получение уведомлений',
+      href: '/my/subscriptions/create',
     },
   ]
 
@@ -103,7 +107,7 @@ export default function CreateButton(props) {
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
       >
-        Создать
+        Добавить
       </Button>
       <CreateAdMenu />
     </Box>
