@@ -6,7 +6,16 @@ const subscriptionSchema = new Schema(
       ref: 'User',
       required: true,
     },
-    elements: [String],
+    elements: [
+      {
+        name: { type: String, required: true },
+        subscribed: { type: Boolean, default: true, required: true },
+        unsubscribeToken: { type: String, unique: true, required: true },
+        unsubscribeTokenUsed: { type: Boolean, default: false, required: true },
+        unsubscribeTokenExpires: { type: Date, required: true },
+        listUnsubscribeToken: { type: String, unique: true, required: true },
+      },
+    ],
   },
   { timestamps: true },
 )

@@ -4,7 +4,8 @@ import Account from './account'
 import UserRole from './userRole'
 import WasteType from './wasteType'
 import Event from './eventModel'
-import subscriptionVariant from './subscriptionVariant'
+import Subscription from './subscription'
+import SubscriptionVariant from './subscriptionVariant'
 import User from './user'
 
 export {
@@ -14,6 +15,7 @@ export {
   WasteType,
   Account,
   Event,
-  subscriptionVariant,
+  SubscriptionVariant,
+  Subscription,
   User,
 }
