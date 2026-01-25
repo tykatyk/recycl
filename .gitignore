@@ -3,4 +3,4 @@
 /.env.local
 /.next-env.d.ts
 /.vscode
-/public/locks
+/lib/locks
