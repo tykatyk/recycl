@@ -45,8 +45,12 @@ const handleEmailUnsubscribe = async (
   return res.json({ status: SUCCESS, message: OK })
 }
 
-const handleTokenUnsubscribe = async (token: string, res: NextApiResponse) => {
-  if (!token || typeof token !== 'string') {
+const handleTokenUnsubscribe = async (
+  token: string | string[] | undefined,
+  res: NextApiResponse<UnsubscribeApiResponse>,
+  checkTokenExpirationAndUsage = false,
+) => {
+  if (typeof token !== 'string') {
     return res.status(400).end()
   }
   await dbConnect()
@@ -55,7 +59,7 @@ const handleTokenUnsubscribe = async (token: string, res: NextApiResponse) => {
   })
 
   if (!subscriptions) {
-    return res.status(200).json({ message: TOKEN_NOT_FOUND })
+    return res.status(200).json({ status: ERROR, error: TOKEN_NOT_FOUND })
   }
 
   const element = subscriptions.elements.find(
@@ -63,14 +67,28 @@ const handleTokenUnsubscribe = async (token: string, res: NextApiResponse) => {
   )
 
   if (!element) {
-    return res.status(200).json({ message: TOKEN_NOT_FOUND })
+    return res.status(200).json({ status: ERROR, error: TOKEN_NOT_FOUND })
+  }
+
+  if (!element.subscribed) {
+    return res.status(200).json({ status: SUCCESS, message: OK })
+  }
+
+  if (checkTokenExpirationAndUsage) {
+    if (element.unsubscribeTokenUsed) {
+      return res.status(200).json({ status: ERROR, error: TOKEN_USED })
+    }
+
+    if (element.unsubscribeTokenExpires < new Date()) {
+      return res.status(200).json({ status: ERROR, error: TOKEN_EXPIRED })
+    }
   }
 
   element.subscribed = false
   element.unsubscribeTokenUsed = true
 
   await subscriptions.save()
-  return res.status(200).json({ message: OK })
+  return res.status(200).json({ status: SUCCESS, message: OK })
 }
 
 export default async function unsubscribe(
@@ -79,48 +97,23 @@ export default async function unsubscribe(
 ) {
   switch (req.method) {
     case 'POST': {
-      const { email, token } = req.body
+      const { scope, data } = req.body
 
-      if (email) {
-        return handleEmailUnsubscribe(email, res)
-      } else if (token) {
-        return handleTokenUnsubscribe(token, res)
-      } else {
-        return res.status(400).end()
+      switch (scope) {
+        case 'email':
+          return handleEmailUnsubscribe(data, res)
+        case 'token':
+          return handleTokenUnsubscribe(data, res)
+        default:
+          return res.status(400).end()
       }
     }
+
     case 'GET': {
       const { token } = req.query
-      if (typeof token !== 'string') {
-        return res.status(400).end()
-      }
+
       try {
-        await dbConnect()
-        const subscriptions = await Subscription.findOne({
-          elements: { unsubscribeToken: token },
-        }).select(['unsubscribeTokenUsed', 'unsubscribeTokenExpires'])
-
-        if (!subscriptions) {
-          return res.status(200).json({ message: TOKEN_NOT_FOUND })
-        }
-        const element = subscriptions.elements.find(
-          (el) => el.unsubscribeToken === token,
-        )
-
-        if (!element) {
-          return res.status(200).json({ message: TOKEN_NOT_FOUND })
-        }
-
-        const { unsubscribeTokenUsed, unsubscribeTokenExpires } = element
-
-        if (unsubscribeTokenUsed) {
-          return res.status(200).json({ message: TOKEN_USED })
-        }
-        if (unsubscribeTokenExpires < new Date()) {
-          return res.status(200).json({ message: TOKEN_EXPIRED })
-        }
-
-        return res.status(200).json({ message: OK })
+        return await handleTokenUnsubscribe(token, res, true)
       } catch (error) {
         return res.status(500).end()
       }

@@ -6,41 +6,45 @@ import { ReactElement, useCallback, useEffect, useState } from 'react'
 import CustomSnackbar from '../../../../components/uiParts/Snackbars'
 import SuccessfullUnsubscribe from '../../../../components/subscriptions/SuccsesfulUnsubscribe'
 import TokenNotFound from '../../../../components/subscriptions/TokenNotFound'
-import TokenExpired from '../../../../components/subscriptions/TokenExpired'
+import TokenExpired from '../../../../components/subscriptions/TokenExpiredOrUsed'
+import type { UnsubscribeApiResponse } from '../../../../lib/subscriptions/types'
 
 const titleHeading = 'Отписаться от рассылки'
 const errorMessge = 'Ошибка при загрузке данных'
 const unsubscribeRoute = '/api/subscriptions/unsubscribe'
 
-type TokenData = {
-  message: 'tokenNotFound' | 'tokenUsed' | 'tokenExpired' | 'ok'
-} | null
-
 const ShowUnsubscibe = ({
   data,
   token,
 }: {
-  data: TokenData
+  data: UnsubscribeApiResponse | null
   token: string
 }) => {
   if (!data) {
     return null
   }
 
-  const message = data.message.toLowerCase()
-
-  switch (message) {
-    case 'tokennotfound':
-      return <TokenNotFound />
-    case 'tokenused':
-      return <TokenExpired token={token} />
-    case 'tokenexpired':
-      return <TokenExpired token={token} />
-    case 'ok':
-      return <SuccessfullUnsubscribe />
-    default:
-      return null
+  if (data.status === 'SUCCESS') {
+    return <SuccessfullUnsubscribe />
   }
+
+  if (data.status === 'ERROR') {
+    switch (data.error) {
+      case 'TOKEN_NOT_FOUND':
+        return <TokenNotFound />
+      case 'TOKEN_USED':
+        return <TokenExpired token={token} />
+      case 'TOKEN_EXPIRED':
+        return <TokenExpired token={token} />
+      case 'USER_NOT_FOUND':
+        return null
+      case 'SUBSCRIPTION_NOT_FOUND':
+        return null
+      default:
+        return null
+    }
+  }
+  return null
 }
 
 export default function Unsubscribe() {
@@ -50,7 +54,7 @@ export default function Unsubscribe() {
   const token = router.query.token
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
-  const [data, setData] = useState<TokenData>(null)
+  const [data, setData] = useState<UnsubscribeApiResponse | null>(null)
 
   const dataFetcher = useCallback(async () => {
     if (typeof token !== 'string') return null
@@ -63,18 +67,18 @@ export default function Unsubscribe() {
       setError(errorMessge)
       return null
     }
-    const data = (await response.json()) as TokenData
+    const data = (await response.json()) as UnsubscribeApiResponse
     return data
   }, [token])
 
   useEffect(() => {
-    if (!token) return
+    if (typeof token !== 'string') return
 
     setLoading(true)
     dataFetcher()
       .then((data) => {
         // setData(data)
-        setData({ message: 'tokenExpired' })
+        setData({ status: 'ERROR', error: 'TOKEN_EXPIRED' })
       })
       .catch((_) => {
         setError(errorMessge)
@@ -84,12 +88,12 @@ export default function Unsubscribe() {
       })
   }, [token])
 
+  if (typeof token !== 'string') return null
+
   if (loading) {
     content = <PageLoadingCircle />
-  } else if (data) {
-    const verifiedToken = typeof token === 'string' ? token : ''
-
-    content = <ShowUnsubscibe data={data} token={verifiedToken} />
+  } else {
+    content = <ShowUnsubscibe data={data} token={token} />
   }
 
   return (

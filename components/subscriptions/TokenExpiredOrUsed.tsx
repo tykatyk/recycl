@@ -14,9 +14,9 @@ const headingText = 'Для отписки от рассылки нажмите 
 const buttonText = 'Отписаться'
 
 const TokenExpiredOrUsedUnsubscribe = ({
-  handleTokenExpired,
+  handleTokenExpiredOrUsed,
 }: {
-  handleTokenExpired: () => Promise<void>
+  handleTokenExpiredOrUsed: () => Promise<void>
 }) => {
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -34,7 +34,7 @@ const TokenExpiredOrUsedUnsubscribe = ({
           disabled={loading}
           onClick={async () => {
             setLoading(true)
-            await handleTokenExpired()
+            await handleTokenExpiredOrUsed()
             setLoading(false)
           }}
         >
@@ -51,14 +51,14 @@ export default function TokenExpiredOrUsed({ token }: { token: string }) {
   const [data, setData] = useState<UnsubscribeApiResponse | null>(null)
   let content: ReactElement | null = null
 
-  const handleTokenExpired = useCallback(async () => {
+  const handleTokenExpiredOrUsed = useCallback(async () => {
     //ToDo: maybe use try catch
     const response = await fetch(unsubscribeAPI, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ scope: 'token', data: token }),
     })
     if (!response.ok) {
       setError(errorMessge)
@@ -81,7 +81,7 @@ export default function TokenExpiredOrUsed({ token }: { token: string }) {
     default:
       content = (
         <TokenExpiredOrUsedUnsubscribe
-          handleTokenExpired={handleTokenExpired}
+          handleTokenExpiredOrUsed={handleTokenExpiredOrUsed}
         />
       )
   }

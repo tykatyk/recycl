@@ -22,7 +22,7 @@ export default function TokenNotFound() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ scope: 'email', data: email }),
     })
     if (!response.ok) {
       //ToDo: handle error
