@@ -3,17 +3,18 @@ import { ReactElement, useCallback, useState } from 'react'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import CustomSnackbar from '../uiParts/Snackbars'
 import SuccessfullUnsubscribe from './SuccsesfulUnsubscribe'
-import { unsubscribeApiResponseStatuses } from '../../lib/subscriptions/unsubscribeApiResponseCodes'
+import { unsubscribeApiResponseCodes } from '../../lib/subscriptions/unsubscribeApiResponseCodes'
 import type { UnsubscribeApiResponse } from '../../lib/subscriptions/types'
 
 const unsubscribeAPI = '/api/subscriptions/unsubscribe'
-const { SUCCESS, ERROR } = unsubscribeApiResponseStatuses
 
 const errorMessge = 'Ошибка при получении данных'
-const headingText = 'Для отписки от рассылки нажмите кнопку'
+const headingText = 'Cрок действия ссылки истек'
+const mainText = 'Для отписки от рассылки нажмите кнопку'
 const buttonText = 'Отписаться'
+const { SUCCESS, NOT_FOUND } = unsubscribeApiResponseCodes
 
-const TokenExpiredOrUsedUnsubscribe = ({
+const UnsubscribeExpiredOrUsedToken = ({
   handleTokenExpiredOrUsed,
 }: {
   handleTokenExpiredOrUsed: () => Promise<void>
@@ -25,6 +26,7 @@ const TokenExpiredOrUsedUnsubscribe = ({
       <Typography variant="h4" component="h1" sx={{ mb: 4 }} align="center">
         {headingText}
       </Typography>
+      <Typography sx={{ mb: 4 }}>{mainText}</Typography>
 
       <Box>
         <Button
@@ -61,30 +63,32 @@ export default function TokenExpiredOrUsed({ token }: { token: string }) {
       body: JSON.stringify({ scope: 'token', data: token }),
     })
     if (!response.ok) {
-      setError(errorMessge)
+      if (response.status == 404) {
+        setError('Подписка не найдена')
+      } else {
+        setError(errorMessge)
+      }
+
       return
     }
     const data: UnsubscribeApiResponse = await response.json()
 
-    if (data.status === ERROR) {
-      setError(errorMessge)
-    } else if (data.status === SUCCESS) {
-      setData(data)
-    }
+    setData(data)
   }, [token])
 
   switch (data?.status) {
     case SUCCESS:
       content = <SuccessfullUnsubscribe />
-      return
+      break
 
     default:
       content = (
-        <TokenExpiredOrUsedUnsubscribe
+        <UnsubscribeExpiredOrUsedToken
           handleTokenExpiredOrUsed={handleTokenExpiredOrUsed}
         />
       )
   }
+
   return (
     <>
       {content}

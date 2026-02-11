@@ -1,13 +1,13 @@
 import React from 'react'
 import { Grid } from '@mui/material'
 import Alert from '@mui/material/Alert'
-import LayoutWithouHeader from './LayoutWithouHeader'
+import LayoutWithoutHeader from './LayoutWithoutHeader'
 
 export default function ResetLayout(props) {
   const { title, message, severity = 'error' } = props
 
   return (
-    <LayoutWithouHeader title={title ? `${title} | Recycl` : 'Recycl'}>
+    <LayoutWithoutHeader title={title ? `${title} | Recycl` : 'Recycl'}>
       <Grid
         container
         alignItems="center"
@@ -27,6 +27,6 @@ export default function ResetLayout(props) {
           </Grid>
         </Grid>
       </Grid>
-    </LayoutWithouHeader>
+    </LayoutWithoutHeader>
   )
 }

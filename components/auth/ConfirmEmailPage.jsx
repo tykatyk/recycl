@@ -1,7 +1,6 @@
-import React from 'react'
 import ResetLayout from '../layouts/ResetLayout'
 
-export default function ResetPasswordPage({ urlIsValid }) {
+export default function ConfirmEmailPage({ urlIsValid }) {
   const title = 'Подтверждение email'
   if (!urlIsValid)
     return <ResetLayout title={title} message="Срок действия ссылки истек" />

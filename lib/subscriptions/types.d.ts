@@ -1,30 +1,20 @@
-import {
-  unsubscribeApiResponseCodes,
-  unsubscribeApiResponseStatuses,
-} from '../../lib/subscriptions/unsubscribeApiResponseCodes'
+import { unsubscribeApiResponseCodes } from '../../lib/subscriptions/unsubscribeApiResponseCodes'
 
 const {
-  OK,
-  USER_NOT_FOUND,
-  SUBSCRIPTION_NOT_FOUND,
+  SUCCESS,
   TOKEN_NOT_FOUND,
   TOKEN_EXPIRED,
+  USER_NOT_FOUND,
+  SUBSCRIPTION_NOT_FOUND,
   TOKEN_USED,
 } = unsubscribeApiResponseCodes
 
-const { SUCCESS, ERROR } = unsubscribeApiResponseStatuses
-
-export type UnsubscribeApiResponse =
-  | {
-      status: typeof SUCCESS
-      message: typeof OK
-    }
-  | {
-      status: typeof ERROR
-      error:
-        | typeof USER_NOT_FOUND
-        | typeof SUBSCRIPTION_NOT_FOUND
-        | typeof TOKEN_NOT_FOUND
-        | typeof TOKEN_EXPIRED
-        | typeof TOKEN_USED
-    }
+export type UnsubscribeApiResponse = {
+  status:
+    | typeof SUCCESS
+    | typeof TOKEN_NOT_FOUND
+    | typeof TOKEN_EXPIRED
+    | typeof USER_NOT_FOUND
+    | typeof SUBSCRIPTION_NOT_FOUND
+    | typeof TOKEN_USED
+}
