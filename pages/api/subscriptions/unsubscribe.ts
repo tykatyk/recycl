@@ -2,96 +2,116 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import dbConnect from '../../../lib/db/connection'
 import { User, Subscription } from '../../../lib/db/models'
 import { unsubscribeApiResponseCodes } from '../../../lib/subscriptions/unsubscribeApiResponseCodes'
-import { unsubscribeApiResponseStatuses } from '../../../lib/subscriptions/unsubscribeApiResponseCodes'
 import { emailSchema } from '../../../lib/validation'
 import type { UnsubscribeApiResponse } from '../../../lib/subscriptions/types'
+import subscription from '../../../lib/db/models/subscription'
 
-const {
-  USER_NOT_FOUND,
-  SUBSCRIPTION_NOT_FOUND,
-  TOKEN_NOT_FOUND,
-  TOKEN_EXPIRED,
-  TOKEN_USED,
-  OK,
-} = unsubscribeApiResponseCodes
+const { NOT_FOUND, TOKEN_EXPIRED, TOKEN_USED, SUCCESS } =
+  unsubscribeApiResponseCodes
 
-const { SUCCESS, ERROR } = unsubscribeApiResponseStatuses
-
-const handleEmailUnsubscribe = async (
-  email: string,
+const tokenNotFoundUnsubscribe = async (
+  email: string | string[] | undefined,
   res: NextApiResponse<UnsubscribeApiResponse>,
 ) => {
-  if (!emailSchema.validate(email)) {
+  let validatedEmail = ''
+  try {
+    const validated = await emailSchema.validate({ email })
+    validatedEmail = validated.email
+  } catch (error) {
     return res.status(400).end()
   }
+
   await dbConnect()
-  const user = await User.findOne({ email }).select('_id').lean()
+  const user = await User.findOne({ email: validatedEmail }).select('_id')
   if (!user) {
-    return res.status(200).json({ status: ERROR, error: USER_NOT_FOUND })
+    return res.status(404).end()
   }
-  const subscriptions = await Subscription.findOneAndUpdate(
-    { user: user._id },
+  await Subscription.findOneAndUpdate(
+    { user: user._id, subscribed: true },
     {
-      'elements.$[].subscribed': false,
-      'elements.$[].unsubscribeTokenUsed': true,
+      subscribed: false,
+      unsubscribeTokenUsed: true,
     },
   )
-  if (!subscriptions) {
-    return res
-      .status(200)
-      .json({ status: ERROR, error: SUBSCRIPTION_NOT_FOUND })
+
+  if (!subscription) {
+    return res.json({ status: NOT_FOUND })
   }
 
-  return res.json({ status: SUCCESS, message: OK })
+  //ToDo: send email to the user
+
+  return res.json({ status: SUCCESS })
 }
 
-const handleTokenUnsubscribe = async (
+const initialUnsubscribe = async (
   token: string | string[] | undefined,
   res: NextApiResponse<UnsubscribeApiResponse>,
-  checkTokenExpirationAndUsage = false,
 ) => {
   if (typeof token !== 'string') {
     return res.status(400).end()
   }
+
   await dbConnect()
-  const subscriptions = await Subscription.findOne({
-    elements: { unsubscribeToken: token },
+  const subscription = await Subscription.findOne({
+    unsubscribeToken: token,
   })
 
-  if (!subscriptions) {
-    return res.status(200).json({ status: ERROR, error: TOKEN_NOT_FOUND })
+  if (!subscription) {
+    return res.status(200).json({ status: NOT_FOUND })
+  }
+  const { subscribed, unsubscribeTokenUsed, unsubscribeTokenExpires } =
+    subscription
+
+  if (!subscribed) {
+    return res.status(200).json({ status: SUCCESS })
   }
 
-  const element = subscriptions.elements.find(
-    (el) => el.unsubscribeToken === token,
-  )
-
-  if (!element) {
-    return res.status(200).json({ status: ERROR, error: TOKEN_NOT_FOUND })
+  if (unsubscribeTokenUsed) {
+    return res.status(200).json({ status: TOKEN_USED })
   }
 
-  if (!element.subscribed) {
-    return res.status(200).json({ status: SUCCESS, message: OK })
+  if (unsubscribeTokenExpires < new Date()) {
+    return res.status(200).json({ status: TOKEN_EXPIRED })
   }
 
-  if (checkTokenExpirationAndUsage) {
-    if (element.unsubscribeTokenUsed) {
-      return res.status(200).json({ status: ERROR, error: TOKEN_USED })
-    }
+  subscription.subscribed = false
+  subscription.unsubscribeTokenUsed = true
 
-    if (element.unsubscribeTokenExpires < new Date()) {
-      return res.status(200).json({ status: ERROR, error: TOKEN_EXPIRED })
-    }
-  }
-
-  element.subscribed = false
-  element.unsubscribeTokenUsed = true
-
-  await subscriptions.save()
-  return res.status(200).json({ status: SUCCESS, message: OK })
+  await subscription.save()
+  return res.status(200).json({ status: SUCCESS })
 }
 
-export default async function unsubscribe(
+const tokenExpiredOrUsedUnsubscribe = async (
+  token: string | string[] | undefined,
+  res: NextApiResponse<UnsubscribeApiResponse>,
+) => {
+  if (typeof token !== 'string') {
+    return res.status(400).end()
+  }
+
+  await dbConnect()
+  const subscription = await Subscription.findOne({
+    unsubscribeToken: token,
+  })
+
+  if (!subscription) {
+    return res.status(404).json({ status: NOT_FOUND })
+  }
+
+  const { subscribed } = subscription
+
+  if (!subscribed) {
+    return res.status(200).json({ status: SUCCESS })
+  }
+
+  subscription.subscribed = false
+  subscription.unsubscribeTokenUsed = true
+
+  await subscription.save()
+  return res.status(200).json({ status: SUCCESS })
+}
+
+export default async function Unsubscribe(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
@@ -101,9 +121,19 @@ export default async function unsubscribe(
 
       switch (scope) {
         case 'email':
-          return handleEmailUnsubscribe(data, res)
+          try {
+            return await tokenNotFoundUnsubscribe(data, res)
+          } catch (error) {
+            return res.status(500).end()
+          }
+
         case 'token':
-          return handleTokenUnsubscribe(data, res)
+          try {
+            return await tokenExpiredOrUsedUnsubscribe(data, res)
+          } catch (error) {
+            return res.status(500).end()
+          }
+
         default:
           return res.status(400).end()
       }
@@ -113,14 +143,16 @@ export default async function unsubscribe(
       const { token } = req.query
 
       try {
-        return await handleTokenUnsubscribe(token, res, true)
+        return await initialUnsubscribe(token, res)
       } catch (error) {
         return res.status(500).end()
       }
     }
+
     case 'HEAD': {
       return res.status(204).end()
     }
+
     default: {
       return res.status(405).end()
     }

@@ -5,9 +5,9 @@ const subscriptionVariantSchema = new Schema({
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-    required: true,
+  isConfigurable: {
+    type: Boolean,
+    default: false,
   },
 })
 

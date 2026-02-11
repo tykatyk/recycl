@@ -4,7 +4,7 @@ import fs from 'fs/promises'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import dateFormatter from '../../../lib/helpers/dateFormatter'
 import EmailSendingMetrics from '../../../lib/helpers/email/emailSendingMetrics'
-import processSubscriptions from '../../../lib/jobs/processSubscriptions'
+import processSubscriptions from '../../../lib/subscriptions/processSubscriptions'
 
 const lockDirectory = path.join(
   __dirname,

@@ -65,6 +65,8 @@ const userSchema = new Schema(
           `${props.value} Недействительный адрес электронной почты!`,
       },
       lowercase: true,
+      trim: true,
+      index: true,
     },
     newEmail: {
       type: String,
@@ -111,11 +113,6 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    subscriptions: [
-      {
-        type: String,
-      },
-    ],
     roles: [
       {
         type: Schema.Types.ObjectId,

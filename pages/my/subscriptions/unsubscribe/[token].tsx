@@ -6,8 +6,12 @@ import { ReactElement, useCallback, useEffect, useState } from 'react'
 import CustomSnackbar from '../../../../components/uiParts/Snackbars'
 import SuccessfullUnsubscribe from '../../../../components/subscriptions/SuccsesfulUnsubscribe'
 import TokenNotFound from '../../../../components/subscriptions/TokenNotFound'
-import TokenExpired from '../../../../components/subscriptions/TokenExpiredOrUsed'
-import type { UnsubscribeApiResponse } from '../../../../lib/subscriptions/types'
+import TokenExpiredOrUsed from '../../../../components/subscriptions/TokenExpiredOrUsed'
+import { unsubscribeApiResponseCodes } from '../../../../lib/subscriptions/unsubscribeApiResponseCodes'
+import { UnsubscribeApiResponse } from '../../../../lib/subscriptions/types'
+
+const { SUCCESS, NOT_FOUND, TOKEN_USED, TOKEN_EXPIRED } =
+  unsubscribeApiResponseCodes
 
 const titleHeading = 'Отписаться от рассылки'
 const errorMessge = 'Ошибка при загрузке данных'
@@ -20,31 +24,19 @@ const ShowUnsubscibe = ({
   data: UnsubscribeApiResponse | null
   token: string
 }) => {
-  if (!data) {
-    return null
-  }
+  switch (data?.status) {
+    case SUCCESS:
+      return <SuccessfullUnsubscribe />
+    case NOT_FOUND:
+      return <TokenNotFound />
+    case TOKEN_USED:
+    case TOKEN_EXPIRED:
+      return <TokenExpiredOrUsed token={token} />
 
-  if (data.status === 'SUCCESS') {
-    return <SuccessfullUnsubscribe />
+    default:
+      //ToDo: handle default case
+      return null
   }
-
-  if (data.status === 'ERROR') {
-    switch (data.error) {
-      case 'TOKEN_NOT_FOUND':
-        return <TokenNotFound />
-      case 'TOKEN_USED':
-        return <TokenExpired token={token} />
-      case 'TOKEN_EXPIRED':
-        return <TokenExpired token={token} />
-      case 'USER_NOT_FOUND':
-        return null
-      case 'SUBSCRIPTION_NOT_FOUND':
-        return null
-      default:
-        return null
-    }
-  }
-  return null
 }
 
 export default function Unsubscribe() {
@@ -62,6 +54,7 @@ export default function Unsubscribe() {
     const queryString = new URLSearchParams({ token }).toString()
     const urlWithParams = `${unsubscribeRoute}?${queryString}`
 
+    //ToDo: maybe use try catch
     const response = await fetch(urlWithParams)
     if (!response.ok) {
       setError(errorMessge)
@@ -77,8 +70,8 @@ export default function Unsubscribe() {
     setLoading(true)
     dataFetcher()
       .then((data) => {
-        // setData(data)
-        setData({ status: 'ERROR', error: 'TOKEN_EXPIRED' })
+        setData(data)
+        // setData({ status: NOT_FOUND })
       })
       .catch((_) => {
         setError(errorMessge)
@@ -92,12 +85,13 @@ export default function Unsubscribe() {
 
   if (loading) {
     content = <PageLoadingCircle />
-  } else {
+  } else if (data) {
     content = <ShowUnsubscibe data={data} token={token} />
   }
 
   return (
     <Layout title={`${titleHeading} | ${process.env.NEXT_PUBLIC_BRAND}`}>
+      {/*--maybe use Box instead of Grid--*/}
       <Grid
         container
         direction="column"
