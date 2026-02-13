@@ -13,7 +13,7 @@ export default function RedirectUnathenticatedUser(props) {
     router.push({
       pathname: '/auth/login',
       query: {
-        from: `${process.env.NEXT_PUBLIC_URL}${router.asPath}`,
+        from: `${router.asPath}`,
       },
     })
     return null

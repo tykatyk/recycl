@@ -13,7 +13,7 @@ const subscriptionSchema = new Schema(
     },
     subscribed: { type: Boolean, default: true, required: true },
     unsubscribeToken: { type: String, unique: true, required: true },
-    unsubscribeTokenUsed: { type: Boolean, default: false, required: true },
+    unsubscribeTokenUsed: { type: Boolean, required: true },
     unsubscribeTokenExpires: { type: Date, required: true },
     listUnsubscribeToken: { type: String, unique: true, required: true },
   },

@@ -1,12 +1,10 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { User } from '../../../lib/db/models'
+import { Subscription } from '../../../lib/db/models'
 import dbConnect from '../../../lib/db/connection'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
-import { array, string } from 'yup'
-const subscriptionTypes = ['wasteAvailable', 'mobileStationAvailable'] as const
-const subscriptionFields = '-_id subscriptions'
+import cryptoRandomString from 'crypto-random-string'
 
 async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -17,37 +15,65 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'POST': {
-      const validationSchema = array()
-        .of(string().oneOf(subscriptionTypes))
-        .defined()
+      //ToDo: handle errors
+      const { variant, subscribed } = req.body
 
-      const subscriptions = req.body.updatedSubs
-
-      if (!(await validationSchema.isValid(subscriptions))) {
+      if (!variant && typeof subscribed !== 'boolean') {
         return res.status(400).end()
       }
 
-      await User.findOneAndUpdate(
-        {
-          _id: session.id,
-        },
-        {
-          subscriptions,
-        },
-      )
-        .select(subscriptionFields)
-        .lean()
+      const user = session.id
 
-      return res.status(200).json("User's subscriptions updated")
+      const subscription = await Subscription.findOne({
+        user,
+        variant,
+      })
+
+      if (subscription) {
+        subscription.subscribed = subscribed
+        await subscription.save()
+        return res.status(200).end()
+      }
+
+      const unsubscribeToken = cryptoRandomString({
+        length: 32,
+        type: 'url-safe',
+      })
+
+      const unsubscribeTokenUsed = false
+      const today = new Date()
+
+      const unsubscribeTokenExpires = today.getDate() + 30
+
+      const listUnsubscribeToken = cryptoRandomString({
+        length: 32,
+        type: 'url-safe',
+      })
+      await Subscription.create({
+        user,
+        variant,
+        subscribed,
+        unsubscribeToken,
+        unsubscribeTokenUsed,
+        unsubscribeTokenExpires,
+        listUnsubscribeToken,
+      })
+
+      return res.status(200).end()
     }
     case 'GET': {
-      const subscriptions = await User.findOne({
-        _id: session.id,
+      const subscriptions = await Subscription.find({
+        user: session.id,
+        subscribed: true,
       })
-        .select(subscriptionFields)
+        .select('-_id variant')
         .lean()
 
-      return res.json(subscriptions)
+      if (!subscriptions) return res.json([])
+
+      const variantIds = subscriptions.map((sub) => sub.variant)
+
+      return res.json(variantIds)
     }
 
     default: {

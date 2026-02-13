@@ -1,12 +1,12 @@
-import React from 'react'
 import { Button, Box } from '@mui/material'
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import { useRouter } from 'next/router'
+const buttonText = 'На главную'
 
-export default function BackButton({ text = 'Назад' }) {
+export default function HomePageButton() {
   const router = useRouter()
-  const handleClick = () => router.back()
+  const handleClick = () => router.push('/')
 
   return (
     <Box
@@ -19,7 +19,7 @@ export default function BackButton({ text = 'Назад' }) {
         startIcon={<ArrowBackIosIcon />}
         sx={{ color: '#fff' }}
       >
-        {text}
+        {buttonText}
       </Button>
     </Box>
   )
