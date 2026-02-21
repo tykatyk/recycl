@@ -12,10 +12,15 @@ const subscriptionSchema = new Schema(
       required: true,
     },
     subscribed: { type: Boolean, default: true, required: true },
-    unsubscribeToken: { type: String, unique: true, required: true },
-    unsubscribeTokenUsed: { type: Boolean, required: true },
-    unsubscribeTokenExpires: { type: Date, required: true },
+    unsubscribeTokens: [
+      {
+        value: { type: String, unique: true, required: true },
+        used: { type: Boolean, required: true },
+        expires: { type: Date, required: true },
+      },
+    ],
     listUnsubscribeToken: { type: String, unique: true, required: true },
+    lastSentAt: { type: Date },
   },
   { timestamps: true },
 )

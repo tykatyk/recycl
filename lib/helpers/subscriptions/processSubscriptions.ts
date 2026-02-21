@@ -1,11 +1,11 @@
-import { emailSenderSendpulse } from '../helpers/email/sendEmailSendpulse'
-import prepareNotifications from '../helpers/email/prepareNotifications'
+import { emailSenderSendpulse } from '../email/sendEmailSendpulse'
+import prepareNotifications from '../email/prepareNotifications'
 import {
   prepareEmailHtml,
   prepareEmailObj,
-} from '../helpers/email/wasteRemovalSubscriptionEmail'
-import EmailSendingDispatcher from '../helpers/email/emailSendingDispatcher'
-import EmailSendingMetrics from '../helpers/email/emailSendingMetrics'
+} from '../email/templates/wasteRemovalSubscriptionEmail'
+import EmailSendingDispatcher from '../email/emailSendingDispatcher'
+import EmailSendingMetrics from '../email/emailSendingMetrics'
 import dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
 
@@ -37,6 +37,8 @@ async function processSubscriptions(metrics: EmailSendingMetrics) {
   if (!canSendEmails()) return
 
   const notifications = await prepareNotifications()
+  // console.log(notifications)
+  // return
   const dispatcher = new EmailSendingDispatcher()
   metrics.totalEmails = notifications.length
 
@@ -49,9 +51,10 @@ async function processSubscriptions(metrics: EmailSendingMetrics) {
     const html = prepareEmailHtml({ notification, host, brandName })
     const email = prepareEmailObj({
       notification,
+      host,
+      brandName,
       subject,
       html,
-      brandName,
       emailFrom,
     })
 

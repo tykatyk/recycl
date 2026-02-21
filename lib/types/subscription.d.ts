@@ -1,4 +1,6 @@
 import type { UserType } from '../db/models/user'
+import { unsubscribeApiResponseCodes } from './unsubscribeApiResponseCodes'
+import { Types } from 'mongoose'
 
 export interface EventByWasteType {
   eventId: string
@@ -20,15 +22,36 @@ export interface WasteRemovalByLocation {
 export interface WasteRemovalNotification {
   receiverEmail: string
   receiverName: string
+  unsubscribeToken: string
+  listUnsubscribeToken: string
   data: WasteRemovalByLocation[]
 }
 
 export type SubscribedUser = Pick<
-  UserType & { _id: string },
-  '_id' | 'name' | 'email'
+  UserType & { _id: Types.ObjectId },
+  '_id' | 'name' | 'email' | 'isBanned' | 'isActive'
 >
 
 export interface AggregatedApplication {
   userId: mongoose.Types.ObjectId
   docs: [{ locationId: string; locationName: string; wasteTypes: string[] }]
+}
+
+const {
+  SUCCESS,
+  TOKEN_NOT_FOUND,
+  TOKEN_EXPIRED,
+  USER_NOT_FOUND,
+  SUBSCRIPTION_NOT_FOUND,
+  TOKEN_USED,
+} = unsubscribeApiResponseCodes
+
+export type UnsubscribeApiResponse = {
+  status:
+    | typeof SUCCESS
+    | typeof TOKEN_NOT_FOUND
+    | typeof TOKEN_EXPIRED
+    | typeof USER_NOT_FOUND
+    | typeof SUBSCRIPTION_NOT_FOUND
+    | typeof TOKEN_USED
 }

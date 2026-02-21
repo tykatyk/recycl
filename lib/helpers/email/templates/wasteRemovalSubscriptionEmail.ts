@@ -1,24 +1,26 @@
-import { Email } from '../../types/email'
-import formatDate from '../dateFormatter'
-import type { WasteRemovalNotification } from '../../types/subscription'
+import { Email } from '../../../types/email'
+import formatDate from '../../dateFormatter'
+import type { WasteRemovalNotification } from '../../../types/subscription'
 
 const yellow = ' #f8bc45'
 const logoPath = '../public/images/logo.png'
 
-const getDetailsUrl = (eventId: string, host: string) => {
-  const url = new URL(`${host}events/${eventId}`)
+const getUrl = (params: { host: string; route: string; id?: string }) => {
+  const { host, route, id } = params
+  const url = new URL(`${host}${route}${id ? `/${id}` : ''}`)
   return url.toString()
 }
 
 type EmailParams = {
   notification: WasteRemovalNotification
+  host: string
+  brandName: string
   subject: string
   html: string
-  brandName: string
   emailFrom: string
 }
 export function prepareEmailObj(params: EmailParams) {
-  const { notification, subject, html, brandName, emailFrom } = params
+  const { notification, subject, html, brandName, emailFrom, host } = params
 
   const receiverName = notification.receiverName ?? notification.receiverEmail
 
@@ -35,6 +37,10 @@ export function prepareEmailObj(params: EmailParams) {
         email: notification.receiverEmail,
       },
     ],
+    // headers: {
+    //   'List-Unsubscribe': `<${getUrl({ host, route: 'my/subscriptions/unsubscribe', id: notification.listUnsubscribeToken })}>`,
+    //   'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    // },
   }
   return emailObj
 }
@@ -64,7 +70,7 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
               <tr>
                 <td>
                   <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
-                     href="${getDetailsUrl(evByWasteType.eventId, host)}">Подробнее</a>
+                     href="${getUrl({ host, route: 'events', id: evByWasteType.eventId })}">Подробнее</a>
                 </td>
               </tr>
             </table>
@@ -160,7 +166,7 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
             >
               Если вы не хотите получать подобные уведомления, нажмите
               <br /><a
-                href="#"
+                href="{{unsubscribe_url}}"
                 style="
                   display: inline-block;
                   padding-top: 4px;

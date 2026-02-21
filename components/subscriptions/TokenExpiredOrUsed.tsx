@@ -3,8 +3,8 @@ import { ReactElement, useCallback, useState } from 'react'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import CustomSnackbar from '../uiParts/Snackbars'
 import SuccessfullUnsubscribe from './SuccsesfulUnsubscribe'
-import { unsubscribeApiResponseCodes } from '../../lib/subscriptions/unsubscribeApiResponseCodes'
-import type { UnsubscribeApiResponse } from '../../lib/subscriptions/types'
+import { unsubscribeApiResponseCodes } from '../../lib/helpers/subscriptions/unsubscribeApiResponseCodes'
+import type { UnsubscribeApiResponse } from '../../lib/types/subscription'
 
 const unsubscribeAPI = '/api/subscriptions/unsubscribe'
 

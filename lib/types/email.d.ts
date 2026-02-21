@@ -11,4 +11,8 @@ export type Email = {
       email: string
     },
   ]
+  headers?: {
+    'List-Unsubscribe': string
+    'List-Unsubscribe-Post': string
+  }
 }

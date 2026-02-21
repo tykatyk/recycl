@@ -7,8 +7,8 @@ import CustomSnackbar from '../../../../components/uiParts/Snackbars'
 import SuccessfullUnsubscribe from '../../../../components/subscriptions/SuccsesfulUnsubscribe'
 import TokenNotFound from '../../../../components/subscriptions/TokenNotFound'
 import TokenExpiredOrUsed from '../../../../components/subscriptions/TokenExpiredOrUsed'
-import { unsubscribeApiResponseCodes } from '../../../../lib/subscriptions/unsubscribeApiResponseCodes'
-import { UnsubscribeApiResponse } from '../../../../lib/subscriptions/types'
+import { unsubscribeApiResponseCodes } from '../../../../lib/helpers/subscriptions/unsubscribeApiResponseCodes'
+import { UnsubscribeApiResponse } from '../../../../lib/types/subscription'
 
 const { SUCCESS, NOT_FOUND, TOKEN_USED, TOKEN_EXPIRED } =
   unsubscribeApiResponseCodes

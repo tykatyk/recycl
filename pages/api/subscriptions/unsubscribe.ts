@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import dbConnect from '../../../lib/db/connection'
 import { User, Subscription } from '../../../lib/db/models'
-import { unsubscribeApiResponseCodes } from '../../../lib/subscriptions/unsubscribeApiResponseCodes'
+import { unsubscribeApiResponseCodes } from '../../../lib/helpers/subscriptions/unsubscribeApiResponseCodes'
 import { emailSchema } from '../../../lib/validation'
-import type { UnsubscribeApiResponse } from '../../../lib/subscriptions/types'
+import type { UnsubscribeApiResponse } from '../../../lib/types/subscription'
 import subscription from '../../../lib/db/models/subscription'
 
 const { NOT_FOUND, TOKEN_EXPIRED, TOKEN_USED, SUCCESS } =
