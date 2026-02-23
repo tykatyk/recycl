@@ -37,10 +37,6 @@ export function prepareEmailObj(params: EmailParams) {
         email: notification.receiverEmail,
       },
     ],
-    // headers: {
-    //   'List-Unsubscribe': `<${getUrl({ host, route: 'my/subscriptions/unsubscribe', id: notification.listUnsubscribeToken })}>`,
-    //   'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-    // },
   }
   return emailObj
 }
@@ -63,16 +59,18 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
             .map(
               (evByWasteType, idx) => `
         <tr style="color: #ccc; line-height: 1.1">
-          <td style="${idx === eventsByWasteType.length - 1 ? '' : 'padding-bottom: 16px'}; padding-left: 8px">
+          <td style="${idx === eventsByWasteType.length - 1 ? '' : 'padding-bottom: 16px;'} padding-left: 8px">
             <table>
-              <tr><td>Дата и время: ${formatDate(evByWasteType.date)}</td></tr>
-              <tr><td>Организатор: ${evByWasteType.agentName}</td></tr>
-              <tr>
-                <td>
-                  <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
-                     href="${getUrl({ host, route: 'events', id: evByWasteType.eventId })}">Подробнее</a>
-                </td>
-              </tr>
+              <tbody>
+                <tr><td>Дата и время: ${formatDate(evByWasteType.date)}</td></tr>
+                <tr><td>Организатор: ${evByWasteType.agentName}</td></tr>
+                <tr>
+                  <td>
+                    <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
+                      href="${getUrl({ host, route: 'events', id: evByWasteType.eventId })}">Подробнее</a>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </td>
         </tr>`,
@@ -83,8 +81,10 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
         <tr>
           <td style="padding-bottom: 8px">
             <table style="font-size: 16px; color: #fff;">
-              <tr><th align="left" style="padding: 0 0 16px 8px;">Тип вторсырья: ${wasteType}</th></tr>
-              ${byWasteTypeHtml}
+              <tbody>
+                <tr><th align="left" style="padding: 0 0 16px 8px;">Тип вторсырья: ${wasteType}</th></tr>
+                ${byWasteTypeHtml}
+              </tbody>
             </table>
           </td>
         </tr>`
@@ -95,8 +95,10 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
       <tr>
         <td style="padding: 24px 0">
           <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="color: #fff; text-align: left" width="100%">
-            <tr><th style="font-size: 24px; padding-bottom: 16px">Населенный пункт: ${loc.locationName}</th></tr>
-            ${byLocationHtml}
+            <tbody>
+              <tr><th style="font-size: 24px; padding-bottom: 16px">Населенный пункт: ${loc.locationName}</th></tr>
+              ${byLocationHtml}
+            </tbody>
           </table>
         </td>
       </tr>`
@@ -123,29 +125,32 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
           margin: auto;
         "
       >
+        <tbody>
           <tr>
             <td align="center" style="padding: 10px 0px; color: #fff">
               <a href="${host}" style="display: inline-block; text-decoration: none; color: #adce5d;">
                 <table role="presentation">
-                  <tr>
-                    <td>
-                      <img
-                        src="${logoPath}"
-                        alt="Logo"
-                        width="30"
-                        style="display: block; border: 0"
-                      />
-                    </td>
-                    <td
-                      style="
-                        font-size: 24px;
-                        font-weight: bold;
-                        letter-spacing: 0;
-                      "
-                    >
-                      ${brandName}
-                    </td>
-                  </tr>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <img
+                          src="${logoPath}"
+                          alt="Logo"
+                          width="30"
+                          style="display: block; border: 0"
+                        />
+                      </td>
+                      <td
+                        style="
+                          font-size: 24px;
+                          font-weight: bold;
+                          letter-spacing: 0;
+                        "
+                      >
+                        ${brandName}
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
               </a>
             </td>
@@ -176,7 +181,8 @@ export function prepareEmailHtml(params: PrepareEmailHtml) {
                 >отписаться</a
               >.
             </td>
-        </tr>
+          </tr>
+        </tbody>
       </table>
     </body>
   </html>

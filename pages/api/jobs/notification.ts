@@ -1,10 +1,13 @@
+//ToDo: this job should be done on the outer server
+
 import { NextApiRequest, NextApiResponse } from 'next'
 import path from 'path'
 import fs from 'fs/promises'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import dateFormatter from '../../../lib/helpers/dateFormatter'
-import EmailSendingMetrics from '../../../lib/helpers/email/emailSendingMetrics'
-import processSubscriptions from '../../../lib/subscriptions/processSubscriptions'
+import { EmailSendingMetrics } from '../../../lib/helpers/email/emailSendingMetrics'
+import type { MetricsSummary } from '../../../lib/helpers/email/emailSendingMetrics'
+import processSubscriptions from '../../../lib/helpers/subscriptions/processSubscriptions'
 
 const lockDirectory = path.join(
   __dirname,
@@ -34,11 +37,7 @@ async function createLock() {
 }
 
 async function removeLock() {
-  try {
-    await fs.unlink(lockPath)
-  } catch (err) {
-    console.error(err)
-  }
+  await fs.unlink(lockPath)
 }
 
 async function ensureDirectoryExists(path: string) {
@@ -56,8 +55,8 @@ async function writeMetricsToFile(metricsText: string) {
   try {
     await ensureDirectoryExists(metricsDirectory)
 
-    const jobStartedDateString = dateFormatter(metrics.jobStarted, 'T', '-')
-    const path = `${metricsDirectory}/${jobStartedDateString}.txt`
+    const jobStartedDate = dateFormatter(metrics.jobStarted, 'T', '-')
+    const path = `${metricsDirectory}/${jobStartedDate}.txt`
 
     await fs.writeFile(path, metricsText, {
       flag: 'wx',
@@ -71,7 +70,7 @@ async function writeMetricsToFile(metricsText: string) {
   }
 }
 
-function prepareMetricsText(metrics: EmailSendingMetrics) {
+function prepareMetricsText(metrics: MetricsSummary) {
   const { errorMessages = [], ...rest } = metrics
 
   const metricsText = Object.entries(rest)
@@ -85,34 +84,34 @@ function prepareMetricsText(metrics: EmailSendingMetrics) {
   return [metricsText, errorsText].join('\n')
 }
 
-async function notifications(req: NextApiRequest, res: NextApiResponse) {
+async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).end()
   }
 
   const auth = req.headers['authorization']
-  if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
-    return res.status(401).end()
-  }
-
-  /*
-   *Remove stale lock which is modified more than 13 hours ago.
-   *13 hours = 30000 emails/2500 emails per hour as of Sendpulse limitations +1 extra hour
-   */
-  const stats = await fs.stat(lockPath).catch(() => null)
-  if (stats && Date.now() - stats.mtimeMs > 13 * 60 * 60 * 1000) {
-    await fs.unlink(lockPath)
-  }
-
-  if (!(await createLock())) {
-    return res.status(500).json('Cannot create a lock file')
-  }
+  // if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
+  //   return res.status(401).end()
+  // }
 
   try {
-    console.log('Job started.')
+    const stats = await fs.stat(lockPath).catch(() => null)
+    if (stats && Date.now() - stats.mtimeMs > 13 * 60 * 60 * 1000) {
+      /*
+       *Remove stale lock that is modified more than 13 hours ago.
+       *13 hours = 30000 emails/2500 emails per hour as of Sendpulse limitations +1 extra hour
+       */
+      await removeLock()
+    }
 
+    if (!(await createLock())) {
+      return res.status(500).json('Cannot create a lock file')
+    }
+
+    console.log('Job started.')
     await processSubscriptions(metrics)
     console.log(successMessage)
+
     res.json(successMessage)
   } catch (err) {
     console.error('Job failed:', err)
@@ -122,7 +121,7 @@ async function notifications(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const metricsText = prepareMetricsText(metrics)
+    const metricsText = prepareMetricsText(metrics.getSummary())
 
     writeMetricsToFile(metricsText)
   } catch (err) {
@@ -130,4 +129,4 @@ async function notifications(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default apiHandler(notifications)
+export default apiHandler(requestHandler)

@@ -28,8 +28,8 @@ export default class EmailSendingDispatcher {
     this.queue.push(task)
     this.processTask()
   }
-
-  processTask() {
+  //ToDo: check if this should be async and if we need to await task execution
+  async processTask() {
     if (this.queue.length === 0) {
       clearTimeout(this.timeout)
       return
@@ -38,12 +38,12 @@ export default class EmailSendingDispatcher {
     if (this.canSendNext()) {
       const task = this.queue.shift()
       this.timestamps.push(Date.now())
-      task()
+      await task()
     }
 
     clearTimeout(this.timeout)
 
-    this.timeout = setTimeout(() => {
+    this.timeout = setTimeout(async () => {
       this.processTask()
     }, 100)
   }

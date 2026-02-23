@@ -1,24 +1,32 @@
-import dbConnect from '../../../lib/db/connection'
-import { User, Event, RemovalApplication } from '../../../lib/db/models'
+import dbConnect from '../../db/connection'
+import {
+  Event,
+  RemovalApplication,
+  Subscription as SubscriptionModel,
+  UnsubscribeToken,
+} from '../../db/models'
 import type {
   SubscribedUser,
   AggregatedApplication,
   WasteRemovalByLocation,
   WasteRemovalEvents,
   WasteRemovalNotification,
-} from '../../../lib/types/subscription'
+} from '../../types/subscription'
+import cryptoRandomString from 'crypto-random-string'
 
-const subscriptionType = 'mobileStationAvailable'
+//ToDo: receive subscription type as a parameter
+const subscriptionType = '692d94649d358fe3fb068fdb'
 
-async function getSubscribedUsers() {
-  return await User.find({
-    isBanned: false,
-    isActive: true,
-    subscriptions: subscriptionType,
-    email: { $exists: true, $nin: [null, ''] },
+async function getSubscriptions() {
+  const subscriptions = await SubscriptionModel.find({
+    subscribed: true,
+    variant: subscriptionType,
+  }).populate<{ user: SubscribedUser }>('user', 'name email isBanned isActive')
+
+  const filtered = subscriptions.filter((sub) => {
+    return sub.user.isActive && !sub.user.isBanned
   })
-    .select('_id name email')
-    .lean<SubscribedUser[]>()
+  return filtered
 }
 
 const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
@@ -29,7 +37,7 @@ const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
           user: {
             $in: subscribedUsers.map((u) => u._id),
           },
-          expires: { $gte: new Date() },
+          // expires: { $gte: new Date() },
         },
       },
       {
@@ -75,7 +83,7 @@ const getRemovalEvents = async () => {
     {
       $match: {
         isActive: true,
-        date: { $gte: new Date() },
+        // date: { $gte: new Date() },
       },
     },
     {
@@ -166,14 +174,18 @@ const getRemovalEvents = async () => {
 export default async function prepareNotifications() {
   await dbConnect(process.env.DATABASE_URL)
 
-  const subscribedUsers = await getSubscribedUsers()
+  const subscriptions = await getSubscriptions()
 
-  if (subscribedUsers.length === 0) return []
+  if (subscriptions.length === 0) return []
+
+  const subscribedUsers = subscriptions.map((sub) => sub.user)
 
   const aggregatedRemovalApplications =
     await getRemovalApplications(subscribedUsers)
+  //ToDo: return if no applications, to avoid unnecessary processing of events
 
   const aggregatedRemovalEvents = await getRemovalEvents()
+  //ToDo: return if no events, to avoid unnecessary processing of events
 
   const removalEventsMap = new Map(
     aggregatedRemovalEvents.map((reByLocation) => {
@@ -185,44 +197,27 @@ export default async function prepareNotifications() {
     }),
   )
 
-  const userMap = new Map(
-    subscribedUsers.map((u) => [
-      u._id.toString(),
-      { email: u.email, name: u.name },
+  const removalApplicationsMap = new Map(
+    aggregatedRemovalApplications.map((app) => [
+      app.userId.toString(),
+      app.docs,
     ]),
-  )
-
-  const removalApplications = aggregatedRemovalApplications.map(
-    (application) => {
-      const { userId, docs } = application
-      const userIdString = userId.toString()
-      const user = userMap.get(userIdString)
-
-      return {
-        userId: userIdString,
-        userName: user?.name || '',
-        userEmail: user?.email || '',
-        docs,
-      }
-    },
   )
 
   const notifications: WasteRemovalNotification[] = []
 
-  removalApplications.forEach(async (application) => {
-    const notification: WasteRemovalNotification = {
-      receiverEmail: application.userEmail,
-      receiverName: application.userName,
-      data: [],
-    }
+  for (const subscription of subscriptions) {
+    const userApplicationsByLocation = removalApplicationsMap.get(
+      subscription.user._id.toString(),
+    )
+    if (!userApplicationsByLocation) continue
 
-    for (const doc of application.docs) {
+    const data: WasteRemovalNotification['data'] = []
+
+    for (const doc of userApplicationsByLocation) {
       const { locationId, locationName, wasteTypes } = doc
-      const location: WasteRemovalByLocation = {
-        locationId,
-        locationName,
-        eventsByLocation: [],
-      }
+
+      const eventsByLocation: WasteRemovalEvents[] = []
 
       const allEventsByLocation = removalEventsMap.get(locationId)
       if (!allEventsByLocation) continue
@@ -237,16 +232,50 @@ export default async function prepareNotifications() {
           eventsByWasteType,
         }
 
-        location.eventsByLocation.push(removalbleWasteTypes)
+        eventsByLocation.push(removalbleWasteTypes)
       }
 
-      if (location.eventsByLocation.length === 0) continue
-      notification.data.push(location)
+      if (eventsByLocation.length === 0) continue
+
+      data.push({ locationId, locationName, eventsByLocation })
     }
 
-    if (notification.data.length === 0) return
-    notifications.push(notification)
-  })
+    if (data.length === 0) continue
+
+    const unsubscribeTokenValue = cryptoRandomString({
+      length: 32,
+      type: 'url-safe',
+    })
+
+    const unsubscribeTokenExpirationDate = new Date()
+    unsubscribeTokenExpirationDate.setDate(
+      unsubscribeTokenExpirationDate.getDate() + 90,
+    )
+
+    //ToDo: try catch and handle errors
+    const unsubscribeToken = await UnsubscribeToken.create({
+      subscription: subscription._id,
+      value: unsubscribeTokenValue,
+      expires: unsubscribeTokenExpirationDate,
+      used: false,
+    })
+
+    if (!unsubscribeToken) {
+      console.error(
+        'Failed to create unsubscribe token for subscription',
+        subscription._id,
+      )
+      continue
+    }
+
+    notifications.push({
+      receiverEmail: subscription.user.email,
+      receiverName: subscription.user.name,
+      unsubscribeToken: unsubscribeToken.value,
+      listUnsubscribeToken: subscription.listUnsubscribeToken,
+      data,
+    })
+  }
 
   return notifications
 }

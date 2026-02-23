@@ -13,7 +13,7 @@ import Snackbars from '../../../components/uiParts/Snackbars'
 import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
 import { useEffect, useMemo, useState } from 'react'
 import type { SubscriptionVariant } from '../../../lib/db/models/subscriptionVariant'
-import type { Subscription } from '../../../lib/db/models/subscription'
+
 const loadingErrorText = 'Ошибка при загрузке данных'
 const updatingErrorMessage = 'Ошибка при обновлении данных'
 const titleHeadingText = 'Мои подписки на получение уведомлений'
@@ -22,7 +22,11 @@ const disabledText = 'Выключено'
 const configText = 'Настроить'
 const subscriptionVariantsApi = '/api/subscriptions/variant'
 const subscriptionsApi = '/api/subscriptions'
-const wasteAvailableHref = '/my/subscriptions/wasteAvailable'
+const mySubscriptionsUrl = '/my/subscriptions/'
+
+const getSubscriptionConfigUrl = (id: string) => {
+  return `${mySubscriptionsUrl}${id}`
+}
 
 type UserSubs = string[]
 
@@ -76,7 +80,6 @@ export default function MySubscriptions() {
         return result || []
       })
   }
-
   async function updateUserSubscription(subscription: {
     variant: string
     subscribed: boolean
@@ -143,7 +146,7 @@ export default function MySubscriptions() {
             <Button
               startIcon={<SettingsIcon />}
               color="secondary"
-              href={wasteAvailableHref}
+              href={getSubscriptionConfigUrl(sub._id)}
               disabled={userSubsForSearch.has(sub._id) ? false : true}
             >
               {configText}

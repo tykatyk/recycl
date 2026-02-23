@@ -35,16 +35,6 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
         return res.status(200).end()
       }
 
-      const unsubscribeToken = cryptoRandomString({
-        length: 32,
-        type: 'url-safe',
-      })
-
-      const unsubscribeTokenUsed = false
-      const today = new Date()
-
-      const unsubscribeTokenExpires = today.getDate() + 30
-
       const listUnsubscribeToken = cryptoRandomString({
         length: 32,
         type: 'url-safe',
@@ -53,9 +43,6 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
         user,
         variant,
         subscribed,
-        unsubscribeToken,
-        unsubscribeTokenUsed,
-        unsubscribeTokenExpires,
         listUnsubscribeToken,
       })
 

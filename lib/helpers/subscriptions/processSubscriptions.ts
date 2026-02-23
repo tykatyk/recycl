@@ -1,11 +1,11 @@
-import { emailSenderSendpulse } from '../email/sendEmailSendpulse'
-import prepareNotifications from '../email/prepareNotifications'
+import { sendPulseFetcher } from '../email/sendPulseFetcher'
+import prepareNotifications from './prepareNotifications'
 import {
   prepareEmailHtml,
   prepareEmailObj,
 } from '../email/templates/wasteRemovalSubscriptionEmail'
 import EmailSendingDispatcher from '../email/emailSendingDispatcher'
-import EmailSendingMetrics from '../email/emailSendingMetrics'
+import { EmailSendingMetrics } from '../email/emailSendingMetrics'
 import dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
 
@@ -14,6 +14,20 @@ const brandName = process.env.BRAND || ''
 const emailFrom = process.env.EMAIL_FROM || ''
 
 const subject = 'Предстоящие события по сбору вторсырья в вашем городе'
+
+const sendEmailEndpoint = '/smtp/emails'
+
+const logProcessionProgress = (total: number, metrics: EmailSendingMetrics) => {
+  const processed = metrics.totalEmailsProcessed
+
+  console.log(`Jobs processed: ${processed} out of ${total}`)
+
+  if (processed < total) {
+    setTimeout(() => {
+      logProcessionProgress(total, metrics)
+    }, 2000)
+  }
+}
 
 const canSendEmails = () => {
   if (!host) {
@@ -37,10 +51,8 @@ async function processSubscriptions(metrics: EmailSendingMetrics) {
   if (!canSendEmails()) return
 
   const notifications = await prepareNotifications()
-  // console.log(notifications)
-  // return
+
   const dispatcher = new EmailSendingDispatcher()
-  metrics.totalEmails = notifications.length
 
   notifications.forEach((notification) => {
     if (!notification.receiverEmail) {
@@ -49,32 +61,40 @@ async function processSubscriptions(metrics: EmailSendingMetrics) {
     }
 
     const html = prepareEmailHtml({ notification, host, brandName })
+
+    const bufferObj = Buffer.from(html, 'utf8')
+
+    const encodedHtml = bufferObj.toString('base64')
+
     const email = prepareEmailObj({
       notification,
       host,
       brandName,
       subject,
-      html,
+      html: encodedHtml,
       emailFrom,
     })
 
     dispatcher.addTask(async () => {
       try {
-        emailSenderSendpulse(email, metrics)
-        metrics.totalEmailsProcessed++
+        //ToDo: add timeout or abort controller for the request
+        const result = await sendPulseFetcher(sendEmailEndpoint, {
+          method: 'POST',
+          body: JSON.stringify({ email }),
+        })
+
+        metrics.append(result)
       } catch (err) {
         console.error('Failed to send email', err)
+        metrics.append({
+          error_code: `${brandName}_email_sending_error`,
+          message: err instanceof Error ? err.message : 'Unknown error',
+        })
       }
     })
-    metrics.totalEmailsToProcess++
   })
-  while (metrics.totalEmailsToProcess != metrics.totalEmailsProcessed) {
-    setTimeout(() => {
-      console.log(
-        `Jobs added to dispatcher: ${metrics.totalEmailsToProcess}; jobs processed: ${metrics.totalEmailsProcessed}`,
-      )
-    }, 2000)
-  }
+
+  logProcessionProgress(notifications.length, metrics)
 }
 
 export default processSubscriptions

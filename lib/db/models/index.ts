@@ -6,6 +6,7 @@ import WasteType from './wasteType'
 import Event from './eventModel'
 import Subscription from './subscription'
 import SubscriptionVariant from './subscriptionVariant'
+import UnsubscribeToken from './unsubscribeToken'
 import User from './user'
 
 export {
@@ -17,5 +18,6 @@ export {
   Event,
   SubscriptionVariant,
   Subscription,
+  UnsubscribeToken,
   User,
 }

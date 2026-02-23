@@ -1,10 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import dbConnect from '../../../lib/db/connection'
-import { User, Subscription } from '../../../lib/db/models'
+import { User, Subscription, UnsubscribeToken } from '../../../lib/db/models'
 import { unsubscribeApiResponseCodes } from '../../../lib/helpers/subscriptions/unsubscribeApiResponseCodes'
 import { emailSchema } from '../../../lib/validation'
 import type { UnsubscribeApiResponse } from '../../../lib/types/subscription'
-import subscription from '../../../lib/db/models/subscription'
 
 const { NOT_FOUND, TOKEN_EXPIRED, TOKEN_USED, SUCCESS } =
   unsubscribeApiResponseCodes
@@ -26,19 +25,18 @@ const tokenNotFoundUnsubscribe = async (
   if (!user) {
     return res.status(404).end()
   }
-  await Subscription.findOneAndUpdate(
+
+  //ToDo: Instead of immediate unsubscribe,send an email to the user with a link to unsubscribe
+  const subscription = await Subscription.findOneAndUpdate(
     { user: user._id, subscribed: true },
     {
       subscribed: false,
-      unsubscribeTokenUsed: true,
     },
   )
 
   if (!subscription) {
     return res.json({ status: NOT_FOUND })
   }
-
-  //ToDo: send email to the user
 
   return res.json({ status: SUCCESS })
 }
@@ -52,32 +50,38 @@ const initialUnsubscribe = async (
   }
 
   await dbConnect()
+  const unsubscribeToken = await UnsubscribeToken.findOne({
+    value: token,
+  })
+
+  if (!unsubscribeToken) {
+    return res.status(200).json({ status: NOT_FOUND })
+  }
+
   const subscription = await Subscription.findOne({
-    unsubscribeToken: token,
+    _id: unsubscribeToken.subscription,
   })
 
   if (!subscription) {
     return res.status(200).json({ status: NOT_FOUND })
   }
-  const { subscribed, unsubscribeTokenUsed, unsubscribeTokenExpires } =
-    subscription
 
-  if (!subscribed) {
-    return res.status(200).json({ status: SUCCESS })
-  }
+  const { used, expires } = unsubscribeToken
 
-  if (unsubscribeTokenUsed) {
+  if (used) {
     return res.status(200).json({ status: TOKEN_USED })
   }
 
-  if (unsubscribeTokenExpires < new Date()) {
+  if (expires < new Date()) {
     return res.status(200).json({ status: TOKEN_EXPIRED })
   }
 
   subscription.subscribed = false
-  subscription.unsubscribeTokenUsed = true
-
   await subscription.save()
+
+  unsubscribeToken.used = true
+  await unsubscribeToken.save()
+
   return res.status(200).json({ status: SUCCESS })
 }
 
@@ -90,8 +94,17 @@ const tokenExpiredOrUsedUnsubscribe = async (
   }
 
   await dbConnect()
+
+  const unsubscribeToken = await UnsubscribeToken.findOne({
+    value: token,
+  })
+
+  if (!unsubscribeToken) {
+    return res.status(404).json({ status: NOT_FOUND })
+  }
+
   const subscription = await Subscription.findOne({
-    unsubscribeToken: token,
+    _id: unsubscribeToken.subscription,
   })
 
   if (!subscription) {
@@ -105,9 +118,11 @@ const tokenExpiredOrUsedUnsubscribe = async (
   }
 
   subscription.subscribed = false
-  subscription.unsubscribeTokenUsed = true
-
   await subscription.save()
+
+  unsubscribeToken.used = true
+  await unsubscribeToken.save()
+
   return res.status(200).json({ status: SUCCESS })
 }
 
