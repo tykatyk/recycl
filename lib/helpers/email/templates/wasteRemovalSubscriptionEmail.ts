@@ -2,6 +2,10 @@ import { Email } from '../../../types/email'
 import formatDate from '../../dateFormatter'
 import type { WasteRemovalNotification } from '../../../types/subscription'
 
+const host = process.env.HOST || ''
+const brandName = process.env.BRAND || ''
+const emailFrom = process.env.EMAIL_FROM || ''
+
 const yellow = ' #f8bc45'
 const logoPath = '../public/images/logo.png'
 
@@ -13,14 +17,11 @@ const getUrl = (params: { host: string; route: string; id?: string }) => {
 
 type EmailParams = {
   notification: WasteRemovalNotification
-  host: string
-  brandName: string
   subject: string
   html: string
-  emailFrom: string
 }
 export function prepareEmailObj(params: EmailParams) {
-  const { notification, subject, html, brandName, emailFrom, host } = params
+  const { notification, subject, html } = params
 
   const receiverName = notification.receiverName ?? notification.receiverEmail
 
@@ -41,15 +42,7 @@ export function prepareEmailObj(params: EmailParams) {
   return emailObj
 }
 
-type PrepareEmailHtml = {
-  notification: WasteRemovalNotification
-  host: string
-  brandName: string
-}
-
-export function prepareEmailHtml(params: PrepareEmailHtml) {
-  const { notification, host, brandName } = params
-
+export function prepareHtml(notification: WasteRemovalNotification) {
   const emailHtml = notification.data
     .map((loc) => {
       const byLocationHtml = loc.eventsByLocation

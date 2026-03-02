@@ -1,6 +1,8 @@
 import mongoose from 'mongoose'
 
-export default async function dbConnect(uri = process.env.DATABASE_URL) {
+export default async function dbConnect(
+  uri: string = process.env.DATABASE_URL || '',
+) {
   if (!uri) {
     throw new Error('Database url is not defined\n')
   }

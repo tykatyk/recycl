@@ -21,6 +21,10 @@ async function getSubscriptions() {
   const subscriptions = await SubscriptionModel.find({
     subscribed: true,
     variant: subscriptionType,
+    $or: [
+      { lastSentAt: { $lte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+      { lastSentAt: null },
+    ],
   }).populate<{ user: SubscribedUser }>('user', 'name email isBanned isActive')
 
   const filtered = subscriptions.filter((sub) => {
@@ -78,6 +82,7 @@ const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
   return aggregatedRemovalApplications
 }
 
+//ToDo: only get events that are created after the last job
 const getRemovalEvents = async () => {
   const removalEvents = await Event.aggregate<WasteRemovalByLocation>([
     {
@@ -171,11 +176,12 @@ const getRemovalEvents = async () => {
   return removalEvents
 }
 
-export default async function prepareNotifications() {
+export async function prepareSubscriptionData() {
+  const subscriptionData: WasteRemovalNotification[] = []
+
   await dbConnect(process.env.DATABASE_URL)
 
   const subscriptions = await getSubscriptions()
-
   if (subscriptions.length === 0) return []
 
   const subscribedUsers = subscriptions.map((sub) => sub.user)
@@ -203,8 +209,6 @@ export default async function prepareNotifications() {
       app.docs,
     ]),
   )
-
-  const notifications: WasteRemovalNotification[] = []
 
   for (const subscription of subscriptions) {
     const userApplicationsByLocation = removalApplicationsMap.get(
@@ -268,7 +272,7 @@ export default async function prepareNotifications() {
       continue
     }
 
-    notifications.push({
+    subscriptionData.push({
       receiverEmail: subscription.user.email,
       receiverName: subscription.user.name,
       unsubscribeToken: unsubscribeToken.value,
@@ -277,5 +281,5 @@ export default async function prepareNotifications() {
     })
   }
 
-  return notifications
+  return subscriptionData
 }

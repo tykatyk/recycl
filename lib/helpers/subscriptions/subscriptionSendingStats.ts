@@ -1,19 +1,11 @@
-export interface MetricsSummary {
+export class SubscriptionSendingStats {
   jobStarted: Date
   jobFinished: Date
   totalEmailsProcessed: number
   totalErrors: number
   errorMessages: string[]
-}
-
-export class EmailSendingMetrics {
-  jobStarted: MetricsSummary['jobStarted']
-  jobFinished: MetricsSummary['jobFinished']
-  totalEmailsProcessed: MetricsSummary['totalEmailsProcessed']
-  totalErrors: MetricsSummary['totalErrors']
-  errorMessages: MetricsSummary['errorMessages']
   append: (data: any) => void
-  getSummary: () => MetricsSummary
+  getSummary: () => string
 
   constructor() {
     this.jobStarted = new Date()
@@ -24,7 +16,7 @@ export class EmailSendingMetrics {
     this.append = (data) => {
       this.totalEmailsProcessed++
 
-      if (!data.error_code) return
+      if (data && !data.error_code) return
 
       this.totalErrors++
 
@@ -49,13 +41,18 @@ export class EmailSendingMetrics {
     }
 
     this.getSummary = () => {
-      return {
-        jobStarted: this.jobStarted,
-        jobFinished: this.jobFinished,
-        totalEmailsProcessed: this.totalEmailsProcessed,
-        totalErrors: this.totalErrors,
-        errorMessages: this.errorMessages,
-      }
+      const summary = [
+        `jobStarted: ${this.jobStarted}`,
+        `jobFinished: ${this.jobFinished}`,
+        `totalEmailsProcessed: ${this.totalEmailsProcessed}`,
+        `totalErrors: ${this.totalErrors}`,
+      ].join('\n')
+
+      const errors = this.errorMessages.length
+        ? `errorMessages:\n${this.errorMessages.join('\n')}`
+        : 'errorMessages: none'
+
+      return [summary, errors].join('\n')
     }
   }
 }
