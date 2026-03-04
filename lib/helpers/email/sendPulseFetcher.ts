@@ -2,6 +2,7 @@ import { getAccessToken } from './sendPulseTokenManager'
 import { incrementRequestCount } from './sendPulseApiRequestLimiter'
 
 const BASE_URL = 'https://api.sendpulse.com'
+const MAX_REQUEST_TIME_MS = 5000
 
 //ToDo: sendPulseFetcher should have generic type, to type the response data
 export async function sendPulseFetcher(
@@ -18,6 +19,7 @@ export async function sendPulseFetcher(
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: AbortSignal.timeout(MAX_REQUEST_TIME_MS),
     })
     await incrementRequestCount()
     return response
