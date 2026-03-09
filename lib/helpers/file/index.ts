@@ -1,5 +1,6 @@
 import { Stats } from 'fs'
 import fs from 'fs/promises'
+import { maxJobDurationMs } from '../subscriptions'
 
 export const ensureDirectoryExists = async (path: string) => {
   try {
@@ -31,7 +32,7 @@ export const removeLock = async (lockPath: string) => {
 }
 
 export const isStaleLock = (stats: Stats) => {
-  if (stats && Date.now() - stats.mtimeMs > 13 * 60 * 60 * 1000) {
+  if (stats && Date.now() - stats.mtimeMs >= maxJobDurationMs) {
     return true
   }
   return false

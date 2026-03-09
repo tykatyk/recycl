@@ -1,6 +1,7 @@
 export class SubscriptionSendingStats {
   jobStarted: Date
   jobFinished: Date
+  totalEmailsToProcess: number
   totalEmailsProcessed: number
   totalErrors: number
   errorMessages: string[]
@@ -10,6 +11,7 @@ export class SubscriptionSendingStats {
   constructor() {
     this.jobStarted = new Date()
     this.jobFinished = this.jobStarted
+    this.totalEmailsToProcess = 0
     this.totalEmailsProcessed = 0
     this.totalErrors = 0
     this.errorMessages = []
@@ -24,13 +26,8 @@ export class SubscriptionSendingStats {
 
       const parts: string[] = []
 
-      if (error_code) {
-        parts.push(`ErrorCode: ${error_code}`)
-      }
-
-      if (message) {
-        parts.push(`Message: ${message}`)
-      }
+      parts.push(`ErrorCode: ${error_code}`)
+      parts.push(`Message: ${message}`)
 
       const errorMessage =
         parts.length > 0
@@ -44,6 +41,7 @@ export class SubscriptionSendingStats {
       const summary = [
         `jobStarted: ${this.jobStarted}`,
         `jobFinished: ${this.jobFinished}`,
+        `totalEmailsToProcess: ${this.totalEmailsToProcess}`,
         `totalEmailsProcessed: ${this.totalEmailsProcessed}`,
         `totalErrors: ${this.totalErrors}`,
       ].join('\n')

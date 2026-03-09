@@ -23,8 +23,7 @@ let refreshPromise: Promise<string> | null = null
 async function readToken(): Promise<TokenData | null> {
   try {
     const data = await fs.readFile(TOKEN_PATH, 'utf-8')
-    return null
-    // return JSON.parse(data)
+    return JSON.parse(data)
   } catch (err) {
     console.error('Failed to read token file:', err)
     return null

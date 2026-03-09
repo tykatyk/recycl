@@ -2,35 +2,51 @@ import Redis from 'ioredis'
 
 const requestsPerMinute = 1000
 const requestsPerDay = 500000
-const emailsPerHour = 50
+export const emailsPerHour = 50
 const emailsPerMonth = 12000
 
 const redis = new Redis(process.env.REDIS_URL || '')
+type RequestTimeLimits = 'minute' | 'day'
+type SendEmailTimeLimit = 'hour' | 'month'
 
-const keyBase = 'sendPusleRequestsPer'
+type RequestKeyBase = 'sendPusleRequestsPer'
+type EmailKeyBase = 'sendPusleSentEmailsPer'
 
-//ToDo: implement getting last minute and last day requests from Redis
+const keyBaseEmail: EmailKeyBase = 'sendPusleSentEmailsPer'
+const RequestkeyBase: RequestKeyBase = 'sendPusleRequestsPer'
 
-const getMinuteKey = () => {
-  const currentMinute = Math.floor(Date.now() / (60 * 1000))
-  return `${keyBase}Minute:${currentMinute}`
-}
+type GetRequestsCountKey =
+  | { period: RequestTimeLimits; keyBase: RequestKeyBase }
+  | { period: SendEmailTimeLimit; keyBase: EmailKeyBase }
 
-const getHourKey = () => {
-  const currentHour = Math.floor(Date.now() / (60 * 60 * 1000))
-  return `${keyBase}Hour:${currentHour}`
-}
+const getKey = (options: GetRequestsCountKey) => {
+  const { period, keyBase } = options
+  let key = ''
 
-const getDayKey = () => {
-  const currentDay = Math.floor(Date.now() / (24 * 60 * 60 * 1000))
-  return `${keyBase}Day:${currentDay}`
-}
+  switch (period) {
+    case 'minute':
+      const currentMinute = Math.floor(Date.now() / (60 * 1000))
+      key = `${keyBase}Minute:${currentMinute}`
+      break
+    case 'hour':
+      const currentHour = Math.floor(Date.now() / (60 * 1000))
+      key = `${keyBase}Minute:${currentHour}`
+      break
 
-const getMonthKey = () => {
-  const currentDate = new Date()
-  const currentMonth =
-    currentDate.getUTCFullYear() * 12 + currentDate.getUTCMonth()
-  return `${keyBase}Month:${currentMonth}`
+    case 'day':
+      const currentDay = Math.floor(Date.now() / (24 * 60 * 60 * 1000))
+      key = `${keyBase}Day:${currentDay}`
+      break
+    case 'month':
+      const currentMonth = Math.floor(Date.now() / (24 * 60 * 60 * 1000))
+      key = `${keyBase}Day:${currentMonth}`
+      break
+
+    default:
+      break
+  }
+
+  return key
 }
 
 const getCounter = async (key: string) => {
@@ -38,8 +54,8 @@ const getCounter = async (key: string) => {
 }
 
 export const incrementRequestCount = async () => {
-  const minuteKey = getMinuteKey()
-  const dayKey = getDayKey()
+  const minuteKey = getKey({ period: 'minute', keyBase: RequestkeyBase })
+  const dayKey = getKey({ period: 'day', keyBase: RequestkeyBase })
 
   await redis.incr(minuteKey)
   await redis.expire(minuteKey, 60)
@@ -49,13 +65,14 @@ export const incrementRequestCount = async () => {
 }
 
 export const canCallAPI = async () => {
-  const minuteKey = getMinuteKey()
+  const minuteKey = getKey({ period: 'minute', keyBase: RequestkeyBase })
+
   const lastMinuteRequests = await getCounter(minuteKey)
   if (Number(lastMinuteRequests) >= requestsPerMinute) {
     return false
   }
 
-  const dayKey = getDayKey()
+  const dayKey = getKey({ period: 'day', keyBase: RequestkeyBase })
   const lastDayRequests = await getCounter(dayKey)
 
   if (Number(lastDayRequests) >= requestsPerDay) {
@@ -66,13 +83,11 @@ export const canCallAPI = async () => {
 }
 
 export const canSendEmail = async () => {
-  if (!(await canCallAPI())) return false
-
-  const hourKey = getHourKey()
+  const hourKey = getKey({ period: 'hour', keyBase: keyBaseEmail })
   const hourCounter = Number(await getCounter(hourKey))
   if (hourCounter >= emailsPerHour) return false
 
-  const monthKey = getMonthKey()
+  const monthKey = getKey({ period: 'month', keyBase: keyBaseEmail })
   const monthCounter = Number(await getCounter(monthKey))
   if (monthCounter >= emailsPerMonth) return false
 

@@ -13,16 +13,20 @@ import type {
   WasteRemovalNotification,
 } from '../../types/subscription'
 import cryptoRandomString from 'crypto-random-string'
+import { maxJobDurationMs } from '.'
 
-//ToDo: receive subscription type as a parameter
-const subscriptionType = '692d94649d358fe3fb068fdb'
+const noSubsVariantId = 'No subscription variant provided'
 
-async function getSubscriptions() {
+async function getSubscriptions(subscriptionVariantId: string) {
+  if (!subscriptionVariantId) {
+    console.log(noSubsVariantId)
+    return []
+  }
   const subscriptions = await SubscriptionModel.find({
     subscribed: true,
-    variant: subscriptionType,
+    variant: subscriptionVariantId,
     $or: [
-      { lastSentAt: { $lte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+      { lastSentAt: { $lte: new Date(Date.now() - maxJobDurationMs) } },
       { lastSentAt: null },
     ],
   }).populate<{ user: SubscribedUser }>('user', 'name email isBanned isActive')
@@ -176,12 +180,17 @@ const getRemovalEvents = async () => {
   return removalEvents
 }
 
-export async function prepareSubscriptionData() {
+export async function prepareSubscriptionData(subscriptionVariantId: string) {
+  if (!subscriptionVariantId) {
+    console.log(noSubsVariantId)
+    return []
+  }
+
   const subscriptionData: WasteRemovalNotification[] = []
 
   await dbConnect(process.env.DATABASE_URL)
 
-  const subscriptions = await getSubscriptions()
+  const subscriptions = await getSubscriptions(subscriptionVariantId)
   if (subscriptions.length === 0) return []
 
   const subscribedUsers = subscriptions.map((sub) => sub.user)

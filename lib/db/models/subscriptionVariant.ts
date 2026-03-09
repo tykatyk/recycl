@@ -1,7 +1,8 @@
-import { Schema, models, model, InferSchemaType } from 'mongoose'
+import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
 
 const subscriptionVariantSchema = new Schema({
-  title: {
+  name: String,
+  userDescription: {
     type: String,
     required: true,
   },
@@ -15,5 +16,14 @@ export type SubscriptionVariant = InferSchemaType<
   typeof subscriptionVariantSchema
 >
 
-export default models.SubscriptionVariant ||
-  model<SubscriptionVariant>('SubscriptionVariant', subscriptionVariantSchema)
+type SubscriptionVariantModel = Model<SubscriptionVariant>
+
+// export default (models.SubscriptionVariant as Model<SubscriptionVariant>) ||
+//   model<SubscriptionVariant>('SubscriptionVariant', subscriptionVariantSchema)
+
+export const SubscriptionVariant =
+  (models.SubscriptionVariant as SubscriptionVariantModel) ||
+  model<SubscriptionVariant, SubscriptionVariantModel>(
+    'SubscriptionVariant',
+    subscriptionVariantSchema,
+  )

@@ -16,3 +16,12 @@ export type Email = {
     'List-Unsubscribe-Post': string
   }
 }
+
+type SendPulseSuccess = {
+  id: string
+}
+type SendPulseError = {
+  error_code?: string
+  message?: string
+}
+export type SendPulseSMPTResponse = SendPulseSuccess | SendPulseError

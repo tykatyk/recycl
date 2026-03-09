@@ -44,6 +44,7 @@ export default function MySubscriptions() {
 
   const handleClose = () => setBackendError('')
 
+  //ToDo: check if user has removal application ads before letting him to create a waste removal subscription
   const handleChange = async (id: string) => {
     let updatedUserSubs: UserSubs = []
     let subscribed = false
@@ -123,7 +124,7 @@ export default function MySubscriptions() {
         }}
       >
         <Grid item xs={12}>
-          <Typography>{sub.title}</Typography>
+          <Typography>{sub.userDescription}</Typography>
         </Grid>
 
         <Grid item xs={12}>

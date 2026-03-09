@@ -1,14 +1,21 @@
-//ToDo: this job should be done on the outer server
+//ToDo: this job should be done on the outer server or in a separate process
 
 import { NextApiRequest, NextApiResponse } from 'next'
 import path from 'path'
 import fs from 'fs/promises'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
-import sendSubscriptionEmails from '../../../lib/helpers/subscriptions/sendSubscriptionEmails'
 import { createLock, removeLock, isStaleLock } from '../../../lib/helpers/file'
-import { ensureUsersSubscribed } from '../../../lib/helpers/subscriptions/ensureUsersSubscribed'
-import { prepareSubscriptionData } from '../../../lib/helpers/subscriptions/prepareSubscriptionData'
 import { canSendEmails } from '../../../lib/helpers/email'
+import {
+  ensureUsersSubscribed,
+  prepareSubscriptionData,
+  sendSubscriptionEmails,
+  SubscriptionSendingStats,
+  maxJobDurationMs,
+  writeStatsToFile,
+  withAbortSignal,
+} from '../../../lib/helpers/subscriptions'
+import { SubscriptionVariant } from '../../../lib/db/models'
 
 const lockDirectory = path.join(
   __dirname,
@@ -16,19 +23,41 @@ const lockDirectory = path.join(
 )
 
 const lockPath = `${lockDirectory}/subscriptionNotification.lock`
-
 const jobStartedMessage = 'Job started.'
 const cantCreateLockMessage = 'Cannot create a lock file'
+const cantSendEmails = 'Cannot send emails'
+const unknownErrorMessage = 'An error while sending notification emails'
+// const subscriptionVariantId = '692d94649d358fe3fb068fdb'
 
 async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
+  //ToDo: method should be POST
   if (req.method !== 'GET') {
     return res.status(405).end()
+  }
+
+  const { subscription: subscriptionVariantId } = req.query
+  if (typeof subscriptionVariantId !== 'string') {
+    return res.status(400).end()
+  }
+
+  const subscriptionVariant = await SubscriptionVariant.findOne({
+    _id: subscriptionVariantId,
+  })
+
+  if (!subscriptionVariant) {
+    return res.status(404).end()
   }
 
   const auth = req.headers['authorization']
   // if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
   //   return res.status(401).end()
   // }
+
+  let lockCreated = false
+  let timer: NodeJS.Timeout | null = null
+  let folderName = subscriptionVariant._id ?? ''
+
+  const metrics = new SubscriptionSendingStats()
 
   try {
     const lockStats = await fs.stat(lockPath).catch(() => null)
@@ -44,27 +73,60 @@ async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    if (!canSendEmails()) return
+    if (!canSendEmails()) return res.status(500).json(cantSendEmails)
 
     if (!(await createLock(lockDirectory, lockPath))) {
       console.error(cantCreateLockMessage)
       return res.status(500).json(cantCreateLockMessage)
     }
+    lockCreated = true
+
     console.log(jobStartedMessage)
 
-    await ensureUsersSubscribed()
+    const controller = new AbortController()
 
-    const subscriptionData = await prepareSubscriptionData()
+    const longTask = async (signal: AbortSignal) => {
+      await withAbortSignal(() => ensureUsersSubscribed(), signal)
 
-    sendSubscriptionEmails(subscriptionData)
+      const subscriptionData = await withAbortSignal(
+        () => prepareSubscriptionData(subscriptionVariantId),
+        signal,
+      )
+
+      await withAbortSignal(
+        () => sendSubscriptionEmails(subscriptionData, metrics, signal),
+        signal,
+      )
+    }
+
+    timer = setTimeout(() => controller.abort(), maxJobDurationMs)
+
+    await longTask(controller.signal)
 
     res.json(jobStartedMessage)
   } catch (err) {
     console.error('Job failed:', err)
-    res.status(500).json('An error while sending notification emails')
+
+    if (!res.headersSent) {
+      res.status(500).json(unknownErrorMessage)
+    }
   } finally {
-    //ToDo: catch
-    await removeLock(lockPath)
+    if (timer) {
+      clearTimeout(timer)
+    }
+
+    metrics.jobFinished = new Date()
+    if (folderName) {
+      await writeStatsToFile(metrics).catch(() => {
+        console.error('Failed to write subscription metrics to a file')
+      })
+    }
+
+    if (lockCreated) {
+      await removeLock(lockPath).catch(() => {
+        console.error('Failed to remove the lock')
+      })
+    }
   }
 }
 

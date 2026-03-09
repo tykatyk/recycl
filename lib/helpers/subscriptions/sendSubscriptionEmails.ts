@@ -1,142 +1,155 @@
-import path from 'path'
-import fs from 'fs/promises'
 import dayjs from 'dayjs'
+import dotenv from 'dotenv'
+import { Subscription } from '../../db/models'
+import { WasteRemovalNotification } from '../../types/subscription'
+import { withExponentialBackoff } from '../email'
+import { canCallAPI, canSendEmail } from '../email/sendPulseApiRequestLimiter'
 import { sendPulseFetcher } from '../email/sendPulseFetcher'
 import {
   prepareHtml,
   prepareEmailObj,
 } from '../email/templates/wasteRemovalSubscriptionEmail'
-import dotenv from 'dotenv'
-import { Subscription } from '../../db/models'
-import dateFormatter from '../../../lib/helpers/dateFormatter'
+import { logProgress } from './subscriptionSendingLogger'
 import { SubscriptionSendingStats } from './subscriptionSendingStats'
-import { ensureDirectoryExists } from '../file'
-import { WasteRemovalNotification } from '../../types/subscription'
-import { withExponentialBackoff } from '../email'
-import { canCallAPI } from '../email/sendPulseApiRequestLimiter'
+import { emailsPerHour } from '../email/sendPulseApiRequestLimiter'
+import { maxJobDurationMs } from '.'
+import { createAbortError, TimeoutError } from '../../errors'
+import type { SendPulseSMPTResponse } from '../../types/email'
 
 dotenv.config({ path: '.env.local' })
 
-const brandName = process.env.BRAND || ''
-
-const subscriptionEmailSendingInterval = 24 * 60 * 60 * 1000 //24 hours
-
 const subject = 'Предстоящие события по сбору вторсырья в вашем городе'
 const sendEmailEndpoint = '/smtp/emails'
+const oneHour = 60 * 60 * 1000
 
-const metricsDirectory = path.join(__dirname, '../../../logs')
-
-async function writeStatsToFile(metrics: SubscriptionSendingStats) {
-  try {
-    await ensureDirectoryExists(metricsDirectory)
-
-    const jobStartedDate = dateFormatter(metrics.jobStarted, 'T', '-')
-    //ToDo: rename metrix file
-    const path = `${metricsDirectory}/${jobStartedDate}.txt`
-
-    const metricsText = metrics.getSummary()
-
-    await fs.writeFile(path, metricsText, {
-      flag: 'wx',
-    })
-  } catch (err: any) {
-    console.log(err)
-    if (err.code === 'EEXIST') {
-      console.error('Metrics file already exists')
-    }
-    console.log(err)
-  }
+const isJobTimedOut = (jobStarted: Date, maxDurationMs: number) => {
+  return (
+    dayjs(new Date()).diff(dayjs(jobStarted), 'milliseconds') > maxDurationMs
+  )
 }
 
-const logProgress = (total: number, metrics: SubscriptionSendingStats) => {
-  const processed = metrics.totalEmailsProcessed
-  console.log(`Jobs processed: ${processed} out of ${total}`)
+const buildEncodedEmail = (notification: WasteRemovalNotification) => {
+  const html = prepareHtml(notification)
+  const bufferedHtml = Buffer.from(html, 'utf8')
+  const encodedHtml = bufferedHtml.toString('base64')
 
-  if (processed === total) {
-    try {
-      writeStatsToFile(metrics)
-    } catch (err) {
-      console.error(err)
+  return prepareEmailObj({
+    notification,
+    subject,
+    html: encodedHtml,
+  })
+}
+
+const waitWithAbort = async (ms: number, signal?: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) reject(createAbortError())
+
+    const timeout = setTimeout(() => {
+      cleanup()
+      resolve()
+    }, ms)
+
+    const onAbort = () => {
+      clearTimeout(timeout)
+      cleanup()
+      reject(createAbortError())
     }
+
+    const cleanup = () => {
+      if (signal) {
+        signal.removeEventListener('abort', onAbort)
+      }
+    }
+
+    if (signal) {
+      signal.addEventListener('abort', onAbort, { once: true })
+    }
+  })
+
+const runWithRateLimitAndAbort = async (
+  task: () => Promise<void>,
+  pace: number,
+  signal?: AbortSignal,
+) => {
+  await withExponentialBackoff(async () => {
+    if (signal?.aborted) return
+
+    if (!(await canCallAPI()) || !(await canSendEmail())) {
+      throw new Error('Rate limited')
+    }
+
+    await waitWithAbort(pace, signal)
+    if (signal?.aborted) return
+    await task()
+  })
+}
+
+const sendSingleSubscriptionEmail = async (
+  notification: WasteRemovalNotification,
+  metrics: SubscriptionSendingStats,
+) => {
+  if (isJobTimedOut(metrics.jobStarted, maxJobDurationMs)) {
+    try {
+      throw new TimeoutError('Job execution time exceeded')
+    } catch (err) {
+      metrics.append({
+        error_code: err.code,
+        message: err.message,
+      })
+    }
+    return
   }
 
-  try {
-    writeStatsToFile(metrics)
-  } catch (err) {
-    console.error(err)
+  const email = buildEncodedEmail(notification)
+
+  const result = await sendPulseFetcher<SendPulseSMPTResponse>(
+    sendEmailEndpoint,
+    {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    },
+  )
+
+  if (result && 'id' in result && result.id) {
+    await Subscription.findOneAndUpdate(
+      { listUnsubscribeToken: notification.listUnsubscribeToken },
+      { lastSent: new Date() },
+    )
   }
+
+  metrics.append(result)
 }
 
 async function sendSubscriptionEmails(
   subscriptionData: WasteRemovalNotification[],
+  metrics: SubscriptionSendingStats,
+  signal?: AbortSignal,
 ) {
+  if (signal?.aborted) return
+
   if (!subscriptionData || subscriptionData.length === 0) {
     console.log('No subscription data to process')
     return
   }
+  metrics.totalEmailsToProcess = subscriptionData.length
 
-  const metrics = new SubscriptionSendingStats()
-  const emailsPerHour = 50
-  const pace = 2 * Math.ceil((60 * 60 * 1000) / emailsPerHour) // Time to wait between requests to stay within the rate limit
+  const pace = 2 * Math.ceil(oneHour / emailsPerHour)
 
   for (const notification of subscriptionData) {
+    if (signal?.aborted) return
+
     if (!notification.receiverEmail) {
       console.log('No receiver email')
-      return
+      continue
     }
 
-    const html = prepareHtml(notification)
-    const bufferedHtml = Buffer.from(html, 'utf8')
-    const encodedHtml = bufferedHtml.toString('base64')
+    await runWithRateLimitAndAbort(
+      () => sendSingleSubscriptionEmail(notification, metrics),
+      pace,
+      signal,
+    )
 
-    const email = prepareEmailObj({
-      notification,
-      subject,
-      html: encodedHtml,
-    })
-
-    const task = async () => {
-      try {
-        const now = new Date()
-
-        if (
-          dayjs(now).diff(dayjs(metrics.jobStarted), 'milliseconds') >
-          subscriptionEmailSendingInterval
-        ) {
-          throw new Error('Job execution time exceeded')
-        }
-
-        const result = await sendPulseFetcher(sendEmailEndpoint, {
-          method: 'POST',
-          body: JSON.stringify({ email }),
-          signal: AbortSignal.timeout(5000),
-        })
-
-        if (result && result.id) {
-          await Subscription.findOneAndUpdate(
-            { listUnsubscribeToken: notification.listUnsubscribeToken },
-            { lastSent: new Date() },
-          )
-        }
-        metrics.append(result)
-      } catch (err) {
-        console.error('Failed to send email', err)
-        metrics.append({
-          error_code: `${brandName}_email_sending_error`,
-          message: err instanceof Error ? err.message : 'Unknown error',
-        })
-      }
-    }
-
-    await withExponentialBackoff(async () => {
-      if (!(await canCallAPI())) {
-        throw new Error('Rate limited')
-      }
-
-      await new Promise((r) => setTimeout(r, pace))
-      await task()
-      logProgress(subscriptionData.length, metrics)
-    })
+    logProgress(subscriptionData.length, metrics)
   }
 }
 
