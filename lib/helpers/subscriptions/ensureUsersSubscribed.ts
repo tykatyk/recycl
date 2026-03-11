@@ -9,7 +9,10 @@ import { withExponentialBackoff } from '../email/index'
 
 const sendPulsePath = '/smtp/unsubscribe'
 
-async function getUnsubscribedUsersFromProvider(limit: number, offset: number) {
+export const getUnsubscribedUsersFromProvider = async (
+  limit: number,
+  offset: number,
+) => {
   const unsubscribedUsers = await sendPulseFetcher(
     `${sendPulsePath}?limit=${limit}&offset=${offset}`,
     { signal: AbortSignal.timeout(5000) },
@@ -21,7 +24,7 @@ async function getUnsubscribedUsersFromProvider(limit: number, offset: number) {
   return unsubscribedUsers
 }
 
-async function setSubscriptionsUsubscribed(emails: string[]) {
+export const setSubscriptionsUsubscribed = async (emails: string[]) => {
   await dbConnect(process.env.DATABASE_URL)
   return await Subscription.updateMany(
     { email: { $in: emails }, subscribed: true },

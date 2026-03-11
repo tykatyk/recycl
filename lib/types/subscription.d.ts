@@ -59,3 +59,8 @@ export type UnsubscribeApiResponse = {
 export type PrepareSubscriptionRunJobData = {
   runId: string
 }
+
+export type EnsureUsersSubscribedJobData = {
+  offset: number
+  limit: number
+}

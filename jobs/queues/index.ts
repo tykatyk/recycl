@@ -1,22 +1,17 @@
 import { Queue } from 'bullmq'
-import IORedis from 'ioredis'
-import { PrepareSubscriptionRunJobData } from '../../lib/types/subscription'
+import {
+  PrepareSubscriptionRunJobData,
+  EnsureUsersSubscribedJobData,
+} from '../../lib/types/subscription'
 
-const connection = new IORedis(process.env.REDIS_URL!, {
-  maxRetriesPerRequest: null,
-})
+import { redisConnection } from '../../lib/db/redisConnection'
 
-// export type EnsureUsersSubscribedJobData = {
-//   offset: number
-//   limit: number
-// }
-
-export const emailQueue = new Queue<PrepareSubscriptionRunJobData>(
-  'prepare-subscription-run',
-  {
-    connection,
+export const prepareSubsctionRunQueue =
+  //ToDo: use const for job name
+  new Queue<EnsureUsersSubscribedJobData>('prepare-subscription-run', {
+    connection: redisConnection,
     defaultJobOptions: {
-      attempts: 11,
+      attempts: 6,
       backoff: {
         type: 'exponential',
         delay: 5000, // 5s, then 10s, 20s, 40s...
@@ -24,5 +19,4 @@ export const emailQueue = new Queue<PrepareSubscriptionRunJobData>(
       removeOnComplete: 1000,
       removeOnFail: 5000,
     },
-  },
-)
+  })

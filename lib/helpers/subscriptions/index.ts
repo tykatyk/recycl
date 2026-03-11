@@ -1,6 +1,10 @@
 import { createAbortError } from '../../errors'
 
-export { ensureUsersSubscribed } from './ensureUsersSubscribed'
+export {
+  ensureUsersSubscribed,
+  getUnsubscribedUsersFromProvider,
+  setSubscriptionsUsubscribed,
+} from './ensureUsersSubscribed'
 export { prepareSubscriptionData } from './prepareSubscriptionData'
 export { SubscriptionSendingStats } from './subscriptionSendingStats'
 export { unsubscribeApiResponseCodes } from './unsubscribeApiResponseCodes'

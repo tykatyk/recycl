@@ -17,8 +17,9 @@ import {
 import { SubscriptionVariantModel } from '../../../lib/db/models'
 import { createSubscriptionRun } from '../../../lib/helpers/subscriptions/createRun'
 import dbConnect from '../../../lib/db/connection'
-import { emailQueue } from '../../../jobs/queues'
-import { JOB_PREPARE_SUBSCRIPTION_RUN } from '../../../jobs/jobNames'
+import { prepareSubsctionRunQueue } from '../../../jobs/queues'
+import { JOB_PREPARE_SUBSCRIPTION_RUN } from '../../../lib/helpers/queues/jobNames'
+import { getJobId } from '../../../lib/helpers/queues'
 
 const lockDirectory = path.join(
   __dirname,
@@ -125,13 +126,14 @@ async function wasteAvailableSubscriptionHandler(
       requestedBy: 'system',
     })
 
-    await emailQueue.add(
-      JOB_PREPARE_SUBSCRIPTION_RUN,
-      { runId: String(run._id) },
-      {
-        jobId: `prepare:${String(run._id)}`,
-      },
-    )
+    const jobData = {
+      offset: 0,
+      limit: 50,
+    }
+
+    await prepareSubsctionRunQueue.add(JOB_PREPARE_SUBSCRIPTION_RUN, jobData, {
+      jobId: getJobId(jobData),
+    })
 
     return res.status(202).json({ status: 'queued', runId: run._id })
   } catch (error) {
