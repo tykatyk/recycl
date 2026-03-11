@@ -1,6 +1,6 @@
 import Redis from 'ioredis'
 
-const requestsPerMinute = 1000
+export const requestsPerMinute = 1000
 const requestsPerDay = 500000
 export const emailsPerHour = 50
 const emailsPerMonth = 12000

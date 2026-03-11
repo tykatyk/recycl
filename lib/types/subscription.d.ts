@@ -55,3 +55,7 @@ export type UnsubscribeApiResponse = {
     | typeof SUBSCRIPTION_NOT_FOUND
     | typeof TOKEN_USED
 }
+
+export type PrepareSubscriptionRunJobData = {
+  runId: string
+}

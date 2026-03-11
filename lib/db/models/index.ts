@@ -5,9 +5,10 @@ import UserRole from './userRole'
 import WasteType from './wasteType'
 import Event from './eventModel'
 import Subscription from './subscription'
-import SubscriptionVariant from './subscriptionVariant'
+import SubscriptionVariantModel from './subscriptionVariant'
 import UnsubscribeToken from './unsubscribeToken'
 import User from './user'
+import SubscriptionEmailRunModel from './subscriptionEmailRun'
 
 export {
   Message,
@@ -16,8 +17,9 @@ export {
   WasteType,
   Account,
   Event,
-  SubscriptionVariant,
+  SubscriptionVariantModel,
   Subscription,
   UnsubscribeToken,
   User,
+  SubscriptionEmailRunModel,
 }

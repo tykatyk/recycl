@@ -1,7 +1,10 @@
 import { sendPulseFetcher } from '../email/sendPulseFetcher'
 import { Subscription } from '../../db/models'
 import dbConnect from '../../db/connection'
-import { canCallAPI } from '../email/sendPulseApiRequestLimiter'
+import {
+  canCallAPI,
+  requestsPerMinute,
+} from '../email/sendPulseApiRequestLimiter'
 import { withExponentialBackoff } from '../email/index'
 
 const sendPulsePath = '/smtp/unsubscribe'
@@ -29,7 +32,6 @@ async function setSubscriptionsUsubscribed(emails: string[]) {
 export async function ensureUsersSubscribed() {
   let offset = 0
   const limit = 50
-  const requestsPerMinute = 1000
   const pace = 2 * Math.ceil((60 * 1000) / requestsPerMinute) // Time to wait between requests to stay within the rate limit
   let hasMore = true
 

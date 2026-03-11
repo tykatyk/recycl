@@ -1,5 +1,4 @@
 //ToDo: this job should be done on the outer server or in a separate process
-
 import { NextApiRequest, NextApiResponse } from 'next'
 import path from 'path'
 import fs from 'fs/promises'
@@ -15,7 +14,11 @@ import {
   writeStatsToFile,
   withAbortSignal,
 } from '../../../lib/helpers/subscriptions'
-import { SubscriptionVariant } from '../../../lib/db/models'
+import { SubscriptionVariantModel } from '../../../lib/db/models'
+import { createSubscriptionRun } from '../../../lib/helpers/subscriptions/createRun'
+import dbConnect from '../../../lib/db/connection'
+import { emailQueue } from '../../../jobs/queues'
+import { JOB_PREPARE_SUBSCRIPTION_RUN } from '../../../jobs/jobNames'
 
 const lockDirectory = path.join(
   __dirname,
@@ -29,33 +32,13 @@ const cantSendEmails = 'Cannot send emails'
 const unknownErrorMessage = 'An error while sending notification emails'
 // const subscriptionVariantId = '692d94649d358fe3fb068fdb'
 
-async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
-  //ToDo: method should be POST
-  if (req.method !== 'GET') {
-    return res.status(405).end()
-  }
-
-  const { subscription: subscriptionVariantId } = req.query
-  if (typeof subscriptionVariantId !== 'string') {
-    return res.status(400).end()
-  }
-
-  const subscriptionVariant = await SubscriptionVariant.findOne({
-    _id: subscriptionVariantId,
-  })
-
-  if (!subscriptionVariant) {
-    return res.status(404).end()
-  }
-
-  const auth = req.headers['authorization']
-  // if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
-  //   return res.status(401).end()
-  // }
-
+async function wasteRemovalSubscriptionHandler(
+  subscriptionVariantId: string,
+  res: NextApiResponse,
+) {
   let lockCreated = false
   let timer: NodeJS.Timeout | null = null
-  let folderName = subscriptionVariant._id ?? ''
+  let folderName = subscriptionVariantId ?? ''
 
   const metrics = new SubscriptionSendingStats()
 
@@ -89,7 +72,7 @@ async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
       await withAbortSignal(() => ensureUsersSubscribed(), signal)
 
       const subscriptionData = await withAbortSignal(
-        () => prepareSubscriptionData(subscriptionVariantId),
+        () => prepareSubscriptionData(subscriptionVariantId.toString()),
         signal,
       )
 
@@ -127,6 +110,77 @@ async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
         console.error('Failed to remove the lock')
       })
     }
+  }
+}
+
+async function wasteAvailableSubscriptionHandler(
+  subscriptionVariantId: string,
+  res: NextApiResponse,
+) {
+  try {
+    await dbConnect()
+
+    const run = await createSubscriptionRun({
+      subscriptionVariantId: subscriptionVariantId,
+      requestedBy: 'system',
+    })
+
+    await emailQueue.add(
+      JOB_PREPARE_SUBSCRIPTION_RUN,
+      { runId: String(run._id) },
+      {
+        jobId: `prepare:${String(run._id)}`,
+      },
+    )
+
+    return res.status(202).json({ status: 'queued', runId: run._id })
+  } catch (error) {
+    console.error('Failed to enqueue subscription send', error)
+    return res
+      .status(500)
+      .json({ error: 'Failed to enqueue subscription send' })
+  }
+}
+
+async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
+  //ToDo: method should be POST
+  if (req.method !== 'GET') {
+    return res.status(405).end()
+  }
+
+  const { subscription: subscriptionVariantId } = req.query
+  if (typeof subscriptionVariantId !== 'string') {
+    return res.status(400).end()
+  }
+
+  const auth = req.headers['authorization']
+  // if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
+  //   return res.status(401).end()
+  // }
+
+  const subscriptionVariant = await SubscriptionVariantModel.findOne({
+    _id: subscriptionVariantId,
+  })
+
+  if (!subscriptionVariant) {
+    return res.status(404).end()
+  }
+
+  switch (subscriptionVariant.name) {
+    case 'wasteAdded':
+      return await wasteAvailableSubscriptionHandler(
+        subscriptionVariant._id.toString(),
+        res,
+      )
+
+    case 'wasteRemoval':
+      return await wasteRemovalSubscriptionHandler(
+        subscriptionVariant._id.toString(),
+        res,
+      )
+
+    default:
+      return res.status(400)
   }
 }
 
