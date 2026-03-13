@@ -20,5 +20,10 @@ const subscriptionSchema = new Schema(
 
 export type Subscription = InferSchemaType<typeof subscriptionSchema>
 
-export default (models.Subscription as Model<Subscription>) ||
-  model<Subscription>('Subscription', subscriptionSchema)
+type SubscriptionModel = Model<Subscription>
+
+const SubscriptionModel =
+  (models.Subscription as SubscriptionModel) ||
+  model<Subscription, SubscriptionModel>('Subscription', subscriptionSchema)
+
+export default SubscriptionModel
