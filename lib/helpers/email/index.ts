@@ -1,3 +1,9 @@
+import {
+  prepareHtml,
+  prepareEmailObj,
+} from './templates/wasteRemovalSubscriptionEmail'
+import { WasteRemovalNotification } from '../../types/subscription'
+
 const host = process.env.HOST
 const brandName = process.env.BRAND
 const emailFrom = process.env.EMAIL_FROM
@@ -46,4 +52,17 @@ export const withExponentialBackoff = async <T>(
   }
   // unreachable, but required for TS
   throw new Error('Unexpected retry failure')
+}
+
+export const buildEncodedEmail = (notification: WasteRemovalNotification) => {
+  const html = prepareHtml(notification)
+  const bufferedHtml = Buffer.from(html, 'utf8')
+  const encodedHtml = bufferedHtml.toString('base64')
+  const subject = 'Предстоящие события по сбору вторсырья в вашем городе'
+
+  return prepareEmailObj({
+    notification,
+    subject,
+    html: encodedHtml,
+  })
 }

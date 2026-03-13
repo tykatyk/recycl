@@ -56,10 +56,13 @@ export type UnsubscribeApiResponse = {
     | typeof TOKEN_USED
 }
 
-export type PrepareSubscriptionRunJobData = {
+export type SubscriptionRunJobData = {
   runId: string
 }
 
+export type PrepareSubscriptionRunJobData = {
+  _id: string
+}
 export type EnsureUsersSubscribedJobData = {
   offset: number
   limit: number

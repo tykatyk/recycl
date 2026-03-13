@@ -15,11 +15,16 @@ import {
   withAbortSignal,
 } from '../../../lib/helpers/subscriptions'
 import { SubscriptionVariantModel } from '../../../lib/db/models'
+import { redisConnection } from '../../../lib/db/redisConnection'
 import { createSubscriptionRun } from '../../../lib/helpers/subscriptions/createRun'
 import dbConnect from '../../../lib/db/connection'
-import { prepareSubsctionRunQueue } from '../../../jobs/queues'
+import {
+  QUEUE_PREPARE_SUBSCRIPTION_RUN,
+  QUEUE_ENSURE_USERS_SUBSCRIBED,
+} from '../../../lib/helpers/queues'
 import { JOB_PREPARE_SUBSCRIPTION_RUN } from '../../../lib/helpers/queues/jobNames'
-import { getJobId } from '../../../lib/helpers/queues'
+import { getJobName } from '../../../lib/helpers/queues'
+import { FlowProducer } from 'bullmq'
 
 const lockDirectory = path.join(
   __dirname,
@@ -125,14 +130,26 @@ async function wasteAvailableSubscriptionHandler(
       subscriptionVariantId: subscriptionVariantId,
       requestedBy: 'system',
     })
-
-    const jobData = {
+    const ensureUsersSubscribedRunJobData = {
       offset: 0,
       limit: 50,
     }
+    const flowProducer = new FlowProducer({ connection: redisConnection })
 
-    await prepareSubsctionRunQueue.add(JOB_PREPARE_SUBSCRIPTION_RUN, jobData, {
-      jobId: getJobId(jobData),
+    await flowProducer.add({
+      name: JOB_PREPARE_SUBSCRIPTION_RUN,
+      queueName: QUEUE_PREPARE_SUBSCRIPTION_RUN,
+      opts: {
+        jobId: run._id.toString(),
+      },
+      children: [
+        {
+          name: getJobName(ensureUsersSubscribedRunJobData),
+          //ToDo: maybe add runId for better status monitoring
+          data: ensureUsersSubscribedRunJobData,
+          queueName: QUEUE_ENSURE_USERS_SUBSCRIBED,
+        },
+      ],
     })
 
     return res.status(202).json({ status: 'queued', runId: run._id })

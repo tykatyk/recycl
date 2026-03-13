@@ -2,13 +2,9 @@ import dayjs from 'dayjs'
 import dotenv from 'dotenv'
 import { Subscription } from '../../db/models'
 import { WasteRemovalNotification } from '../../types/subscription'
-import { withExponentialBackoff } from '../email'
+import { withExponentialBackoff, buildEncodedEmail } from '../email'
 import { canCallAPI, canSendEmail } from '../email/sendPulseApiRequestLimiter'
 import { sendPulseFetcher } from '../email/sendPulseFetcher'
-import {
-  prepareHtml,
-  prepareEmailObj,
-} from '../email/templates/wasteRemovalSubscriptionEmail'
 import { logProgress } from './subscriptionSendingLogger'
 import { SubscriptionSendingStats } from './subscriptionSendingStats'
 import { emailsPerHour } from '../email/sendPulseApiRequestLimiter'
@@ -18,7 +14,6 @@ import type { SendPulseSMPTResponse } from '../../types/email'
 
 dotenv.config({ path: '.env.local' })
 
-const subject = 'Предстоящие события по сбору вторсырья в вашем городе'
 const sendEmailEndpoint = '/smtp/emails'
 const oneHour = 60 * 60 * 1000
 
@@ -26,18 +21,6 @@ const isJobTimedOut = (jobStarted: Date, maxDurationMs: number) => {
   return (
     dayjs(new Date()).diff(dayjs(jobStarted), 'milliseconds') > maxDurationMs
   )
-}
-
-const buildEncodedEmail = (notification: WasteRemovalNotification) => {
-  const html = prepareHtml(notification)
-  const bufferedHtml = Buffer.from(html, 'utf8')
-  const encodedHtml = bufferedHtml.toString('base64')
-
-  return prepareEmailObj({
-    notification,
-    subject,
-    html: encodedHtml,
-  })
 }
 
 const waitWithAbort = async (ms: number, signal?: AbortSignal) =>
