@@ -1,8 +1,8 @@
 import dbConnect from '../../db/connection'
 import {
-  Event,
+  WasteRemovalEventModel,
   RemovalApplication,
-  Subscription as SubscriptionModel,
+  SubscriptionModel,
   UnsubscribeToken,
 } from '../../db/models'
 import type {
@@ -88,94 +88,95 @@ const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
 
 //ToDo: only get events that are created after the last job
 const getRemovalEvents = async () => {
-  const removalEvents = await Event.aggregate<WasteRemovalByLocation>([
-    {
-      $match: {
-        isActive: true,
-        // date: { $gte: new Date() },
+  const removalEvents =
+    await WasteRemovalEventModel.aggregate<WasteRemovalByLocation>([
+      {
+        $match: {
+          isActive: true,
+          // date: { $gte: new Date() },
+        },
       },
-    },
-    {
-      $sort: {
-        date: 1,
+      {
+        $sort: {
+          date: 1,
+        },
       },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user',
-        foreignField: '_id',
-        as: 'populatedUser',
-        pipeline: [
-          {
-            $project: {
-              _id: 1,
-              name: 1,
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'populatedUser',
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                name: 1,
+              },
+            },
+          ],
+        },
+      },
+      { $unwind: '$populatedUser' },
+      {
+        $group: {
+          _id: {
+            userId: '$user',
+            locationId: '$location.place_id',
+            wasteType: '$waste',
+          },
+          eventId: { $first: { $toString: '$_id' } },
+          locationName: { $first: '$location.structured_formatting.main_text' },
+          agentName: { $first: '$populatedUser.name' },
+          date: { $first: '$date' },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            locationId: '$_id.locationId',
+            wasteType: '$_id.wasteType',
+          },
+          locationName: { $first: '$locationName' },
+          eventsByWasteType: {
+            $push: {
+              eventId: '$eventId',
+              agentName: '$agentName',
+              date: '$date',
             },
           },
-        ],
-      },
-    },
-    { $unwind: '$populatedUser' },
-    {
-      $group: {
-        _id: {
-          userId: '$user',
-          locationId: '$location.place_id',
-          wasteType: '$waste',
         },
-        eventId: { $first: { $toString: '$_id' } },
-        locationName: { $first: '$location.structured_formatting.main_text' },
-        agentName: { $first: '$populatedUser.name' },
-        date: { $first: '$date' },
       },
-    },
-    {
-      $group: {
-        _id: {
-          locationId: '$_id.locationId',
-          wasteType: '$_id.wasteType',
-        },
-        locationName: { $first: '$locationName' },
-        eventsByWasteType: {
-          $push: {
-            eventId: '$eventId',
-            agentName: '$agentName',
-            date: '$date',
+      {
+        $project: {
+          _id: '$_id',
+          locationName: '$locationName',
+          eventsByWasteType: {
+            $slice: ['$eventsByWasteType', 3], //max 3 events to avoid long emails
           },
         },
       },
-    },
-    {
-      $project: {
-        _id: '$_id',
-        locationName: '$locationName',
-        eventsByWasteType: {
-          $slice: ['$eventsByWasteType', 3], //max 3 events to avoid long emails
-        },
-      },
-    },
-    {
-      $group: {
-        _id: '$_id.locationId',
-        locationName: { $first: '$locationName' },
-        docs: {
-          $push: {
-            wasteType: '$_id.wasteType',
-            eventsByWasteType: '$eventsByWasteType',
+      {
+        $group: {
+          _id: '$_id.locationId',
+          locationName: { $first: '$locationName' },
+          docs: {
+            $push: {
+              wasteType: '$_id.wasteType',
+              eventsByWasteType: '$eventsByWasteType',
+            },
           },
         },
       },
-    },
-    {
-      $project: {
-        _id: 0,
-        locationId: '$_id',
-        locationName: '$locationName',
-        eventsByLocation: '$docs',
+      {
+        $project: {
+          _id: 0,
+          locationId: '$_id',
+          locationName: '$locationName',
+          eventsByLocation: '$docs',
+        },
       },
-    },
-  ])
+    ])
 
   return removalEvents
 }

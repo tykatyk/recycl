@@ -14,7 +14,10 @@ import {
   writeStatsToFile,
   withAbortSignal,
 } from '../../../lib/helpers/subscriptions'
-import { SubscriptionVariantModel } from '../../../lib/db/models'
+import {
+  SubscriptionVariantModel,
+  SubscriptionEmailRunModel,
+} from '../../../lib/db/models'
 import { redisConnection } from '../../../lib/db/redisConnection'
 import { createSubscriptionRun } from '../../../lib/helpers/subscriptions/createRun'
 import dbConnect from '../../../lib/db/connection'
@@ -134,13 +137,23 @@ async function wasteAvailableSubscriptionHandler(
       offset: 0,
       limit: 50,
     }
+
+    //ToDo: implement lastRunDate
+    const lastRunDate = await SubscriptionEmailRunModel.findOne({
+      subscriptionVariantId,
+    }).sort({ startedAt: 'desc' })
+
     const flowProducer = new FlowProducer({ connection: redisConnection })
 
     await flowProducer.add({
       name: JOB_PREPARE_SUBSCRIPTION_RUN,
       queueName: QUEUE_PREPARE_SUBSCRIPTION_RUN,
+      data: {
+        runId: run._id,
+        lastRunDate,
+      },
       opts: {
-        jobId: run._id.toString(),
+        jobId: `prepareSubscriptionRun:${run._id.toString()}`,
       },
       children: [
         {
