@@ -1,7 +1,7 @@
 import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
 import { contactPhone, locationSchema } from '../../helpers/dbModelCommons'
 
-const eventSchema = new Schema(
+const wasteRemovalEventSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -24,13 +24,21 @@ const eventSchema = new Schema(
     viewedBy: {
       type: Array,
     },
-    isActive: { type: Boolean, default: true },
+    isActive: { type: Boolean, default: true, required: true },
     comment: String,
   },
   { timestamps: true },
 )
 
-export type EventType = InferSchemaType<typeof eventSchema>
+export type WasteRemovalEvent = InferSchemaType<typeof wasteRemovalEventSchema>
 
-export default (models.Event as Model<EventType>) ||
-  model<EventType>('Event', eventSchema)
+type WasteRemovalEventModel = Model<WasteRemovalEvent>
+
+const WasteRemovalEventModel =
+  (models.WasteRemovalEvent as WasteRemovalEventModel) ||
+  model<WasteRemovalEvent, WasteRemovalEventModel>(
+    'Event',
+    wasteRemovalEventSchema,
+  )
+
+export default WasteRemovalEventModel

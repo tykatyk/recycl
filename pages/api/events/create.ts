@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { eventValidationSchema } from '../../../lib/validation/eventFormValidator'
-import EventModel from '../../../lib/db/models/eventModel'
+import EventModel from '../../../lib/db/models/wasteRemovalEvent'
 import {
   apiHandler,
   METHOD_NOT_ALLOWED,

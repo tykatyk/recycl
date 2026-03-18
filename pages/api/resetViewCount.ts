@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import eventModel from '../../lib/db/models/eventModel'
+import eventModel from '../../lib/db/models/wasteRemovalEvent'
 import dbConnect from '../../lib/db/connection'
 import {
   apiHandler,

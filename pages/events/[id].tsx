@@ -1,7 +1,7 @@
 import type { Event as RecycleEvent } from '../../lib/types/event'
 import ShowSingleEvent from '../../components/events/ShowSingleEvent'
 import dbConnect from '../../lib/db/connection'
-import eventModel from '../../lib/db/models/eventModel'
+import eventModel from '../../lib/db/models/wasteRemovalEvent'
 import { GetServerSideProps } from 'next'
 import { ParsedUrlQuery } from 'querystring'
 import { isValidObjectId } from 'mongoose'

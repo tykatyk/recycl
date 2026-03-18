@@ -3,12 +3,13 @@ import RemovalApplication from './removalApplication'
 import Account from './account'
 import UserRole from './userRole'
 import WasteType from './wasteType'
-import Event from './eventModel'
+import WasteRemovalEventModel from './wasteRemovalEvent'
 import SubscriptionModel from './subscription'
+import WasteAvailableSubscriptionModel from './wasteAvailableSubsciption'
 import SubscriptionVariantModel from './subscriptionVariant'
 import UnsubscribeToken from './unsubscribeToken'
 import User from './user'
-import SubscriptionEmailRunModel from './subscriptionEmailRun'
+import SubscriptionEmailRunModel from './subscriptionEmailJobRun'
 
 export {
   Message,
@@ -16,9 +17,10 @@ export {
   UserRole,
   WasteType,
   Account,
-  Event,
+  WasteRemovalEventModel,
   SubscriptionVariantModel,
-  SubscriptionModel as Subscription,
+  SubscriptionModel,
+  WasteAvailableSubscriptionModel,
   UnsubscribeToken,
   User,
   SubscriptionEmailRunModel,

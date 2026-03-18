@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import eventModel from '../../lib/db/models/eventModel'
-import type { EventType } from '../../lib/db/models/eventModel'
+import eventModel from '../../lib/db/models/wasteRemovalEvent'
+import type { WasteRemovalEvent } from '../../lib/db/models/wasteRemovalEvent'
 import dbConnect from '../../lib/db/connection'
 import { METHOD_NOT_ALLOWED } from '../../lib/helpers/errorHelpers'
 import cryptoRandomString from 'crypto-random-string'
@@ -21,7 +21,7 @@ export default async function viewCounter(
   if (!session?.id) return res.status(401).end()
 
   const incrementViewCount = async (
-    ad: HydratedDocument<EventType>,
+    ad: HydratedDocument<WasteRemovalEvent>,
     identifier: string,
   ) => {
     ad.viewedBy.push(identifier)
