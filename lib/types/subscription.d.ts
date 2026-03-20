@@ -64,7 +64,7 @@ export type PrepareSubscriptionRunJobData = {
   runId: string
   subscriptionVariantId: string
   userId?: string
-  lastRunDate: Date | null
+  lastRunDate?: Date
 }
 export type EnsureUsersSubscribedJobData = {
   offset: number

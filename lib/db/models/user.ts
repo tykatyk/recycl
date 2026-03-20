@@ -135,7 +135,10 @@ userSchema.methods.generateEmailConfirm = function (length = 128) {
   this.confirmEmailToken = cryptoRandomString({ length, type: 'url-safe' })
   this.confirmEmailExpires = Date.now() + 3600000
 }
-export type UserType = InferSchemaType<typeof userSchema>
+export type User = InferSchemaType<typeof userSchema>
 
-export default (models.User as Model<UserType>) ||
-  model<UserType>('User', userSchema)
+type UserModel = Model<User>
+const UserModel =
+  (models.User as Model<User>) || model<User, UserModel>('User', userSchema)
+
+export default UserModel

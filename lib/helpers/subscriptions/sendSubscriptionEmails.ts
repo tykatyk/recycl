@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import dotenv from 'dotenv'
-import { Subscription } from '../../db/models'
+import { SubscriptionModel } from '../../db/models'
 import { WasteRemovalNotification } from '../../types/subscription'
 import { withExponentialBackoff, buildEncodedEmail } from '../email'
 import { canCallAPI, canSendEmail } from '../email/sendPulseApiRequestLimiter'
@@ -94,7 +94,7 @@ const sendSingleSubscriptionEmail = async (
   )
 
   if (result && 'id' in result && result.id) {
-    await Subscription.findOneAndUpdate(
+    await SubscriptionModel.findOneAndUpdate(
       { listUnsubscribeToken: notification.listUnsubscribeToken },
       { lastSent: new Date() },
     )
