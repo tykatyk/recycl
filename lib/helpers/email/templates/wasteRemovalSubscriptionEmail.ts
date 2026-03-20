@@ -60,7 +60,7 @@ export function prepareHtml(notification: WasteRemovalNotification) {
                 <tr>
                   <td>
                     <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
-                      href="${getUrl({ host, route: 'events', id: evByWasteType.eventId })}">Подробнее</a>
+                      href="${getUrl({ host, route: '/events', id: evByWasteType.eventId })}">Подробнее</a>
                   </td>
                 </tr>
               </tbody>
@@ -163,16 +163,16 @@ export function prepareHtml(notification: WasteRemovalNotification) {
               style="padding: 0px 0px 10px 0px; font-size: 14px; color: #ccc"
             >
               Если вы не хотите получать подобные уведомления, нажмите
-              <br /><a
-                href="{{unsubscribe_url}}"
+              <br />
+              <a href="{{unsubscribe_url}}"
                 style="
                   display: inline-block;
                   padding-top: 4px;
                   color: #ccc;
                   text-decoration: underline;
                 "
-                >отписаться</a
-              >.
+                >отписаться
+              </a>
             </td>
           </tr>
         </tbody>
