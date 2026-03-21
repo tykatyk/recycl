@@ -5,8 +5,13 @@ import {
   WasteAvailableSubscriptionModel,
   WasteRemovalEventModel,
 } from '../../db/models'
-import type { FilterQuery, Types } from 'mongoose'
-import type { PrepareSubscriptionRunJobData } from '../../types/subscription'
+import type { FilterQuery } from 'mongoose'
+import type {
+  PrepareSubscriptionRunJobData,
+  WasteTypeCounters,
+  Location,
+  WasteAvailableSubscriptionData,
+} from '../../types/subscription'
 import type { Subscription } from '../../db/models/subscription'
 import dbConnect from '../../db/connection'
 import { prepareSubsctionRunQueue } from '../queues'
@@ -20,7 +25,10 @@ import { buildEncodedEmail } from '../email'
 import { subscriptionRunQueue } from '../queues'
 import { WasteAvailableSubscription } from '../../db/models/wasteAvailableSubsciption'
 
-const getData = async (userId: string, lastRunDate: Date) => {
+const getEmailData = async (
+  userId: string,
+  lastRunDate: Date,
+): Promise<WasteAvailableSubscriptionData | null> => {
   //ToDo: check if user is not banned
 
   //ToDo: add subscription type
@@ -45,8 +53,6 @@ const getData = async (userId: string, lastRunDate: Date) => {
     return null
   }
 
-  type WasteTypeCounters = { wasteName: string; newAdsCount: number }
-  type Location = { name: string; wasteTypes: WasteTypeCounters[] }
   const locations: Location[] = []
 
   for (const item of items) {
@@ -126,14 +132,26 @@ export const prepareSubsctionRunWorker =
         .select('user')
 
       if (users.length === 0) {
-        //ToDo: mark as completed
+        //ToDo: mark job as completed
         return
       }
       const lastRun = lastRunDate ?? new Date(Date.now() - 24 * 60 * 60 * 1000)
 
       for (const user of users) {
-        const data = await getData(user._id.toString(), lastRun)
-        const email = buildEncodedEmail(data)
+        const data = await getEmailData(user._id.toString(), lastRun)
+        if (!data) continue
+
+        const { receiverName, receiverEmail } = data
+        //ToDo: subject should === title
+        const subject = ''
+        const html = getEmailHtml(data)
+
+        const email = buildEncodedEmail({
+          receiverName,
+          receiverEmail,
+          subject,
+          html,
+        })
         emails.push(email)
       }
       await subscriptionRunQueue.add(JOB_SEND_SUBSCRIPTION_BATCH, emails, {

@@ -70,3 +70,11 @@ export type EnsureUsersSubscribedJobData = {
   offset: number
   limit: number
 }
+
+export type WasteTypeCounters = { wasteName: string; newAdsCount: number }
+export type Location = { name: string; wasteTypes: WasteTypeCounters[] }
+export type WasteAvailableSubscriptionData = {
+  receiverName: string
+  receiverEmail: string
+  locations: Location[]
+}

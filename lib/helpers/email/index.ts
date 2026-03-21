@@ -1,12 +1,8 @@
-import {
-  prepareHtml,
-  prepareEmailObj,
-} from './templates/wasteRemovalSubscriptionEmail'
-import { WasteRemovalNotification } from '../../types/subscription'
+import type { Email } from '../../types/email'
 
-const host = process.env.HOST
-const brandName = process.env.BRAND
-const emailFrom = process.env.EMAIL_FROM
+const host = process.env.HOST || ''
+const brandName = process.env.BRAND || ''
+const emailFrom = process.env.EMAIL_FROM || ''
 
 export const canSendEmails = () => {
   if (!host) {
@@ -54,15 +50,39 @@ export const withExponentialBackoff = async <T>(
   throw new Error('Unexpected retry failure')
 }
 
-export const buildEncodedEmail = (notification: WasteRemovalNotification) => {
-  const html = prepareHtml(notification)
+type EmailData = {
+  receiverName: string
+  receiverEmail: string
+  subject: string
+  html: string
+}
+
+export function prepareEmailObj(params: EmailData) {
+  const { receiverName, receiverEmail, subject, html } = params
+
+  // const receiverName = notification.receiverName ?? notification.receiverEmail
+
+  const emailObj: Email = {
+    html,
+    subject,
+    from: {
+      name: brandName,
+      email: emailFrom,
+    },
+    to: [
+      {
+        name: receiverName,
+        email: receiverEmail,
+      },
+    ],
+  }
+  return emailObj
+}
+
+export const buildEncodedEmail = (data: EmailData) => {
+  const { html, ...rest } = data
   const bufferedHtml = Buffer.from(html, 'utf8')
   const encodedHtml = bufferedHtml.toString('base64')
-  const subject = 'Предстоящие события по сбору вторсырья в вашем городе'
 
-  return prepareEmailObj({
-    notification,
-    subject,
-    html: encodedHtml,
-  })
+  return prepareEmailObj({ ...rest, html: encodedHtml })
 }
