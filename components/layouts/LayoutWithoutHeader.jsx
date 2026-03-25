@@ -1,22 +1,16 @@
 import Wrapper from '../uiParts/Wrapper'
 import Footer from '../uiParts/Footer'
 import Head from '../uiParts/Head'
-import BackButton from '../uiParts/BackButton'
+import HomePageButton from '../uiParts/HomePageButton'
 import { Box } from '@mui/material'
 
-export default function LayoutWithoutHeader({
-  children,
-  title,
-  backButtonText,
-}) {
+export default function LayoutWithoutHeader({ children, title }) {
   return (
     <>
       <Head title={title} />
       <Wrapper>
-        <BackButton text={backButtonText} />
-        <Box component="div" sx={{ width: '100%' }}>
-          {children}
-        </Box>
+        <HomePageButton />
+        <Box sx={{ width: '100%' }}>{children}</Box>
         <Footer />
       </Wrapper>
     </>

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import {Container } from '@mui/material'
+import { Container } from '@mui/material'
 import Wrapper from '../uiParts/Wrapper'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
@@ -23,7 +23,13 @@ export default function Layout({
         <Container
           component="main"
           maxWidth="md"
-          sx={{ position: 'relative', paddingTop: 6, paddingBottom: 6 }}
+          sx={{
+            position: 'relative',
+            paddingTop: 6,
+            paddingBottom: 6,
+            display: 'flex',
+            flex: 1,
+          }}
         >
           {children}
         </Container>

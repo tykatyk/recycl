@@ -1,4 +1,3 @@
-import React from 'react'
 import { Box, CircularProgress } from '@mui/material'
 
 export default function PageLoadingCircle(props) {
@@ -8,7 +7,7 @@ export default function PageLoadingCircle(props) {
     <Box
       sx={[
         {
-          position: 'fixed',
+          position: 'absolute',
           top: ' 50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
