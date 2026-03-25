@@ -4,21 +4,22 @@ import {
 } from '../../db/models'
 
 export async function createSubscriptionRun(params: {
-  subscriptionVariantId: string
+  subscriptionVariantName: string
   requestedBy?: string | null
 }) {
-  const variant = await SubscriptionVariantModel.findById(
-    params.subscriptionVariantId,
-  )
+  const { subscriptionVariantName, requestedBy } = params
+
+  const variant = await SubscriptionVariantModel.findOne({
+    name: subscriptionVariantName,
+  })
 
   if (!variant) {
     throw new Error('Subscription variant not found')
   }
-
   return SubscriptionEmailRunModel.create({
-    subscriptionVariantId: params.subscriptionVariantId,
+    subscriptionVariantName,
     status: 'queued',
-    requestedBy: params.requestedBy ?? null,
+    requestedBy: requestedBy ?? null,
     requestedAt: new Date(),
   })
 }

@@ -1,4 +1,4 @@
-import { Event } from '../models/index'
+import { WasteRemovalEventModel } from '../models/index'
 import { _id } from '@next-auth/mongodb-adapter'
 import {
   eventVariants,
@@ -72,7 +72,7 @@ const eventQueries = {
     const sort = getSortQuery(sortProperty, sortOrder)
     const skip = pageInt * pageSizeInt
 
-    return await Event.find(select)
+    return await WasteRemovalEventModel.find(select)
       .sort(sort)
       .skip(skip)
       .limit(pageSizeInt)

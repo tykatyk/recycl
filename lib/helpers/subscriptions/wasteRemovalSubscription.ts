@@ -293,3 +293,11 @@ export async function prepareSubscriptionData(subscriptionVariantId: string) {
 
   return subscriptionData
 }
+
+export const getWasteRemovalEmails = async (
+  userIds: string[],
+  lastRun: Date,
+) => {
+  //ToDo implement
+  return []
+}

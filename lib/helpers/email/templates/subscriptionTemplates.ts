@@ -16,22 +16,20 @@ const getUrl = (params: { host: string; route: string; id?: string }) => {
 }
 
 export const getWasteAvailableHtml = (
-  wasteAvailableNotification: WasteAvailableSubscriptionData[],
+  wasteAvailableNotification: WasteAvailableSubscriptionData,
 ) => {
-  const title = `Информируем вас о новых объявлениях о наличии отходов, которые пользователи хотят передать на переработку`
-  const header = 'Список новых объявлений по вывозу отходов'
+  const title = 'Список новых объявлений о наличии вторсыръя'
+  const header = `Информируем вас о новых объявлениях о наличии отходов для переработки`
 
-  const content = wasteAvailableNotification
-    .map((notification) => {
-      const { locations } = notification
-      const newAdsCountByLocation = locations
-        .map((location, locationIdx) => {
-          //ToDo: add locationId to enable sort query
-          const { name: locationName, wasteTypes } = location
-          const newAdsCountByWasteTypes = wasteTypes
-            .map((wasteType, wasteTypeIdx) => {
-              const { wasteName, newAdsCount } = wasteType
-              return `<tr>
+  const { locations } = wasteAvailableNotification
+  const newAdsCountByLocation = locations
+    .map((location, locationIdx) => {
+      //ToDo: add locationId to enable sort query
+      const { locationName, locationId, wasteTypes } = location
+      const newAdsCountByWasteTypes = wasteTypes
+        .map((wasteType, wasteTypeIdx) => {
+          const { wasteName, newAdsCount } = wasteType
+          return `<tr>
                         <td style="padding:8px">
                           Тип отходов: ${wasteName}
                         </td>
@@ -42,14 +40,14 @@ export const getWasteAvailableHtml = (
                         </td>
                       </tr>
                       <tr style="padding:8px">
-                        <a href="${host}/applications/?wasteType=${wasteType}$location=${locationName}&sortBy=createdAd&sortOrder=desc">Посмотреть</a>
+                        <a href="${host}/applications/?wasteType=${wasteType}$location=${locationId}&sortBy=createdAd&sortOrder=desc">Посмотреть</a>
                       </tr>
                       ${wasteTypeIdx !== wasteTypes.length - 1 ? "<td height='8' style='line-height:8px; font-size:0;'></td>" : ''}
                       `
-            })
-            .join('')
+        })
+        .join('')
 
-          return `<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
+      return `<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
                     <tr>
                       <td style="padding:16px 8px">Населенный пункт: ${locationName}</td>
                     </tr>
@@ -57,15 +55,12 @@ export const getWasteAvailableHtml = (
                     <tr><td height="24"></td></tr>
                     ${locationIdx !== locations.length - 1 ? "<td height='24' style='line-height:24px; font-size:0;'></td>" : ''}
                   </table>`
-        })
-        .join('')
-
-      return `<tr>
-                <td>${newAdsCountByLocation}</td>
-              </tr>`
     })
     .join('')
 
+  const content = `<tr>
+                <td>${newAdsCountByLocation}</td>
+              </tr>`
   return getFullHtml({ content, title, header })
 }
 

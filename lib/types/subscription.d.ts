@@ -58,11 +58,19 @@ export type UnsubscribeApiResponse = {
 
 export type SubscriptionRunJobData = {
   runId: string
+  emails: Email[]
+}
+
+export type SubscriptionVariantName = {
+  wasteAvailable: 'wasteAvailable'
+  wasteRemoval: 'wasteRemoval'
 }
 
 export type PrepareSubscriptionRunJobData = {
   runId: string
-  subscriptionVariantId: string
+  subscriptionVariantName:
+    | SubscriptionVariantName['wasteAvailable']
+    | SubscriptionVariantName['wasteRemoval']
   userId?: string
   lastRunDate?: Date
 }
@@ -72,7 +80,11 @@ export type EnsureUsersSubscribedJobData = {
 }
 
 export type WasteTypeCounters = { wasteName: string; newAdsCount: number }
-export type Location = { name: string; wasteTypes: WasteTypeCounters[] }
+export type Location = {
+  locationName: string
+  locationId: string
+  wasteTypes: WasteTypeCounters[]
+}
 export type WasteAvailableSubscriptionData = {
   receiverName: string
   receiverEmail: string

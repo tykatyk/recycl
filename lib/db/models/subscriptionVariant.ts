@@ -1,7 +1,7 @@
 import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
 
 const subscriptionVariantSchema = new Schema({
-  name: String,
+  name: { type: String, required: true, unique: true },
   userDescription: {
     type: String,
     required: true,

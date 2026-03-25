@@ -28,6 +28,9 @@ import {
 import { JOB_PREPARE_SUBSCRIPTION_RUN } from '../../../lib/helpers/queues/jobNames'
 import { getJobName } from '../../../lib/helpers/queues'
 import { FlowProducer } from 'bullmq'
+import { subscriptionVariantNames } from '../../../lib/helpers/subscriptions'
+
+const { wasteAvailable } = subscriptionVariantNames
 
 const lockDirectory = path.join(
   __dirname,
@@ -123,14 +126,17 @@ async function wasteRemovalSubscriptionHandler(
 }
 
 async function wasteAvailableSubscriptionHandler(
-  subscriptionVariantId: string,
+  subscriptionVariantName: string,
   res: NextApiResponse,
 ) {
+  if (subscriptionVariantName !== wasteAvailable) {
+    return res.status(404).end()
+  }
   try {
     await dbConnect()
 
     const run = await createSubscriptionRun({
-      subscriptionVariantId: subscriptionVariantId,
+      subscriptionVariantName,
       requestedBy: 'system',
     })
     const ensureUsersSubscribedRunJobData = {
@@ -140,7 +146,7 @@ async function wasteAvailableSubscriptionHandler(
 
     //ToDo: implement lastRunDate
     const lastRunDate = await SubscriptionEmailRunModel.findOne({
-      subscriptionVariantId,
+      subscriptionVariantName,
     }).sort({ startedAt: 'desc' })
 
     const flowProducer = new FlowProducer({ connection: redisConnection })
@@ -151,6 +157,7 @@ async function wasteAvailableSubscriptionHandler(
       data: {
         runId: run._id,
         lastRunDate,
+        subscriptionVariantName,
       },
       opts: {
         jobId: `prepareSubscriptionRun:${run._id.toString()}`,
@@ -199,15 +206,15 @@ async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   switch (subscriptionVariant.name) {
-    case 'wasteAdded':
+    case 'wasteAvailable':
       return await wasteAvailableSubscriptionHandler(
-        subscriptionVariant._id.toString(),
+        subscriptionVariant.name,
         res,
       )
 
     case 'wasteRemoval':
       return await wasteRemovalSubscriptionHandler(
-        subscriptionVariant._id.toString(),
+        subscriptionVariant.name,
         res,
       )
 

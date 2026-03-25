@@ -1,17 +1,22 @@
 import { createAbortError } from '../../errors'
-
+import type { SubscriptionVariantName } from '../../types/subscription'
 export {
   ensureUsersSubscribed,
   getUnsubscribedUsersFromProvider,
   setSubscriptionsUsubscribed,
 } from './ensureUsersSubscribed'
-export { prepareSubscriptionData } from './prepareSubscriptionData'
+export { prepareSubscriptionData } from './wasteRemovalSubscription'
 export { SubscriptionSendingStats } from './subscriptionSendingStats'
 export { unsubscribeApiResponseCodes } from './unsubscribeApiResponseCodes'
 export { logProgress } from './subscriptionSendingLogger'
 export { writeStatsToFile } from './subscriptionSendingLogger'
 export { default as sendSubscriptionEmails } from './sendSubscriptionEmails'
 export const maxJobDurationMs = 24 * 60 * 60 * 1000 // 24 hours
+
+export const subscriptionVariantNames: SubscriptionVariantName = {
+  wasteAvailable: 'wasteAvailable',
+  wasteRemoval: 'wasteRemoval',
+}
 
 export const withAbortSignal = async <T>(
   task: () => Promise<T>,
