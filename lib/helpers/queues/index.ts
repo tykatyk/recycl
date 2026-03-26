@@ -2,7 +2,7 @@ import { JOB_ENSURE_USERS_SUBSCRIBED } from './jobNames'
 import { Queue } from 'bullmq'
 import {
   PrepareSubscriptionRunJobData,
-  SubscriptionRunJobData,
+  SendSubscriptionEmailJobData,
   EnsureUsersSubscribedJobData,
 } from '../../types/subscription'
 
@@ -17,7 +17,7 @@ export const QUEUE_SUBSCRIPTION_RUN = 'subscriptionRun'
 export const QUEUE_PREPARE_SUBSCRIPTION_RUN = 'prepareSubscriptionRun'
 export const QUEUE_ENSURE_USERS_SUBSCRIBED = 'ensureUsersSubscribed'
 
-export const subscriptionRunQueue = new Queue<SubscriptionRunJobData>(
+export const subscriptionRunQueue = new Queue<SendSubscriptionEmailJobData>(
   QUEUE_SUBSCRIPTION_RUN,
   {
     connection: redisConnection,

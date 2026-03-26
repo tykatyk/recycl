@@ -1,6 +1,9 @@
 import type { UserType } from '../db/models/user'
 import { unsubscribeApiResponseCodes } from './unsubscribeApiResponseCodes'
 import { Types } from 'mongoose'
+import type { Email } from './email'
+import { subscriptionVariantNames } from '../helpers/subscriptions'
+const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
 export interface EventByWasteType {
   eventId: string
@@ -56,23 +59,24 @@ export type UnsubscribeApiResponse = {
     | typeof TOKEN_USED
 }
 
-export type SubscriptionRunJobData = {
-  runId: string
-  emails: Email[]
-}
+// export type SubscriptionVariantName = {
+//   wasteAvailable: 'wasteAvailable'
+//   wasteRemoval: 'wasteRemoval'
+// }
 
-export type SubscriptionVariantName = {
-  wasteAvailable: 'wasteAvailable'
-  wasteRemoval: 'wasteRemoval'
+export type SendSubscriptionEmailJobData = {
+  runId: string
+  userId: string
+  userName: string
+  userEmail: string
+  lastRunDate: Date
+  subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval
 }
 
 export type PrepareSubscriptionRunJobData = {
   runId: string
-  subscriptionVariantName:
-    | SubscriptionVariantName['wasteAvailable']
-    | SubscriptionVariantName['wasteRemoval']
+  subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval
   userId?: string
-  lastRunDate?: Date
 }
 export type EnsureUsersSubscribedJobData = {
   offset: number

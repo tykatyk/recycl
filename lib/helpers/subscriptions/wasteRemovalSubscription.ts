@@ -294,7 +294,7 @@ export async function prepareSubscriptionData(subscriptionVariantId: string) {
   return subscriptionData
 }
 
-export const getWasteRemovalEmails = async (
+export const getWasteRemovalEmail = async (
   userIds: string[],
   lastRun: Date,
 ) => {

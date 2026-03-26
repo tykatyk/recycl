@@ -11,17 +11,18 @@ import type {
 import { redisConnection as redis } from '../../db/redisConnection'
 import { buildEncodedEmail } from '../email'
 import { getWasteAvailableHtml } from '../email/templates/subscriptionTemplates'
-import { Email } from '../../types/email'
 
 type GetEmailData = {
   userId: string
+  userName: string
+  userEmail: string
   lastRunDate: Date
 }
 
 const getWasteAvailableData = async (
   params: GetEmailData,
 ): Promise<WasteAvailableSubscriptionData | null> => {
-  const { userId, lastRunDate } = params
+  const { userId, userName, userEmail, lastRunDate } = params
 
   //ToDo: check if user is not banned
 
@@ -36,16 +37,6 @@ const getWasteAvailableData = async (
     user: userId,
   })
   if (items.length === 0) return null
-
-  const user = await UserModel.findById(userId).select<{
-    name: string
-    email: string
-  }>('name email')
-
-  if (!user) {
-    console.error('User not found')
-    return null
-  }
 
   const locations: Location[] = []
 
@@ -91,37 +82,31 @@ const getWasteAvailableData = async (
 
   if (locations.length === 0) return null
   return {
-    receiverName: user.name,
-    receiverEmail: user.email,
+    receiverName: userName,
+    receiverEmail: userEmail,
     locations,
   }
 }
 
-export const getWasteAvailableEmails = async (
-  userIds: string[],
-  lastRunDate: Date,
-) => {
-  const emails: Email[] = []
+export const getWasteAvailableEmail = async (params: GetEmailData) => {
+  const { userId, userName, userEmail, lastRunDate } = params
+  const data = await getWasteAvailableData({
+    userId,
+    userName,
+    userEmail,
+    lastRunDate,
+  })
+  if (!data) return null
 
-  for (const userId of userIds) {
-    const data = await getWasteAvailableData({
-      userId,
-      lastRunDate,
-    })
-    if (!data) continue
+  const { receiverName, receiverEmail } = data
+  //ToDo: subject should === title
+  const subject = ''
+  const html = getWasteAvailableHtml(data)
 
-    const { receiverName, receiverEmail } = data
-    //ToDo: subject should === title
-    const subject = ''
-    const html = getWasteAvailableHtml(data)
-
-    const email = buildEncodedEmail({
-      receiverName,
-      receiverEmail,
-      subject,
-      html,
-    })
-    emails.push(email)
-  }
-  return emails
+  return buildEncodedEmail({
+    receiverName,
+    receiverEmail,
+    subject,
+    html,
+  })
 }

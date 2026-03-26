@@ -144,11 +144,6 @@ async function wasteAvailableSubscriptionHandler(
       limit: 50,
     }
 
-    //ToDo: implement lastRunDate
-    const lastRunDate = await SubscriptionEmailRunModel.findOne({
-      subscriptionVariantName,
-    }).sort({ startedAt: 'desc' })
-
     const flowProducer = new FlowProducer({ connection: redisConnection })
 
     await flowProducer.add({
@@ -156,7 +151,6 @@ async function wasteAvailableSubscriptionHandler(
       queueName: QUEUE_PREPARE_SUBSCRIPTION_RUN,
       data: {
         runId: run._id,
-        lastRunDate,
         subscriptionVariantName,
       },
       opts: {

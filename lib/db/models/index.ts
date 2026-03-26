@@ -5,6 +5,7 @@ import UserRole from './userRole'
 import WasteType from './wasteType'
 import WasteRemovalEventModel from './wasteRemovalEvent'
 import SubscriptionModel from './subscription'
+import SubscriptionEmailDeliveryModel from './subscriptionEmailDelivery'
 import WasteAvailableSubscriptionModel from './wasteAvailableSubsciption'
 import SubscriptionVariantModel from './subscriptionVariant'
 import UnsubscribeToken from './unsubscribeToken'
@@ -20,6 +21,7 @@ export {
   WasteRemovalEventModel,
   SubscriptionVariantModel,
   SubscriptionModel,
+  SubscriptionEmailDeliveryModel,
   WasteAvailableSubscriptionModel,
   UnsubscribeToken,
   UserModel,

@@ -1,5 +1,9 @@
 import { Worker, Job } from 'bullmq'
-import { SubscriptionModel, SubscriptionEmailRunModel } from '../../db/models'
+import {
+  SubscriptionModel,
+  SubscriptionEmailRunModel,
+  UserModel,
+} from '../../db/models'
 import type { FilterQuery, Types } from 'mongoose'
 import type { PrepareSubscriptionRunJobData } from '../../types/subscription'
 import { subscriptionVariantNames } from '../subscriptions'
@@ -13,18 +17,28 @@ import {
 } from '../queues/jobNames'
 import { QUEUE_PREPARE_SUBSCRIPTION_RUN } from '../queues'
 import { subscriptionRunQueue } from '../queues'
-import { Email } from '../../types/email'
-import { getWasteAvailableEmails } from '../subscriptions/wasteAvailableSubscription'
-import { getWasteRemovalEmails } from '../subscriptions/wasteRemovalSubscription'
 
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 const batchLimit = 100
 
+const getLastRunDate = async (
+  subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval,
+) => {
+  const lastRun = await SubscriptionEmailRunModel.findOne({
+    subscriptionVariantName,
+  })
+    .select('startedAt')
+    .sort({ startedAt: 'desc' })
+  if (lastRun) {
+    return lastRun.startedAt
+  }
+  return new Date(Date.now() - 24 * 60 * 60 * 1000)
+}
 export const prepareSubsctionRunWorker =
   new Worker<PrepareSubscriptionRunJobData>(
     QUEUE_PREPARE_SUBSCRIPTION_RUN,
     async (job: Job<PrepareSubscriptionRunJobData>) => {
-      const { runId, subscriptionVariantName, userId, lastRunDate } = job.data
+      const { runId, subscriptionVariantName, userId } = job.data
 
       await dbConnect()
 
@@ -41,8 +55,10 @@ export const prepareSubsctionRunWorker =
         subscriptionVariantName !== wasteAvailable &&
         subscriptionVariantName !== wasteRemoval
       ) {
+        const date = new Date()
         subscriptiionRun.status = 'failed'
-        subscriptiionRun.lastHeartbeatAt = new Date()
+        subscriptiionRun.finishedAt = date
+        subscriptiionRun.lastHeartbeatAt = date
         subscriptiionRun.errorMessage = 'Incorrect subscriptionVariantName'
         await subscriptiionRun.save()
 
@@ -68,7 +84,11 @@ export const prepareSubsctionRunWorker =
 
       const userIds = subs.map((s) => s.user.toString())
 
-      if (userIds.length === 0) {
+      const users = await UserModel.find({ _id: { $in: userIds } })
+        .select('name email')
+        .lean<{ _id: string; name: string; email: string }[]>()
+
+      if (users.length === 0) {
         const date = new Date()
 
         subscriptiionRun.status = 'completed'
@@ -78,25 +98,25 @@ export const prepareSubsctionRunWorker =
 
         return
       }
-      const lastRun = lastRunDate ?? new Date(Date.now() - 24 * 60 * 60 * 1000)
+      const lastRun = await getLastRunDate(subscriptionVariantName)
 
-      let emails: Email[] = []
-      if (subscriptionVariantName == wasteAvailable) {
-        emails = await getWasteAvailableEmails(userIds, lastRun)
-      } else {
-        emails = await getWasteRemovalEmails(userIds, lastRun)
+      for (const user of users) {
+        const { _id, name, email } = user
+        await subscriptionRunQueue.add(JOB_SEND_SUBSCRIPTION_BATCH, {
+          runId,
+          userId: _id,
+          userName: name,
+          userEmail: email,
+          subscriptionVariantName,
+          lastRunDate: lastRun,
+        })
       }
 
-      await subscriptionRunQueue.add(JOB_SEND_SUBSCRIPTION_BATCH, {
-        runId,
-        emails,
-      })
       if (userIds.length === batchLimit) {
         prepareSubsctionRunQueue.add(JOB_PREPARE_SUBSCRIPTION_RUN, {
           runId,
           subscriptionVariantName,
           userId: userIds[length - 1],
-          lastRunDate: lastRun,
         })
       }
     },
