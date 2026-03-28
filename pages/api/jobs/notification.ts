@@ -16,7 +16,7 @@ import {
 } from '../../../lib/helpers/subscriptions'
 import {
   SubscriptionVariantModel,
-  SubscriptionEmailRunModel,
+  SubscriptionJobRunModel,
 } from '../../../lib/db/models'
 import { redisConnection } from '../../../lib/db/redisConnection'
 import { createSubscriptionRun } from '../../../lib/helpers/subscriptions/createRun'
@@ -139,7 +139,7 @@ async function wasteAvailableSubscriptionHandler(
       subscriptionVariantName,
       requestedBy: 'system',
     })
-    const ensureUsersSubscribedRunJobData = {
+    const ensureUsersSubscribedJobData = {
       offset: 0,
       limit: 50,
     }
@@ -158,9 +158,9 @@ async function wasteAvailableSubscriptionHandler(
       },
       children: [
         {
-          name: getJobName(ensureUsersSubscribedRunJobData),
+          name: getJobName(ensureUsersSubscribedJobData),
           //ToDo: maybe add runId for better status monitoring
-          data: ensureUsersSubscribedRunJobData,
+          data: ensureUsersSubscribedJobData,
           queueName: QUEUE_ENSURE_USERS_SUBSCRIBED,
         },
       ],

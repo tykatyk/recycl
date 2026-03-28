@@ -1,3 +1,4 @@
+import type { SendPulseError } from '../types/email'
 export const internalServerError = new Error('Internal server error')
 
 export class TimeoutError extends Error {
@@ -10,8 +11,15 @@ export class TimeoutError extends Error {
   }
 }
 
-export const createAbortError = () => {
-  const err = new Error('Job execution aborted due to timeout')
+export const createAbortError = (message?: string) => {
+  const err = new Error(message ?? 'Job execution aborted due to timeout')
   err.name = 'AbortError'
+  return err
+}
+
+export const createSendPulseError = (params: SendPulseError) => {
+  const { error_code, message } = params
+  const err = new Error(`Error code: ${error_code}, message: ${message}`)
+  err.name = 'SendPulseError'
   return err
 }

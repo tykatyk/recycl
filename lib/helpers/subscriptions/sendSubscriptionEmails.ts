@@ -17,9 +17,9 @@ dotenv.config({ path: '.env.local' })
 const sendEmailEndpoint = '/smtp/emails'
 const oneHour = 60 * 60 * 1000
 
-const isJobTimedOut = (jobStarted: Date, maxDurationMs: number) => {
+export const isJobTimedOut = (jobStarted: Date) => {
   return (
-    dayjs(new Date()).diff(dayjs(jobStarted), 'milliseconds') > maxDurationMs
+    dayjs(new Date()).diff(dayjs(jobStarted), 'milliseconds') > maxJobDurationMs
   )
 }
 
@@ -71,7 +71,7 @@ const sendSingleSubscriptionEmail = async (
   notification: WasteRemovalNotification,
   metrics: SubscriptionSendingStats,
 ) => {
-  if (isJobTimedOut(metrics.jobStarted, maxJobDurationMs)) {
+  if (isJobTimedOut(metrics.jobStarted)) {
     try {
       throw new TimeoutError('Job execution time exceeded')
     } catch (err) {

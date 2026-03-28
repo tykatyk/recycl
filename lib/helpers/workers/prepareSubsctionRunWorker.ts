@@ -1,7 +1,7 @@
 import { Worker, Job } from 'bullmq'
 import {
   SubscriptionModel,
-  SubscriptionEmailRunModel,
+  SubscriptionJobRunModel,
   UserModel,
 } from '../../db/models'
 import type { FilterQuery, Types } from 'mongoose'
@@ -9,14 +9,16 @@ import type { PrepareSubscriptionRunJobData } from '../../types/subscription'
 import { subscriptionVariantNames } from '../subscriptions'
 import type { Subscription } from '../../db/models/subscription'
 import dbConnect from '../../db/connection'
-import { prepareSubsctionRunQueue } from '../queues'
 import { redisConnection as redis } from '../../db/redisConnection'
 import {
   JOB_PREPARE_SUBSCRIPTION_RUN,
   JOB_SEND_SUBSCRIPTION_BATCH,
 } from '../queues/jobNames'
-import { QUEUE_PREPARE_SUBSCRIPTION_RUN } from '../queues'
-import { subscriptionRunQueue } from '../queues'
+import {
+  QUEUE_PREPARE_SUBSCRIPTION_RUN,
+  subscriptionRunQueue,
+  prepareSubsctionRunQueue,
+} from '../queues'
 
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 const batchLimit = 100
@@ -24,7 +26,7 @@ const batchLimit = 100
 const getLastRunDate = async (
   subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval,
 ) => {
-  const lastRun = await SubscriptionEmailRunModel.findOne({
+  const lastRun = await SubscriptionJobRunModel.findOne({
     subscriptionVariantName,
   })
     .select('startedAt')
@@ -38,37 +40,41 @@ export const prepareSubsctionRunWorker =
   new Worker<PrepareSubscriptionRunJobData>(
     QUEUE_PREPARE_SUBSCRIPTION_RUN,
     async (job: Job<PrepareSubscriptionRunJobData>) => {
+      //ToDo: mark subscription run as failed if job throws
       const { runId, subscriptionVariantName, userId } = job.data
 
       await dbConnect()
 
-      const subscriptiionRun = await SubscriptionEmailRunModel.findById({
+      const subscriptionRun = await SubscriptionJobRunModel.findById({
         _id: runId,
       })
 
-      if (!subscriptiionRun) {
+      if (!subscriptionRun) {
         console.error('Cannot find subscriptionRun')
         return
       }
 
+      const lastHeartBeat = new Date()
       if (
         subscriptionVariantName !== wasteAvailable &&
         subscriptionVariantName !== wasteRemoval
       ) {
-        const date = new Date()
-        subscriptiionRun.status = 'failed'
-        subscriptiionRun.finishedAt = date
-        subscriptiionRun.lastHeartbeatAt = date
-        subscriptiionRun.errorMessage = 'Incorrect subscriptionVariantName'
-        await subscriptiionRun.save()
+        subscriptionRun.status = 'failed'
+        subscriptionRun.finishedAt = lastHeartBeat
+        subscriptionRun.lastHeartbeatAt = lastHeartBeat
+        subscriptionRun.errorMessage = 'Incorrect subscriptionVariantName'
+        await subscriptionRun.save()
 
         return
       }
 
-      if (!subscriptiionRun.startedAt) {
-        subscriptiionRun.startedAt = new Date()
-        await subscriptiionRun.save()
+      if (!subscriptionRun.startedAt) {
+        subscriptionRun.startedAt = new Date()
       }
+
+      subscriptionRun.status = 'processing'
+      subscriptionRun.lastHeartbeatAt = lastHeartBeat
+      await subscriptionRun.save()
 
       const query: FilterQuery<Pick<Subscription, 'subscribed' | 'variant'>> = {
         subscribed: true,
@@ -91,10 +97,10 @@ export const prepareSubsctionRunWorker =
       if (users.length === 0) {
         const date = new Date()
 
-        subscriptiionRun.status = 'completed'
-        subscriptiionRun.lastHeartbeatAt = date
-        subscriptiionRun.finishedAt = date
-        await subscriptiionRun.save()
+        subscriptionRun.status = 'completed'
+        subscriptionRun.lastHeartbeatAt = date
+        subscriptionRun.finishedAt = date
+        await subscriptionRun.save()
 
         return
       }
@@ -114,6 +120,7 @@ export const prepareSubsctionRunWorker =
 
       if (userIds.length === batchLimit) {
         prepareSubsctionRunQueue.add(JOB_PREPARE_SUBSCRIPTION_RUN, {
+          //ToDo: add number of attempts
           runId,
           subscriptionVariantName,
           userId: userIds[length - 1],

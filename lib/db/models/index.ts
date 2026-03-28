@@ -10,7 +10,7 @@ import WasteAvailableSubscriptionModel from './wasteAvailableSubsciption'
 import SubscriptionVariantModel from './subscriptionVariant'
 import UnsubscribeToken from './unsubscribeToken'
 import UserModel from './user'
-import SubscriptionEmailRunModel from './subscriptionEmailJobRun'
+import SubscriptionJobRunModel from './subscriptionJobRun'
 
 export {
   Message,
@@ -25,5 +25,5 @@ export {
   WasteAvailableSubscriptionModel,
   UnsubscribeToken,
   UserModel,
-  SubscriptionEmailRunModel,
+  SubscriptionJobRunModel,
 }

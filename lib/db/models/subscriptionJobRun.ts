@@ -1,7 +1,7 @@
 import { Schema, model, models, InferSchemaType, Model, Types } from 'mongoose'
 import { subscriptionVariantNames } from '../../helpers/subscriptions'
 
-const subscriptionEmailRunSchema = new Schema(
+const subscriptionJobRunSchema = new Schema(
   {
     subscriptionVariantName: {
       type: String,
@@ -72,7 +72,7 @@ const subscriptionEmailRunSchema = new Schema(
 )
 
 export type SubscriptionEmailRun = InferSchemaType<
-  typeof subscriptionEmailRunSchema
+  typeof subscriptionJobRunSchema
 >
 
 type SubscriptionEmailRunModel = Model<SubscriptionEmailRun>
@@ -81,7 +81,7 @@ const SubscriptionEmailRunModel =
   (models.SubscriptionEmailRun as SubscriptionEmailRunModel) ||
   model<SubscriptionEmailRun, SubscriptionEmailRunModel>(
     'SubscriptionEmailRun',
-    subscriptionEmailRunSchema,
+    subscriptionJobRunSchema,
   )
 
 export default SubscriptionEmailRunModel

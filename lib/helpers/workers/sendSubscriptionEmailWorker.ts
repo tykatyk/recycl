@@ -6,12 +6,16 @@ import { sendPulseFetcher } from '../email/sendPulseFetcher'
 import { Email, SendPulseSMPTResponse } from '../../types/email'
 import {
   SubscriptionEmailDeliveryModel,
-  SubscriptionEmailRunModel,
+  SubscriptionJobRunModel,
 } from '../../db/models'
 import { subscriptionVariantNames } from '../subscriptions'
 import { getWasteAvailableEmail } from '../subscriptions/wasteAvailableSubscription'
 import { getWasteRemovalEmail } from '../subscriptions/wasteRemovalSubscription'
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
+import { createSendPulseError } from '../../errors'
+import type { SendPulseError } from '../../types/email'
+import { emailsPerHour } from '../email/sendPulseApiRequestLimiter'
+import { isJobTimedOut } from '../subscriptions/sendSubscriptionEmails'
 
 const sendEmailEndpoint = '/smtp/emails'
 
@@ -20,6 +24,12 @@ const buildEmailIdempotencyKey = (params: {
   userId: string
 }) => {
   return `${params.runId}:${params.userId}`
+}
+
+const setLastHeartBeat = async (runId: string) => {
+  await SubscriptionJobRunModel.findByIdAndUpdate(runId, {
+    lastHeartbeatAt: new Date(),
+  })
 }
 
 export const sendSubscriptionEmailWorker =
@@ -34,20 +44,26 @@ export const sendSubscriptionEmailWorker =
         lastRunDate,
         subscriptionVariantName,
       } = job.data
+      const { attempts = 1 } = job.opts
+      const { attemptsMade, timestamp } = job
+
       const idempotencyKey = buildEmailIdempotencyKey({ runId, userId })
 
-      //ToDo: check if run is not cancelled
-      //ToDo: set run's status as processing
-      //ToDo: check if can call API
+      const run = await SubscriptionJobRunModel.findById(runId, {})
+      if (!run) throw new Error(`Run ${runId} not found`)
+
+      if (run.status === 'cancelRequested' || run.status === 'cancelled') {
+        return
+      }
+      if (isJobTimedOut(new Date(timestamp))) return
+
+      //ToDo: update campaign stats (sent, failed)
       try {
         const existing = await SubscriptionEmailDeliveryModel.findOne({
           idempotencyKey,
         })
 
-        if (
-          existing &&
-          ['sent', 'delivered', 'complained'].includes(existing.status)
-        ) {
+        if (existing && existing.status === 'sent') {
           return
         }
 
@@ -60,20 +76,12 @@ export const sendSubscriptionEmailWorker =
             lastRunDate,
           })
         } else {
+          //ToDo: implemet getWasteRemovalEmail
           // emailObj = await getWasteRemovalEmail(userIds, lastRun)
         }
 
         if (!emailObj) {
-          await SubscriptionEmailDeliveryModel.updateOne(
-            {
-              idempotencyKey,
-            },
-            {
-              status: 'failed',
-              lastError: 'Email is empty',
-            },
-          )
-          return
+          throw new Error('Cannot build emailObj')
         }
 
         const result = await sendPulseFetcher<SendPulseSMPTResponse>(
@@ -91,43 +99,46 @@ export const sendSubscriptionEmailWorker =
             {
               status: 'sent',
             },
+            { upsert: true },
           )
         } else {
-          const { error_code = '', message = '' } = result
-          await SubscriptionEmailDeliveryModel.updateOne(
-            {
-              idempotencyKey,
-            },
-            {
-              status: 'failed',
-              lastError: `Error code: ${error_code}, message: ${message}`,
-            },
-          )
-          //ToDo: throw new error
+          //reschedule to job in case of a provider error
+          throw createSendPulseError(result as SendPulseError)
         }
+        await setLastHeartBeat(runId)
       } catch (error) {
         await SubscriptionEmailDeliveryModel.updateOne(
           {
             idempotencyKey,
           },
           {
-            status: 'failed',
-            runId,
-            userId,
-            email: userEmail,
-            lastError: error instanceof Error ? error.message : String(error),
+            $setOnInsert: {
+              status: 'failed',
+              runId,
+              userId,
+              email: userEmail,
+              lastError: error instanceof Error ? error.message : String(error),
+            },
           },
+          { upsert: true },
         )
 
-        await SubscriptionEmailRunModel.findByIdAndUpdate(runId, {
-          lastHeartbeatAt: new Date(),
-        })
+        await setLastHeartBeat(runId)
 
-        if (error.name === 'AbortError') {
+        if (
+          (error.name === 'SendPulseError' || error.name === 'AbortError') &&
+          attemptsMade < attempts
+        ) {
           //reschedule the job
           throw error
         }
       }
     },
-    { connection: redis },
+    {
+      connection: redis,
+      limiter: {
+        max: Math.max(Math.floor(0.8 * emailsPerHour), 50),
+        duration: 60 * 60 * 1000, //1 hour
+      },
+    },
   )
