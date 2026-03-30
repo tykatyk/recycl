@@ -71,17 +71,15 @@ const subscriptionJobRunSchema = new Schema(
   { timestamps: true },
 )
 
-export type SubscriptionEmailRun = InferSchemaType<
-  typeof subscriptionJobRunSchema
->
+export type SubscriptionRun = InferSchemaType<typeof subscriptionJobRunSchema>
 
-type SubscriptionEmailRunModel = Model<SubscriptionEmailRun>
+type SubscriptionRunModel = Model<SubscriptionRun>
 
-const SubscriptionEmailRunModel =
-  (models.SubscriptionEmailRun as SubscriptionEmailRunModel) ||
-  model<SubscriptionEmailRun, SubscriptionEmailRunModel>(
-    'SubscriptionEmailRun',
+const SubscriptionRunModel =
+  (models.SubscriptionRun as SubscriptionRunModel) ||
+  model<SubscriptionRun, SubscriptionRunModel>(
+    'SubscriptionRun',
     subscriptionJobRunSchema,
   )
 
-export default SubscriptionEmailRunModel
+export default SubscriptionRunModel

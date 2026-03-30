@@ -1,9 +1,5 @@
 import { Worker, Job } from 'bullmq'
-import {
-  SubscriptionModel,
-  SubscriptionJobRunModel,
-  UserModel,
-} from '../../db/models'
+import { SubscriptionModel, SubscriptionRunModel } from '../../db/models'
 import type { FilterQuery, Types } from 'mongoose'
 import type { PrepareSubscriptionRunJobData } from '../../types/subscription'
 import { subscriptionVariantNames } from '../subscriptions'
@@ -23,29 +19,21 @@ import {
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 const batchLimit = 100
 
-const getLastRunDate = async (
-  subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval,
-) => {
-  const lastRun = await SubscriptionJobRunModel.findOne({
-    subscriptionVariantName,
-  })
-    .select('startedAt')
-    .sort({ startedAt: 'desc' })
-  if (lastRun) {
-    return lastRun.startedAt
-  }
-  return new Date(Date.now() - 24 * 60 * 60 * 1000)
-}
 export const prepareSubsctionRunWorker =
   new Worker<PrepareSubscriptionRunJobData>(
     QUEUE_PREPARE_SUBSCRIPTION_RUN,
     async (job: Job<PrepareSubscriptionRunJobData>) => {
       //ToDo: mark subscription run as failed if job throws
-      const { runId, subscriptionVariantName, userId } = job.data
+      const {
+        runId,
+        subscriptionVariantName,
+        userId,
+        totalRecipients = 0,
+      } = job.data
 
       await dbConnect()
 
-      const subscriptionRun = await SubscriptionJobRunModel.findById({
+      const subscriptionRun = await SubscriptionRunModel.findById({
         _id: runId,
       })
 
@@ -90,42 +78,45 @@ export const prepareSubsctionRunWorker =
 
       const userIds = subs.map((s) => s.user.toString())
 
-      const users = await UserModel.find({ _id: { $in: userIds } })
-        .select('name email')
-        .lean<{ _id: string; name: string; email: string }[]>()
-
-      if (users.length === 0) {
+      if (userIds.length === 0) {
         const date = new Date()
 
         subscriptionRun.status = 'completed'
         subscriptionRun.lastHeartbeatAt = date
-        subscriptionRun.finishedAt = date
+
+        if (totalRecipients === 0) {
+          subscriptionRun.finishedAt = date
+        } else {
+          subscriptionRun.totalRecipients = totalRecipients
+        }
+
         await subscriptionRun.save()
 
         return
       }
-      const lastRun = await getLastRunDate(subscriptionVariantName)
 
-      for (const user of users) {
-        const { _id, name, email } = user
-        await subscriptionRunQueue.add(JOB_SEND_SUBSCRIPTION_BATCH, {
+      await subscriptionRunQueue.add(
+        JOB_SEND_SUBSCRIPTION_BATCH,
+        {
           runId,
-          userId: _id,
-          userName: name,
-          userEmail: email,
+          userIds,
           subscriptionVariantName,
-          lastRunDate: lastRun,
-        })
-      }
+        },
+        {
+          attempts: 11,
+          backoff: {
+            type: 'exponential',
+            delay: 4000,
+          },
+        },
+      )
 
-      if (userIds.length === batchLimit) {
-        prepareSubsctionRunQueue.add(JOB_PREPARE_SUBSCRIPTION_RUN, {
-          //ToDo: add number of attempts
-          runId,
-          subscriptionVariantName,
-          userId: userIds[length - 1],
-        })
-      }
+      prepareSubsctionRunQueue.add(JOB_PREPARE_SUBSCRIPTION_RUN, {
+        runId,
+        subscriptionVariantName,
+        userId: userIds[length - 1],
+        totalRecipients: totalRecipients + userIds.length,
+      })
     },
     { connection: redis },
   )

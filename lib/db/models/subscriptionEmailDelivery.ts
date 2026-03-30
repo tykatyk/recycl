@@ -33,7 +33,7 @@ const emailDeliverySchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['queued', 'sent', 'failed'],
+      enum: ['queued', 'sent', 'skipped', 'failed'],
       required: true,
       default: 'queued',
       index: true,

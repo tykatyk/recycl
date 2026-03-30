@@ -59,17 +59,9 @@ export type UnsubscribeApiResponse = {
     | typeof TOKEN_USED
 }
 
-// export type SubscriptionVariantName = {
-//   wasteAvailable: 'wasteAvailable'
-//   wasteRemoval: 'wasteRemoval'
-// }
-
 export type SendSubscriptionEmailJobData = {
   runId: string
-  userId: string
-  userName: string
-  userEmail: string
-  lastRunDate: Date
+  userIds: string[]
   subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval
 }
 
@@ -77,6 +69,7 @@ export type PrepareSubscriptionRunJobData = {
   runId: string
   subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval
   userId?: string
+  totalRecipients?: number
 }
 export type EnsureUsersSubscribedJobData = {
   offset: number

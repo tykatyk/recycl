@@ -6,7 +6,8 @@ import { sendPulseFetcher } from '../email/sendPulseFetcher'
 import { Email, SendPulseSMPTResponse } from '../../types/email'
 import {
   SubscriptionEmailDeliveryModel,
-  SubscriptionJobRunModel,
+  SubscriptionRunModel,
+  UserModel,
 } from '../../db/models'
 import { subscriptionVariantNames } from '../subscriptions'
 import { getWasteAvailableEmail } from '../subscriptions/wasteAvailableSubscription'
@@ -26,119 +27,182 @@ const buildEmailIdempotencyKey = (params: {
   return `${params.runId}:${params.userId}`
 }
 
-const setLastHeartBeat = async (runId: string) => {
-  await SubscriptionJobRunModel.findByIdAndUpdate(runId, {
-    lastHeartbeatAt: new Date(),
+const getLastRunDate = async (
+  subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval,
+  runId: string,
+) => {
+  const previousRun = await SubscriptionRunModel.findOne({
+    id: {
+      $lt: runId,
+    },
+    subscriptionVariantName,
   })
+    .select('startedAt')
+    .sort({ _id: 'desc' })
+    .limit(1)
+
+  if (previousRun) {
+    return previousRun.startedAt
+  }
+  return new Date(Date.now() - 24 * 60 * 60 * 1000)
 }
 
 export const sendSubscriptionEmailWorker =
   new Worker<SendSubscriptionEmailJobData>(
     QUEUE_SUBSCRIPTION_RUN,
     async (job: Job<SendSubscriptionEmailJobData>) => {
-      const {
-        runId,
-        userId,
-        userName,
-        userEmail,
-        lastRunDate,
-        subscriptionVariantName,
-      } = job.data
+      const { runId, userIds, subscriptionVariantName } = job.data
       const { attempts = 1 } = job.opts
       const { attemptsMade, timestamp } = job
 
-      const idempotencyKey = buildEmailIdempotencyKey({ runId, userId })
+      let idempotencyKey = ''
+      let userId = ''
+      let userEmail = ''
 
-      const run = await SubscriptionJobRunModel.findById(runId, {})
-      if (!run) throw new Error(`Run ${runId} not found`)
+      let totalRecipients = 0
 
-      if (run.status === 'cancelRequested' || run.status === 'cancelled') {
-        return
+      const counters = {
+        sentCount: 0,
+        failedCount: 0,
+        skippedCount: 0,
       }
-      if (isJobTimedOut(new Date(timestamp))) return
 
-      //ToDo: update campaign stats (sent, failed)
       try {
-        const existing = await SubscriptionEmailDeliveryModel.findOne({
-          idempotencyKey,
-        })
+        const users = await UserModel.find({ _id: { $in: userIds } })
+          .select('name email')
+          .lean<{ _id: string; name: string; email: string }[]>()
 
-        if (existing && existing.status === 'sent') {
-          return
-        }
+        if (users.length === 0) return
 
-        let emailObj: Email | null = null
-        if (subscriptionVariantName == wasteAvailable) {
-          emailObj = await getWasteAvailableEmail({
+        const lastRunDate = await getLastRunDate(subscriptionVariantName, runId)
+
+        for (const user of users) {
+          const { _id, name: userName, email } = user
+          userId = _id.toString()
+          userEmail = email
+
+          idempotencyKey = buildEmailIdempotencyKey({
+            runId,
             userId,
-            userName,
-            userEmail,
-            lastRunDate,
           })
-        } else {
-          //ToDo: implemet getWasteRemovalEmail
-          // emailObj = await getWasteRemovalEmail(userIds, lastRun)
-        }
 
-        if (!emailObj) {
-          throw new Error('Cannot build emailObj')
-        }
+          const run = await SubscriptionRunModel.findById(runId, {})
+          if (!run) throw new Error(`Run ${runId} not found`)
 
-        const result = await sendPulseFetcher<SendPulseSMPTResponse>(
-          sendEmailEndpoint,
-          {
-            method: 'POST',
-            body: JSON.stringify({ email: emailObj }),
-          },
-        )
-        if ('id' in result) {
-          await SubscriptionEmailDeliveryModel.updateOne(
-            {
-              idempotencyKey,
-            },
-            {
-              status: 'sent',
-            },
-            { upsert: true },
-          )
-        } else {
-          //reschedule to job in case of a provider error
-          throw createSendPulseError(result as SendPulseError)
-        }
-        await setLastHeartBeat(runId)
-      } catch (error) {
-        await SubscriptionEmailDeliveryModel.updateOne(
-          {
+          totalRecipients = run.totalRecipients
+
+          if (run.status === 'cancelRequested' || run.status === 'cancelled') {
+            counters.skippedCount += 1
+            continue
+          }
+
+          if (isJobTimedOut(new Date(timestamp))) {
+            counters.skippedCount += 1
+            continue
+          }
+
+          const existing = await SubscriptionEmailDeliveryModel.findOne({
             idempotencyKey,
-          },
-          {
-            $setOnInsert: {
-              status: 'failed',
-              runId,
+          })
+
+          if (existing?.status === 'sent') {
+            continue
+          }
+
+          let emailObj: Email | null = null
+          if (subscriptionVariantName == wasteAvailable) {
+            emailObj = await getWasteAvailableEmail({
               userId,
-              email: userEmail,
-              lastError: error instanceof Error ? error.message : String(error),
+              userName,
+              userEmail,
+              lastRunDate,
+            })
+          } else {
+            //ToDo: implemet getWasteRemovalEmail
+            // emailObj = await getWasteRemovalEmail(userIds, lastRun)
+          }
+
+          if (!emailObj) {
+            counters.skippedCount += 1
+            continue
+          }
+
+          const result = await sendPulseFetcher<SendPulseSMPTResponse>(
+            sendEmailEndpoint,
+            {
+              method: 'POST',
+              body: JSON.stringify({ email: emailObj }),
             },
+          )
+          if ('id' in result) {
+            counters.sentCount += 1
+
+            if (existing?.status == 'failed') {
+              counters.failedCount -= 1
+            }
+            if (existing?.status == 'skipped') {
+              counters.skippedCount -= 1
+            }
+            await SubscriptionEmailDeliveryModel.updateOne(
+              {
+                idempotencyKey,
+              },
+              {
+                status: 'sent',
+              },
+              { upsert: true },
+            )
+          } else {
+            throw createSendPulseError(result as SendPulseError)
+          }
+        }
+
+        //update campaign stats
+        await SubscriptionRunModel.updateOne(
+          { runId },
+          {
+            $inc: {
+              sentCount: counters.sentCount,
+              failedCount: counters.failedCount,
+              skippedCount: counters.skippedCount,
+            },
+            lastHeartbeatAt: new Date(),
           },
           { upsert: true },
         )
+      } catch (error) {
+        if (error.name === 'SendPulseError') {
+          if (idempotencyKey && userId && userEmail) {
+            await SubscriptionEmailDeliveryModel.updateOne(
+              {
+                idempotencyKey,
+              },
+              {
+                $setOnInsert: {
+                  status: 'failed',
+                  runId,
+                  userId,
+                  email: userEmail,
+                  lastError:
+                    error instanceof Error ? error.message : String(error),
+                },
+              },
+              { upsert: true },
+            )
+          }
 
-        await setLastHeartBeat(runId)
-
-        if (
-          (error.name === 'SendPulseError' || error.name === 'AbortError') &&
-          attemptsMade < attempts
-        ) {
-          //reschedule the job
-          throw error
+          if (attemptsMade === attempts) return
         }
+
+        await SubscriptionRunModel.findByIdAndUpdate(runId, {
+          lastHeartbeatAt: new Date(),
+        })
+
+        //reschedule the job
+        throw error
       }
     },
     {
       connection: redis,
-      limiter: {
-        max: Math.max(Math.floor(0.8 * emailsPerHour), 50),
-        duration: 60 * 60 * 1000, //1 hour
-      },
     },
   )
