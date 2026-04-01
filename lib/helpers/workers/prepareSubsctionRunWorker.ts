@@ -1,5 +1,9 @@
 import { Worker, Job } from 'bullmq'
-import { SubscriptionModel, SubscriptionRunModel } from '../../db/models'
+import {
+  SubscriptionBatchModel,
+  SubscriptionModel,
+  SubscriptionRunModel,
+} from '../../db/models'
 import type { FilterQuery, Types } from 'mongoose'
 import type { PrepareSubscriptionRunJobData } from '../../types/subscription'
 import { subscriptionVariantNames } from '../subscriptions'
@@ -77,17 +81,18 @@ export const prepareSubsctionRunWorker =
         .lean<{ user: Types.ObjectId }[]>()
 
       const userIds = subs.map((s) => s.user.toString())
+      const recipientsCount = totalRecipients + userIds.length
 
-      if (userIds.length === 0) {
+      //ToDo: maybe move this logic to senSubsEmailWorker
+      if (userIds.length < batchLimit) {
         const date = new Date()
 
-        subscriptionRun.status = 'completed'
+        subscriptionRun.totalRecipients = recipientsCount
         subscriptionRun.lastHeartbeatAt = date
 
-        if (totalRecipients === 0) {
+        if (recipientsCount === 0) {
+          subscriptionRun.status = 'completed'
           subscriptionRun.finishedAt = date
-        } else {
-          subscriptionRun.totalRecipients = totalRecipients
         }
 
         await subscriptionRun.save()
@@ -95,11 +100,17 @@ export const prepareSubsctionRunWorker =
         return
       }
 
+      const batch = await SubscriptionBatchModel.create({
+        runId,
+        recipientIds: userIds,
+        recipientCount: userIds.length,
+      })
+
       await subscriptionRunQueue.add(
         JOB_SEND_SUBSCRIPTION_BATCH,
         {
           runId,
-          userIds,
+          batchId: batch._id.toString(),
           subscriptionVariantName,
         },
         {
@@ -115,7 +126,7 @@ export const prepareSubsctionRunWorker =
         runId,
         subscriptionVariantName,
         userId: userIds[length - 1],
-        totalRecipients: totalRecipients + userIds.length,
+        totalRecipients: recipientsCount,
       })
     },
     { connection: redis },

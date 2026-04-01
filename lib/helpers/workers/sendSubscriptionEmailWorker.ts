@@ -7,6 +7,7 @@ import { Email, SendPulseSMPTResponse } from '../../types/email'
 import {
   SubscriptionEmailDeliveryModel,
   SubscriptionRunModel,
+  SubscriptionBatchModel,
   UserModel,
 } from '../../db/models'
 import { subscriptionVariantNames } from '../subscriptions'
@@ -51,15 +52,13 @@ export const sendSubscriptionEmailWorker =
   new Worker<SendSubscriptionEmailJobData>(
     QUEUE_SUBSCRIPTION_RUN,
     async (job: Job<SendSubscriptionEmailJobData>) => {
-      const { runId, userIds, subscriptionVariantName } = job.data
+      const { runId, batchId, subscriptionVariantName } = job.data
       const { attempts = 1 } = job.opts
       const { attemptsMade, timestamp } = job
 
       let idempotencyKey = ''
       let userId = ''
       let userEmail = ''
-
-      let totalRecipients = 0
 
       const counters = {
         sentCount: 0,
@@ -68,7 +67,11 @@ export const sendSubscriptionEmailWorker =
       }
 
       try {
-        const users = await UserModel.find({ _id: { $in: userIds } })
+        const batch = await SubscriptionBatchModel.findById(batchId)
+        if (!batch) {
+          throw new Error(`Batch  ${batchId} not found`)
+        }
+        const users = await UserModel.find({ _id: { $in: batch.recipientIds } })
           .select('name email')
           .lean<{ _id: string; name: string; email: string }[]>()
 
@@ -89,8 +92,6 @@ export const sendSubscriptionEmailWorker =
           const run = await SubscriptionRunModel.findById(runId, {})
           if (!run) throw new Error(`Run ${runId} not found`)
 
-          totalRecipients = run.totalRecipients
-
           if (run.status === 'cancelRequested' || run.status === 'cancelled') {
             counters.skippedCount += 1
             continue
@@ -100,7 +101,7 @@ export const sendSubscriptionEmailWorker =
             counters.skippedCount += 1
             continue
           }
-
+          //ToDo: check if sent an email less than 24 hours ago. If so, skip
           const existing = await SubscriptionEmailDeliveryModel.findOne({
             idempotencyKey,
           })

@@ -61,7 +61,7 @@ export type UnsubscribeApiResponse = {
 
 export type SendSubscriptionEmailJobData = {
   runId: string
-  userIds: string[]
+  batchId: string
   subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval
 }
 
