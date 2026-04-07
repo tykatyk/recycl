@@ -14,10 +14,7 @@ import {
   writeStatsToFile,
   withAbortSignal,
 } from '../../../lib/helpers/subscriptions'
-import {
-  SubscriptionVariantModel,
-  SubscriptionJobRunModel,
-} from '../../../lib/db/models'
+import { SubscriptionVariantModel } from '../../../lib/db/models'
 import { redisConnection } from '../../../lib/db/redisConnection'
 import { createSubscriptionRun } from '../../../lib/helpers/subscriptions/createRun'
 import dbConnect from '../../../lib/db/connection'

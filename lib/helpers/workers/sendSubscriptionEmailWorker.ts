@@ -16,7 +16,6 @@ import { getWasteRemovalEmail } from '../subscriptions/wasteRemovalSubscription'
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 import { createSendPulseError } from '../../errors'
 import type { SendPulseError } from '../../types/email'
-import { emailsPerHour } from '../email/sendPulseApiRequestLimiter'
 import { isJobTimedOut } from '../subscriptions/sendSubscriptionEmails'
 
 const sendEmailEndpoint = '/smtp/emails'
@@ -56,10 +55,6 @@ export const sendSubscriptionEmailWorker =
       const { attempts = 1 } = job.opts
       const { attemptsMade, timestamp } = job
 
-      let idempotencyKey = ''
-      let userId = ''
-      let userEmail = ''
-
       const counters = {
         sentCount: 0,
         failedCount: 0,
@@ -67,7 +62,15 @@ export const sendSubscriptionEmailWorker =
       }
 
       try {
-        const batch = await SubscriptionBatchModel.findById(batchId)
+        const batch = await SubscriptionBatchModel.findByIdAndUpdate(
+          {
+            _id: batchId,
+          },
+          {
+            status: 'processing',
+            lastHeartbeatAt: new Date(),
+          },
+        )
         if (!batch) {
           throw new Error(`Batch  ${batchId} not found`)
         }
@@ -79,29 +82,55 @@ export const sendSubscriptionEmailWorker =
 
         const lastRunDate = await getLastRunDate(subscriptionVariantName, runId)
 
+        const run = await SubscriptionRunModel.findById(runId, {})
+        if (!run) throw new Error(`Run ${runId} not found`)
+
+        if (run.status === 'cancelRequested' || run.status === 'cancelled') {
+          const date = new Date()
+
+          run.lastHeartbeatAt = date
+          run.finishedAt = date
+          await run.save()
+          return
+        }
+
         for (const user of users) {
           const { _id, name: userName, email } = user
-          userId = _id.toString()
-          userEmail = email
+          const userId = _id.toString()
+          const userEmail = email
 
-          idempotencyKey = buildEmailIdempotencyKey({
+          const idempotencyKey = buildEmailIdempotencyKey({
             runId,
             userId,
           })
 
-          const run = await SubscriptionRunModel.findById(runId, {})
-          if (!run) throw new Error(`Run ${runId} not found`)
+          //check if sent an email less than 24 hours ago
+          const recentySent = await SubscriptionEmailDeliveryModel.findOne({
+            runId: {
+              $ne: runId,
+            },
+            updatedAt: {
+              $lte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+            },
+            email: userEmail,
+            status: 'sent',
+            subscriptionVariantName,
+          })
 
-          if (run.status === 'cancelRequested' || run.status === 'cancelled') {
+          if (recentySent || isJobTimedOut(new Date(timestamp))) {
             counters.skippedCount += 1
+            await SubscriptionEmailDeliveryModel.updateOne(
+              {
+                idempotencyKey,
+              },
+              {
+                status: 'skipped',
+              },
+              { upsert: true },
+            )
             continue
           }
 
-          if (isJobTimedOut(new Date(timestamp))) {
-            counters.skippedCount += 1
-            continue
-          }
-          //ToDo: check if sent an email less than 24 hours ago. If so, skip
           const existing = await SubscriptionEmailDeliveryModel.findOne({
             idempotencyKey,
           })
@@ -123,10 +152,7 @@ export const sendSubscriptionEmailWorker =
             // emailObj = await getWasteRemovalEmail(userIds, lastRun)
           }
 
-          if (!emailObj) {
-            counters.skippedCount += 1
-            continue
-          }
+          if (!emailObj) continue
 
           const result = await sendPulseFetcher<SendPulseSMPTResponse>(
             sendEmailEndpoint,
@@ -141,9 +167,7 @@ export const sendSubscriptionEmailWorker =
             if (existing?.status == 'failed') {
               counters.failedCount -= 1
             }
-            if (existing?.status == 'skipped') {
-              counters.skippedCount -= 1
-            }
+
             await SubscriptionEmailDeliveryModel.updateOne(
               {
                 idempotencyKey,
@@ -154,26 +178,13 @@ export const sendSubscriptionEmailWorker =
               { upsert: true },
             )
           } else {
-            throw createSendPulseError(result as SendPulseError)
-          }
-        }
+            //failed to send an email
+            if (!existing || existing.status !== 'failed') {
+              counters.failedCount += 1
+            }
 
-        //update campaign stats
-        await SubscriptionRunModel.updateOne(
-          { runId },
-          {
-            $inc: {
-              sentCount: counters.sentCount,
-              failedCount: counters.failedCount,
-              skippedCount: counters.skippedCount,
-            },
-            lastHeartbeatAt: new Date(),
-          },
-          { upsert: true },
-        )
-      } catch (error) {
-        if (error.name === 'SendPulseError') {
-          if (idempotencyKey && userId && userEmail) {
+            const error = createSendPulseError(result as SendPulseError)
+
             await SubscriptionEmailDeliveryModel.updateOne(
               {
                 idempotencyKey,
@@ -184,23 +195,78 @@ export const sendSubscriptionEmailWorker =
                   runId,
                   userId,
                   email: userEmail,
-                  lastError:
-                    error instanceof Error ? error.message : String(error),
+                  lastError: error.message,
                 },
               },
               { upsert: true },
             )
-          }
 
-          if (attemptsMade === attempts) return
+            await SubscriptionBatchModel.updateOne({
+              runId,
+              $inc: {
+                sentCount: counters.sentCount,
+                failedCount: counters.failedCount,
+                skippedCount: counters.skippedCount,
+              },
+              lastHeartbeatAt: new Date(),
+              status: attemptsMade === attempts ? 'failed' : 'processing',
+            })
+
+            await SubscriptionRunModel.updateOne(
+              { runId },
+              {
+                $inc: {
+                  sentCount: counters.sentCount,
+                  failedCount: counters.failedCount,
+                  skippedCount: counters.skippedCount,
+                },
+                lastHeartbeatAt: new Date(),
+              },
+            )
+
+            if (attemptsMade < attempts) throw error
+          }
         }
 
-        await SubscriptionRunModel.findByIdAndUpdate(runId, {
-          lastHeartbeatAt: new Date(),
+        //update campaign stats
+        const date = new Date()
+
+        await SubscriptionBatchModel.updateOne({
+          runId,
+          $inc: {
+            sentCount: counters.sentCount,
+            skippedCount: counters.skippedCount,
+          },
+          lastHeartbeatAt: date,
+          status: 'finished',
+          finishedAt: date,
         })
 
-        //reschedule the job
-        throw error
+        run.sentCount += counters.sentCount
+        run.skippedCount += counters.skippedCount
+        run.lastHeartbeatAt = date
+
+        const remainingBatches = await SubscriptionBatchModel.findOne({
+          runId,
+          status: { $in: ['queued', 'processing'] },
+        })
+
+        if (!remainingBatches) {
+          const failed = await SubscriptionBatchModel.findOne({
+            runId,
+            status: 'failed',
+          })
+
+          run.status = failed ? 'failed' : 'completed'
+          run.finishedAt = date
+        }
+
+        await run.save()
+      } catch (error) {
+        if (error.name === 'SendPulseError') {
+          //reschedule the job
+          throw error
+        }
       }
     },
     {

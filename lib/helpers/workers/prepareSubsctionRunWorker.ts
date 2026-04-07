@@ -80,11 +80,10 @@ export const prepareSubsctionRunWorker =
         .select({ user: 1, _id: 0 })
         .lean<{ user: Types.ObjectId }[]>()
 
-      const userIds = subs.map((s) => s.user.toString())
-      const recipientsCount = totalRecipients + userIds.length
+      const recipientsCount = totalRecipients + subs.length
 
       //ToDo: maybe move this logic to senSubsEmailWorker
-      if (userIds.length < batchLimit) {
+      if (subs.length < batchLimit) {
         const date = new Date()
 
         subscriptionRun.totalRecipients = recipientsCount
@@ -100,6 +99,7 @@ export const prepareSubsctionRunWorker =
         return
       }
 
+      const userIds = subs.map((s) => s.user.toString())
       const batch = await SubscriptionBatchModel.create({
         runId,
         recipientIds: userIds,

@@ -1,4 +1,5 @@
 import { Schema, model, models, InferSchemaType, Model } from 'mongoose'
+import { subscriptionVariantNames } from '../../helpers/subscriptions'
 
 const emailDeliverySchema = new Schema(
   {
@@ -7,6 +8,11 @@ const emailDeliverySchema = new Schema(
       ref: 'SubscriptionEmailRun',
       required: true,
       index: true,
+    },
+    subscriptionVariantName: {
+      type: String,
+      enum: Object.values(subscriptionVariantNames),
+      required: true,
     },
     userId: {
       type: String,

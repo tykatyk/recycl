@@ -1,7 +1,12 @@
 import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
+import { subscriptionVariantNames } from '../../helpers/subscriptions'
 
 const subscriptionVariantSchema = new Schema({
-  name: { type: String, required: true, unique: true },
+  name: {
+    type: String,
+    required: true,
+    enum: Object.values(subscriptionVariantNames),
+  },
   userDescription: {
     type: String,
     required: true,
