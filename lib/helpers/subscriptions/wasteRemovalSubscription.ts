@@ -1,9 +1,9 @@
 import dbConnect from '../../db/connection'
 import {
   WasteRemovalEventModel,
-  RemovalApplication,
   SubscriptionModel,
   UnsubscribeToken,
+  RemovalApplicationModel,
 } from '../../db/models'
 import type {
   SubscribedUser,
@@ -14,6 +14,7 @@ import type {
 } from '../../types/subscription'
 import cryptoRandomString from 'crypto-random-string'
 import { maxJobDurationMs } from '.'
+import type { PrepareSubscriptionData } from '../../types/subscription'
 
 const noSubsVariantId = 'No subscription variant provided'
 
@@ -39,7 +40,7 @@ async function getSubscriptions(subscriptionVariantId: string) {
 
 const getRemovalApplications = async (subscribedUsers: SubscribedUser[]) => {
   const aggregatedRemovalApplications =
-    await RemovalApplication.aggregate<AggregatedApplication>([
+    await RemovalApplicationModel.aggregate<AggregatedApplication>([
       {
         $match: {
           user: {
@@ -294,10 +295,84 @@ export async function prepareSubscriptionData(subscriptionVariantId: string) {
   return subscriptionData
 }
 
-export const getWasteRemovalEmail = async (
-  userIds: string[],
-  lastRun: Date,
-) => {
-  //ToDo implement
-  return []
+//ToDo: refactor params type
+export const getWasteRemovalEmail = async (params: PrepareSubscriptionData) => {
+  const { userId, lastRunDate, userEmail, userName } = params
+
+  //ToDo: maybe refactor types
+  const removalApplications = await RemovalApplicationModel.aggregate<{
+    locationId: string
+    locationName: string
+    wasteTypes: string[]
+  }>([
+    {
+      $match: {
+        user: userId,
+        isActive: true,
+        // expires: { $gte: new Date() },
+      },
+    },
+    {
+      $group: {
+        _id: '$waste_location.place_id',
+        locationName: {
+          $first: '$wasteLocation.structured_formatting.main_text',
+        },
+        wasteTypes: {
+          $addToSet: '$wasteType',
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        locationId: '$_id',
+        locationName: '$locationName',
+        wasteTypes: '$wasteTypes',
+      },
+    },
+  ])
+
+  if (removalApplications.length == 0) return []
+
+  type EventsByLocation = {
+    wasteType: string
+    removalEventsCount: number
+  }
+
+  type WasteRemovalData = {
+    locationId: string
+    locationName: string
+    eventsByLocation: EventsByLocation[]
+  }
+  const data: WasteRemovalData[] = []
+
+  for (const removalApplication of removalApplications) {
+    const { locationId, locationName, wasteTypes } = removalApplication
+    const eventsByLocation: EventsByLocation[] = []
+
+    for (const wasteType of wasteTypes) {
+      const removalEventsCount = await WasteRemovalEventModel.countDocuments({
+        isActive: true,
+        location: {
+          place_id: locationId,
+        },
+        waste: wasteType,
+        createdAt: {
+          $gt: lastRunDate,
+        },
+        date: {
+          $gt: new Date(Date.now() + 12 * 60 * 60 * 1000),
+        },
+      })
+
+      if (removalEventsCount === 0) continue
+      eventsByLocation.push({ wasteType, removalEventsCount })
+    }
+    if (eventsByLocation.length === 0) continue
+
+    data.push({ locationId, locationName, eventsByLocation })
+  }
+  //ToDo: implement further to get email obj
+  return data
 }
