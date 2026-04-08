@@ -1,4 +1,4 @@
-import type { Email } from '../../types/email'
+import type { Email, EmailData } from '../../types/email'
 
 const host = process.env.HOST || ''
 const brandName = process.env.BRAND || ''
@@ -50,15 +50,8 @@ export const withExponentialBackoff = async <T>(
   throw new Error('Unexpected retry failure')
 }
 
-type EmailData = {
-  receiverName: string
-  receiverEmail: string
-  subject: string
-  html: string
-}
-
 export function prepareEmailObj(params: EmailData) {
-  const { receiverName, receiverEmail, subject, html } = params
+  const { userName, userEmail, subject, html } = params
 
   // const receiverName = notification.receiverName ?? notification.receiverEmail
 
@@ -71,8 +64,8 @@ export function prepareEmailObj(params: EmailData) {
     },
     to: [
       {
-        name: receiverName,
-        email: receiverEmail,
+        name: userName,
+        email: userEmail,
       },
     ],
   }

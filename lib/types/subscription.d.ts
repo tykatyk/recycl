@@ -77,13 +77,21 @@ export type EnsureUsersSubscribedJobData = {
 }
 
 export type WasteTypeCounters = { wasteName: string; newAdsCount: number }
+
 export type Location = {
   locationName: string
   locationId: string
   wasteTypes: WasteTypeCounters[]
 }
 export type WasteAvailableSubscriptionData = {
-  receiverName: string
-  receiverEmail: string
+  userName: string
+  userEmail: string
   locations: Location[]
+}
+
+export type PrepareSubscriptionData = {
+  userName: string
+  userEmail: string
+  userId: string
+  lastRunDate: Date
 }

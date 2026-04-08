@@ -15,6 +15,7 @@ const getUrl = (params: { host: string; route: string; id?: string }) => {
   return url.toString()
 }
 
+//ToDo: Change data type. Only location needed
 export const getWasteAvailableHtml = (
   wasteAvailableNotification: WasteAvailableSubscriptionData,
 ) => {

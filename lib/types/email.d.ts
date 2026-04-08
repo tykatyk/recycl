@@ -25,3 +25,10 @@ type SendPulseError = {
   message?: string
 }
 export type SendPulseSMPTResponse = SendPulseSuccess | SendPulseError
+
+export type EmailData = {
+  userName: string
+  userEmail: string
+  subject: string
+  html: string
+}

@@ -17,6 +17,7 @@ const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 import { createSendPulseError } from '../../errors'
 import type { SendPulseError } from '../../types/email'
 import { isJobTimedOut } from '../subscriptions/sendSubscriptionEmails'
+import { maxJobDurationMs } from '../subscriptions'
 
 const sendEmailEndpoint = '/smtp/emails'
 
@@ -44,7 +45,7 @@ const getLastRunDate = async (
   if (previousRun) {
     return previousRun.startedAt
   }
-  return new Date(Date.now() - 24 * 60 * 60 * 1000)
+  return new Date(Date.now() - maxJobDurationMs)
 }
 
 export const sendSubscriptionEmailWorker =
@@ -110,7 +111,7 @@ export const sendSubscriptionEmailWorker =
               $ne: runId,
             },
             updatedAt: {
-              $lte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+              $lte: new Date(Date.now() - maxJobDurationMs),
             },
             email: userEmail,
             status: 'sent',

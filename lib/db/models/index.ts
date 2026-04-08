@@ -1,5 +1,5 @@
 import Message from './message'
-import RemovalApplication from './removalApplication'
+import RemovalApplicationModel from './removalApplication'
 import Account from './account'
 import UserRole from './userRole'
 import WasteType from './wasteType'
@@ -15,7 +15,7 @@ import SubscriptionBatchModel from './subscriptionBatch'
 
 export {
   Message,
-  RemovalApplication,
+  RemovalApplicationModel,
   UserRole,
   WasteType,
   Account,

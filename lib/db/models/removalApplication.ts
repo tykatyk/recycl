@@ -37,7 +37,17 @@ const removalApplicationSchema = new Schema(
   },
   { timestamps: true },
 )
-type RemovalApplication = InferSchemaType<typeof removalApplicationSchema>
+export type RemovalApplication = InferSchemaType<
+  typeof removalApplicationSchema
+>
 
-export default (models.RemovalApplication as Model<RemovalApplication>) ||
-  model<RemovalApplication>('RemovalApplication', removalApplicationSchema)
+type RemovalApplicationModel = Model<RemovalApplication>
+
+const RemovalApplicationModel =
+  (models.RemovalApplication as RemovalApplicationModel) ||
+  model<RemovalApplication, RemovalApplicationModel>(
+    'RemovalApplication',
+    removalApplicationSchema,
+  )
+
+export default RemovalApplicationModel
