@@ -22,6 +22,17 @@ export interface WasteRemovalByLocation {
   eventsByLocation: WasteRemovalEvents[]
 }
 
+export type AggregatedRemovalApplication = {
+  locationId: string
+  locationName: string
+  wasteTypes: string[]
+}
+
+export interface AggregatedApplicationPerUser {
+  userId: mongoose.Types.ObjectId
+  docs: AggregatedRemovalApplication[]
+}
+
 export interface WasteRemovalNotification {
   receiverEmail: string
   receiverName: string
@@ -34,11 +45,6 @@ export type SubscribedUser = Pick<
   UserType & { _id: Types.ObjectId },
   '_id' | 'name' | 'email' | 'isBanned' | 'isActive'
 >
-
-export interface AggregatedApplication {
-  userId: mongoose.Types.ObjectId
-  docs: [{ locationId: string; locationName: string; wasteTypes: string[] }]
-}
 
 const {
   SUCCESS,
@@ -59,37 +65,38 @@ export type UnsubscribeApiResponse = {
     | typeof TOKEN_USED
 }
 
+export type SubscriptionVariantName =
+  | typeof wasteAvailable
+  | typeof wasteRemoval
+
 export type SendSubscriptionEmailJobData = {
   runId: string
   batchId: string
-  subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval
+  subscriptionVariantName: SubscriptionVariantNames
 }
 
 export type PrepareSubscriptionRunJobData = {
   runId: string
-  subscriptionVariantName: typeof wasteAvailable | typeof wasteRemoval
+  subscriptionVariantName: SubscriptionVariantNames
   userId?: string
   totalRecipients?: number
 }
+
 export type EnsureUsersSubscribedJobData = {
   offset: number
   limit: number
 }
 
-export type WasteTypeCounters = { wasteName: string; newAdsCount: number }
+export type WasteTypeCounter = { wasteName: string; newAdsCount: number }
 
-export type Location = {
+export type WasteLocationCounter = {
   locationName: string
   locationId: string
-  wasteTypes: WasteTypeCounters[]
-}
-export type WasteAvailableSubscriptionData = {
-  userName: string
-  userEmail: string
-  locations: Location[]
+  adCounters: WasteTypeCounter[]
 }
 
 export type PrepareSubscriptionData = {
+  subscriptionName: SubscriptionVariantName
   userName: string
   userEmail: string
   userId: string

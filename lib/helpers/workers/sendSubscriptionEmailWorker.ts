@@ -3,16 +3,17 @@ import { QUEUE_SUBSCRIPTION_RUN } from '../queues'
 import { SendSubscriptionEmailJobData } from '../../types/subscription'
 import { redisConnection as redis } from '../../db/redisConnection'
 import { sendPulseFetcher } from '../email/sendPulseFetcher'
-import { Email, SendPulseSMPTResponse } from '../../types/email'
+import { SendPulseSMPTResponse } from '../../types/email'
 import {
   SubscriptionEmailDeliveryModel,
   SubscriptionRunModel,
   SubscriptionBatchModel,
   UserModel,
 } from '../../db/models'
-import { subscriptionVariantNames } from '../subscriptions'
-import { getWasteAvailableEmail } from '../subscriptions/wasteAvailableSubscription'
-import { getWasteRemovalEmail } from '../subscriptions/wasteRemovalSubscription'
+import {
+  getSubscriptionEmail,
+  subscriptionVariantNames,
+} from '../subscriptions'
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 import { createSendPulseError } from '../../errors'
 import type { SendPulseError } from '../../types/email'
@@ -140,18 +141,13 @@ export const sendSubscriptionEmailWorker =
             continue
           }
 
-          let emailObj: Email | null = null
-          if (subscriptionVariantName == wasteAvailable) {
-            emailObj = await getWasteAvailableEmail({
-              userId,
-              userName,
-              userEmail,
-              lastRunDate,
-            })
-          } else {
-            //ToDo: implemet getWasteRemovalEmail
-            // emailObj = await getWasteRemovalEmail(userIds, lastRun)
-          }
+          const emailObj = getSubscriptionEmail({
+            userId,
+            userName,
+            userEmail,
+            lastRunDate,
+            subscriptionName: subscriptionVariantName,
+          })
 
           if (!emailObj) continue
 

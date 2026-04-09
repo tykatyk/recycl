@@ -1,8 +1,10 @@
 import formatDate from '../../dateFormatter'
 import type {
   WasteRemovalNotification,
-  WasteAvailableSubscriptionData,
+  WasteLocationCounter,
+  SubscriptionVariantName,
 } from '../../../types/subscription'
+import { subscriptionVariantNames } from '../../subscriptions'
 
 const host = process.env.HOST || ''
 
@@ -15,19 +17,47 @@ const getUrl = (params: { host: string; route: string; id?: string }) => {
   return url.toString()
 }
 
-//ToDo: Change data type. Only location needed
-export const getWasteAvailableHtml = (
-  wasteAvailableNotification: WasteAvailableSubscriptionData,
+export const getSubscriptionTitleAndHeader = (
+  subscriptionName: SubscriptionVariantName,
 ) => {
-  const title = 'Список новых объявлений о наличии вторсыръя'
-  const header = `Информируем вас о новых объявлениях о наличии отходов для переработки`
+  const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
-  const { locations } = wasteAvailableNotification
+  const wasteAvailableTitle = 'Список новых объявлений о наличии вторсыръя'
+  const wasteAvailableHeader = `Информируем вас о новых объявлениях о наличии отходов для переработки`
+
+  const wasteRemovalTitle = 'Список новых объявлений о наличии вторсыръя'
+  const wasteRemovalHeader = `Информируем вас о новых объявлениях о наличии отходов для переработки`
+
+  let title = ''
+  let header = ''
+
+  switch (subscriptionName) {
+    case wasteAvailable:
+      title = wasteAvailableTitle
+      header = wasteAvailableHeader
+      return { title, header }
+
+    case wasteRemoval:
+      title = wasteRemovalTitle
+      header = wasteRemovalHeader
+      return { title, header }
+
+    default:
+      throw new Error('Unknown subscription name')
+  }
+}
+
+export const getSubscriptionHtml = (params: {
+  locations: WasteLocationCounter[]
+  subscriptionName: SubscriptionVariantName
+}) => {
+  const { locations, subscriptionName } = params
+  const { title, header } = getSubscriptionTitleAndHeader(subscriptionName)
+
   const newAdsCountByLocation = locations
     .map((location, locationIdx) => {
-      //ToDo: add locationId to enable sort query
-      const { locationName, locationId, wasteTypes } = location
-      const newAdsCountByWasteTypes = wasteTypes
+      const { locationName, locationId, adCounters } = location
+      const newAdsCountByWasteTypes = adCounters
         .map((wasteType, wasteTypeIdx) => {
           const { wasteName, newAdsCount } = wasteType
           return `<tr>
@@ -43,7 +73,7 @@ export const getWasteAvailableHtml = (
                       <tr style="padding:8px">
                         <a href="${host}/applications/?wasteType=${wasteType}$location=${locationId}&sortBy=createdAd&sortOrder=desc">Посмотреть</a>
                       </tr>
-                      ${wasteTypeIdx !== wasteTypes.length - 1 ? "<td height='8' style='line-height:8px; font-size:0;'></td>" : ''}
+                      ${wasteTypeIdx !== adCounters.length - 1 ? "<td height='8' style='line-height:8px; font-size:0;'></td>" : ''}
                       `
         })
         .join('')
