@@ -1,9 +1,6 @@
 import Redis from 'ioredis'
 
 export const requestsPerMinute = 1000
-const requestsPerDay = 500000
-export const emailsPerHour = 50
-const emailsPerMonth = 12000
 
 const redis = new Redis(process.env.REDIS_URL || '')
 type RequestTimeLimits = 'minute' | 'day'
@@ -12,7 +9,6 @@ type SendEmailTimeLimit = 'hour' | 'month'
 type RequestKeyBase = 'sendPusleRequestsPer'
 type EmailKeyBase = 'sendPusleSentEmailsPer'
 
-const keyBaseEmail: EmailKeyBase = 'sendPusleSentEmailsPer'
 const RequestkeyBase: RequestKeyBase = 'sendPusleRequestsPer'
 
 type GetRequestsCountKey =
@@ -49,10 +45,6 @@ const getKey = (options: GetRequestsCountKey) => {
   return key
 }
 
-const getCounter = async (key: string) => {
-  return redis.get(key)
-}
-
 export const incrementRequestCount = async () => {
   const minuteKey = getKey({ period: 'minute', keyBase: RequestkeyBase })
   const dayKey = getKey({ period: 'day', keyBase: RequestkeyBase })
@@ -62,34 +54,4 @@ export const incrementRequestCount = async () => {
 
   await redis.incr(dayKey)
   await redis.expire(dayKey, 86400)
-}
-
-export const canCallAPI = async () => {
-  const minuteKey = getKey({ period: 'minute', keyBase: RequestkeyBase })
-
-  const lastMinuteRequests = await getCounter(minuteKey)
-  if (Number(lastMinuteRequests) >= requestsPerMinute) {
-    return false
-  }
-
-  const dayKey = getKey({ period: 'day', keyBase: RequestkeyBase })
-  const lastDayRequests = await getCounter(dayKey)
-
-  if (Number(lastDayRequests) >= requestsPerDay) {
-    return false
-  }
-
-  return true
-}
-
-export const canSendEmail = async () => {
-  const hourKey = getKey({ period: 'hour', keyBase: keyBaseEmail })
-  const hourCounter = Number(await getCounter(hourKey))
-  if (hourCounter >= emailsPerHour) return false
-
-  const monthKey = getKey({ period: 'month', keyBase: keyBaseEmail })
-  const monthCounter = Number(await getCounter(monthKey))
-  if (monthCounter >= emailsPerMonth) return false
-
-  return true
 }

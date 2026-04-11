@@ -1,45 +1,55 @@
-import formatDate from '../../dateFormatter'
 import type {
-  WasteRemovalNotification,
   WasteLocationCounter,
   SubscriptionVariantName,
 } from '../../../types/subscription'
 import { subscriptionVariantNames } from '../../subscriptions'
 
-const host = process.env.HOST || ''
+const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
-const yellow = ' #f8bc45'
+const removalEventsRoute = 'events'
+const removalApplicationsRoute = 'applications'
+
+const host = process.env.HOST || ''
 const white = ' #ffffff'
 
-const getUrl = (params: { host: string; route: string; id?: string }) => {
-  const { host, route, id } = params
-  const url = new URL(`${host}${route}${id ? `/${id}` : ''}`)
-  return url.toString()
+const getUrl = (params: {
+  wasteName: string
+  locationId: string
+  subscriptionName: string
+}) => {
+  const { wasteName, locationId, subscriptionName } = params
+
+  const query = `wasteType=${wasteName}$location=${locationId}&sortBy=createdAd&sortOrder=desc`
+
+  switch (subscriptionName) {
+    case wasteAvailable:
+      return new URL(`${host}/${removalApplicationsRoute}/?${query}`).toString()
+
+    case wasteRemoval:
+      return new URL(`${host}/${removalEventsRoute}/?${query}`).toString()
+
+    default:
+      throw new Error('Unknown subscription name')
+  }
 }
 
 export const getSubscriptionTitleAndHeader = (
   subscriptionName: SubscriptionVariantName,
 ) => {
-  const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
-
-  const wasteAvailableTitle = 'Список новых объявлений о наличии вторсыръя'
-  const wasteAvailableHeader = `Информируем вас о новых объявлениях о наличии отходов для переработки`
-
-  const wasteRemovalTitle = 'Список новых объявлений о наличии вторсыръя'
-  const wasteRemovalHeader = `Информируем вас о новых объявлениях о наличии отходов для переработки`
-
   let title = ''
   let header = ''
 
   switch (subscriptionName) {
     case wasteAvailable:
-      title = wasteAvailableTitle
-      header = wasteAvailableHeader
+      title = 'Список новых объявлений о наличии вторсыръя'
+      header =
+        'Информируем вас о новых объявлениях о наличии отходов для переработки'
       return { title, header }
 
     case wasteRemoval:
-      title = wasteRemovalTitle
-      header = wasteRemovalHeader
+      title = 'Список новых объявлений о наличии вторсыръя'
+      header =
+        'Информируем вас о новых объявлениях о наличии отходов для переработки'
       return { title, header }
 
     default:
@@ -71,7 +81,7 @@ export const getSubscriptionHtml = (params: {
                         </td>
                       </tr>
                       <tr style="padding:8px">
-                        <a href="${host}/applications/?wasteType=${wasteType}$location=${locationId}&sortBy=createdAd&sortOrder=desc">Посмотреть</a>
+                        <a href="${getUrl({ wasteName, locationId, subscriptionName })}">Посмотреть</a>
                       </tr>
                       ${wasteTypeIdx !== adCounters.length - 1 ? "<td height='8' style='line-height:8px; font-size:0;'></td>" : ''}
                       `
@@ -92,63 +102,6 @@ export const getSubscriptionHtml = (params: {
   const content = `<tr>
                 <td>${newAdsCountByLocation}</td>
               </tr>`
-  return getFullHtml({ content, title, header })
-}
-
-export const getWasteRemovalHtml = (notification: WasteRemovalNotification) => {
-  const title = 'Список событий по приему вторсырья '
-  const header =
-    'Информируем вас о предстоящих событиях по сбору вторсырья в вашем населенном пункте'
-
-  const content = notification.data
-    .map((loc) => {
-      const byLocationHtml = loc.eventsByLocation
-        .map((evByLocation) => {
-          const { wasteType, eventsByWasteType } = evByLocation
-          const byWasteTypeHtml = eventsByWasteType
-            .map(
-              (evByWasteType, idx) => `
-        <tr>
-          <td style="color:${white}; line-height: 1.1; ${idx === eventsByWasteType.length - 1 ? '' : 'padding-bottom: 16px;'} padding-left: 8px">
-            <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
-              <tr><td>Дата и время: ${formatDate(evByWasteType.date)}</td></tr>
-              <tr><td>Организатор: ${evByWasteType.agentName}</td></tr>
-              <tr>
-                <td>
-                  <a style="display: inline-block; padding-top: 4px; text-decoration: none; color:${yellow};" 
-                    href="${getUrl({ host, route: '/events', id: evByWasteType.eventId })}">Подробнее</a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>`,
-            )
-            .join('')
-
-          return `
-        <tr>
-          <td style="padding-bottom: 8px">
-            <table role="presentation" border="0" cellspacing="0" cellpadding="0 width="100%" style="font-size: 16px">
-              <tr><td align="left" style="padding: 0 0 16px 8px;">Тип вторсырья: ${wasteType}</td></tr>
-              ${byWasteTypeHtml}
-            </table>
-          </td>
-        </tr>`
-        })
-        .join('')
-
-      return `
-      <tr>
-        <td style="padding: 24px 0">
-          <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" style="color:${white}; text-align: left">
-            <tr><td style="font-size: 24px; padding-bottom: 16px">Населенный пункт: ${loc.locationName}</td></tr>
-            ${byLocationHtml}
-          </table>
-        </td>
-      </tr>`
-    })
-    .join('')
-
   return getFullHtml({ content, title, header })
 }
 

@@ -14,11 +14,11 @@ import {
   getSubscriptionEmail,
   subscriptionVariantNames,
 } from '../subscriptions'
-const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 import { createSendPulseError } from '../../errors'
 import type { SendPulseError } from '../../types/email'
-import { isJobTimedOut } from '../subscriptions/sendSubscriptionEmails'
-import { maxJobDurationMs } from '../subscriptions'
+import { maxJobDurationMs, isJobTimedOut } from '../subscriptions'
+
+const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
 const sendEmailEndpoint = '/smtp/emails'
 
@@ -106,7 +106,7 @@ export const sendSubscriptionEmailWorker =
             userId,
           })
 
-          //check if sent an email less than 24 hours ago
+          //check if email is sent less than 24 hours ago
           const recentySent = await SubscriptionEmailDeliveryModel.findOne({
             runId: {
               $ne: runId,

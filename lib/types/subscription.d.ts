@@ -5,46 +5,11 @@ import type { Email } from './email'
 import { subscriptionVariantNames } from '../helpers/subscriptions'
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
-export interface EventByWasteType {
-  eventId: string
-  agentName: string
-  date: string
-}
-
-export interface WasteRemovalEvents {
-  wasteType: string
-  eventsByWasteType: EventByWasteType[]
-}
-
-export interface WasteRemovalByLocation {
-  locationId: string
-  locationName: string
-  eventsByLocation: WasteRemovalEvents[]
-}
-
 export type AggregatedRemovalApplication = {
   locationId: string
   locationName: string
   wasteTypes: string[]
 }
-
-export interface AggregatedApplicationPerUser {
-  userId: mongoose.Types.ObjectId
-  docs: AggregatedRemovalApplication[]
-}
-
-export interface WasteRemovalNotification {
-  receiverEmail: string
-  receiverName: string
-  unsubscribeToken: string
-  listUnsubscribeToken: string
-  data: WasteRemovalByLocation[]
-}
-
-export type SubscribedUser = Pick<
-  UserType & { _id: Types.ObjectId },
-  '_id' | 'name' | 'email' | 'isBanned' | 'isActive'
->
 
 const {
   SUCCESS,

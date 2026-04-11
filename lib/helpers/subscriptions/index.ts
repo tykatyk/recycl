@@ -1,4 +1,4 @@
-import { createAbortError } from '../../errors'
+import dayjs from 'dayjs'
 import {
   PrepareSubscriptionData,
   SubscriptionVariantName,
@@ -10,18 +10,21 @@ import {
 } from '../email/templates/subscriptionTemplates'
 import { getWasteAvailableData } from './wasteAvailableSubscription'
 import { getWasteRemovalData } from './wasteRemovalSubscription'
+
 export {
-  ensureUsersSubscribed,
   getUnsubscribedUsersFromProvider,
   setSubscriptionsUsubscribed,
 } from './ensureUsersSubscribed'
-export { prepareSubscriptionData } from './wasteRemovalSubscription'
-export { SubscriptionSendingStats } from './subscriptionSendingStats'
+
 export { unsubscribeApiResponseCodes } from './unsubscribeApiResponseCodes'
-export { logProgress } from './subscriptionSendingLogger'
-export { writeStatsToFile } from './subscriptionSendingLogger'
-export { default as sendSubscriptionEmails } from './sendSubscriptionEmails'
+
 export const maxJobDurationMs = 24 * 60 * 60 * 1000 // 24 hours
+
+export const isJobTimedOut = (jobStarted: Date) => {
+  return (
+    dayjs(new Date()).diff(dayjs(jobStarted), 'milliseconds') > maxJobDurationMs
+  )
+}
 
 export const subscriptionVariantNames = {
   wasteAvailable: 'wasteAvailable',
@@ -77,28 +80,4 @@ export const getSubscriptionEmail = async (params: PrepareSubscriptionData) => {
     subject: title,
     html,
   })
-}
-
-export const withAbortSignal = async <T>(
-  task: () => Promise<T>,
-  signal: AbortSignal,
-): Promise<T> => {
-  if (signal.aborted) {
-    throw createAbortError()
-  }
-
-  let onAbort: (() => void) | null = null
-
-  const abortPromise = new Promise<never>((_, reject) => {
-    onAbort = () => reject(createAbortError())
-    signal.addEventListener('abort', onAbort, { once: true })
-  })
-
-  try {
-    return await Promise.race([task(), abortPromise])
-  } finally {
-    if (onAbort) {
-      signal.removeEventListener('abort', onAbort)
-    }
-  }
 }
