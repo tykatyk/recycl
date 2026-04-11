@@ -1,4 +1,3 @@
-//ToDo: this job should be done on the outer server or in a separate process
 import { NextApiRequest, NextApiResponse } from 'next'
 import path from 'path'
 import fs from 'fs/promises'
@@ -27,7 +26,7 @@ import { getJobName } from '../../../lib/helpers/queues'
 import { FlowProducer } from 'bullmq'
 import { subscriptionVariantNames } from '../../../lib/helpers/subscriptions'
 
-const { wasteAvailable } = subscriptionVariantNames
+const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
 const lockDirectory = path.join(
   __dirname,
@@ -39,7 +38,6 @@ const jobStartedMessage = 'Job started.'
 const cantCreateLockMessage = 'Cannot create a lock file'
 const cantSendEmails = 'Cannot send emails'
 const unknownErrorMessage = 'An error while sending notification emails'
-// const subscriptionVariantId = '692d94649d358fe3fb068fdb'
 
 async function wasteRemovalSubscriptionHandler(
   subscriptionVariantId: string,
@@ -122,7 +120,7 @@ async function wasteRemovalSubscriptionHandler(
   }
 }
 
-async function wasteAvailableSubscriptionHandler(
+async function subscriptionHandler(
   subscriptionVariantName: string,
   res: NextApiResponse,
 ) {
@@ -173,13 +171,15 @@ async function wasteAvailableSubscriptionHandler(
 }
 
 async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
-  //ToDo: method should be POST
-  if (req.method !== 'GET') {
+  if (req.method !== 'POST') {
     return res.status(405).end()
   }
 
-  const { subscription: subscriptionVariantId } = req.query
-  if (typeof subscriptionVariantId !== 'string') {
+  const { subscription: subscriptionVariantName } = req.body
+  if (
+    subscriptionVariantName !== wasteAvailable &&
+    subscriptionVariantName !== wasteRemoval
+  ) {
     return res.status(400).end()
   }
 
@@ -189,29 +189,14 @@ async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
   // }
 
   const subscriptionVariant = await SubscriptionVariantModel.findOne({
-    _id: subscriptionVariantId,
+    name: subscriptionVariantName,
   })
 
   if (!subscriptionVariant) {
     return res.status(404).end()
   }
 
-  switch (subscriptionVariant.name) {
-    case 'wasteAvailable':
-      return await wasteAvailableSubscriptionHandler(
-        subscriptionVariant.name,
-        res,
-      )
-
-    case 'wasteRemoval':
-      return await wasteRemovalSubscriptionHandler(
-        subscriptionVariant.name,
-        res,
-      )
-
-    default:
-      return res.status(400)
-  }
+  return await subscriptionHandler(subscriptionVariantName, res)
 }
 
 export default apiHandler(requestHandler)
