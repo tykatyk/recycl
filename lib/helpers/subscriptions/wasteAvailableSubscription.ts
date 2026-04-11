@@ -1,28 +1,19 @@
 import {
-  UserModel,
   WasteAvailableSubscriptionModel,
   WasteRemovalEventModel,
 } from '../../db/models'
 import type {
-  WasteTypeCounters,
-  Location,
-  WasteAvailableSubscriptionData,
+  WasteTypeCounter,
+  WasteLocationCounter,
 } from '../../types/subscription'
 import { redisConnection as redis } from '../../db/redisConnection'
-import { buildEncodedEmail } from '../email'
-import { getWasteAvailableHtml } from '../email/templates/subscriptionTemplates'
+import { WasteAvailableSubscription } from '../../db/models/wasteAvailableSubsciption'
 
-type GetEmailData = {
+export const getWasteAvailableData = async (params: {
   userId: string
-  userName: string
-  userEmail: string
   lastRunDate: Date
-}
-
-const getWasteAvailableData = async (
-  params: GetEmailData,
-): Promise<WasteAvailableSubscriptionData | null> => {
-  const { userId, userName, userEmail, lastRunDate } = params
+}) => {
+  const { userId, lastRunDate } = params
 
   //ToDo: check if user is not banned
 
@@ -33,19 +24,37 @@ const getWasteAvailableData = async (
   //4. For each waste type check Redis the count of the new waste removal proposal where locationId === location._id and wasteType === wasteType
   //5. If there is no record in Redis: get previously mentioned data from the db and put it to Redis
 
-  const items = await WasteAvailableSubscriptionModel.find({
-    user: userId,
-  })
-  if (items.length === 0) return null
+  const items =
+    await WasteAvailableSubscriptionModel.aggregate<WasteAvailableSubscription>(
+      [
+        {
+          $match: { user: userId },
+        },
+        {
+          $group: {
+            _id: '$location.place_id',
+            location: { $first: '$location' },
+            wasteTypes: {
+              $addToSet: { $each: '$wasteTypes' },
+            },
+          },
+        },
+        {
+          $replaceRoot: { newRoot: '$firstDoc' },
+        },
+      ],
+    )
 
-  const locations: Location[] = []
+  if (items.length === 0) return []
+
+  const locations: WasteLocationCounter[] = []
 
   for (const item of items) {
     const { location, wasteTypes } = item
 
     if (!wasteTypes || wasteTypes.length === 0) continue
 
-    const wasteTypeCounters: WasteTypeCounters[] = []
+    const wasteTypeCounters: WasteTypeCounter[] = []
 
     for (const wasteType of wasteTypes) {
       let counter = 0
@@ -55,6 +64,9 @@ const getWasteAvailableData = async (
       if (redisCounter === null) {
         counter = await WasteRemovalEventModel.countDocuments({
           waste: wasteType,
+          location: {
+            place_id: location.place_id,
+          },
           createdAt: {
             $gt: lastRunDate,
           },
@@ -76,37 +88,10 @@ const getWasteAvailableData = async (
       //ToDo: remove country name from description
       locationName: location.description,
       locationId: location.place_id,
-      wasteTypes: wasteTypeCounters,
+      adCounters: wasteTypeCounters,
     })
   }
 
-  if (locations.length === 0) return null
-  return {
-    receiverName: userName,
-    receiverEmail: userEmail,
-    locations,
-  }
-}
-
-export const getWasteAvailableEmail = async (params: GetEmailData) => {
-  const { userId, userName, userEmail, lastRunDate } = params
-  const data = await getWasteAvailableData({
-    userId,
-    userName,
-    userEmail,
-    lastRunDate,
-  })
-  if (!data) return null
-
-  const { receiverName, receiverEmail } = data
-  //ToDo: subject should === title
-  const subject = ''
-  const html = getWasteAvailableHtml(data)
-
-  return buildEncodedEmail({
-    receiverName,
-    receiverEmail,
-    subject,
-    html,
-  })
+  if (locations.length === 0) return []
+  return locations
 }
