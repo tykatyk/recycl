@@ -120,14 +120,32 @@ async function wasteRemovalSubscriptionHandler(
   }
 }
 
-async function subscriptionHandler(
-  subscriptionVariantName: string,
-  res: NextApiResponse,
-) {
-  if (subscriptionVariantName !== wasteAvailable) {
-    return res.status(404).end()
+async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).end()
   }
+
+  const auth = req.headers['authorization']
+  // if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
+  //   return res.status(401).end()
+  // }
+
+  const { subscription: subscriptionVariantName } = req.body
+
+  if (
+    subscriptionVariantName !== wasteAvailable &&
+    subscriptionVariantName !== wasteRemoval
+  ) {
+    return res.status(400).end()
+  }
+
   try {
+    const subscriptionVariant = await SubscriptionVariantModel.findOne({
+      name: subscriptionVariantName,
+    })
+
+    if (!subscriptionVariant) return res.status(404).end()
+
     await dbConnect()
 
     const run = await createSubscriptionRun({
@@ -168,35 +186,6 @@ async function subscriptionHandler(
       .status(500)
       .json({ error: 'Failed to enqueue subscription send' })
   }
-}
-
-async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).end()
-  }
-
-  const { subscription: subscriptionVariantName } = req.body
-  if (
-    subscriptionVariantName !== wasteAvailable &&
-    subscriptionVariantName !== wasteRemoval
-  ) {
-    return res.status(400).end()
-  }
-
-  const auth = req.headers['authorization']
-  // if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
-  //   return res.status(401).end()
-  // }
-
-  const subscriptionVariant = await SubscriptionVariantModel.findOne({
-    name: subscriptionVariantName,
-  })
-
-  if (!subscriptionVariant) {
-    return res.status(404).end()
-  }
-
-  return await subscriptionHandler(subscriptionVariantName, res)
 }
 
 export default apiHandler(requestHandler)
