@@ -42,18 +42,16 @@ export const prepareSubsctionRunWorker =
       })
 
       if (!subscriptionRun) {
-        console.error('Cannot find subscriptionRun')
-        return
+        throw new Error(`Cannot find subscriptionRun id ${runId}`)
       }
 
-      const lastHeartBeat = new Date()
       if (
         subscriptionVariantName !== wasteAvailable &&
         subscriptionVariantName !== wasteRemoval
       ) {
         subscriptionRun.status = 'failed'
-        subscriptionRun.finishedAt = lastHeartBeat
-        subscriptionRun.lastHeartbeatAt = lastHeartBeat
+        subscriptionRun.lastHeartbeatAt = new Date()
+        subscriptionRun.finishedAt = new Date()
         subscriptionRun.errorMessage = 'Incorrect subscriptionVariantName'
         await subscriptionRun.save()
 
@@ -63,10 +61,6 @@ export const prepareSubsctionRunWorker =
       if (!subscriptionRun.startedAt) {
         subscriptionRun.startedAt = new Date()
       }
-
-      subscriptionRun.status = 'processing'
-      subscriptionRun.lastHeartbeatAt = lastHeartBeat
-      await subscriptionRun.save()
 
       const query: FilterQuery<Pick<Subscription, 'subscribed' | 'variant'>> = {
         subscribed: true,
@@ -82,22 +76,22 @@ export const prepareSubsctionRunWorker =
 
       const recipientsCount = totalRecipients + subs.length
 
-      //ToDo: maybe move this logic to senSubsEmailWorker
-      if (subs.length < batchLimit) {
-        const date = new Date()
+      subscriptionRun.lastHeartbeatAt = new Date()
 
+      if (recipientsCount === 0) {
+        subscriptionRun.status = 'completed'
+        subscriptionRun.finishedAt = new Date()
+      } else {
+        subscriptionRun.status = 'processing'
+      }
+
+      if (subs.length === 0) {
         subscriptionRun.totalRecipients = recipientsCount
-        subscriptionRun.lastHeartbeatAt = date
-
-        if (recipientsCount === 0) {
-          subscriptionRun.status = 'completed'
-          subscriptionRun.finishedAt = date
-        }
-
         await subscriptionRun.save()
-
         return
       }
+
+      await subscriptionRun.save()
 
       const userIds = subs.map((s) => s.user.toString())
       const batch = await SubscriptionBatchModel.create({
