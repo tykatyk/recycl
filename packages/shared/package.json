@@ -1,0 +1,26 @@
+{
+  "name": "@recycl/shared",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json"
+  },
+  "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "crypto-random-string": "^5.0.0",
+    "dayjs": "^1.11.20",
+    "ioredis": "^5.10.1",
+    "mongodb": "^5.9.2",
+    "mongoose": "^7.5.2",
+    "yup": "^1.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0"
+  }
+}

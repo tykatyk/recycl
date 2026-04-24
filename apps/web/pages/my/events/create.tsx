@@ -1,0 +1,49 @@
+import CreateUpdate from '../../../components/events/CreateUpdate'
+import {
+  InferGetServerSidePropsType,
+  GetServerSidePropsContext,
+  GetServerSideProps,
+} from 'next'
+import { Waste } from '../../../lib/types/waste'
+import queries from '../../../../../packages/db/queries'
+import dbConnect from '../../../../../packages/db/connection'
+import { getServerSidePropsHandler } from '../../../lib/helpers/errorHelpers'
+import { getSession } from 'next-auth/react'
+
+export default function CreateEvent({
+  wasteTypes,
+  userPhone,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  return <CreateUpdate wasteTypes={wasteTypes} userPhone={userPhone} />
+}
+
+const callback = (async (context: GetServerSidePropsContext) => {
+  const session = await getSession({ req: context.req })
+  if (!session?.user) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/auth/login?from=${encodeURIComponent(context.resolvedUrl)}`,
+      },
+    }
+  }
+
+  await dbConnect()
+
+  const wasteTypes = await queries.wasteType.getAll()
+  const userId = session.id
+  const user = await queries.user.getById(userId, session.user)
+  const userPhone = (user?.phone as string) || ''
+
+  return {
+    props: {
+      wasteTypes: JSON.parse(JSON.stringify(wasteTypes)) as Waste[],
+      userPhone,
+    },
+  }
+}) satisfies GetServerSideProps<{
+  wasteTypes: Waste[]
+  userPhone: string
+}>
+
+export const getServerSideProps = getServerSidePropsHandler(callback)

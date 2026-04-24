@@ -1,0 +1,30 @@
+import * as yup from 'yup'
+import { validation } from '@recycl/shared'
+
+const { phone, validationMessages: messages } = validation
+const { required, type, positive } = messages
+
+export default yup.object().shape({
+  wasteLocation: yup.object().nullable().required(required),
+  wasteType: yup.string().required(required),
+  quantity: yup.number().typeError(type).positive(positive).required(required),
+  contactPhone: phone.required(required),
+  comment: yup.string(),
+  notificationRadiusCheckbox: yup.boolean(),
+  notificationRadius: yup.number().when('notificationRadiusCheckbox', {
+    is: true,
+    then: (numberSchema) => {
+      return numberSchema
+        .typeError(type)
+        .positive(positive)
+        .required('Заполните это поле')
+    },
+  }),
+  notificationCitiesCheckbox: yup.boolean(),
+  notificationCities: yup.array().when('notificationCitiesCheckbox', {
+    is: true,
+    then: (arraySchema) => {
+      return arraySchema.typeError(type).min(1, 'Заполните это поле')
+    },
+  }),
+})
