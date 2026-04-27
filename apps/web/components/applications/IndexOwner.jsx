@@ -192,7 +192,7 @@ export default function RemovalApplications(props) {
                       return
                     }
                     if (params.field !== '__check__')
-                      Router.push(`/applications/${params.id}`)
+                      Router.push(`/my/applications/edit/${params.id}`)
                   }}
                   onRowSelectionModelChange={(params) => {
                     setSelected(params)
