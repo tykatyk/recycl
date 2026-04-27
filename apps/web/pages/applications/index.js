@@ -1,4 +1,3 @@
-import React from 'react'
 import IndexPage from '../../components/applications/Index'
 import AppliicationsOnMap from '../../components/applications/ApplicationsOnMap'
 

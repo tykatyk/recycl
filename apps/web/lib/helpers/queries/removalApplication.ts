@@ -1,6 +1,6 @@
-import getCoords from '../../helpers/getCoords'
+import getCoords from '../getCoords'
 //import removalApplication from '../../validation/removalApplication' //ToDo: Add validation before create and update operations
-import { RemovalApplication } from '@recycl/shared/dist/server/db'
+import { RemovalApplicationModel } from '@recycl/shared/dist/server/db'
 import { internalServerError } from '../../errors/index'
 
 const removalApplicationQueries = {
@@ -22,7 +22,7 @@ const removalApplicationQueries = {
       locationCoords.type = 'Point'
       locationCoords.coordinates = coords
 
-      const removalAppliaction = new RemovalApplication(data)
+      const removalAppliaction = new RemovalApplicationModel(data)
       return await removalAppliaction.save()
     } catch (error) {
       console.log(error)
@@ -30,9 +30,10 @@ const removalApplicationQueries = {
     }
   },
 
-  get: async (id) => {
+  get: async (id: string) => {
+    //ToDo: check if id is of type ObjectId
     try {
-      const result = await RemovalApplication.findById(id)
+      const result = await RemovalApplicationModel.findById(id)
         // .populate('user')
         .exec()
       return result
@@ -52,7 +53,7 @@ const removalApplicationQueries = {
       return null
 
     try {
-      const result = await RemovalApplication.aggregate([
+      const result = await RemovalApplicationModel.aggregate([
         {
           $match: {
             'wasteLocation.position.coordinates': {
@@ -95,7 +96,7 @@ const removalApplicationQueries = {
 
       if (queryParams.city) query['wasteLocation.place_id'] = queryParams.city
 
-      return await RemovalApplication.find(query)
+      return await RemovalApplicationModel.find(query)
     } catch (error) {
       console.log(error)
       throw internalServerError
@@ -107,7 +108,7 @@ const removalApplicationQueries = {
   getWithMessageCount: async (user) => {
     if (!user) return null
     try {
-      const result = await RemovalApplication.aggregate([
+      const result = await RemovalApplicationModel.aggregate([
         {
           $match: { user: user['_id'] },
         },
@@ -159,7 +160,7 @@ const removalApplicationQueries = {
 
   update: async (id, newValue) => {
     try {
-      return await RemovalApplication.findByIdAndUpdate(id, newValue, {
+      return await RemovalApplicationModel.findByIdAndUpdate(id, newValue, {
         new: true,
       }).exec()
     } catch (error) {
@@ -170,7 +171,7 @@ const removalApplicationQueries = {
 
   delete: async (id) => {
     try {
-      return await RemovalApplication.findByIdAndRemove(id).exec()
+      return await RemovalApplicationModel.findByIdAndRemove(id).exec()
     } catch (error) {
       console.log(error)
       throw internalServerError
@@ -179,7 +180,9 @@ const removalApplicationQueries = {
 
   deleteMany: async (ids) => {
     try {
-      return await RemovalApplication.deleteMany({ _id: { $in: ids } }).exec()
+      return await RemovalApplicationModel.deleteMany({
+        _id: { $in: ids },
+      }).exec()
     } catch (error) {
       console.log(error)
       throw internalServerError

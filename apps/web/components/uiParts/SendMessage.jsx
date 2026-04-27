@@ -1,4 +1,4 @@
-import { React, useState } from 'react'
+import { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import { Box, Typography, Button } from '@mui/material'
 import { useSession } from 'next-auth/react'
@@ -10,7 +10,7 @@ import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import { useMutation } from '@apollo/client'
 import { CREATE_MESSAGE } from '../../lib/graphql/queries/message'
-import { whitespaceRegex } from '../../../../packages/shared/validation/regularExpressions'
+import { whitespaceRegex } from '@recycl/shared/dist/validation/regularExpressions'
 
 const PREFIX = 'SendMessage'
 
