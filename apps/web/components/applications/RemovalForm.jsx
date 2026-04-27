@@ -1,5 +1,5 @@
-import { React, useEffect, useState } from 'react'
-import { styled, useTheme } from '@mui/material/styles'
+import { useEffect, useState } from 'react'
+import { styled } from '@mui/material/styles'
 import { Grid, Typography, InputAdornment, Button } from '@mui/material'
 import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
@@ -60,7 +60,7 @@ const Root = styled('div')(({ theme }) => ({
 const initialValues = getInitialValues()
 const fields = Object.keys(initialValues)
 
-export default function RemovalForm(props) {
+export default function RemovalForm() {
   const router = useRouter()
   const { data: session } = useSession()
   const { id: userId } = session
@@ -139,14 +139,17 @@ export default function RemovalForm(props) {
       if (applicationId && !called)
         getRemovalApplication({ variables: { id: applicationId } })
       if (applicationData) {
-        fields.forEach((field) => {
-          if (field === 'wasteType') return
-          setFieldValue(
-            field,
-            applicationData.getRemovalApplication[field],
-            false,
-          )
-        })
+        if (applicationData.getRemovalApplication === null) {
+          router.push('/404')
+        } else {
+          fields.forEach((field) => {
+            setFieldValue(
+              field,
+              applicationData.getRemovalApplication[field],
+              false,
+            )
+          })
+        }
       }
     }, [setFieldValue])
 

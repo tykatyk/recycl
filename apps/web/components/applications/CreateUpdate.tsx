@@ -1,10 +1,9 @@
-import React from 'react'
 import { Grid } from '@mui/material'
 import Layout from '../layouts/Layout'
 import RemovalForm from './RemovalForm'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 
-export default function RemovalApplication(props) {
+export default function CreateUpdate() {
   return (
     <RedirectUnathenticatedUser>
       <Layout title="Создать (обновить) заявку на вывоз отходов | Recycl">
@@ -17,7 +16,7 @@ export default function RemovalApplication(props) {
             padding: '16px',
           }}
         >
-          <RemovalForm {...props} />
+          <RemovalForm />
         </Grid>
       </Layout>
     </RedirectUnathenticatedUser>
