@@ -1,4 +1,6 @@
 import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
+import { subscriptionVariantNames } from '../../subscription'
+
 const subscriptionSchema = new Schema(
   {
     user: {
@@ -7,8 +9,8 @@ const subscriptionSchema = new Schema(
       required: true,
     },
     variant: {
-      type: Schema.Types.ObjectId,
-      ref: 'SubscriptionVariant',
+      enum: Object.values(subscriptionVariantNames),
+      type: String,
       required: true,
     },
     subscribed: { type: Boolean, default: true, required: true },

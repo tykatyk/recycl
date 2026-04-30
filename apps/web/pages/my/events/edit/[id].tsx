@@ -2,9 +2,11 @@ import CreateUpdate from '../../../../components/events/CreateUpdate'
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 import type { Event } from '../../../../lib/types/event'
 import type { Waste } from '../../../../lib/types/waste'
-import queries from '../../../../../../packages/db/queries'
-import eventModel from '../../../../../../packages/db/models/wasteRemovalEvent'
-import dbConnect from '../../../../../../packages/db/connection'
+import queries from '../../../../lib/helpers/queries'
+import {
+  WasteRemovalEventModel as eventModel,
+  dbConnect,
+} from '@recycl/shared/dist/server/db'
 import { getSession } from 'next-auth/react'
 import { ParsedUrlQuery } from 'querystring'
 import { isValidObjectId } from 'mongoose'

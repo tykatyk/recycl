@@ -8,7 +8,7 @@ import { getWasteAvailableData } from './wasteAvailableSubscription'
 import { getWasteRemovalData } from './wasteRemovalSubscription'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 
-const getSubscriptionData = async (params: {
+export const getSubscriptionData = async (params: {
   userId: string
   lastRunDate: Date
   subscriptionName: SubscriptionVariantName
@@ -35,14 +35,7 @@ const getSubscriptionData = async (params: {
 }
 
 export const getSubscriptionEmail = async (params: PrepareSubscriptionData) => {
-  const { userId, lastRunDate, userName, userEmail, subscriptionName } = params
-
-  const data = await getSubscriptionData({
-    userId,
-    lastRunDate,
-    subscriptionName,
-  })
-  if (data.length == 0) return null
+  const { userName, userEmail, subscriptionName, data } = params
 
   const html = getSubscriptionHtml({
     subscriptionName,

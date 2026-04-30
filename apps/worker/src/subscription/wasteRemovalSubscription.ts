@@ -7,25 +7,26 @@ import type {
   WasteLocationCounter,
   WasteTypeCounter,
 } from './types'
+import mongoose from 'mongoose'
 
 const getRemovalApplications = async (userId: string) => {
   const removalApplications =
     await RemovalApplicationModel.aggregate<AggregatedRemovalApplication>([
       {
         $match: {
-          user: userId,
+          user: new mongoose.Types.ObjectId(userId),
           isActive: true,
-          // expires: { $gte: new Date() },
+          expires: { $gte: new Date() },
         },
       },
       {
         $group: {
-          _id: '$waste_location.place_id',
+          _id: '$wasteLocation.place_id',
           locationName: {
             $first: '$wasteLocation.structured_formatting.main_text',
           },
-          wasteTypes: {
-            $addToSet: { $each: '$wasteType' },
+          allWasteTypes: {
+            $push: '$wasteType',
           },
         },
       },
@@ -34,7 +35,9 @@ const getRemovalApplications = async (userId: string) => {
           _id: 0,
           locationId: '$_id',
           locationName: '$locationName',
-          wasteTypes: '$wasteTypes',
+          wasteTypes: {
+            $setUnion: ['$allWasteTypes'],
+          },
         },
       },
     ])
@@ -49,6 +52,7 @@ export const getWasteRemovalData = async (params: {
   const { userId, lastRunDate } = params
 
   const removalApplications = await getRemovalApplications(userId)
+
   if (removalApplications.length == 0) return []
 
   const data: WasteLocationCounter[] = []
@@ -60,8 +64,9 @@ export const getWasteRemovalData = async (params: {
     for (const wasteName of wasteTypes) {
       const newAdsCount = await WasteRemovalEventModel.countDocuments({
         isActive: true,
-        location: {
-          place_id: locationId,
+        'location.place_id': locationId,
+        user: {
+          $ne: new mongoose.Types.ObjectId(userId),
         },
         waste: wasteName,
         createdAt: {
@@ -79,5 +84,6 @@ export const getWasteRemovalData = async (params: {
 
     data.push({ locationId, locationName, adCounters: eventCounters })
   }
+
   return data
 }

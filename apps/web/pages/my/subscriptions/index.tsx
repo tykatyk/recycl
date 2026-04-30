@@ -12,7 +12,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import Snackbars from '../../../components/uiParts/Snackbars'
 import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
 import { useEffect, useMemo, useState } from 'react'
-import type { SubscriptionVariant } from '../../../../../packages/db/models/subscriptionVariant'
+import type { SubscriptionVariant } from '@recycl/shared/dist/server/db/models/subscriptionVariant'
 
 const loadingErrorText = 'Ошибка при загрузке данных'
 const updatingErrorMessage = 'Ошибка при обновлении данных'
@@ -28,14 +28,14 @@ const getSubscriptionConfigUrl = (id: string) => {
   return `${mySubscriptionsUrl}${id}`
 }
 
-type UserSubs = string[]
+type SubscriptionName = string[]
 
 export default function MySubscriptions() {
   const [backendError, setBackendError] = useState('')
   const [allSubs, setAllSubs] = useState<
     ({ _id: string } & SubscriptionVariant)[]
   >([])
-  const [userSubs, setUserSubs] = useState<UserSubs>([])
+  const [userSubs, setUserSubs] = useState<SubscriptionName>([])
 
   const [loading, setLoading] = useState(false)
 
@@ -46,20 +46,20 @@ export default function MySubscriptions() {
   const handleClose = () => setBackendError('')
 
   //ToDo: check if user has removal application ads before letting him to create a waste removal subscription
-  const handleChange = async (id: string) => {
-    let updatedUserSubs: UserSubs = []
+  const handleChange = async (name: string) => {
+    let updatedUserSubs: SubscriptionName = []
     let subscribed = false
 
-    if (userSubsForSearch.has(id)) {
+    if (userSubsForSearch.has(name)) {
       updatedUserSubs = userSubs.filter((item) => {
-        return item !== id
+        return item !== name
       })
     } else {
-      updatedUserSubs = [...userSubs, id]
+      updatedUserSubs = [...userSubs, name]
       subscribed = true
     }
     setUserSubs(updatedUserSubs)
-    await updateUserSubscription({ variant: id, subscribed })
+    await updateUserSubscription({ variant: name, subscribed })
   }
 
   async function fetchAllSubscriptions() {
@@ -139,14 +139,14 @@ export default function MySubscriptions() {
             control={
               <Switch
                 color="secondary"
-                checked={userSubsForSearch.has(sub._id)}
+                checked={userSubsForSearch.has(sub.name)}
                 onChange={async (e) => {
-                  await handleChange(sub._id)
+                  await handleChange(sub.name)
                 }}
                 inputProps={{ 'aria-label': 'controlled' }}
               />
             }
-            label={userSubsForSearch.has(sub._id) ? enabledText : disabledText}
+            label={userSubsForSearch.has(sub.name) ? enabledText : disabledText}
           />
         </Grid>
         {sub.isConfigurable ? (
@@ -154,8 +154,8 @@ export default function MySubscriptions() {
             <Button
               startIcon={<SettingsIcon />}
               color="secondary"
-              href={getSubscriptionConfigUrl(sub._id)}
-              disabled={userSubsForSearch.has(sub._id) ? false : true}
+              href={getSubscriptionConfigUrl(sub.name)}
+              disabled={userSubsForSearch.has(sub.name) ? false : true}
             >
               {configText}
             </Button>

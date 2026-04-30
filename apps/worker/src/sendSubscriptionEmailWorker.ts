@@ -8,7 +8,10 @@ import {
   SubscriptionBatchModel,
   UserModel,
 } from '@recycl/shared/dist/server/db'
-import { getSubscriptionEmail } from './subscription/subscriptionEmailBuilder'
+import {
+  getSubscriptionData,
+  getSubscriptionEmail,
+} from './subscription/subscriptionEmailBuilder'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import { QUEUE_SUBSCRIPTION_RUN } from '@recycl/shared/dist/server/worker'
 import { createSendPulseError } from './email/sendPulseError'
@@ -68,6 +71,20 @@ export const sendSubscriptionEmailWorker =
         skippedCount: 0,
       }
 
+      const skipRecipient = async (idempotencyKey: string, cause: string) => {
+        counters.skippedCount += 1
+        await SubscriptionEmailDeliveryModel.updateOne(
+          {
+            idempotencyKey,
+          },
+          {
+            status: 'skipped',
+            lastError: cause,
+          },
+          { upsert: true },
+        )
+      }
+
       try {
         const batch = await SubscriptionBatchModel.findByIdAndUpdate(
           {
@@ -124,17 +141,12 @@ export const sendSubscriptionEmailWorker =
             subscriptionVariantName,
           })
 
-          if (recentySent || isJobTimedOut(new Date(timestamp))) {
-            counters.skippedCount += 1
-            await SubscriptionEmailDeliveryModel.updateOne(
-              {
-                idempotencyKey,
-              },
-              {
-                status: 'skipped',
-              },
-              { upsert: true },
-            )
+          if (recentySent) {
+            await skipRecipient(idempotencyKey, 'Sent recently')
+            continue
+          }
+          if (isJobTimedOut(new Date(timestamp))) {
+            await skipRecipient(idempotencyKey, 'Job timed out')
             continue
           }
 
@@ -146,15 +158,23 @@ export const sendSubscriptionEmailWorker =
             continue
           }
 
-          const emailObj = getSubscriptionEmail({
+          const subscriptionData = await getSubscriptionData({
             userId,
-            userName,
-            userEmail,
             lastRunDate,
             subscriptionName: subscriptionVariantName,
           })
 
-          if (!emailObj) continue
+          if (subscriptionData.length === 0) {
+            await skipRecipient(idempotencyKey, 'No data')
+            continue
+          }
+
+          const emailObj = await getSubscriptionEmail({
+            userName,
+            userEmail,
+            subscriptionName: subscriptionVariantName,
+            data: subscriptionData,
+          })
 
           const result = await sendPulseFetcher<SendPulseSMPTResponse>(
             sendEmailEndpoint,
@@ -240,7 +260,7 @@ export const sendSubscriptionEmailWorker =
             skippedCount: counters.skippedCount,
           },
           lastHeartbeatAt: date,
-          status: 'finished',
+          status: 'completed',
           finishedAt: date,
         })
 
@@ -265,6 +285,7 @@ export const sendSubscriptionEmailWorker =
 
         await run.save()
       } catch (error) {
+        console.error(error)
         if (error.name === 'SendPulseError') {
           //reschedule the job
           throw error

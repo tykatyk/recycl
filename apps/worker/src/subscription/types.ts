@@ -36,8 +36,7 @@ type PrepareSubscriptionData = {
   subscriptionName: SubscriptionVariantName
   userName: string
   userEmail: string
-  userId: string
-  lastRunDate: Date
+  data: WasteLocationCounter[]
 }
 
 export type {

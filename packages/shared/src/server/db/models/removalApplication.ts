@@ -23,7 +23,7 @@ const removalApplicationSchema = new Schema(
     //ToDo: maybe make contactPhone required
     contactPhone,
     passDocumet: Boolean,
-    isActive: Boolean,
+    isActive: { type: Boolean, required: true, default: true },
     comment: String,
     notificationCities: [{ description: String, place_id: String }],
     notificationCitiesCheckbox: Boolean,

@@ -17,6 +17,7 @@
     "@recycl/shared": "^1.0.0",
     "bullmq": "^5.74.1",
     "dayjs": "^1.11.20",
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "mongoose": "^7.5.2"
   }
 }
