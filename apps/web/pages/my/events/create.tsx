@@ -5,8 +5,8 @@ import {
   GetServerSideProps,
 } from 'next'
 import { Waste } from '../../../lib/types/waste'
-import queries from '../../../../../packages/db/queries'
-import dbConnect from '../../../../../packages/db/connection'
+import queries from '../../../lib/helpers/queries'
+import { dbConnect } from '@recycl/shared/dist/server/db'
 import { getServerSidePropsHandler } from '../../../lib/helpers/errorHelpers'
 import { getSession } from 'next-auth/react'
 

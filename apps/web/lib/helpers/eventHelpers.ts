@@ -7,6 +7,7 @@ import type {
   SortOrder,
   Variant,
 } from '../types/event'
+import type { PlaceType } from '../types/placeAutocomplete'
 
 export function getInitialValues(event?: Event, userPhone: string = ''): Event {
   return {
@@ -20,7 +21,9 @@ export function getInitialValues(event?: Event, userPhone: string = ''): Event {
 }
 
 //ToDo привести цю функцію у відповідність з аналогічною функцією в removalFormConfig
-export function getNormalizedValues(values: Event): Event {
+export function getNormalizedValues<T extends { location: PlaceType }>(
+  values: T,
+): T {
   if (!values.location) return values
 
   const normalizedLocation = {

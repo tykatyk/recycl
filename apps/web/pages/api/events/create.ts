@@ -2,13 +2,16 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { eventValidationSchema } from '../../../lib/validation/eventFormValidator'
-import EventModel from '../../../../../packages/db/models/wasteRemovalEvent'
+import {
+  dbConnect,
+  WasteRemovalEventModel as EventModel,
+} from '@recycl/shared/dist/server/db'
 import {
   apiHandler,
   METHOD_NOT_ALLOWED,
 } from '../../../lib/helpers/errorHelpers'
-import dbConnect from '../../../../../packages/db/connection'
 import mongoose from 'mongoose'
+import getCoords from '../../../lib/helpers/getCoords'
 
 async function createEvent(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST')
@@ -25,6 +28,18 @@ async function createEvent(req: NextApiRequest, res: NextApiResponse) {
 
   const event = new EventModel(req.body)
   event.user = new mongoose.Types.ObjectId(userId)
+
+  const placeId = event.location.place_id
+  const coords = await getCoords(placeId)
+
+  if (!coords || coords.length < 2) {
+    throw new Error(`Cannot get coordinates for placeId ${placeId}`)
+  }
+
+  event.location.position = {
+    type: 'Point',
+    coordinates: coords,
+  }
 
   await dbConnect()
   await event.save()

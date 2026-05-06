@@ -66,6 +66,7 @@ export default function RemovalForm() {
   const { id: userId } = session
   const { id: applicationId } = router.query
   const [backendError, setBackendError] = useState(null)
+
   const {
     loading: gettingWasteTypes,
     data: wasteTypesData,

@@ -7,14 +7,14 @@ const removalApplicationQueries = {
   create: async (data, user) => {
     if (!user) return null
 
-    const placeId = data.wasteLocation['place_id']
-    const coords = await getCoords(placeId)
-
-    if (!coords || coords.length < 2) {
-      throw new Error(`Cannot get coordinates for placeId ${placeId}`)
-    }
-
     try {
+      const placeId = data.wasteLocation['place_id']
+      const coords = await getCoords(placeId)
+
+      if (!coords || coords.length < 2) {
+        throw new Error(`Cannot get coordinates for placeId ${placeId}`)
+      }
+
       data.user = user['_id']
       data.wasteLocation.position = {}
 

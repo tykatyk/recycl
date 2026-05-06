@@ -5,4 +5,4 @@ export type PlaceType = {
     main_text: string
     secondary_text: string
   }
-}
+} | null

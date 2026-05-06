@@ -39,7 +39,7 @@ export default function PlacesAutocomplete(props) {
       loadScript(
         `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}&libraries=places`,
         document.querySelector('head'),
-        'google-maps'
+        'google-maps',
       )
     }
 
@@ -50,7 +50,7 @@ export default function PlacesAutocomplete(props) {
       throttle((request, callback) => {
         autocompleteService.current.getPlacePredictions(request, callback)
       }, 200),
-    []
+    [],
   )
 
   React.useEffect(() => {
@@ -74,7 +74,12 @@ export default function PlacesAutocomplete(props) {
     }
 
     fetch(
-      { input: inputValue, types: ['(cities)'], sessionToken },
+      {
+        input: inputValue,
+        types: ['geocode'],
+        componentRestrictions: { country: 'ua' },
+        sessionToken,
+      },
       (results) => {
         if (active) {
           let newOptions = []
@@ -89,7 +94,7 @@ export default function PlacesAutocomplete(props) {
 
           setOptions(newOptions)
         }
-      }
+      },
     )
 
     return () => {
@@ -130,8 +135,8 @@ export default function PlacesAutocomplete(props) {
         typeof option === 'string'
           ? option
           : option.description
-          ? option.description
-          : ''
+            ? option.description
+            : ''
       }
       filterOptions={(x) => x}
       ListboxComponent={Listbox}
@@ -185,7 +190,7 @@ export default function PlacesAutocomplete(props) {
 
         const parts = parse(
           option.structured_formatting.main_text,
-          matches.map((match) => [match.offset, match.offset + match.length])
+          matches.map((match) => [match.offset, match.offset + match.length]),
         )
 
         return (

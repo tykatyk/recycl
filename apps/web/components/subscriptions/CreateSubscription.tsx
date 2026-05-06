@@ -16,23 +16,40 @@ import type {
 } from '../../lib/types/event'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { Box, Typography } from '@mui/material'
+import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 import type { Waste } from '../../lib/types/waste'
 import { PlaceType } from '../../lib/types/placeAutocomplete'
 import Layout from '../layouts/Layout'
+import HelpIcon from '@mui/icons-material/Help'
+import * as yup from 'yup'
+import { validation } from '@recycl/shared'
 
 type WasteAvailableSubscriptionConfig = {
-  location: PlaceType | null
+  location: PlaceType
   wasteTypes: Waste[]
+  radius: number
 }
 
-const title = 'Добавление подписки на получение уведомлений о наличии вторсирья'
+const title = 'Создание подписки на получение уведомлений о наличии вторсырья'
 const errorMessage = 'Возникла ошибка при сохранении заявки'
-const api = '/api/events'
-const createRoute = `${api}/create`
-const updateRoute = (id: string) => `${api}/${id}`
-const indexRoute = '/my/events'
-const inactiveEventsRoute = '/my/events/inactive'
+const createRoute = `/api/subscriptions/waste-available`
+const indexRoute = '/my/subscriptions/waste-available'
+
+const SubscriptionDetails = () => {
+  return (
+    <Box
+      sx={{
+        p: 2,
+        border: '1px dashed #ccc',
+        borderRadius: '8px',
+      }}
+    >
+      <Typography sx={{ fontWeight: 200, fontSize: '0.875rem', color: '#ccc' }}>
+        {`Подписка предназначена для тех, кто занимается сбором вторсырья для дальнейшей переработки или утилизации. Она позволяет находить сырье, которое вам нужно, в местах, в которых вы работаете. Для добавления подписки укажите местоположение, относительно которого будет производится поиск, радиус поиска и один или несколько видов вторсырья. После добавления подписки, вы будете получать уведомления на электронную почту о новых объявлениях о наличии вторсырья.`}
+      </Typography>
+    </Box>
+  )
+}
 
 export default function CreateSubscription() {
   const [severity, setSeverity] = useState<string>('success')
@@ -44,24 +61,41 @@ export default function CreateSubscription() {
   const { data: session, status } = useSession({
     required: true,
     onUnauthenticated() {
-      window.location.replace('/auth/login?from=/my/subscriptions/create')
+      window.location.replace(
+        '/auth/login?from=/my/subscriptions/waste-available/create',
+      )
     },
   })
 
-  const getWasteTypes = async () => {
-    return await fetch('/api/waste-types')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Response is not OK')
-        }
-        return response.json()
-      })
-      .then((data: Waste[]) => {
-        return data
-      })
-  }
+  const [showDetails, setShowDetails] = useState(false)
+
+  const wasteRemovalSubscriptionSchema = yup.object({
+    location: validation.location,
+    wasteTypes: yup
+      .array()
+      .of(yup.string())
+      .min(1, (min) => `Выберите хотя бы ${min.min} элемент`),
+    radius: yup
+      .number()
+      .required()
+      .min(1, (min) => `Значение не должно быть меньше ${min.min}`)
+      .max(200, (max) => `Значение не должно быть больше ${max.max}`),
+  })
 
   useEffect(() => {
+    const getWasteTypes = async () => {
+      return await fetch('/api/waste-types')
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Response is not OK')
+          }
+          return response.json()
+        })
+        .then((data: Waste[]) => {
+          return data
+        })
+    }
+
     getWasteTypes()
       .then((wasteTypes) => {
         setWasteTypes(wasteTypes)
@@ -86,8 +120,8 @@ export default function CreateSubscription() {
   ) => {
     setSubmitting(true)
 
-    // const normalizedValues = getNormalizedValues(values)
-    const normalizedValues = null
+    const normalizedValues = getNormalizedValues(values)
+    console.log(normalizedValues)
 
     fetch(createRoute, {
       method: 'POST',
@@ -95,6 +129,9 @@ export default function CreateSubscription() {
       body: JSON.stringify(normalizedValues),
     })
       .then((response) => {
+        if (!response.ok) {
+          throw new Error(errorMessage)
+        }
         return response.json()
       })
       .then((data) => {
@@ -107,6 +144,7 @@ export default function CreateSubscription() {
         }
       })
       .catch((error) => {
+        console.log(error)
         setSeverity('error')
         setNotification(errorMessage)
       })
@@ -123,22 +161,46 @@ export default function CreateSubscription() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          width: '100%',
         }}
       >
-        <Typography
-          component={'h1'}
-          variant="h6"
-          paragraph
-          align="center"
-          sx={{ mb: 3 }}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            // justifyContent: 'center',
+            // alignItems: 'center',
+            mb: 2,
+          }}
         >
-          {title}
-        </Typography>
+          <Box sx={{ display: 'flex' }}>
+            <Typography component={'h1'} variant="h6" align="center">
+              {title}
+            </Typography>
+            <Box sx={{ pl: 2 }}>
+              <Tooltip title="Подробнее об этой подписке">
+                <IconButton
+                  onClick={() => {
+                    setShowDetails(!showDetails)
+                  }}
+                >
+                  <HelpIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+          {showDetails ? <SubscriptionDetails /> : null}
+        </Box>
+
         <Box sx={{ width: '100%' }}>
           <Formik
             enableReinitialize
-            initialValues={{ location: null, wasteTypes: [] }}
-            // validationSchema={eventSchema}
+            initialValues={{
+              location: null,
+              wasteTypes: [],
+              radius: 0,
+            }}
+            validationSchema={wasteRemovalSubscriptionSchema}
             onSubmit={(
               values: WasteAvailableSubscriptionConfig,
               actions: FormikHelpers<WasteAvailableSubscriptionConfig>,

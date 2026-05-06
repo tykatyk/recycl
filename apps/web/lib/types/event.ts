@@ -19,10 +19,6 @@ export type HrefOptions = Omit<PaginationOptions, 'page' | 'pageSize'> & {
   pageSize?: number
 }
 
-export type SSProps = {
-  props: EventProps
-}
-
 export type EventCreateUpdateProps = {
   event?: Event
   wasteTypes?: [Waste]
