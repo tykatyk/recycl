@@ -19,7 +19,7 @@ const updatingErrorMessage = 'Ошибка при обновлении данн�
 const titleHeadingText = 'Мои подписки на получение уведомлений'
 const enabledText = 'Включено'
 const disabledText = 'Выключено'
-const configText = 'Настроить'
+const configText = 'Настроить подписку'
 const subscriptionVariantsApi = '/api/subscriptions/variant'
 const subscriptionsApi = '/api/subscriptions'
 const mySubscriptionsUrl = '/my/subscriptions/'
@@ -138,7 +138,6 @@ export default function MySubscriptions() {
           <FormControlLabel
             control={
               <Switch
-                color="secondary"
                 checked={userSubsForSearch.has(sub.name)}
                 onChange={async (e) => {
                   await handleChange(sub.name)
@@ -153,8 +152,7 @@ export default function MySubscriptions() {
           <Grid item xs={12}>
             <Button
               startIcon={<SettingsIcon />}
-              color="secondary"
-              href={getSubscriptionConfigUrl(sub.name)}
+              href={getSubscriptionConfigUrl('waste-available')}
               disabled={userSubsForSearch.has(sub.name) ? false : true}
             >
               {configText}

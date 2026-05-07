@@ -3,6 +3,4 @@ export type ThemeColors = {
   secondary: string
   background: string
   brand: string
-  text: string
-  buttonText: string
 }

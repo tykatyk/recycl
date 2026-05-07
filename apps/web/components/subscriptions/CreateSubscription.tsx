@@ -9,6 +9,7 @@ import {
 } from '../../lib/helpers/eventHelpers'
 import { eventSchema } from '../../lib/validation'
 import { showErrorMessages } from '../../lib/helpers/errorHelpers'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import type {
   Event,
   EventCreateUpdateProps,
@@ -23,6 +24,8 @@ import Layout from '../layouts/Layout'
 import HelpIcon from '@mui/icons-material/Help'
 import * as yup from 'yup'
 import { validation } from '@recycl/shared'
+import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
+import Link from '../uiParts/Link'
 
 type WasteAvailableSubscriptionConfig = {
   location: PlaceType
@@ -51,6 +54,20 @@ const SubscriptionDetails = () => {
   )
 }
 
+const wasteRemovalSubscriptionSchema = yup.object({
+  location: validation.location,
+  wasteTypes: yup
+    .array()
+    .of(yup.string())
+    .min(1, (min) => `Выберите хотя бы ${min.min} элемент`),
+  radius: yup
+    .number()
+    // .nullable()
+    .required(validation.validationMessages.required)
+    .min(1, (min) => `Значение не должно быть меньше ${min.min}`)
+    .max(200, (max) => `Значение не должно быть больше ${max.max}`),
+})
+
 export default function CreateSubscription() {
   const [severity, setSeverity] = useState<string>('success')
   const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
@@ -68,42 +85,56 @@ export default function CreateSubscription() {
   })
 
   const [showDetails, setShowDetails] = useState(false)
-
-  const wasteRemovalSubscriptionSchema = yup.object({
-    location: validation.location,
-    wasteTypes: yup
-      .array()
-      .of(yup.string())
-      .min(1, (min) => `Выберите хотя бы ${min.min} элемент`),
-    radius: yup
-      .number()
-      .required()
-      .min(1, (min) => `Значение не должно быть меньше ${min.min}`)
-      .max(200, (max) => `Значение не должно быть больше ${max.max}`),
-  })
+  const [subscibed, setSubscribed] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [viewStatus, setViewStatus] = useState('')
 
   useEffect(() => {
-    const getWasteTypes = async () => {
-      return await fetch('/api/waste-types')
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Response is not OK')
-          }
-          return response.json()
-        })
-        .then((data: Waste[]) => {
-          return data
-        })
+    const getActiveSubscriptions = async () => {
+      const response = await fetch('/api/subscriptions')
+
+      if (!response.ok) {
+        throw new Error('Response is not OK')
+      }
+
+      return (await response.json()) as (keyof typeof subscriptionVariantNames)[]
     }
 
-    getWasteTypes()
-      .then((wasteTypes) => {
+    const getWasteTypes = async () => {
+      const response = await fetch('/api/waste-types')
+
+      if (!response.ok) {
+        throw new Error('Response is not OK')
+      }
+
+      return (await response.json()) as Waste[]
+    }
+
+    const loadData = async () => {
+      try {
+        setViewStatus('loading')
+        const activeSubscriptions = await getActiveSubscriptions()
+
+        console.log(activeSubscriptions)
+
+        if (
+          activeSubscriptions.includes(subscriptionVariantNames.wasteAvailable)
+        ) {
+          setViewStatus('unsubscribed')
+          return
+        }
+
+        const wasteTypes = await getWasteTypes()
+
         setWasteTypes(wasteTypes)
-      })
-      .catch((error) => {
+        setViewStatus('ok')
+      } catch (error) {
         setSeverity('error')
-        setNotification('Oшибка сервера')
-      })
+        setNotification('Ошибка сервера')
+      }
+    }
+
+    loadData()
   }, [])
 
   //show error if no wasteTypes found
@@ -121,7 +152,6 @@ export default function CreateSubscription() {
     setSubmitting(true)
 
     const normalizedValues = getNormalizedValues(values)
-    console.log(normalizedValues)
 
     fetch(createRoute, {
       method: 'POST',
@@ -153,17 +183,9 @@ export default function CreateSubscription() {
       })
   }
 
-  return (
-    <Layout title={title}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-        }}
-      >
+  const CreationForm = () => {
+    return (
+      <>
         <Box
           sx={{
             display: 'flex',
@@ -191,14 +213,13 @@ export default function CreateSubscription() {
           </Box>
           {showDetails ? <SubscriptionDetails /> : null}
         </Box>
-
         <Box sx={{ width: '100%' }}>
           <Formik
             enableReinitialize
             initialValues={{
               location: null,
               wasteTypes: [],
-              radius: 0,
+              radius: '' as unknown as number,
             }}
             validationSchema={wasteRemovalSubscriptionSchema}
             onSubmit={(
@@ -211,7 +232,54 @@ export default function CreateSubscription() {
             <SubscriptionForm wasteTypes={wasteTypes} />
           </Formik>
         </Box>
+      </>
+    )
+  }
 
+  const NotSubscribed = () => {
+    return (
+      <Box
+        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      >
+        <Typography paragraph align="center">
+          У вас отключено получение уведомлений о появлении вторсырья.
+        </Typography>
+        <Typography paragraph align="center">
+          Чтобы иметь возможность добавлять новые подписки, сначала включите
+          уведомления, перейдя по ссылке.
+        </Typography>
+        <Typography>
+          <Link href="#">Управление подпиской</Link>
+        </Typography>
+      </Box>
+    )
+  }
+
+  const renderContent = () => {
+    switch (viewStatus) {
+      case 'loading':
+        return <PageLoadingCircle />
+      case 'unsubscribed':
+        return <NotSubscribed />
+      case 'ok':
+        return <CreationForm />
+      default:
+        return null
+    }
+  }
+
+  return (
+    <Layout title={title}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+        }}
+      >
+        {renderContent()}
         <Snackbar
           severity={severity}
           open={!!notification}

@@ -25,8 +25,8 @@ export default function Layout({
           maxWidth="md"
           sx={{
             position: 'relative',
-            paddingTop: 6,
-            paddingBottom: 6,
+            paddingTop: 3,
+            paddingBottom: 3,
             display: 'flex',
             flex: 1,
           }}

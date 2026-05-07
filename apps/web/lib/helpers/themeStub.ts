@@ -4,13 +4,10 @@ import { ruRU } from '@mui/x-date-pickers/locales'
 import type { ThemeColors } from '../types/themeColors'
 
 export const colors: ThemeColors = {
-  primary: '#1a2b34', // dark blue-green
-  secondary: '#f8bc45', // yellow
-  // secondary: '#adce5d', // lime
+  secondary: '#9be1da', //teal
+  primary: '#ffbf3e', // yellow
   background: '#223c4a', // blue-green
   brand: '#adce5d',
-  text: '#ffffff',
-  buttonText: '#1f1f1f',
 }
 
 const theme = createTheme(

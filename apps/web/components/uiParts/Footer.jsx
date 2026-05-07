@@ -17,7 +17,7 @@ const Root = styled('footer')(({ theme }) => ({
     marginTop: 'auto',
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: '#1a2b34',
     color: theme.palette.text.primary,
     width: '100%',
   },
@@ -38,7 +38,7 @@ const Root = styled('footer')(({ theme }) => ({
 
   [`& .${classes.link}`]: {
     '&:hover': {
-      color: '#adce5d',
+      color: theme.palette.primary.main,
     },
   },
 }))

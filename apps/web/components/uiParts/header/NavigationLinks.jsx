@@ -17,7 +17,7 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
 
   [`& .${classes.link}`]: {
     '&:hover': {
-      color: '#adce5d',
+      color: theme.palette.primary.main,
     },
   },
 }))
@@ -42,7 +42,7 @@ export default function HeaderLinks(props) {
 
   const styles = {}
   if (props.isDesktop) {
-    ;(styles.display = 'inline-block'), (styles.width = 'auto')
+    ;((styles.display = 'inline-block'), (styles.width = 'auto'))
   }
   return (
     <StyledTypography

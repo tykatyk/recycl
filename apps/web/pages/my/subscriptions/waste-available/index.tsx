@@ -14,12 +14,15 @@ export default function WasteAvailableSubscriptions() {
         }}
       >
         <Typography component={'h1'} variant="h6" paragraph align="center">
-          Еще нет ни одной подписки. Добавьте одну или несколько
+          Еще нет ни одной подписки
+        </Typography>
+        <Typography sx={{ mb: 4 }} align="center">
+          Добавьте регион поиска и укажите типы вторсырья, которые вас
+          интересуют
         </Typography>
         <Button
-          color="secondary"
           variant="contained"
-          href="/my/subscriptions/wasteAvailable/create"
+          href="/my/subscriptions/waste-available/create"
         >
           Добавить
         </Button>
