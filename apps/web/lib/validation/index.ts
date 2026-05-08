@@ -8,6 +8,7 @@ import quantitySchema from './quantity'
 import contactUsForm from './contactUsForm'
 import chatForm from './chatForm'
 import { eventValidationSchema } from './eventFormValidator'
+import { wasteAvailableSubscriptionSchema } from './wasteAvailableSubscription'
 
 export {
   loginSchema,
@@ -23,4 +24,5 @@ export {
   contactUsForm as contactUsSchema,
   chatForm as chatSchema,
   eventValidationSchema as eventSchema,
+  wasteAvailableSubscriptionSchema,
 }

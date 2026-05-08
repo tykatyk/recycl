@@ -15,7 +15,7 @@ export default function PageLoadingCircle(props) {
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
     >
-      <CircularProgress size={size} color="secondary" />
+      <CircularProgress size={size} />
     </Box>
   )
 }

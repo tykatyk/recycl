@@ -2,8 +2,10 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { SubscriptionModel, dbConnect } from '@recycl/shared/dist/server/db/'
+import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription/'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import cryptoRandomString from 'crypto-random-string'
+import * as yup from 'yup'
 
 async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -48,12 +50,20 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).end()
     }
     case 'GET': {
+      // const validationSchema = yup.object({
+      //   variant: yup.string().oneOf(Object.keys(subscriptionVariantNames)),
+      //   subscribed: yup.string().oneOf(['true', 'false']),
+      // })
+      // try {
+      //   await validationSchema.validate(req.query)
+      // } catch (error) {
+      //   console.error(error)
+      // }
+
       const subscriptions = await SubscriptionModel.find({
         user: session.id,
         subscribed: true,
-      })
-        .select('-_id variant')
-        .lean()
+      }).lean()
 
       if (!subscriptions) return res.json([])
 

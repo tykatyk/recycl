@@ -116,12 +116,7 @@ const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
           </Field>
         </Box>
         <Box>
-          <Button
-            variant="contained"
-            color="secondary"
-            type="submit"
-            disabled={isSubmitting}
-          >
+          <Button variant="contained" type="submit" disabled={isSubmitting}>
             Сохранить
             {isSubmitting && <ButtonSubmittingCircle />}
           </Button>

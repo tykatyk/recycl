@@ -22,16 +22,10 @@ import type { Waste } from '../../lib/types/waste'
 import { PlaceType } from '../../lib/types/placeAutocomplete'
 import Layout from '../layouts/Layout'
 import HelpIcon from '@mui/icons-material/Help'
-import * as yup from 'yup'
-import { validation } from '@recycl/shared'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import Link from '../uiParts/Link'
-
-type WasteAvailableSubscriptionConfig = {
-  location: PlaceType
-  wasteTypes: Waste[]
-  radius: number
-}
+import { wasteAvailableSubscriptionSchema } from '../../lib/validation'
+import * as yup from 'yup'
 
 const title = 'Создание подписки на получение уведомлений о наличии вторсырья'
 const errorMessage = 'Возникла ошибка при сохранении заявки'
@@ -53,20 +47,6 @@ const SubscriptionDetails = () => {
     </Box>
   )
 }
-
-const wasteRemovalSubscriptionSchema = yup.object({
-  location: validation.location,
-  wasteTypes: yup
-    .array()
-    .of(yup.string())
-    .min(1, (min) => `Выберите хотя бы ${min.min} элемент`),
-  radius: yup
-    .number()
-    // .nullable()
-    .required(validation.validationMessages.required)
-    .min(1, (min) => `Значение не должно быть меньше ${min.min}`)
-    .max(200, (max) => `Значение не должно быть больше ${max.max}`),
-})
 
 export default function CreateSubscription() {
   const [severity, setSeverity] = useState<string>('success')
@@ -118,7 +98,7 @@ export default function CreateSubscription() {
         console.log(activeSubscriptions)
 
         if (
-          activeSubscriptions.includes(subscriptionVariantNames.wasteAvailable)
+          !activeSubscriptions.includes(subscriptionVariantNames.wasteAvailable)
         ) {
           setViewStatus('unsubscribed')
           return
@@ -142,12 +122,12 @@ export default function CreateSubscription() {
 
   //ToDo: refactor to helper function, since this handler can also be used for creating removalApplications
   const createHandler = (
-    values: WasteAvailableSubscriptionConfig,
+    values: yup.InferType<typeof wasteAvailableSubscriptionSchema>,
     {
       setSubmitting,
       setErrors,
       resetForm,
-    }: FormikHelpers<WasteAvailableSubscriptionConfig>,
+    }: FormikHelpers<yup.InferType<typeof wasteAvailableSubscriptionSchema>>,
   ) => {
     setSubmitting(true)
 
@@ -162,19 +142,11 @@ export default function CreateSubscription() {
         if (!response.ok) {
           throw new Error(errorMessage)
         }
-        return response.json()
+        resetForm()
+        // router.push(indexRoute)
       })
-      .then((data) => {
-        if (data.error) {
-          setSeverity('error')
-          showErrorMessages(data.error, setErrors, setNotification)
-        } else if (data.message) {
-          resetForm()
-          router.push(indexRoute)
-        }
-      })
+
       .catch((error) => {
-        console.log(error)
         setSeverity('error')
         setNotification(errorMessage)
       })
@@ -214,17 +186,19 @@ export default function CreateSubscription() {
           {showDetails ? <SubscriptionDetails /> : null}
         </Box>
         <Box sx={{ width: '100%' }}>
-          <Formik
+          <Formik<yup.InferType<typeof wasteAvailableSubscriptionSchema>>
             enableReinitialize
-            initialValues={{
-              location: null,
-              wasteTypes: [],
-              radius: '' as unknown as number,
-            }}
-            validationSchema={wasteRemovalSubscriptionSchema}
+            initialValues={
+              {
+                location: null,
+                wasteTypes: [],
+                radius: '',
+              } as any
+            }
+            validationSchema={wasteAvailableSubscriptionSchema}
             onSubmit={(
-              values: WasteAvailableSubscriptionConfig,
-              actions: FormikHelpers<WasteAvailableSubscriptionConfig>,
+              values /*: WasteAvailableSubscriptionConfig*/,
+              actions /*: FormikHelpers<WasteAvailableSubscriptionConfig>*/,
             ) => {
               createHandler(values, actions)
             }}
@@ -242,14 +216,13 @@ export default function CreateSubscription() {
         sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
       >
         <Typography paragraph align="center">
-          У вас отключено получение уведомлений о появлении вторсырья.
+          У вас отключено получение уведомлений о наличии вторсырья.
         </Typography>
         <Typography paragraph align="center">
-          Чтобы иметь возможность добавлять новые подписки, сначала включите
-          уведомления, перейдя по ссылке.
+          Чтобы добавить подписку, включите уведомления, перейдя по ссылке:
         </Typography>
         <Typography>
-          <Link href="#">Управление подпиской</Link>
+          <Link href="/my/subscriptions">Управление подпиской</Link>
         </Typography>
       </Box>
     )

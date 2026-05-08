@@ -1,6 +1,7 @@
 type AggregatedRemovalApplication = {
   locationId: string
   locationName: string
+  coordinates: number[]
   wasteTypes: string[]
 }
 
