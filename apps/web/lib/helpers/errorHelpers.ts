@@ -8,11 +8,8 @@ import {
   GetServerSideProps,
   GetServerSidePropsContext,
 } from 'next'
-
-import { errorResponse } from './responses'
-
-export const INTERNAL_SERVER_ERROR = 'Ошибка сервера'
-export const METHOD_NOT_ALLOWED = 'Method not allowed'
+import { validationErrorResponse } from './responses'
+import { INTERNAL_SERVER_ERROR } from '../errors'
 
 export function mapErrors(error: ValidationError) {
   if (Array.isArray(error)) return null
@@ -77,7 +74,7 @@ export const apiHandler =
       }
 
       if (e instanceof ValidationError && allowValidationErrorsOnFrontend) {
-        return errorResponse(e, res)
+        return validationErrorResponse(e, res)
       }
       res.status(500).json({
         error: INTERNAL_SERVER_ERROR,

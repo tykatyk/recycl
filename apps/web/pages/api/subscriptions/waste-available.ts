@@ -32,32 +32,34 @@ async function wasteAvailableSubscriptionApiHandler(
 
   switch (req.method) {
     case 'POST': {
-      try {
-        await wasteAvailableSubscriptionSchema.validate(req.body)
+      await wasteAvailableSubscriptionSchema.validate(req.body, {
+        abortEarly: false,
+      })
 
-        const { location, wasteTypes, radius } = req.body
-        const coords = await getCoords(location.place_id)
-        if (!coords) {
-          throw new Error()
-        }
-
-        const user = session.id
-
-        await WasteAvailableSubscriptionModel.create({
-          user,
-          location: {
-            position: { type: 'Point', coordinates: coords },
-            ...location,
-          },
-          wasteTypes,
-          radius,
-        })
-
-        return res.status(200).end()
-      } catch (error) {
-        console.error(error)
-        return res.status(400).end()
+      const { location, wasteTypes, radius } = req.body
+      const coords = await getCoords(location.place_id)
+      if (!coords) {
+        throw new Error('Cannot retrieve coordinates')
       }
+
+      const user = session.id
+
+      await WasteAvailableSubscriptionModel.create({
+        user,
+        location: {
+          position: { type: 'Point', coordinates: coords },
+          ...location,
+        },
+        wasteTypes,
+        radius,
+      })
+
+      return res
+        .status(200)
+        .end({ status: 'OK', message: 'Subscription created' })
+    }
+    case 'PATCH': {
+      //ToDo: implement
     }
     case 'GET': {
       const subscriptions = await SubscriptionModel.find({
@@ -80,4 +82,4 @@ async function wasteAvailableSubscriptionApiHandler(
   }
 }
 
-export default apiHandler(wasteAvailableSubscriptionApiHandler)
+export default apiHandler(wasteAvailableSubscriptionApiHandler, true)

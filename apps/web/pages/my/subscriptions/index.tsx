@@ -45,7 +45,6 @@ export default function MySubscriptions() {
 
   const handleClose = () => setBackendError('')
 
-  //ToDo: check if user has removal application ads before letting him to create a waste removal subscription
   const handleChange = async (name: string) => {
     let updatedUserSubs: SubscriptionName = []
     let subscribed = false
@@ -74,7 +73,7 @@ export default function MySubscriptions() {
   }
 
   async function fetchUserSubscriptions() {
-    return await fetch(subscriptionsApi)
+    return await fetch('/api/subscriptions?subscribed=true')
       .then((respone) => {
         if (!respone.ok) {
           throw new Error('Ошибка сервера')
@@ -151,7 +150,7 @@ export default function MySubscriptions() {
         {sub.isConfigurable ? (
           <Grid item xs={12}>
             <Button
-              startIcon={<SettingsIcon />}
+              endIcon={<SettingsIcon />}
               href={getSubscriptionConfigUrl('waste-available')}
               disabled={userSubsForSearch.has(sub.name) ? false : true}
             >

@@ -60,10 +60,19 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
       //   console.error(error)
       // }
 
-      const subscriptions = await SubscriptionModel.find({
-        user: session.id,
-        subscribed: true,
-      }).lean()
+      const { variant, subscribed } = req.query
+
+      const dbQuery: Record<string, unknown> = { user: session.id }
+
+      if (subscribed) {
+        dbQuery.subscribed = subscribed === 'true' ? true : false
+      }
+
+      if (variant) {
+        dbQuery.variant = variant
+      }
+
+      const subscriptions = await SubscriptionModel.find(dbQuery).lean()
 
       if (!subscriptions) return res.json([])
 

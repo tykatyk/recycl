@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { Message } from '@recycl/shared/dist/server/db'
-import { internalServerError } from '../../errors/index'
+import { INTERNAL_SERVER_ERROR } from '../../errors/index'
 
 const messageQueries = {
   create: async (data, user) => {
@@ -9,7 +9,7 @@ const messageQueries = {
       return await Message.create(data)
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -24,7 +24,7 @@ const messageQueries = {
         },
       ).exec()
     } catch (error) {
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -33,7 +33,7 @@ const messageQueries = {
     try {
       return await Message.findById(id).exec()
     } catch (error) {
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
   //ToDo: Maybe set limit to env variable
@@ -146,7 +146,7 @@ const messageQueries = {
       return processedResult
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -181,7 +181,7 @@ const messageQueries = {
       return result
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -231,7 +231,7 @@ const messageQueries = {
       return result.length > 0 ? result.map((element) => element._id) : []
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -239,7 +239,7 @@ const messageQueries = {
     try {
       return await Message.findByIdAndRemove(id).exec()
     } catch (error) {
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -250,7 +250,7 @@ const messageQueries = {
       return result.deletedCount
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -297,7 +297,7 @@ const messageQueries = {
       })
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -405,7 +405,7 @@ const messageQueries = {
       })
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 }

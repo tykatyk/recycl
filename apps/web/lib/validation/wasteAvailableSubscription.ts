@@ -10,6 +10,7 @@ export const wasteAvailableSubscriptionSchema = yup.object({
     .min(1, (min) => `Выберите хотя бы ${min.min} элемент`),
   radius: yup
     .number()
+    .typeError('Введите целое цисло')
     .required(validation.validationMessages.required)
     .min(1, (min) => `Значение не должно быть меньше ${min.min}`)
     .max(200, (max) => `Значение не должно быть больше ${max.max}`),

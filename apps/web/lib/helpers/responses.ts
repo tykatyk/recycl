@@ -6,10 +6,10 @@ import type { ValidationError } from 'yup'
 type ErrorResponse = { error: FormValidationError }
 
 export const perFormErrorResponse = function (
-  message = 'Неизвестная ошибка',
+  message: string,
   res: NextApiResponse<ErrorResponse>,
 ) {
-  res.status(500).json({
+  res.status(422).json({
     error: {
       type: 'perForm',
       message,
@@ -17,7 +17,7 @@ export const perFormErrorResponse = function (
   })
 }
 
-export const errorResponse = function (
+export const validationErrorResponse = function (
   error: ValidationError,
   res: NextApiResponse<ErrorResponse>,
 ) {
@@ -30,7 +30,7 @@ export const errorResponse = function (
       },
     })
   } else {
-    perFormErrorResponse('Возникла ошибка при проверке данных формы', res)
+    perFormErrorResponse('Ошибка при проверке данных формы', res)
   }
 }
 

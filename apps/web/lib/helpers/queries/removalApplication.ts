@@ -1,7 +1,7 @@
 import getCoords from '../getCoords'
 //import removalApplication from '../../validation/removalApplication' //ToDo: Add validation before create and update operations
 import { RemovalApplicationModel } from '@recycl/shared/dist/server/db'
-import { internalServerError } from '../../errors/index'
+import { INTERNAL_SERVER_ERROR } from '../../errors'
 
 const removalApplicationQueries = {
   create: async (data, user) => {
@@ -26,7 +26,7 @@ const removalApplicationQueries = {
       return await removalAppliaction.save()
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -39,7 +39,7 @@ const removalApplicationQueries = {
       return result
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -85,7 +85,7 @@ const removalApplicationQueries = {
       return result
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -99,7 +99,7 @@ const removalApplicationQueries = {
       return await RemovalApplicationModel.find(query)
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -154,7 +154,7 @@ const removalApplicationQueries = {
       return result
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -165,7 +165,7 @@ const removalApplicationQueries = {
       }).exec()
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -174,7 +174,7 @@ const removalApplicationQueries = {
       return await RemovalApplicationModel.findByIdAndRemove(id).exec()
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
@@ -185,7 +185,7 @@ const removalApplicationQueries = {
       }).exec()
     } catch (error) {
       console.log(error)
-      throw internalServerError
+      throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 }

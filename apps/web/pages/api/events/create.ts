@@ -6,10 +6,9 @@ import {
   dbConnect,
   WasteRemovalEventModel as EventModel,
 } from '@recycl/shared/dist/server/db'
-import {
-  apiHandler,
-  METHOD_NOT_ALLOWED,
-} from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
+
 import mongoose from 'mongoose'
 import getCoords from '../../../lib/helpers/getCoords'
 
