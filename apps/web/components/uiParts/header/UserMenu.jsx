@@ -9,11 +9,19 @@ import {
   ListItem,
   MenuList,
   ListItemText,
+  ListItemIcon,
 } from '@mui/material'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import Link from '../Link'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
+import LoginIcon from '@mui/icons-material/Login'
+import LogoutIcon from '@mui/icons-material/Logout'
+import SettingsIcon from '@mui/icons-material/Settings'
+import InventoryIcon from '@mui/icons-material/Inventory'
+import PlaceIcon from '@mui/icons-material/Place'
+import EmailIcon from '@mui/icons-material/Email'
 
 const authenticated = 'authenticated'
 
@@ -44,30 +52,32 @@ export default function UserMenu(props) {
       text: 'Мои',
       items: [
         {
-          text: 'Обьявления о наличии отходов',
+          text: 'Обьявления о наличии вторсырья',
           href: '/my/applications',
+          icon: InventoryIcon,
         },
         {
-          text: 'Обьявления о приеме отходов передвижными пунктами',
+          text: 'Пункты приема вторсырья',
           href: '/my/events',
-        },
-        {
-          text: 'Пункты приема отходов',
-          href: '#',
+          icon: PlaceIcon,
         },
         {
           text: 'Подписки на уведомления',
           href: '/my/subscriptions',
+          icon: EmailIcon,
         },
       ],
     },
     {
       text: 'Настройки',
       href: '/my/account',
+      icon: SettingsIcon,
     },
   ]
 
   const showSubmenu = (item, index) => {
+    const Icon = item.icon
+
     if (item.items) {
       return (
         <ListItem sx={{ flexDirection: 'column' }} key={index}>
@@ -90,48 +100,65 @@ export default function UserMenu(props) {
     } else {
       return (
         <MenuItem onClick={handleClose} key={index}>
-          <Link
-            href={item.href}
-            onClick={preventDefault}
-            color="inherit"
-            underline="none"
-            className={classes.link}
-          >
-            {item.text}
-          </Link>
+          <ListItemIcon>{Icon ? <Icon /> : null}</ListItemIcon>
+          <ListItemText>
+            <Link
+              href={item.href}
+              onClick={preventDefault}
+              color="inherit"
+              underline="none"
+              className={classes.link}
+            >
+              {item.text}
+            </Link>
+          </ListItemText>
         </MenuItem>
       )
     }
   }
 
   let logIn = (
-    <Link
-      href="/auth/login"
-      color="inherit"
-      underline="none"
-      className={classes.link}
-    >
-      Войти
-    </Link>
+    <>
+      <ListItemIcon>
+        <LoginIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText>
+        <Link
+          href="/auth/login"
+          color="inherit"
+          underline="none"
+          className={classes.link}
+        >
+          Войти
+        </Link>
+      </ListItemText>
+    </>
   )
 
   if (status === authenticated) {
     logIn = (
-      <Link
-        href="/"
-        onClick={async () => {
-          preventDefault(),
-            await signOut({
-              callbackUrl: `${window.location.origin}`,
-            })
-          await apolloClient.resetStore()
-        }}
-        color="inherit"
-        underline="none"
-        className={classes.link}
-      >
-        Выйти
-      </Link>
+      <>
+        <ListItemIcon>
+          <LogoutIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>
+          <Link
+            href="/"
+            onClick={async () => {
+              ;(preventDefault(),
+                await signOut({
+                  callbackUrl: `${window.location.origin}`,
+                }))
+              await apolloClient.resetStore()
+            }}
+            color="inherit"
+            underline="none"
+            className={classes.link}
+          >
+            Выйти
+          </Link>
+        </ListItemText>
+      </>
     )
   }
 
@@ -155,15 +182,17 @@ export default function UserMenu(props) {
             <ClickAwayListener onClickAway={handleClose}>
               <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
                 {status === authenticated && (
-                  <ListItem divider>
-                    <ListItemText
-                      style={{
-                        textAlign: 'center',
-                        color: theme.palette.secondary.main,
-                      }}
-                      secondary={session.user.name}
-                    />
-                  </ListItem>
+                  <MenuItem>
+                    <ListItem divider>
+                      <ListItemText
+                        style={{
+                          textAlign: 'center',
+                          color: theme.palette.secondary.main,
+                        }}
+                        secondary={session.user.name}
+                      />
+                    </ListItem>
+                  </MenuItem>
                 )}
                 {status === authenticated &&
                   menuItems.map((item, index) => {

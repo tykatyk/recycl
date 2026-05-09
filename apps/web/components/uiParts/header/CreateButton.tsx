@@ -20,16 +20,12 @@ export default function CreateButton(props) {
 
   const menuItems = [
     {
-      text: 'Объявление о наличии отходов',
+      text: 'Объявление о наличии вторсырья',
       href: '/applications/create',
     },
     {
-      text: 'Объявление о приеме отходов передвижным пунктом',
+      text: 'Пункт приема вторсырья',
       href: '/my/events/create',
-    },
-    {
-      text: 'Стационарный пункт приема отходов',
-      href: '#',
     },
     {
       text: 'Подписку на получение уведомлений',
