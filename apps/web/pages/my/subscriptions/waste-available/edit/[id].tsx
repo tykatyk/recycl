@@ -1,4 +1,4 @@
-import CreateSubscription from '../../../../../components/subscriptions/CreateSubscription'
+import CreateSubscription from '../../../../../components/subscriptions/CreateUpdateSubscription'
 export default function EditWasteAvailableSubscription() {
-  return <CreateSubscription />
+  return <CreateSubscription action="update" />
 }

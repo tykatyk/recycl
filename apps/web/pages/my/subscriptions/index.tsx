@@ -5,6 +5,8 @@ import {
   Switch,
   Button,
   Box,
+  IconButton,
+  Tooltip,
 } from '@mui/material'
 import Layout from '../../../components/layouts/Layout'
 import PageLoadingCircle from '../../../components/uiParts/PageLoadingCircle'
@@ -13,6 +15,8 @@ import Snackbars from '../../../components/uiParts/Snackbars'
 import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
 import { useEffect, useMemo, useState } from 'react'
 import type { SubscriptionVariant } from '@recycl/shared/dist/server/db/models/subscriptionVariant'
+import HelpIcon from '@mui/icons-material/Help'
+import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 
 const loadingErrorText = 'Ошибка при загрузке данных'
 const updatingErrorMessage = 'Ошибка при обновлении данных'
@@ -30,14 +34,40 @@ const getSubscriptionConfigUrl = (id: string) => {
 
 type SubscriptionName = string[]
 
+const SubscriptionDetails = () => {
+  return (
+    <Box
+      bgcolor="secondary.main"
+      sx={{
+        p: 2,
+        border: '1px dashed #ccc',
+        borderRadius: '8px',
+      }}
+    >
+      <Typography
+        sx={{
+          fontWeight: 200,
+          fontSize: '0.875rem',
+          color: 'secondary.contrastText',
+        }}
+      >
+        {`Подписка предназначена для тех, кто занимается сбором вторсырья для дальнейшей переработки или утилизации. Она позволяет находить сырье, которое вам нужно, в местах, в которых вы работаете. Для добавления подписки укажите местоположение, относительно которого будет производится поиск, радиус поиска и один или несколько видов вторсырья. После добавления подписки, вы будете получать уведомления на электронную почту о новых объявлениях о наличии вторсырья.`}
+      </Typography>
+    </Box>
+  )
+}
+type SubsVarNameType = typeof subscriptionVariantNames
+
 export default function MySubscriptions() {
   const [backendError, setBackendError] = useState('')
   const [allSubs, setAllSubs] = useState<
     ({ _id: string } & SubscriptionVariant)[]
   >([])
   const [userSubs, setUserSubs] = useState<SubscriptionName>([])
-
   const [loading, setLoading] = useState(false)
+  const [showDetails, setShowDetails] = useState<
+    SubsVarNameType[keyof SubsVarNameType][]
+  >([])
 
   const userSubsForSearch = useMemo(() => {
     return new Set(userSubs)
@@ -130,7 +160,29 @@ export default function MySubscriptions() {
         }}
       >
         <Grid item xs={12}>
-          <Typography>{sub.userDescription}</Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography>{sub.userDescription}</Typography>
+              <Tooltip title="Подробнее об этой подписке">
+                <IconButton
+                  onClick={() => {
+                    const updated = showDetails.includes(sub.name)
+                      ? showDetails.filter((item) => item !== sub.name)
+                      : [...showDetails, sub.name]
+                    setShowDetails(updated)
+                  }}
+                >
+                  <HelpIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            {showDetails.includes(sub.name) ? <SubscriptionDetails /> : null}
+          </Box>
         </Grid>
 
         <Grid item xs={12}>

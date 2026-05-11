@@ -72,9 +72,7 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
         dbQuery.variant = variant
       }
 
-      const subscriptions = await SubscriptionModel.find(dbQuery).lean()
-
-      if (!subscriptions) return res.json([])
+      const subscriptions = await SubscriptionModel.find(dbQuery)
 
       const variantIds = subscriptions.map((sub) => sub.variant)
 

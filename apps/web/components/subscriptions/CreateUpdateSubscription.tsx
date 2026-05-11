@@ -1,61 +1,46 @@
 import { useEffect, useState } from 'react'
 import Snackbar from '../uiParts/Snackbars'
-import ErrorComponent from '../uiParts/Error'
 import SubscriptionForm from './SubscriptionForm'
 import { Formik, FormikHelpers } from 'formik'
-import {
-  getInitialValues,
-  getNormalizedValues,
-} from '../../lib/helpers/eventHelpers'
-import { eventSchema } from '../../lib/validation'
+import { getNormalizedValues } from '../../lib/helpers/eventHelpers'
 import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
-import type {
-  Event,
-  EventCreateUpdateProps,
-  IsInactive,
-} from '../../lib/types/event'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { Box, IconButton, Tooltip, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import type { Waste } from '../../lib/types/waste'
-import { PlaceType } from '../../lib/types/placeAutocomplete'
 import Layout from '../layouts/Layout'
-import HelpIcon from '@mui/icons-material/Help'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import Link from '../uiParts/Link'
 import { wasteAvailableSubscriptionSchema } from '../../lib/validation'
 import * as yup from 'yup'
 
-const title = 'Создание подписки на получение уведомлений о наличии вторсырья'
+const createTitle =
+  'Создание подписки на получение уведомлений о наличии вторсырья'
+const updateTitle =
+  'Редактирование подписки на получение уведомлений о наличии вторсырья'
+
 const errorMessage = 'Возникла ошибка при сохранении заявки'
+
 const createRoute = `/api/subscriptions/waste-available`
+const updateRoute = (id: string) => `/api/subscriptions/waste-available/${id}`
 const indexRoute = '/my/subscriptions/waste-available'
 
-const SubscriptionDetails = () => {
-  return (
-    <Box
-      sx={{
-        p: 2,
-        border: '1px dashed #ccc',
-        borderRadius: '8px',
-      }}
-    >
-      <Typography sx={{ fontWeight: 200, fontSize: '0.875rem', color: '#ccc' }}>
-        {`Подписка предназначена для тех, кто занимается сбором вторсырья для дальнейшей переработки или утилизации. Она позволяет находить сырье, которое вам нужно, в местах, в которых вы работаете. Для добавления подписки укажите местоположение, относительно которого будет производится поиск, радиус поиска и один или несколько видов вторсырья. После добавления подписки, вы будете получать уведомления на электронную почту о новых объявлениях о наличии вторсырья.`}
-      </Typography>
-    </Box>
-  )
-}
-
-export default function CreateSubscription() {
+export default function CreateSubscription(params: { action: string }) {
+  const { action } = params
   const [severity, setSeverity] = useState<string>('success')
   const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
   const router = useRouter()
-  const { isInactive }: IsInactive = router.query
   const [notification, setNotification] = useState<string>('')
-  // const initialValues = getInitialValues(event, userPhone)
-  const { data: session, status } = useSession({
+  const [viewStatus, setViewStatus] = useState('')
+  const [initialValues, setInitialValues] = useState({
+    location: null,
+    wasteTypes: [],
+    radius: '',
+  } as any)
+  const { id = '' } = router.query
+
+  useSession({
     required: true,
     onUnauthenticated() {
       window.location.replace(
@@ -64,13 +49,8 @@ export default function CreateSubscription() {
     },
   })
 
-  const [showDetails, setShowDetails] = useState(false)
-  const [subscibed, setSubscribed] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [viewStatus, setViewStatus] = useState('')
-
   useEffect(() => {
-    const getActiveSubscriptions = async () => {
+    const getUserSubscriptions = async () => {
       const response = await fetch('/api/subscriptions')
 
       if (!response.ok) {
@@ -93,9 +73,7 @@ export default function CreateSubscription() {
     const loadData = async () => {
       try {
         setViewStatus('loading')
-        const activeSubscriptions = await getActiveSubscriptions()
-
-        console.log(activeSubscriptions)
+        const activeSubscriptions = await getUserSubscriptions()
 
         if (
           !activeSubscriptions.includes(subscriptionVariantNames.wasteAvailable)
@@ -117,91 +95,89 @@ export default function CreateSubscription() {
     loadData()
   }, [])
 
-  //show error if no wasteTypes found
-  if (!wasteTypes) return <ErrorComponent />
+  useEffect(() => {
+    const fetcher = async () => {
+      if (!id) return
 
-  //ToDo: refactor to helper function, since this handler can also be used for creating removalApplications
-  const createHandler = (
+      const response = await fetch(`/api/subscriptions/waste-available/${id}`)
+
+      if (!response.ok) throw new Error(errorMessage)
+
+      const data = await response.json()
+      setInitialValues(data)
+    }
+
+    fetcher()
+  }, [id])
+
+  const createHandler = async (
     values: yup.InferType<typeof wasteAvailableSubscriptionSchema>,
     {
       setSubmitting,
       setErrors,
-      resetForm,
     }: FormikHelpers<yup.InferType<typeof wasteAvailableSubscriptionSchema>>,
   ) => {
+    let method = ''
+    let route = ''
+
+    switch (action) {
+      case 'create':
+        method = 'POST'
+        route = createRoute
+        break
+      case 'update':
+        method = 'PUT'
+        route = updateRoute(String(id))
+        break
+
+      default:
+        return
+    }
     setSubmitting(true)
 
     const normalizedValues = getNormalizedValues(values)
 
-    fetch(createRoute, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(normalizedValues),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(errorMessage)
-        }
-        resetForm()
-        // router.push(indexRoute)
+    try {
+      const response = await fetch(route, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(normalizedValues),
       })
 
-      .catch((error) => {
-        setSeverity('error')
-        setNotification(errorMessage)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+      if (!response.ok) {
+        if (response.status === 422) {
+          const data = await response.json()
+          setSeverity('error')
+          showErrorMessages(data.error, setErrors, setNotification)
+          return
+        }
+        throw new Error(errorMessage)
+      }
+
+      router.push(indexRoute)
+    } catch (error) {
+      setSeverity('error')
+      setNotification(errorMessage)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  const CreationForm = () => {
+  const CreateUpdateForm = () => {
     return (
       <>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            // justifyContent: 'center',
-            // alignItems: 'center',
-            mb: 2,
-          }}
-        >
-          <Box sx={{ display: 'flex' }}>
-            <Typography component={'h1'} variant="h6" align="center">
-              {title}
-            </Typography>
-            <Box sx={{ pl: 2 }}>
-              <Tooltip title="Подробнее об этой подписке">
-                <IconButton
-                  onClick={() => {
-                    setShowDetails(!showDetails)
-                  }}
-                >
-                  <HelpIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
-          {showDetails ? <SubscriptionDetails /> : null}
+        <Box sx={{ mb: 2 }}>
+          <Typography component={'h1'} variant="h6" align="center">
+            {action === 'create' ? createTitle : updateTitle}
+          </Typography>
         </Box>
+
         <Box sx={{ width: '100%' }}>
           <Formik<yup.InferType<typeof wasteAvailableSubscriptionSchema>>
             enableReinitialize
-            initialValues={
-              {
-                location: null,
-                wasteTypes: [],
-                radius: '',
-              } as any
-            }
+            initialValues={initialValues}
             validationSchema={wasteAvailableSubscriptionSchema}
-            onSubmit={(
-              values /*: WasteAvailableSubscriptionConfig*/,
-              actions /*: FormikHelpers<WasteAvailableSubscriptionConfig>*/,
-            ) => {
-              createHandler(values, actions)
-            }}
+            onSubmit={createHandler}
           >
             <SubscriptionForm wasteTypes={wasteTypes} />
           </Formik>
@@ -235,14 +211,14 @@ export default function CreateSubscription() {
       case 'unsubscribed':
         return <NotSubscribed />
       case 'ok':
-        return <CreationForm />
+        return <CreateUpdateForm />
       default:
         return null
     }
   }
 
   return (
-    <Layout title={title}>
+    <Layout title={action === 'create' ? createTitle : updateTitle}>
       <Box
         sx={{
           display: 'flex',
