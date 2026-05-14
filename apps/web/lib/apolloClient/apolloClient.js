@@ -36,7 +36,6 @@ function createApolloClient() {
     link: additiveLink,
     // cache: new InMemoryCache(cacheOptions),
     cache: new InMemoryCache(),
-    connectToDevTools: true, //ToDo: should be disabled in production
   })
 }
 

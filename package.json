@@ -10,6 +10,7 @@
   "scripts": {
     "dev:web": "npm run dev -w web",
     "dev:worker": "npm run dev -w worker",
+    "dev:shared": "npm run dev -w @recycl/shared",
     "build": "npm run build --workspaces",
     "start:web": "npm run start -w web",
     "start:worker": "npm run start -w worker"

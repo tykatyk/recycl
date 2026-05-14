@@ -1,18 +1,18 @@
-import React from 'react'
+import { Box } from '@mui/material'
 
 export default function Wrapper(props) {
   return (
-    <div
-      css={(theme) => ({
+    <Box
+      sx={{
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
         flexWrap: 'wrap',
         minHeight: '100vh',
-        backgroundColor: `${theme.palette.background.default}`,
-      })}
+        backgroundColor: 'background.default',
+      }}
     >
       {props.children}
-    </div>
+    </Box>
   )
 }

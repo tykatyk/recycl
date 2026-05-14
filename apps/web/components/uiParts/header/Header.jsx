@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { styled, useTheme } from '@mui/material/styles'
-import { AppBar, Toolbar, Container } from '@mui/material'
+import { useState, useEffect } from 'react'
+import { useTheme } from '@mui/material/styles'
+import { AppBar, Toolbar, Container, Box } from '@mui/material'
 import UserMenu from './UserMenu'
 import UnreadDialogsCounter from './UnreadDialogsCounter'
 import UserAvatar from './UserAvatar'
@@ -8,43 +8,6 @@ import DesktopNavigation from './DesktopNavigation'
 import MobileNavigation from './MobileNavigation'
 import CreateButton from './CreateButton'
 import { useSession } from 'next-auth/react'
-
-const PREFIX = 'Header'
-
-const classes = {
-  root: `${PREFIX}-root`,
-  header: `${PREFIX}-header`,
-  buttons: `${PREFIX}-buttons`,
-  gutter: `${PREFIX}-gutter`,
-}
-
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  [`&.${classes.root}`]: {
-    zIndex: theme.zIndex.drawer + 1,
-    background: '#1a2b34',
-    alignSelf: 'flex-start',
-  },
-
-  [`& .${classes.header}`]: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: 0,
-  },
-
-  [`& .${classes.buttons}`]: {
-    display: 'flex',
-    alignItems: 'center',
-    marginLeft: 'auto',
-  },
-
-  [`& .${classes.gutter}`]: {
-    display: 'flex',
-    paddingLeft: theme.spacing(2),
-    [theme.breakpoints.down('md')]: {
-      paddingLeft: 0,
-    },
-  },
-}))
 
 export default function Header(props) {
   const theme = useTheme()
@@ -98,9 +61,19 @@ export default function Header(props) {
   }
 
   return (
-    <StyledAppBar position="static" id="mainHeader" className={classes.root}>
+    <AppBar
+      position="static"
+      id="mainHeader"
+      sx={{
+        zIndex: theme.zIndex.drawer + 1,
+        background: '#1a2b34',
+        alignSelf: 'flex-start',
+      }}
+    >
       <Container component="div">
-        <Toolbar className={classes.header}>
+        <Toolbar
+          sx={{ display: 'flex', justifyContent: 'space-between', padding: 0 }}
+        >
           {mobileView ? (
             <MobileNavigation
               {...{ drawerOpen, handleDrawerOpen, handleDrawerClose }}
@@ -108,15 +81,25 @@ export default function Header(props) {
           ) : (
             <DesktopNavigation />
           )}
-          <div className={classes.buttons}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}
+          >
             {status === 'authenticated' && (
-              <div className={classes.gutter}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  paddingLeft: theme.spacing(2),
+                  [theme.breakpoints.down('md')]: {
+                    paddingLeft: 0,
+                  },
+                }}
+              >
                 <CreateButton />
                 {/* <UnreadDialogsCounter currentDialogId={currentDialogId} /> */}
-              </div>
+              </Box>
             )}
             <UserAvatar handleMenu={handleMenu} />
-          </div>
+          </Box>
           <UserMenu
             open={menuOpen}
             anchorEl={anchorEl}
@@ -125,6 +108,6 @@ export default function Header(props) {
           />
         </Toolbar>
       </Container>
-    </StyledAppBar>
+    </AppBar>
   )
 }

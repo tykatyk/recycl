@@ -23,18 +23,30 @@ const updatingErrorMessage = 'Ошибка при обновлении данн�
 const titleHeadingText = 'Мои подписки на получение уведомлений'
 const enabledText = 'Включено'
 const disabledText = 'Выключено'
-const configText = 'Настроить подписку'
+const configText = 'Настроить'
+const subscriptionConfig = {
+  wasteAvailable: {
+    title:
+      'Получать уведомления о наличии в моем регионе вторсырья для переработки или утилизации',
+    description: `Подписка предназначена для тех, кто занимается сбором вторсырья для дальнейшей переработки или утилизации. Она позволяет находить сырье, которое вам нужно, в местах, в которых вы работаете. Для добавления подписки укажите местоположение, относительно которого будет производится поиск, радиус поиска и один или несколько видов вторсырья. После добавления подписки, вы будете получать уведомления на электронную почту о новых объявлениях о наличии вторсырья.`,
+    href: '/my/subscriptions/waste-available',
+  },
+  wasteRemoval: {
+    title:
+      'Получать уведомления о появлении в моем регионе пунктов приема вторсырья',
+    description: `Подписка предназначена для тех, кто хочет сдать вторсырье на переработку, но поблизости нет пунктов приема. Данные о типах и местоположении вторсырья, для которых будет производится поиск пунктов приема, берутся из ваших объявлений о наличии вторсырья. Для добавления подписки укажите радиус, в котором будет производится поиск.`,
+    href: '/my/subscriptions/waste-removal',
+  },
+} as const
 const subscriptionVariantsApi = '/api/subscriptions/variant'
 const subscriptionsApi = '/api/subscriptions'
 const mySubscriptionsUrl = '/my/subscriptions/'
 
-const getSubscriptionConfigUrl = (id: string) => {
-  return `${mySubscriptionsUrl}${id}`
-}
-
 type SubscriptionName = string[]
 
-const SubscriptionDetails = () => {
+const SubscriptionDetails = (props: { details: string }) => {
+  const { details } = props
+
   return (
     <Box
       bgcolor="secondary.main"
@@ -46,12 +58,12 @@ const SubscriptionDetails = () => {
     >
       <Typography
         sx={{
-          fontWeight: 200,
+          fontWeight: 300,
           fontSize: '0.875rem',
           color: 'secondary.contrastText',
         }}
       >
-        {`Подписка предназначена для тех, кто занимается сбором вторсырья для дальнейшей переработки или утилизации. Она позволяет находить сырье, которое вам нужно, в местах, в которых вы работаете. Для добавления подписки укажите местоположение, относительно которого будет производится поиск, радиус поиска и один или несколько видов вторсырья. После добавления подписки, вы будете получать уведомления на электронную почту о новых объявлениях о наличии вторсырья.`}
+        {details}
       </Typography>
     </Box>
   )
@@ -155,7 +167,6 @@ export default function MySubscriptions() {
         sx={{
           alignItems: 'center',
           borderBottom: '1px solid #7d7d7d',
-          pt: 3,
           pb: 3,
         }}
       >
@@ -167,7 +178,7 @@ export default function MySubscriptions() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography>{sub.userDescription}</Typography>
+              <Typography>{subscriptionConfig[sub.name].title}</Typography>
               <Tooltip title="Подробнее об этой подписке">
                 <IconButton
                   onClick={() => {
@@ -181,7 +192,11 @@ export default function MySubscriptions() {
                 </IconButton>
               </Tooltip>
             </Box>
-            {showDetails.includes(sub.name) ? <SubscriptionDetails /> : null}
+            {showDetails.includes(sub.name) ? (
+              <SubscriptionDetails
+                details={subscriptionConfig[sub.name].description}
+              />
+            ) : null}
           </Box>
         </Grid>
 
@@ -199,17 +214,17 @@ export default function MySubscriptions() {
             label={userSubsForSearch.has(sub.name) ? enabledText : disabledText}
           />
         </Grid>
-        {sub.isConfigurable ? (
-          <Grid item xs={12}>
-            <Button
-              endIcon={<SettingsIcon />}
-              href={getSubscriptionConfigUrl('waste-available')}
-              disabled={userSubsForSearch.has(sub.name) ? false : true}
-            >
-              {configText}
-            </Button>
-          </Grid>
-        ) : null}
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            size="small"
+            endIcon={<SettingsIcon />}
+            href={subscriptionConfig[sub.name].href}
+            disabled={userSubsForSearch.has(sub.name) ? false : true}
+          >
+            {configText}
+          </Button>
+        </Grid>
       </Grid>
     )
   })
@@ -224,7 +239,7 @@ export default function MySubscriptions() {
     <Layout title={`${titleHeadingText} | Recycl`}>
       <RedirectUnathenticatedUser>
         <Box>
-          <Typography gutterBottom variant="h4" component="h1" sx={{ mb: 4 }}>
+          <Typography sx={{ mb: 4 }} variant="h4" component="h1">
             {titleHeadingText}
           </Typography>
           {content}

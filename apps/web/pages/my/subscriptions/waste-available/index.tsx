@@ -1,8 +1,9 @@
 import { Box, Button, Typography } from '@mui/material'
 import Layout from '../../../../components/layouts/Layout'
+
 export default function WasteAvailableSubscriptions() {
   return (
-    <Layout title="Подписки на обьявления о наличии отходов">
+    <Layout title="Подписки на обьявления о наличии вторсырья">
       <Box
         sx={{
           margin: 'auto',

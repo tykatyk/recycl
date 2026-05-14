@@ -5,10 +5,8 @@ import {
   SubscriptionVariantModel as SubscriptionVariant,
   dbConnect,
 } from '@recycl/shared/dist/server/db'
-import {
-  apiHandler,
-  METHOD_NOT_ALLOWED,
-} from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
 
 async function subscriptionVariants(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {

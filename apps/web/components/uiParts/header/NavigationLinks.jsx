@@ -1,28 +1,9 @@
-import React from 'react'
-import { styled } from '@mui/material/styles'
 import { List, ListItem, ListItemText, Typography } from '@mui/material'
 import Link from '../Link'
 
-const PREFIX = 'NavigationLinks'
-
-const classes = {
-  navLinks: `${PREFIX}-navLinks`,
-  link: `${PREFIX}-link`,
-}
-
-const StyledTypography = styled(Typography)(({ theme }) => ({
-  [`&.${classes.navLinks}`]: {
-    flexGrow: 1,
-  },
-
-  [`& .${classes.link}`]: {
-    '&:hover': {
-      color: theme.palette.primary.main,
-    },
-  },
-}))
-
 export default function HeaderLinks(props) {
+  const { isDesktop = ture } = props
+
   const preventDefault = () => false
 
   const links = [
@@ -37,15 +18,11 @@ export default function HeaderLinks(props) {
   ]
 
   const styles = {}
-  if (props.isDesktop) {
+  if (isDesktop) {
     ;((styles.display = 'inline-block'), (styles.width = 'auto'))
   }
   return (
-    <StyledTypography
-      component="nav"
-      align="right"
-      className={classes.navLinks}
-    >
+    <Typography component="nav" align="right" sx={{ flexGrow: 1 }}>
       <List>
         {links.map((link, index) => (
           <ListItem key={index} style={styles}>
@@ -55,7 +32,11 @@ export default function HeaderLinks(props) {
                 onClick={preventDefault}
                 color="inherit"
                 underline="none"
-                className={classes.link}
+                sx={{
+                  '&:hover': {
+                    color: 'primary.main',
+                  },
+                }}
               >
                 {link.text}
               </Link>
@@ -63,10 +44,6 @@ export default function HeaderLinks(props) {
           </ListItem>
         ))}
       </List>
-    </StyledTypography>
+    </Typography>
   )
-}
-
-HeaderLinks.defaultProps = {
-  isDesktop: true,
 }

@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   modularizeImports: {
     '@mui/material': {
       transform: '@mui/material/{{member}}',
@@ -16,7 +15,7 @@ const nextConfig = {
       transform: '@mui/lab/{{member}}',
     },
   },
-  transpilePackages: ['@recycle/shared'],
+  transpilePackages: ['@recycle/shared', 'formik-mui'],
 }
 
 module.exports = nextConfig

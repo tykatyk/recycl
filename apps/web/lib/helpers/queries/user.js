@@ -1,13 +1,13 @@
 import {
   UserModel as User,
-  RemovalApplication,
+  RemovalApplicationModel,
 } from '@recycl/shared/dist/server/db'
 import { mapErrors } from '../../helpers/errorHelpers'
 import {
   contactsSchema,
   phoneSchema,
   changePasswordSchema,
-} from '@recycl/shared'
+} from '../../validation'
 import { compare, hash } from 'bcrypt'
 // const { UserInputError } = require('apollo-server-micro')
 import { GraphQLError } from 'graphql'
@@ -75,7 +75,7 @@ const userQueries = {
     const id = user.id
     try {
       Promise.all([
-        RemovalApplication.deleteMany({ user: id }).exec(),
+        RemovalApplicationModel.deleteMany({ user: id }).exec(),
         User.findByIdAndRemove(id).exec(),
       ])
         .then((result) => {
