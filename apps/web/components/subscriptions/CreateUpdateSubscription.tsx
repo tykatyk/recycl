@@ -7,12 +7,14 @@ import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { Box, Typography } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import type { Waste } from '../../lib/types/waste'
 import Layout from '../layouts/Layout'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import Link from '../uiParts/Link'
+import { default as ErrorComponent } from '../uiParts/Error'
 import { wasteAvailableSubscriptionSchema } from '../../lib/validation'
+import NotSubscribed from './NotSubscribed'
 import * as yup from 'yup'
 
 const createTitle =
@@ -21,6 +23,7 @@ const updateTitle =
   'Редактирование подписки на получение уведомлений о наличии вторсырья'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
+const notSubscribedMessage = ' У вас отключены уведомления о наличии вторсырья.'
 
 const createRoute = `/api/subscriptions/waste-available`
 const updateRoute = (id: string) => `/api/subscriptions/waste-available/${id}`
@@ -51,7 +54,7 @@ export default function CreateSubscription(params: { action: string }) {
 
   useEffect(() => {
     const getUserSubscriptions = async () => {
-      const response = await fetch('/api/subscriptions')
+      const response = await fetch(`/api/subscriptions`)
 
       if (!response.ok) {
         throw new Error('Response is not OK')
@@ -87,8 +90,7 @@ export default function CreateSubscription(params: { action: string }) {
         setWasteTypes(wasteTypes)
         setViewStatus('ok')
       } catch (error) {
-        setSeverity('error')
-        setNotification('Ошибка сервера')
+        setViewStatus('error')
       }
     }
 
@@ -186,21 +188,16 @@ export default function CreateSubscription(params: { action: string }) {
     )
   }
 
-  const NotSubscribed = () => {
+  const ErrorView = () => {
     return (
-      <Box
-        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-      >
-        <Typography paragraph align="center">
-          У вас отключено получение уведомлений о наличии вторсырья.
-        </Typography>
-        <Typography paragraph align="center">
-          Чтобы добавить подписку, включите уведомления, перейдя по ссылке:
-        </Typography>
-        <Typography>
-          <Link href="/my/subscriptions">Управление подпиской</Link>
-        </Typography>
-      </Box>
+      <Stack spacing={3} sx={{ alignItems: 'center' }}>
+        <ErrorComponent />
+        <Box>
+          <Button variant="outlined" color="secondary" href="/my/subscriptions">
+            Вернуться
+          </Button>
+        </Box>
+      </Stack>
     )
   }
 
@@ -209,7 +206,9 @@ export default function CreateSubscription(params: { action: string }) {
       case 'loading':
         return <PageLoadingCircle />
       case 'unsubscribed':
-        return <NotSubscribed />
+        return <NotSubscribed message={notSubscribedMessage} />
+      case 'error':
+        return <ErrorView />
       case 'ok':
         return <CreateUpdateForm />
       default:

@@ -170,7 +170,7 @@ export default function MySubscriptions() {
           pb: 3,
         }}
       >
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Box
             sx={{
               display: 'flex',
@@ -200,7 +200,7 @@ export default function MySubscriptions() {
           </Box>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <FormControlLabel
             control={
               <Switch
@@ -214,7 +214,7 @@ export default function MySubscriptions() {
             label={userSubsForSearch.has(sub.name) ? enabledText : disabledText}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Button
             variant="contained"
             size="small"

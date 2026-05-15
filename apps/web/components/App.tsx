@@ -37,7 +37,13 @@ export default function App(props) {
         <GlobalCss />
         <SessionProvider session={session}>
           <ApolloProvider client={apolloClient}>
-            <SnackbarProvider maxSnack={3}>
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+            >
               <Component {...pageProps} />
             </SnackbarProvider>
             <CookieConsentPopup />

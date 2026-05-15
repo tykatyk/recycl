@@ -1,4 +1,3 @@
-import React from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import PageLoadingCircle from './PageLoadingCircle'
@@ -22,4 +21,5 @@ export default function RedirectUnathenticatedUser(props) {
   if (status === 'authenticated') {
     return <>{children}</>
   }
+  return null
 }

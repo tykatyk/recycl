@@ -51,9 +51,7 @@ export default function Footer() {
           <Grid
             container
             direction="column"
-            item
-            xs={12}
-            sm={3}
+            size={{ xs: 12, sm: 3 }}
             style={{ paddingLeft: 16, paddingRight: 16, paddingBottom: 24 }}
           >
             <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
@@ -63,9 +61,7 @@ export default function Footer() {
           <Grid
             container
             direction="column"
-            item
-            xs={12}
-            sm={3}
+            size={{ xs: 12, sm: 3 }}
             style={{ paddingBottom: 24 }}
           >
             <Typography
@@ -111,9 +107,7 @@ export default function Footer() {
           <Grid
             container
             direction="column"
-            item
-            xs={12}
-            sm={3}
+            size={{ xs: 12, sm: 3 }}
             style={{ paddingBottom: 24 }}
           >
             <Typography
@@ -156,7 +150,7 @@ export default function Footer() {
               </ListItem>
             </List>
           </Grid>
-          <Grid container direction="column" item xs={12} sm={3}>
+          <Grid container direction="column" size={{ xs: 12, sm: 3 }}>
             <Typography
               variant="caption"
               color="textSecondary"

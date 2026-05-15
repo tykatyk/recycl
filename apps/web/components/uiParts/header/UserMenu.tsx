@@ -1,17 +1,15 @@
-import { styled, useTheme } from '@mui/material/styles'
+import { useTheme } from '@mui/material/styles'
 import {
   MenuItem,
   ClickAwayListener,
   Grow,
   Paper,
-  Popper,
-  List,
   ListItem,
   MenuList,
   ListItemText,
   ListItemIcon,
+  Popper,
 } from '@mui/material'
-import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import Link from '../Link'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
@@ -24,19 +22,6 @@ import PlaceIcon from '@mui/icons-material/Place'
 import EmailIcon from '@mui/icons-material/Email'
 
 const authenticated = 'authenticated'
-
-const PREFIX = 'UserMenu'
-
-const classes = {
-  link: `${PREFIX}-link`,
-}
-
-const StyledPopper = styled(Popper)({
-  [`& .${classes.link}`]: {
-    width: '100%',
-    height: '100%',
-  },
-})
 
 const apolloClient = initializeApollo()
 
@@ -107,7 +92,7 @@ export default function UserMenu(props) {
               onClick={preventDefault}
               color="inherit"
               underline="none"
-              className={classes.link}
+              sx={{ display: 'inline-block', width: '100%' }}
             >
               {item.text}
             </Link>
@@ -127,7 +112,7 @@ export default function UserMenu(props) {
           href="/auth/login"
           color="inherit"
           underline="none"
-          className={classes.link}
+          sx={{ display: 'inline-block', width: '100%' }}
         >
           Войти
         </Link>
@@ -153,7 +138,7 @@ export default function UserMenu(props) {
             }}
             color="inherit"
             underline="none"
-            className={classes.link}
+            sx={{ display: 'inline-block', width: '100%' }}
           >
             Выйти
           </Link>
@@ -163,7 +148,7 @@ export default function UserMenu(props) {
   }
 
   return (
-    <StyledPopper
+    <Popper
       open={open}
       anchorEl={anchorEl}
       role={undefined}
@@ -182,16 +167,14 @@ export default function UserMenu(props) {
             <ClickAwayListener onClickAway={handleClose}>
               <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
                 {status === authenticated && (
-                  <MenuItem>
-                    <ListItem divider>
-                      <ListItemText
-                        style={{
-                          textAlign: 'center',
-                          color: theme.palette.secondary.main,
-                        }}
-                        secondary={session.user.name}
-                      />
-                    </ListItem>
+                  <MenuItem divider>
+                    <ListItemText
+                      style={{
+                        textAlign: 'center',
+                        color: theme.palette.secondary.main,
+                      }}
+                      secondary={session ? session.user?.name : ''}
+                    />
                   </MenuItem>
                 )}
                 {status === authenticated &&
@@ -204,6 +187,6 @@ export default function UserMenu(props) {
           </Paper>
         </Grow>
       )}
-    </StyledPopper>
+    </Popper>
   )
 }

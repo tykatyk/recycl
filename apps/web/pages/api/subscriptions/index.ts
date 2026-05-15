@@ -50,23 +50,18 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).end()
     }
     case 'GET': {
-      // const validationSchema = yup.object({
-      //   variant: yup.string().oneOf(Object.keys(subscriptionVariantNames)),
-      //   subscribed: yup.string().oneOf(['true', 'false']),
-      // })
-      // try {
-      //   await validationSchema.validate(req.query)
-      // } catch (error) {
-      //   console.error(error)
-      // }
+      const validationSchema = yup.object({
+        variant: yup.string().oneOf(Object.keys(subscriptionVariantNames)),
+        subscribed: yup.string().oneOf(['true', 'false']),
+      })
 
-      const { variant, subscribed } = req.query
+      await validationSchema.validate(req.query)
+
+      const { variant, subscribed = true } = req.query
 
       const dbQuery: Record<string, unknown> = { user: session.id }
 
-      if (subscribed) {
-        dbQuery.subscribed = subscribed === 'true' ? true : false
-      }
+      dbQuery.subscribed = subscribed
 
       if (variant) {
         dbQuery.variant = variant
@@ -85,4 +80,4 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default apiHandler(mySubscriptions)
+export default apiHandler(mySubscriptions, true)

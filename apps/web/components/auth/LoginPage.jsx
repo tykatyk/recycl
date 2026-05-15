@@ -42,7 +42,7 @@ const Root = styled('div')(({ theme }) => ({
 
   [`& .${classes.avatar}`]: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.primary.main,
   },
 
   [`& .${classes.form}`]: {
@@ -158,7 +158,6 @@ export default function SignIn() {
                       type="submit"
                       fullWidth
                       variant="contained"
-                      color="secondary"
                       className={classes.submit}
                       disabled={isSubmitting}
                     >
@@ -194,7 +193,6 @@ export default function SignIn() {
                       type="submit"
                       fullWidth
                       variant="contained"
-                      color="secondary"
                       className={classes.submit}
                       disabled={isSubmitting}
                     >

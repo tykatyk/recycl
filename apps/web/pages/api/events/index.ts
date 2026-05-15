@@ -10,10 +10,8 @@ import {
   validSortOrder,
   eventVariants,
 } from '../../../lib/helpers/eventHelpers'
-import {
-  apiHandler,
-  METHOD_NOT_ALLOWED,
-} from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
 import { Variant, SortOrder, OrderBy } from '../../../lib/types/event'
 
 const ONE_HUNDRED = 100

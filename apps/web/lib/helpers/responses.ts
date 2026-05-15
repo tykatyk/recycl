@@ -1,5 +1,6 @@
 import { NextApiResponse } from 'next'
 import { mapErrors } from './errorHelpers'
+import { VALIDATION_ERROR } from '../errors'
 import type { FormValidationError } from '../types/error'
 import type { ValidationError } from 'yup'
 
@@ -30,7 +31,7 @@ export const validationErrorResponse = function (
       },
     })
   } else {
-    perFormErrorResponse('Ошибка при проверке данных формы', res)
+    perFormErrorResponse(VALIDATION_ERROR, res)
   }
 }
 

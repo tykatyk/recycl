@@ -7,10 +7,8 @@ import {
 } from '@recycl/shared/dist/server/db'
 import type { Variant } from '../../../lib/types/event'
 import { eventVariants } from '../../../lib/helpers/eventHelpers'
-import {
-  apiHandler,
-  METHOD_NOT_ALLOWED,
-} from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
 const { active } = eventVariants
 
 interface CountQuery {
