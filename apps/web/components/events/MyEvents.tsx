@@ -33,6 +33,11 @@ import type {
 } from '../../lib/types/event'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import Cookies from 'js-cookie'
+import {
+  getValidPage,
+  getValidPageSize,
+  defaultPageSize,
+} from '../../lib/helpers/pagination'
 
 const { activate, deactivate, remove } = eventActions
 
@@ -50,17 +55,12 @@ const { asc, desc } = validSortOrder
 const { active, inactive } = eventVariants
 
 export default function MyEvents(props: { variant: Variant }) {
-  const pageSizeCookie = Cookies.get('pageSize')
-  const defaultpageSize = pageSizeCookie
-    ? parseInt(pageSizeCookie, 10)
-    : rowsPerPageOptions[0]
-
   const router = useRouter()
   const query = router.query
   const { variant } = props
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(defaultpageSize)
+  const [pageSize, setPageSize] = useState(defaultPageSize)
   const [total, setTotal] = useState(0)
   const [backendError, setBackendError] = useState('')
   const [data, setData] = useState<Event[]>([])
@@ -322,20 +322,9 @@ export default function MyEvents(props: { variant: Variant }) {
           ? validOrderBy[initialOrderBy]
           : validOrderBy.createdAt
 
-      const validatedPage =
-        typeof initialPage === 'string' &&
-        !Number.isNaN(parseInt(initialPage, 10))
-          ? Math.max(parseInt(initialPage, 10), 1)
-          : 1
+      const validatedPage = getValidPage(initialPage)
 
-      const validatedPageSize =
-        typeof initialPageSize === 'string' &&
-        !Number.isNaN(parseInt(initialPageSize, 10)) &&
-        rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10)) >= 0
-          ? rowsPerPageOptions[
-              rowsPerPageOptions.indexOf(parseInt(initialPageSize, 10))
-            ]
-          : defaultpageSize
+      const validatedPageSize = getValidPageSize(initialPageSize)
 
       const newData = await fetchEvents({
         variant,

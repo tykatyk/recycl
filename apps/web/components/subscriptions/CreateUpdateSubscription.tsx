@@ -6,16 +6,15 @@ import { getNormalizedValues } from '../../lib/helpers/eventHelpers'
 import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import { Box, Button, Stack, Typography } from '@mui/material'
 import type { Waste } from '../../lib/types/waste'
 import Layout from '../layouts/Layout'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
-import Link from '../uiParts/Link'
 import { default as ErrorComponent } from '../uiParts/Error'
 import { wasteAvailableSubscriptionSchema } from '../../lib/validation'
 import NotSubscribed from './NotSubscribed'
 import * as yup from 'yup'
+import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 
 const createTitle =
   'Создание подписки на получение уведомлений о наличии вторсырья'
@@ -23,7 +22,8 @@ const updateTitle =
   'Редактирование подписки на получение уведомлений о наличии вторсырья'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
-const notSubscribedMessage = ' У вас отключены уведомления о наличии вторсырья.'
+const notSubscribedMessage =
+  ' У вас отключены уведомления о появлении вторсырья.'
 
 const createRoute = `/api/subscriptions/waste-available`
 const updateRoute = (id: string) => `/api/subscriptions/waste-available/${id}`
@@ -42,15 +42,6 @@ export default function CreateSubscription(params: { action: string }) {
     radius: '',
   } as any)
   const { id = '' } = router.query
-
-  useSession({
-    required: true,
-    onUnauthenticated() {
-      window.location.replace(
-        '/auth/login?from=/my/subscriptions/waste-available/create',
-      )
-    },
-  })
 
   useEffect(() => {
     const getUserSubscriptions = async () => {
@@ -218,25 +209,27 @@ export default function CreateSubscription(params: { action: string }) {
 
   return (
     <Layout title={action === 'create' ? createTitle : updateTitle}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-        }}
-      >
-        {renderContent()}
-        <Snackbar
-          severity={severity}
-          open={!!notification}
-          message={notification}
-          handleClose={() => {
-            setNotification('')
+      <RedirectUnathenticatedUser>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
           }}
-        />
-      </Box>
+        >
+          {renderContent()}
+          <Snackbar
+            severity={severity}
+            open={!!notification}
+            message={notification}
+            handleClose={() => {
+              setNotification('')
+            }}
+          />
+        </Box>
+      </RedirectUnathenticatedUser>
     </Layout>
   )
 }
