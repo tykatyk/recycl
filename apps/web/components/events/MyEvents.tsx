@@ -34,7 +34,7 @@ import type {
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import Cookies from 'js-cookie'
 import {
-  getValidPage,
+  getValidPageNumber,
   getValidPageSize,
   defaultPageSize,
 } from '../../lib/helpers/pagination'
@@ -322,7 +322,7 @@ export default function MyEvents(props: { variant: Variant }) {
           ? validOrderBy[initialOrderBy]
           : validOrderBy.createdAt
 
-      const validatedPage = getValidPage(initialPage)
+      const validatedPage = getValidPageNumber(initialPage)
 
       const validatedPageSize = getValidPageSize(initialPageSize)
 

@@ -16,6 +16,7 @@ async function wasteAvailableSubscriptionApiHandler(
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.id) return res.status(401).end()
+  const user = session.id
 
   await dbConnect()
 
@@ -31,8 +32,6 @@ async function wasteAvailableSubscriptionApiHandler(
         throw new Error('Cannot retrieve coordinates')
       }
 
-      const user = session.id
-
       await WasteAvailableSubscriptionModel.create({
         user,
         location: {
@@ -44,6 +43,11 @@ async function wasteAvailableSubscriptionApiHandler(
       })
 
       return res.status(200).end()
+    }
+
+    case 'GET': {
+      const data = await WasteAvailableSubscriptionModel.find({ user }).lean()
+      res.json(data)
     }
 
     default: {

@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 import { rowsPerPageOptions } from './eventHelpers'
 
-export const getValidPage = (page: string | string[] | undefined) => {
+export const getValidPageNumber = (page: string | string[] | undefined) => {
   const parsedPage = typeof page === 'string' ? parseInt(page, 10) : NaN
 
   return !Number.isNaN(parsedPage) ? parsedPage : 1
