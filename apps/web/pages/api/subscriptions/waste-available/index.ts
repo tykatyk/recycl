@@ -8,6 +8,7 @@ import {
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import getCoords from '../../../../lib/helpers/getCoords'
 import { wasteAvailableSubscriptionSchema } from '../../../../lib/validation'
+import { Types } from 'mongoose'
 
 async function wasteAvailableSubscriptionApiHandler(
   req: NextApiRequest,
@@ -48,6 +49,16 @@ async function wasteAvailableSubscriptionApiHandler(
     case 'GET': {
       const data = await WasteAvailableSubscriptionModel.find({ user }).lean()
       res.json(data)
+    }
+
+    case 'DELETE': {
+      const { documentId } = req.body
+      if (!Types.ObjectId.isValid(documentId)) return res.status(400)
+
+      const data =
+        await WasteAvailableSubscriptionModel.findByIdAndDelete(documentId)
+      if (!data) return res.status(404).end()
+      return res.status(204).end()
     }
 
     default: {
