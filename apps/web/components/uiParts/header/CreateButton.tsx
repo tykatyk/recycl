@@ -28,8 +28,8 @@ export default function CreateButton(props) {
       href: '/my/events/create',
     },
     {
-      text: 'Подписку на получение уведомлений',
-      href: '/my/subscriptions/create',
+      text: 'Подписку на уведомления\n о появлении вторсырья',
+      href: '/my/subscriptions/waste-available/create',
     },
   ]
 
@@ -59,6 +59,11 @@ export default function CreateButton(props) {
                 onClick={() => false}
                 color="inherit"
                 underline="none"
+                sx={{
+                  whiteSpace: 'pre-line',
+                  display: 'inline-block',
+                  width: '100%',
+                }}
               >
                 {item.text}
               </Link>

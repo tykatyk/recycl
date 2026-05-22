@@ -15,8 +15,9 @@ import Snackbars from '../../../components/uiParts/Snackbars'
 import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
 import { useEffect, useMemo, useState } from 'react'
 import type { SubscriptionVariant } from '@recycl/shared/dist/server/db/models/subscriptionVariant'
-import HelpIcon from '@mui/icons-material/Help'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
+import { subscriptionConfig } from '../../../lib/helpers/subscription'
+import HeadingWithDescription from '../../../components/uiParts/HeadingWithDescription'
 
 const loadingErrorText = 'Ошибка при загрузке данных'
 const updatingErrorMessage = 'Ошибка при обновлении данных'
@@ -24,50 +25,12 @@ const titleHeadingText = 'Мои подписки на получение уве
 const enabledText = 'Включено'
 const disabledText = 'Выключено'
 const configText = 'Настроить'
-const subscriptionConfig = {
-  wasteAvailable: {
-    title:
-      'Получать уведомления о появлении в моем регионе вторсырья для переработки или утилизации',
-    description: `Подписка предназначена для тех, кто занимается сбором вторсырья для дальнейшей переработки или утилизации. Она позволяет находить сырье, которое вам нужно, в местах, в которых вы работаете. Для добавления подписки укажите местоположение, относительно которого будет производится поиск, радиус поиска и один или несколько видов вторсырья. После добавления подписки, вы будете получать уведомления на электронную почту о новых объявлениях о наличии вторсырья.`,
-    href: '/my/subscriptions/waste-available',
-  },
-  wasteRemoval: {
-    title:
-      'Получать уведомления о появлении в моем регионе пунктов приема вторсырья',
-    description: `Подписка предназначена для тех, кто хочет сдать вторсырье на переработку, но поблизости нет пунктов приема. Данные о типах и местоположении вторсырья, для которых будет производится поиск пунктов приема, берутся из ваших объявлений о наличии вторсырья. Для добавления подписки укажите радиус, в котором будет производится поиск.`,
-    href: '/my/subscriptions/waste-removal',
-  },
-} as const
+
 const subscriptionVariantsApi = '/api/subscriptions/variant'
 const subscriptionsApi = '/api/subscriptions'
-const mySubscriptionsUrl = '/my/subscriptions/'
 
 type SubscriptionName = string[]
 
-const SubscriptionDetails = (props: { details: string }) => {
-  const { details } = props
-
-  return (
-    <Box
-      bgcolor="secondary.main"
-      sx={{
-        p: 2,
-        border: '1px dashed #ccc',
-        borderRadius: '8px',
-      }}
-    >
-      <Typography
-        sx={{
-          fontWeight: 300,
-          fontSize: '0.875rem',
-          color: 'secondary.contrastText',
-        }}
-      >
-        {details}
-      </Typography>
-    </Box>
-  )
-}
 type SubsVarNameType = typeof subscriptionVariantNames
 
 export default function MySubscriptions() {
@@ -171,33 +134,11 @@ export default function MySubscriptions() {
         }}
       >
         <Grid size={{ xs: 12 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-            }}
+          <HeadingWithDescription
+            detailedDescription={subscriptionConfig[sub.name].description}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography>{subscriptionConfig[sub.name].title}</Typography>
-              <Tooltip title="Подробнее об этой подписке">
-                <IconButton
-                  onClick={() => {
-                    const updated = showDetails.includes(sub.name)
-                      ? showDetails.filter((item) => item !== sub.name)
-                      : [...showDetails, sub.name]
-                    setShowDetails(updated)
-                  }}
-                >
-                  <HelpIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            {showDetails.includes(sub.name) ? (
-              <SubscriptionDetails
-                details={subscriptionConfig[sub.name].description}
-              />
-            ) : null}
-          </Box>
+            <Typography>{subscriptionConfig[sub.name].title}</Typography>
+          </HeadingWithDescription>
         </Grid>
 
         <Grid size={{ xs: 12 }}>
