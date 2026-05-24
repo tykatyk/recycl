@@ -14,6 +14,7 @@ import LayoutWithoutHeader from '../layouts/LayoutWithoutHeader'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
+import GoogleIcon from '@mui/icons-material/Google'
 
 const USER_NOT_FOUND = 'Пользователь с таким email не найден'
 const LINK_SENT = 'На вашу электронную почту отправлена ссылка для входа'
@@ -184,17 +185,21 @@ export default function SignIn() {
                 return (
                   <Form className={classes.form} noValidate autoComplete="off">
                     <Field
+                      sx={{ display: 'none', visibility: 'hidden' }}
                       name="googleAuthCallback"
                       type="hidden"
                       component={TextFieldFormik}
                     />
                     <Button
-                      style={{ marginTop: 0 }}
+                      style={{
+                        marginTop: 0,
+                      }}
                       type="submit"
                       fullWidth
                       variant="contained"
                       className={classes.submit}
                       disabled={isSubmitting}
+                      startIcon={<GoogleIcon />}
                     >
                       {LOGIN_WITH_GOOGLE}
                       {isSubmitting && <ButtonSubmittingCircle />}

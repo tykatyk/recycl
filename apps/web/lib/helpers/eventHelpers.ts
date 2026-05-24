@@ -66,7 +66,7 @@ export const columns: ColumnHeader[] = [
   },
 ]
 
-export const rowsPerPageOptions = [1, 2, 3]
+export const rowsPerPageOptions = [1, 2, 3] as const
 
 export const eventActions: AdActions = {
   activate: 'activate',

@@ -1,7 +1,14 @@
 import loginSchema from './login'
 import registerSchema from './register'
 import removalApplicationSchema from './removalApplication'
-import { email, password, phone, userLocation } from './atomicSchemas'
+import {
+  email,
+  password,
+  phone,
+  userLocation,
+  paginationPageNumberSchema,
+  paginationPageSizeSchema,
+} from './atomicSchemas'
 import contactsSchema from './contacts'
 import changePasswordSchema from './changePassword'
 import quantitySchema from './quantity'
@@ -29,4 +36,6 @@ export {
   eventValidationSchema as eventSchema,
   wasteAvailableSubscriptionSchema,
   wasteRemovalSubscriptionSchema,
+  paginationPageNumberSchema,
+  paginationPageSizeSchema,
 }

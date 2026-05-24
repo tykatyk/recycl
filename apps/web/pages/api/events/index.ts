@@ -5,7 +5,6 @@ import eventQueries from '../../../lib/helpers/queries/eventQuery'
 import { dbConnect } from '@recycl/shared/dist/server/db'
 import * as yup from 'yup'
 import {
-  rowsPerPageOptions,
   validOrderBy,
   validSortOrder,
   eventVariants,
@@ -13,23 +12,14 @@ import {
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
 import { Variant, SortOrder, OrderBy } from '../../../lib/types/event'
-
-const ONE_HUNDRED = 100
+import {
+  paginationPageNumberSchema,
+  paginationPageSizeSchema,
+} from '../../../lib/validation'
 
 const queryValidationSchema = yup.object({
-  page: yup
-    .number()
-    .transform((value) => (value === '' || isNaN(value) ? undefined : value))
-    .integer()
-    .min(0)
-    .default(0),
-  pageSize: yup
-    .number()
-    .transform((value) => (value === '' || isNaN(value) ? undefined : value))
-    .integer()
-    .min(rowsPerPageOptions[0])
-    .max(rowsPerPageOptions[rowsPerPageOptions.length - 1] || ONE_HUNDRED)
-    .default(rowsPerPageOptions[0]),
+  page: paginationPageNumberSchema,
+  pageSize: paginationPageSizeSchema,
   sortOrder: yup
     .string<SortOrder>()
     .transform((value) => (validSortOrder[value] ? value : undefined))

@@ -7,8 +7,13 @@ import {
 } from '@recycl/shared/dist/server/db/'
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import getCoords from '../../../../lib/helpers/getCoords'
-import { wasteAvailableSubscriptionSchema } from '../../../../lib/validation'
+import {
+  wasteAvailableSubscriptionSchema,
+  paginationPageNumberSchema,
+  paginationPageSizeSchema,
+} from '../../../../lib/validation'
 import { Types } from 'mongoose'
+import * as yup from 'yup'
 
 async function wasteAvailableSubscriptionApiHandler(
   req: NextApiRequest,
@@ -47,8 +52,59 @@ async function wasteAvailableSubscriptionApiHandler(
     }
 
     case 'GET': {
-      const data = await WasteAvailableSubscriptionModel.find({ user }).lean()
-      res.json(data)
+      const queryValidationSchema = yup.object({
+        page: paginationPageNumberSchema,
+        pageSize: paginationPageSizeSchema,
+      })
+
+      const validatedQuery = await queryValidationSchema.validate(req.query, {
+        stripUnknown: true,
+      })
+
+      const { page, pageSize } = validatedQuery
+
+      const total = await WasteAvailableSubscriptionModel.countDocuments({
+        user,
+      })
+
+      const skip = Math.max(page - 1, 0) * pageSize
+
+      let vp = page
+
+      if (skip >= total) {
+        vp = Math.floor(total / pageSize)
+      }
+
+      const data = await WasteAvailableSubscriptionModel.find({ user })
+        .skip(vp * pageSize)
+        .limit(pageSize)
+        .sort({ _id: 1 })
+        .lean()
+
+      if (skip >= total) {
+        res
+          .redirect(
+            307,
+            `/my/subscriptions/waste-available?page=${Math.floor(total / pageSize)}&pageSize=${pageSize}`,
+          )
+          .json({
+            items: data,
+            pagination: {
+              page,
+              pageSize,
+              total,
+            },
+          })
+      } else {
+        res.json({
+          items: data,
+          pagination: {
+            page,
+            pageSize,
+            total,
+          },
+        })
+      }
     }
 
     case 'DELETE': {

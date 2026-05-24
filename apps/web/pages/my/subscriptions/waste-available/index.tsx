@@ -1,4 +1,13 @@
-import { Box, Button, Chip, Paper, Stack, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Chip,
+  Paper,
+  Stack,
+  Typography,
+  PaginationRenderItemParams,
+  SelectChangeEvent,
+} from '@mui/material'
 import Layout from '../../../../components/layouts/Layout'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
@@ -17,8 +26,31 @@ import { useSnackbar } from 'notistack'
 import Modal from '@mui/material/Modal'
 import HeadingWithDescription from '../../../../components/uiParts/HeadingWithDescription'
 import { subscriptionConfig } from '../../../../lib/helpers/subscription'
+import DataGridFooter from '../../../../components/uiParts/DataGridFooter'
+import PaginationItem from '@mui/material/PaginationItem'
+import Link from '../../../../components/uiParts/Link'
+import type { HrefOptions } from '../../../../lib/types/event'
+import Cookies from 'js-cookie'
+import { rowsPerPageOptions } from '../../../../lib/helpers/eventHelpers'
 
 const title = 'Мои подписки на уведомления о появлении вторсырья '
+
+const getHref = (options: HrefOptions) => {
+  const { page, pageSize } = options
+  const href = `/my/subscriptions/waste-available?page=${page}&pageSize=${pageSize}`
+  console.log(href)
+  return href
+}
+
+const renderItem = (item: PaginationRenderItemParams) => {
+  return (
+    <PaginationItem
+      // component={Link}
+      // href={`/my/subscriptions/waste-available/?page=${item.page}`}
+      {...item}
+    />
+  )
+}
 
 const DeletingModal = (params: { open: boolean }) => {
   const { open } = params
@@ -60,12 +92,121 @@ const NoData = () => {
   )
 }
 
+const Header = () => {
+  return (
+    <HeadingWithDescription
+      detailedDescription={subscriptionConfig.wasteAvailable.description}
+    >
+      <Typography
+        component="h1"
+        variant="h5"
+        align="center"
+        sx={{ mt: 2, mb: 3 }}
+      >
+        {title}
+      </Typography>
+    </HeadingWithDescription>
+  )
+}
+
+const ActionsBar = (props) => {
+  const { actionsBarRef, isSticky, handleSelectAll, selectedCount, total } =
+    props
+  const selectAllRowsLabel = {
+    slotProps: {
+      input: { 'aria-label': 'Выбрать все строки' },
+    },
+  }
+
+  return (
+    <Box>
+      <Box
+        className={'actionsBarRef'}
+        ref={actionsBarRef}
+        sx={{
+          position: isSticky ? 'fixed' : 'sticky',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+          backgroundColor: isSticky ? '#1a2b34' : 'background.default',
+          boxShadow: isSticky ? '0 2px 4px #3c4b53' : 'none',
+          transition: isSticky ? 'background 0.3s' : 'none',
+        }}
+      >
+        <Box
+          sx={{
+            maxWidth: 900,
+            margin: 'auto',
+            pl: isSticky ? 5 : 2,
+            pr: isSticky ? 5 : 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Box sx={{ p: 2, pl: 0 }}>
+                <Checkbox
+                  color="secondary"
+                  {...selectAllRowsLabel}
+                  onChange={(e) => {
+                    handleSelectAll(e)
+                  }}
+                />
+              </Box>
+
+              <Box sx={{ pr: 2 }}>
+                <Typography variant="body2" sx={{ color: 'grey.400' }}>
+                  {`Выбрано ${selectedCount} из ${total}`}
+                </Typography>
+              </Box>
+              <Box>
+                <Button
+                  size="small"
+                  disabled={selectedCount === 0}
+                  color="secondary"
+                >
+                  Удалить выбранные
+                </Button>
+              </Box>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', pr: 2, pl: 2 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                href="/my/subscriptions/waste-available/create"
+              >
+                Создать
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
 const SubscriptionList = () => {
   const [status, setStatus] = useState('')
   const [data, setData] = useState<any>(null)
   const router = useRouter()
   const query = router.query
-  const { page: initialPage, pageSize: initialPageSize } = query
+  // console.log(query)
+  const {
+    page: initialPage = String(1),
+    pageSize: initialPageSize = String(rowsPerPageOptions[0]),
+  } = query
   const [selected, setSelected] = useState<any>([])
   const [isSticky, setIsSticky] = useState(false)
   const actionsBarRef = useRef<any>(null)
@@ -73,14 +214,6 @@ const SubscriptionList = () => {
   const scrollPosRef = useRef<any>(0)
   const { enqueueSnackbar } = useSnackbar()
 
-  const validPage = getValidPageNumber(initialPage)
-  const validPageSize = getValidPageSize(initialPageSize)
-
-  const selectAllRowsLabel = {
-    slotProps: {
-      input: { 'aria-label': 'Выбрать все строки' },
-    },
-  }
   const selectRowLabel = {
     slotProps: {
       input: { 'aria-label': 'Выбрать строку' },
@@ -136,7 +269,12 @@ const SubscriptionList = () => {
 
   const fetchData = async () => {
     try {
+      // console.log(initialPageSize)
+      if (!initialPage || !initialPageSize) return
       setStatus('loading')
+
+      const validPage = getValidPageNumber(initialPage)
+      const validPageSize = getValidPageSize(initialPageSize)
 
       const options = {
         page: String(validPage),
@@ -157,14 +295,14 @@ const SubscriptionList = () => {
       setData(data)
       setStatus('ok')
     } catch (error) {
+      console.log(error)
       setStatus('error')
     }
   }
 
   useEffect(() => {
-    if (!query) return
     fetchData()
-  }, [query])
+  }, [initialPage, initialPageSize])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -208,108 +346,25 @@ const SubscriptionList = () => {
 
   if (!data && status === 'loading') return <PageLoadingCircle />
 
-  if (data && data.length === 0) return <NoData />
+  if (data && data.pagination && data.pagination.total === 0) return <NoData />
 
-  if (data)
+  if (data && data.items)
     return (
       <Box sx={{ width: '100%', height: '100%' }}>
         {status === 'loading' ? (
           <PageLoadingCircle sx={[{ position: 'fixed' }]} />
         ) : null}
         {status === 'deleting' ? <DeletingModal open={true} /> : null}
-        <ScrollTopButton />
-        <HeadingWithDescription
-          detailedDescription={subscriptionConfig.wasteAvailable.description}
-        >
-          <Typography
-            component="h1"
-            variant="h5"
-            align="center"
-            sx={{ mt: 2, mb: 3 }}
-          >
-            {title}
-          </Typography>
-        </HeadingWithDescription>
-
-        <Box>
-          <Box
-            className={'actionsBarRef'}
-            ref={actionsBarRef}
-            sx={{
-              position: isSticky ? 'fixed' : 'sticky',
-              top: 0,
-              left: 0,
-              right: 0,
-              zIndex: 1000,
-              backgroundColor: isSticky ? '#1a2b34' : 'background.default',
-              boxShadow: isSticky ? '0 2px 4px #3c4b53' : 'none',
-              transition: isSticky ? 'background 0.3s' : 'none',
-            }}
-          >
-            <Box
-              sx={{
-                maxWidth: 900,
-                margin: 'auto',
-                pl: isSticky ? 5 : 2,
-                pr: isSticky ? 5 : 2,
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Box sx={{ p: 2, pl: 0 }}>
-                    <Checkbox
-                      color="secondary"
-                      {...selectAllRowsLabel}
-                      onChange={(e) => {
-                        handleSelectAll(e)
-                      }}
-                    />
-                  </Box>
-
-                  <Box sx={{ pr: 2 }}>
-                    <Typography variant="body2" sx={{ color: 'grey.400' }}>
-                      {`Выбрано ${selected.length} из ${data.length}`}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Button
-                      size="small"
-                      disabled={selected.length === 0}
-                      color="secondary"
-                    >
-                      Удалить выбранные
-                    </Button>
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{ display: 'flex', alignItems: 'center', pr: 2, pl: 2 }}
-                >
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    href="/my/subscriptions/waste-available/create"
-                  >
-                    Создать
-                  </Button>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
+        <Header />
+        <ActionsBar
+          actionsBarRef={actionsBarRef}
+          isSticky={isSticky}
+          handleSelectAll={handleSelectAll}
+          selectedCount={selected.length}
+          total={data.pagination.total}
+        />
         <Stack spacing={2} sx={{ width: '100%' }}>
-          {data.map((item, idx) => {
+          {data.items.map((item, idx) => {
             return (
               <Box
                 sx={{ display: 'flex', width: '100%' }}
@@ -388,6 +443,34 @@ const SubscriptionList = () => {
             )
           })}
         </Stack>
+        <DataGridFooter
+          numRows={data.pagination.total}
+          pageSize={data.pagination.pageSize}
+          page={data.pagination.page}
+          handlePageChange={(
+            event: React.ChangeEvent<unknown>,
+            newPage: number,
+          ) => {
+            const href = getHref({
+              page: newPage,
+              pageSize: data.pagination.pageSize,
+            })
+            router.push(href)
+          }}
+          handlePageSizeChange={(event: SelectChangeEvent) => {
+            // Cookies.set('pageSize', event.target.value.toString())
+
+            const newPageSize = event.target.value
+            // console.log(typeof newPageSize)
+            const href = getHref({
+              page: 1,
+              pageSize: parseInt(newPageSize, 10),
+            })
+
+            router.push(href)
+          }}
+          renderItem={renderItem}
+        />
       </Box>
     )
   return null
@@ -409,6 +492,7 @@ export default function WasteAvailableSubscriptions() {
           }}
         >
           <SubscriptionList />
+          <ScrollTopButton />
         </Box>
       </RedirectUnathenticatedUser>
     </Layout>
