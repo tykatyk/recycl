@@ -17,7 +17,6 @@ import { useEffect, useState } from 'react'
 import {
   getValidPageNumber,
   getValidPageSize,
-  defaultPageSize,
 } from '../../../../lib/helpers/pagination'
 import Checkbox from '@mui/material/Checkbox'
 import { useRef } from 'react'
@@ -28,28 +27,21 @@ import HeadingWithDescription from '../../../../components/uiParts/HeadingWithDe
 import { subscriptionConfig } from '../../../../lib/helpers/subscription'
 import DataGridFooter from '../../../../components/uiParts/DataGridFooter'
 import PaginationItem from '@mui/material/PaginationItem'
-import Link from '../../../../components/uiParts/Link'
 import type { HrefOptions } from '../../../../lib/types/event'
 import Cookies from 'js-cookie'
-import { rowsPerPageOptions } from '../../../../lib/helpers/eventHelpers'
+import NoRows from '../../../../components/uiParts/NoRows'
 
 const title = 'Мои подписки на уведомления о появлении вторсырья '
 
 const getHref = (options: HrefOptions) => {
   const { page, pageSize } = options
   const href = `/my/subscriptions/waste-available?page=${page}&pageSize=${pageSize}`
-  console.log(href)
+
   return href
 }
 
 const renderItem = (item: PaginationRenderItemParams) => {
-  return (
-    <PaginationItem
-      // component={Link}
-      // href={`/my/subscriptions/waste-available/?page=${item.page}`}
-      {...item}
-    />
-  )
+  return <PaginationItem {...item} />
 }
 
 const DeletingModal = (params: { open: boolean }) => {
@@ -110,7 +102,7 @@ const Header = () => {
 }
 
 const ActionsBar = (props) => {
-  const { actionsBarRef, isSticky, handleSelectAll, selectedCount, total } =
+  const { actionsBarRef, isSticky, handleSelectAll, selectedCount, pageSize } =
     props
   const selectAllRowsLabel = {
     slotProps: {
@@ -167,7 +159,7 @@ const ActionsBar = (props) => {
 
               <Box sx={{ pr: 2 }}>
                 <Typography variant="body2" sx={{ color: 'grey.400' }}>
-                  {`Выбрано ${selectedCount} из ${total}`}
+                  {`Выбрано ${selectedCount} из ${pageSize}`}
                 </Typography>
               </Box>
               <Box>
@@ -202,11 +194,6 @@ const SubscriptionList = () => {
   const [data, setData] = useState<any>(null)
   const router = useRouter()
   const query = router.query
-  // console.log(query)
-  const {
-    page: initialPage = String(1),
-    pageSize: initialPageSize = String(rowsPerPageOptions[0]),
-  } = query
   const [selected, setSelected] = useState<any>([])
   const [isSticky, setIsSticky] = useState(false)
   const actionsBarRef = useRef<any>(null)
@@ -260,7 +247,7 @@ const SubscriptionList = () => {
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = data.map((row) => row._id as string)
+      const newSelected = data.items.map((row) => row._id as string)
       setSelected(newSelected)
       return
     }
@@ -269,12 +256,10 @@ const SubscriptionList = () => {
 
   const fetchData = async () => {
     try {
-      // console.log(initialPageSize)
-      if (!initialPage || !initialPageSize) return
       setStatus('loading')
 
-      const validPage = getValidPageNumber(initialPage)
-      const validPageSize = getValidPageSize(initialPageSize)
+      const validPage = getValidPageNumber(query.page)
+      const validPageSize = getValidPageSize(query.pageSize)
 
       const options = {
         page: String(validPage),
@@ -288,21 +273,33 @@ const SubscriptionList = () => {
           },
         },
       )
+
       if (!response.ok) {
         throw new Error('Something went wrong')
       }
       const data = await response.json()
+      const page = data.pagination.page
+      const pageSize = data.pagination.pageSize
+      const total = data.pagination.total
+      const skip = (page - 1) * pageSize
+
+      if (skip >= total) {
+        const lastPage = Math.ceil(total / pageSize)
+        const href = getHref({ page: lastPage, pageSize })
+
+        return router.push(href)
+      }
+
       setData(data)
-      setStatus('ok')
+      setStatus('')
     } catch (error) {
-      console.log(error)
       setStatus('error')
     }
   }
 
   useEffect(() => {
     fetchData()
-  }, [initialPage, initialPageSize])
+  }, [query.page, query.pageSize])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -348,101 +345,125 @@ const SubscriptionList = () => {
 
   if (data && data.pagination && data.pagination.total === 0) return <NoData />
 
-  if (data && data.items)
+  if (data && data.items) {
     return (
-      <Box sx={{ width: '100%', height: '100%' }}>
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {status === 'loading' ? (
           <PageLoadingCircle sx={[{ position: 'fixed' }]} />
         ) : null}
         {status === 'deleting' ? <DeletingModal open={true} /> : null}
         <Header />
-        <ActionsBar
-          actionsBarRef={actionsBarRef}
-          isSticky={isSticky}
-          handleSelectAll={handleSelectAll}
-          selectedCount={selected.length}
-          total={data.pagination.total}
-        />
-        <Stack spacing={2} sx={{ width: '100%' }}>
-          {data.items.map((item, idx) => {
-            return (
-              <Box
-                sx={{ display: 'flex', width: '100%' }}
-                key={item._id}
-                ref={idx === 0 ? firstItemRef : null}
-              >
-                <Paper
-                  sx={{
-                    borderRadius: '8px',
-                    display: 'flex',
-                    flexGrow: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    p: 2,
-                  }}
-                >
-                  <Box sx={{ p: 2, pl: 0 }}>
-                    <Checkbox
-                      color="secondary"
-                      {...selectRowLabel}
-                      slotProps={{
-                        input: { 'data-id': `${item._id}` } as any,
+
+        {data.items.length === 0 && data.pagination.total > 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexGrow: '1',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <NoRows />
+          </Box>
+        ) : (
+          <>
+            <ActionsBar
+              actionsBarRef={actionsBarRef}
+              isSticky={isSticky}
+              handleSelectAll={handleSelectAll}
+              selectedCount={selected.length}
+              pageSize={data.pagination.pageSize}
+            />
+            <Stack spacing={2} sx={{ width: '100%' }}>
+              {data.items.map((item, idx) => {
+                return (
+                  <Box
+                    sx={{ display: 'flex', width: '100%' }}
+                    key={item._id}
+                    ref={idx === 0 ? firstItemRef : null}
+                  >
+                    <Paper
+                      sx={{
+                        borderRadius: '8px',
+                        display: 'flex',
+                        flexGrow: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        p: 2,
                       }}
-                      onChange={(e) => {
-                        const id = e.target.dataset.id
-                        if (!id) return
-                        handleSelect(id)
-                      }}
-                      checked={selected.includes(item._id)}
-                    />
-                  </Box>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Box sx={{ pb: 2 }}>
-                      <Typography variant="h6">
-                        {item.location.description}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ pb: 2 }}>
-                      <Stack direction="row" spacing={1}>
-                        {item.wasteTypes.map((wasteType, idx) => {
-                          return <Chip label={`${wasteType}`} key={idx} />
-                        })}
-                      </Stack>
-                    </Box>
-                    <Box sx={{ pb: 2, borderBottom: '1px solid #5a5a5a' }}>
-                      <Typography
-                        sx={{ color: 'grey.400', fontWeight: 'light' }}
-                        variant="body2"
-                      >
-                        {`Радиус поиска: ${item.radius || 0} км`}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ pt: 1 }}>
-                      <Stack direction="row" spacing={2}>
-                        <Button
-                          href={`/my/subscriptions/waste-available/edit/${item._id}`}
-                          size="small"
+                    >
+                      <Box sx={{ p: 2, pl: 0 }}>
+                        <Checkbox
                           color="secondary"
-                        >
-                          Редактировать
-                        </Button>
-                        <Button
-                          size="small"
-                          color="secondary"
-                          onClick={async (_) => {
-                            await handleDelete(item._id)
+                          {...selectRowLabel}
+                          slotProps={{
+                            input: { 'data-id': `${item._id}` } as any,
                           }}
-                        >
-                          Удалить
-                        </Button>
-                      </Stack>
-                    </Box>
+                          onChange={(e) => {
+                            const id = e.target.dataset.id
+                            if (!id) return
+                            handleSelect(id)
+                          }}
+                          checked={selected.includes(item._id)}
+                        />
+                      </Box>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Box sx={{ pb: 2 }}>
+                          <Typography variant="h6">
+                            {item.location.description}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ pb: 2 }}>
+                          <Stack direction="row" spacing={1}>
+                            {item.wasteTypes.map((wasteType, idx) => {
+                              return <Chip label={`${wasteType}`} key={idx} />
+                            })}
+                          </Stack>
+                        </Box>
+                        <Box sx={{ pb: 2, borderBottom: '1px solid #5a5a5a' }}>
+                          <Typography
+                            sx={{ color: 'grey.400', fontWeight: 'light' }}
+                            variant="body2"
+                          >
+                            {`Радиус поиска: ${item.radius || 0} км`}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ pt: 1 }}>
+                          <Stack direction="row" spacing={2}>
+                            <Button
+                              href={`/my/subscriptions/waste-available/edit/${item._id}`}
+                              size="small"
+                              color="secondary"
+                            >
+                              Редактировать
+                            </Button>
+                            <Button
+                              size="small"
+                              color="secondary"
+                              onClick={async (_) => {
+                                await handleDelete(item._id)
+                              }}
+                            >
+                              Удалить
+                            </Button>
+                          </Stack>
+                        </Box>
+                      </Box>
+                    </Paper>
                   </Box>
-                </Paper>
-              </Box>
-            )
-          })}
-        </Stack>
+                )
+              })}
+            </Stack>
+          </>
+        )}
+
         <DataGridFooter
           numRows={data.pagination.total}
           pageSize={data.pagination.pageSize}
@@ -458,10 +479,10 @@ const SubscriptionList = () => {
             router.push(href)
           }}
           handlePageSizeChange={(event: SelectChangeEvent) => {
-            // Cookies.set('pageSize', event.target.value.toString())
+            Cookies.set('pageSize', event.target.value.toString())
 
             const newPageSize = event.target.value
-            // console.log(typeof newPageSize)
+
             const href = getHref({
               page: 1,
               pageSize: parseInt(newPageSize, 10),
@@ -473,6 +494,7 @@ const SubscriptionList = () => {
         />
       </Box>
     )
+  }
   return null
 }
 

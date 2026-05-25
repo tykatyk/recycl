@@ -66,38 +66,11 @@ async function wasteAvailableSubscriptionApiHandler(
       const total = await WasteAvailableSubscriptionModel.countDocuments({
         user,
       })
-
       const skip = Math.max(page - 1, 0) * pageSize
 
-      let vp = page
-
       if (skip >= total) {
-        vp = Math.floor(total / pageSize)
-      }
-
-      const data = await WasteAvailableSubscriptionModel.find({ user })
-        .skip(vp * pageSize)
-        .limit(pageSize)
-        .sort({ _id: 1 })
-        .lean()
-
-      if (skip >= total) {
-        res
-          .redirect(
-            307,
-            `/my/subscriptions/waste-available?page=${Math.floor(total / pageSize)}&pageSize=${pageSize}`,
-          )
-          .json({
-            items: data,
-            pagination: {
-              page,
-              pageSize,
-              total,
-            },
-          })
-      } else {
-        res.json({
-          items: data,
+        return res.json({
+          items: [],
           pagination: {
             page,
             pageSize,
@@ -105,6 +78,21 @@ async function wasteAvailableSubscriptionApiHandler(
           },
         })
       }
+
+      const data = await WasteAvailableSubscriptionModel.find({ user })
+        .skip(skip)
+        .limit(pageSize)
+        .sort({ _id: -1 })
+        .lean()
+
+      res.json({
+        items: data,
+        pagination: {
+          page,
+          pageSize,
+          total,
+        },
+      })
     }
 
     case 'DELETE': {

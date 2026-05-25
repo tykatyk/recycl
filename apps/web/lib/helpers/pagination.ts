@@ -6,7 +6,9 @@ type RowsPerPageOption = (typeof rowsPerPageOptions)[number]
 export const getValidPageNumber = (page: string | string[] | undefined) => {
   const parsedPage = typeof page === 'string' ? parseInt(page, 10) : NaN
 
-  return !Number.isNaN(parsedPage) ? parsedPage : 1
+  if (Number.isNaN(parsedPage)) return 1
+
+  return parsedPage > 0 ? parsedPage : Math.abs(parsedPage)
 }
 
 const isValidPageSize = (value: number) =>
