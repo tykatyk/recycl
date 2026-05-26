@@ -16,7 +16,7 @@ export async function createSubscriptionRun(params: {
   if (!variant) {
     throw new Error('Subscription variant not found')
   }
-  return SubscriptionRunModel.create({
+  return await SubscriptionRunModel.create({
     subscriptionVariantName,
     status: 'queued',
     requestedBy: requestedBy ?? null,

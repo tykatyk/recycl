@@ -2,9 +2,13 @@ import type { WasteTypeCounter, WasteLocationCounter } from './types'
 import {
   WasteAvailableSubscriptionModel,
   WasteRemovalEventModel,
+  RemovalApplicationModel,
 } from '@recycl/shared/dist/server/db'
 import type { WasteAvailableSubscription } from '@recycl/shared/dist/server/db/models/wasteAvailableSubsciption'
 import { redisConnection as redis } from '@recycl/shared/dist/server/redis'
+import { Types } from 'mongoose'
+
+const EARTH_RADIUS = 6_378_100
 
 export const getWasteAvailableData = async (params: {
   userId: string
@@ -25,19 +29,51 @@ export const getWasteAvailableData = async (params: {
     await WasteAvailableSubscriptionModel.aggregate<WasteAvailableSubscription>(
       [
         {
-          $match: { user: userId },
+          $match: { user: new Types.ObjectId(userId) },
         },
         {
           $group: {
             _id: '$location.place_id',
             location: { $first: '$location' },
-            wasteTypes: {
-              $addToSet: { $each: '$wasteTypes' },
+            radius: { $first: '$radius' },
+            allWasteTypes: {
+              $push: '$wasteTypes',
             },
+            // wasteTypes: {
+            //   $addToSet: { $each: '$wasteTypes' },
+            // },
           },
         },
         {
-          $replaceRoot: { newRoot: '$firstDoc' },
+          $sort: {
+            'location.description': 1,
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            locationId: '$location.place_id',
+            locationName: '$location.description',
+            radius: '$radius',
+            coordinates: '$location.position.coordinates',
+            wasteTypes: {
+              $reduce: {
+                input: {
+                  $reduce: {
+                    input: '$allWasteTypes',
+                    initialValue: [],
+                    in: {
+                      $concatArrays: ['$$value', '$$this'],
+                    },
+                  },
+                },
+                initialValue: [],
+                in: {
+                  $setUnion: ['$$value', ['$$this']],
+                },
+              },
+            },
+          },
         },
       ],
     )
@@ -55,40 +91,50 @@ export const getWasteAvailableData = async (params: {
 
     for (const wasteType of wasteTypes) {
       let counter = 0
-      const key = `WasteAvailableAdsCounter:${wasteType}`
+      // const key = `WasteAvailableAdsCounter:${wasteType}`
 
-      const redisCounter = await redis.get(key)
-      if (redisCounter === null) {
-        counter = await WasteRemovalEventModel.countDocuments({
-          waste: wasteType,
-          location: {
-            place_id: location.place_id,
+      // const redisCounter = await redis.get(key)
+      // if (redisCounter === null) {
+      counter = await RemovalApplicationModel.countDocuments({
+        wasteType: wasteType,
+        'wasteLocation.position': {
+          $geoWithin: {
+            $centerSphere: [
+              item.coordinates,
+              (item.radius * 1000) / EARTH_RADIUS,
+            ],
           },
-          createdAt: {
-            $gt: lastRunDate,
-          },
-          date: { $gt: new Date(Date.now() + 12 * 60 * 60 * 1000) },
-          isActive: true,
-        })
-        await redis.set(key, counter)
-        await redis.expire(key, 30 * 60) //30 minutes
-      } else {
-        counter = Number(redisCounter)
-      }
+        },
+
+        isActive: true,
+        // user: {
+        //   $ne: new Types.ObjectId(userId),
+        // },
+        // createdAt: {
+        //   $gt: lastRunDate,
+        // },
+        // date: { $gt: new Date(Date.now() + 12 * 60 * 60 * 1000) },
+      })
+      //   await redis.set(key, counter)
+      //   await redis.expire(key, 30 * 60) //30 minutes
+      // } else {
+      //   counter = Number(redisCounter)
+      // }
 
       if (!counter) continue
       wasteTypeCounters.push({ wasteName: wasteType, newAdsCount: counter })
     }
+
     if (wasteTypeCounters.length === 0) continue
 
     locations.push({
       //ToDo: remove country name from description
-      locationName: location.description,
-      locationId: location.place_id,
+      locationName: item.locationName,
+      locationId: item.locationId,
       adCounters: wasteTypeCounters,
     })
   }
-
+  // console.log(items)
   if (locations.length === 0) return []
   return locations
 }

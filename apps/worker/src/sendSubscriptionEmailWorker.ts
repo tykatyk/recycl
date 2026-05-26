@@ -70,7 +70,6 @@ export const sendSubscriptionEmailWorker =
         failedCount: 0,
         skippedCount: 0,
       }
-
       const skipRecipient = async (idempotencyKey: string, cause: string) => {
         counters.skippedCount += 1
         await SubscriptionEmailDeliveryModel.updateOne(
@@ -87,11 +86,11 @@ export const sendSubscriptionEmailWorker =
 
       try {
         const batch = await SubscriptionBatchModel.findByIdAndUpdate(
-          {
-            _id: batchId,
-          },
+          batchId,
+
           {
             status: 'processing',
+            startedAt: new Date(),
             lastHeartbeatAt: new Date(),
           },
         )
@@ -183,6 +182,7 @@ export const sendSubscriptionEmailWorker =
               body: JSON.stringify({ email: emailObj }),
             },
           )
+
           if ('id' in result) {
             counters.sentCount += 1
 
@@ -223,8 +223,7 @@ export const sendSubscriptionEmailWorker =
               { upsert: true },
             )
 
-            await SubscriptionBatchModel.updateOne({
-              runId,
+            await SubscriptionBatchModel.findByIdAndUpdate(batchId, {
               $inc: {
                 sentCount: counters.sentCount,
                 failedCount: counters.failedCount,
@@ -253,8 +252,7 @@ export const sendSubscriptionEmailWorker =
         //update campaign stats
         const date = new Date()
 
-        await SubscriptionBatchModel.updateOne({
-          runId,
+        await SubscriptionBatchModel.findByIdAndUpdate(batchId, {
           $inc: {
             sentCount: counters.sentCount,
             skippedCount: counters.skippedCount,
@@ -269,7 +267,7 @@ export const sendSubscriptionEmailWorker =
         run.lastHeartbeatAt = date
 
         const remainingBatches = await SubscriptionBatchModel.findOne({
-          runId,
+          runId: runId,
           status: { $in: ['queued', 'processing'] },
         })
 

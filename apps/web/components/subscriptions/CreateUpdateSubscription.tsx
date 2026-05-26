@@ -103,7 +103,7 @@ export default function CreateSubscription(params: { action: string }) {
     fetcher()
   }, [id])
 
-  const createHandler = async (
+  const formHandler = async (
     values: yup.InferType<typeof wasteAvailableSubscriptionSchema>,
     {
       setSubmitting,
@@ -147,7 +147,7 @@ export default function CreateSubscription(params: { action: string }) {
         throw new Error(errorMessage)
       }
 
-      router.push(indexRoute)
+      action === 'create' ? router.push(indexRoute) : router.back()
     } catch (error) {
       setSeverity('error')
       setNotification(errorMessage)
@@ -170,7 +170,7 @@ export default function CreateSubscription(params: { action: string }) {
             enableReinitialize
             initialValues={initialValues}
             validationSchema={wasteAvailableSubscriptionSchema}
-            onSubmit={createHandler}
+            onSubmit={formHandler}
           >
             <SubscriptionForm wasteTypes={wasteTypes} />
           </Formik>

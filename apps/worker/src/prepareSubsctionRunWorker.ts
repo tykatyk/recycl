@@ -80,6 +80,7 @@ export const prepareSubsctionRunWorker =
         if (recipientsCount === 0) {
           subscriptionRun.status = 'completed'
           subscriptionRun.finishedAt = new Date()
+          console.log('No recipients to send subscription emails')
         } else {
           subscriptionRun.status = 'processing'
         }
@@ -93,6 +94,7 @@ export const prepareSubsctionRunWorker =
         await subscriptionRun.save()
 
         const userIds = subs.map((s) => s.user.toString())
+
         const batch = await SubscriptionBatchModel.create({
           runId,
           recipientIds: userIds,
