@@ -1,7 +1,9 @@
 import type { Event as RecycleEvent } from '../../lib/types/event'
 import ShowSingleEvent from '../../components/events/ShowSingleEvent'
-import dbConnect from '../../../../packages/db/connection'
-import eventModel from '../../../../packages/db/models/wasteRemovalEvent'
+import {
+  dbConnect,
+  WasteRemovalEventModel,
+} from '@recycl/shared/dist/server/db'
 import { GetServerSideProps } from 'next'
 import { ParsedUrlQuery } from 'querystring'
 import { isValidObjectId } from 'mongoose'
@@ -36,7 +38,10 @@ export const getServerSideProps = (async (context) => {
 
   try {
     // Check if the IP address has already viewed this ad
-    const ad = await eventModel.findById(adId).populate(['user', 'waste'])
+    const ad = await WasteRemovalEventModel.findById(adId).populate([
+      'user',
+      'waste',
+    ])
     if (!ad) {
       return notFoundRedirect
     }

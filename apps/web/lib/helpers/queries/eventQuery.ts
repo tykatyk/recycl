@@ -9,8 +9,8 @@ import type {
   Variant,
   SortOrder,
   OrderBy,
-  HrefOptions,
-} from '../../types/event'
+  PaginationOptions,
+} from '../../types/pagination'
 const { active } = eventVariants
 const { asc, desc } = validSortOrder
 
@@ -52,7 +52,7 @@ const getSortQuery = (
 
 const eventQueries = {
   getAll: async (
-    queryParams: HrefOptions & { variant: Variant },
+    queryParams: PaginationOptions & { variant: Variant },
     user: string,
   ) => {
     const {

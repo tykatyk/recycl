@@ -26,14 +26,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import clsx from 'clsx'
-import type {
-  Variant,
-  Event,
-  IsInactive,
-  AdActions,
-  SortOrder,
-  OrderBy,
-} from '../../lib/types/event'
+import type { Event, IsInactive, AdActions } from '../../lib/types/event'
+import type { Variant, SortOrder, OrderBy } from '../../lib/types/pagination'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 import {

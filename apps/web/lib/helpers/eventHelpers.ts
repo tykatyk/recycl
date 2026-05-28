@@ -1,12 +1,7 @@
 import { ReactNode } from 'react'
 import dayjs from 'dayjs'
-import type {
-  Event,
-  AdActions,
-  OrderBy,
-  SortOrder,
-  Variant,
-} from '../types/event'
+import type { Event, AdActions } from '../types/event'
+import type { OrderBy, SortOrder, Variant } from '../types/pagination'
 import type { PlaceType } from '../types/placeAutocomplete'
 
 export function getInitialValues(event?: Event, userPhone: string = ''): Event {

@@ -1,5 +1,5 @@
 import Events from '../../../components/events/MyEvents'
-import type { Variant } from '../../../lib/types/event'
+import type { Variant } from '../../../lib/types/pagination'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 
 export default function InactiveEvents({

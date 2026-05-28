@@ -54,7 +54,7 @@ async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
       limit: 50,
     }
 
-    // if (redisConnection.status === 'wait') await redisConnection.connect()
+    if (redisConnection.status === 'wait') await redisConnection.connect()
 
     const flowProducer = new FlowProducer({ connection: redisConnection })
 
@@ -65,12 +65,8 @@ async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
         runId: run._id,
         subscriptionVariantName,
       },
-      // opts: {
-      //   jobId: `prepareSubscriptionRun:${run._id.toString()}`,
-      // },
       children: [
         {
-          // name: getJobName(ensureUsersSubscribedJobData),
           name: JOB_ENSURE_USERS_SUBSCRIBED,
           //ToDo: maybe add runId for better status monitoring
           data: ensureUsersSubscribedJobData,

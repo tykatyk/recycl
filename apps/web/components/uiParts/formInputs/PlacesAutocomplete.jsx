@@ -37,7 +37,7 @@ export default function PlacesAutocomplete(props) {
   if (typeof window !== 'undefined' && !window.google && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
       loadScript(
-        `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}&libraries=places`,
+        `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}&libraries=places&language=uk`,
         document.querySelector('head'),
         'google-maps',
       )
@@ -78,6 +78,7 @@ export default function PlacesAutocomplete(props) {
         input: inputValue,
         types: ['geocode'],
         componentRestrictions: { country: 'ua' },
+        region: 'ua',
         sessionToken,
       },
       (results) => {
@@ -185,6 +186,7 @@ export default function PlacesAutocomplete(props) {
         )
       }}
       renderOption={(props, option) => {
+        const { key, ...rest } = props
         const matches =
           option.structured_formatting.main_text_matched_substrings || []
 
@@ -194,7 +196,7 @@ export default function PlacesAutocomplete(props) {
         )
 
         return (
-          <li {...props}>
+          <li key={key} {...rest}>
             <Grid container alignItems="center">
               <Grid item>
                 <LocationOnIcon sx={{ mr: 2 }} />

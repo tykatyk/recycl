@@ -7,35 +7,53 @@ import {
   Typography,
   PaginationRenderItemParams,
   SelectChangeEvent,
+  Modal,
+  PaginationItem,
+  Checkbox,
 } from '@mui/material'
+import { useSnackbar } from 'notistack'
+import { useRouter } from 'next/router'
+import { useEffect, useState, useRef, RefObject } from 'react'
+import Cookies from 'js-cookie'
 import Layout from '../../../../components/layouts/Layout'
+import ScrollTopButton from '../../../../components/uiParts/ScrollToTopButton'
+import NoRows from '../../../../components/uiParts/NoRows'
+import HeadingWithDescription from '../../../../components/uiParts/HeadingWithDescription'
+import DataGridFooter from '../../../../components/uiParts/DataGridFooter'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
 import ErrorComponet from '../../../../components/uiParts/Error'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { subscriptionConfig } from '../../../../lib/helpers/subscription'
 import {
   getValidPageNumber,
   getValidPageSize,
 } from '../../../../lib/helpers/pagination'
-import Checkbox from '@mui/material/Checkbox'
-import { useRef } from 'react'
-import ScrollTopButton from '../../../../components/uiParts/ScrollToTopButton'
-import { useSnackbar } from 'notistack'
-import Modal from '@mui/material/Modal'
-import HeadingWithDescription from '../../../../components/uiParts/HeadingWithDescription'
-import { subscriptionConfig } from '../../../../lib/helpers/subscription'
-import DataGridFooter from '../../../../components/uiParts/DataGridFooter'
-import PaginationItem from '@mui/material/PaginationItem'
-import type { HrefOptions } from '../../../../lib/types/event'
-import Cookies from 'js-cookie'
-import NoRows from '../../../../components/uiParts/NoRows'
+import type { HrefOptions } from '../../../../lib/types/pagination'
+import { WasteAvailableSubscription } from '@recycl/shared/dist/server/db/models/wasteAvailableSubsciption'
+import type { PaginatedData } from '../../../../lib/types/pagination'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 const title = 'Мои подписки на уведомления о появлении вторсырья '
+const apiUrl = '/api/subscriptions/waste-available'
+const baseUrl = '/my/subscriptions/waste-available'
+const createSubscriptionUrl = `${baseUrl}/create`
+
+const noDataHeaderText = 'Еще нет ни одной подписки'
+const noDataHelperText =
+  'Укажите типы вторсырья, которые вас интересуют и добавьте регион поиска'
+const addItemButtonText = 'Добавить'
+const editButtonText = 'Редактировать'
+const deleteButtonText = 'Удалить'
+const fetchDataErrorText = 'Не удалось загрузить данные'
+
+const getSearchRadiusText = (radius: number) => {
+  return `Радиус поиска: ${radius} км`
+}
 
 const getHref = (options: HrefOptions) => {
   const { page, pageSize } = options
-  const href = `/my/subscriptions/waste-available?page=${page}&pageSize=${pageSize}`
+  const href = `${baseUrl}?page=${page}&pageSize=${pageSize}`
 
   return href
 }
@@ -68,17 +86,14 @@ const NoData = () => {
         alignItems: 'center',
       }}
     >
-      <Typography component={'h1'} variant="h6" paragraph align="center">
-        Еще нет ни одной подписки
+      <Typography component={'h1'} variant="h6" sx={{ mb: 2 }} align="center">
+        {noDataHeaderText}
       </Typography>
       <Typography sx={{ mb: 4 }} align="center">
-        Укажите типы вторсырья, которые вас интересуют и добавьте регион поиска
+        {noDataHelperText}
       </Typography>
-      <Button
-        variant="contained"
-        href="/my/subscriptions/waste-available/create"
-      >
-        Добавить
+      <Button variant="contained" href={createSubscriptionUrl}>
+        {addItemButtonText}
       </Button>
     </Box>
   )
@@ -100,9 +115,16 @@ const Header = () => {
     </HeadingWithDescription>
   )
 }
+type ActionsBarProps = {
+  actionsBarRef: RefObject<HTMLDivElement | null>
+  isSticky: boolean
+  handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
+  selectedCount: number
+  total: number
+}
 
-const ActionsBar = (props) => {
-  const { actionsBarRef, isSticky, handleSelectAll, selectedCount, pageSize } =
+const ActionsBar = (props: ActionsBarProps) => {
+  const { actionsBarRef, isSticky, handleSelectAll, selectedCount, total } =
     props
   const selectAllRowsLabel = {
     slotProps: {
@@ -113,7 +135,6 @@ const ActionsBar = (props) => {
   return (
     <Box>
       <Box
-        className={'actionsBarRef'}
         ref={actionsBarRef}
         sx={{
           position: isSticky ? 'fixed' : 'sticky',
@@ -149,6 +170,7 @@ const ActionsBar = (props) => {
             >
               <Box sx={{ p: 2, pl: 0 }}>
                 <Checkbox
+                  checked={selectedCount > 0}
                   color="secondary"
                   {...selectAllRowsLabel}
                   onChange={(e) => {
@@ -159,7 +181,7 @@ const ActionsBar = (props) => {
 
               <Box sx={{ pr: 2 }}>
                 <Typography variant="body2" sx={{ color: 'grey.400' }}>
-                  {`Выбрано ${selectedCount} из ${pageSize}`}
+                  {`Выбрано ${selectedCount} из ${total}`}
                 </Typography>
               </Box>
               <Box>
@@ -177,9 +199,9 @@ const ActionsBar = (props) => {
               <Button
                 size="small"
                 variant="outlined"
-                href="/my/subscriptions/waste-available/create"
+                href={createSubscriptionUrl}
               >
-                Создать
+                {addItemButtonText}
               </Button>
             </Box>
           </Box>
@@ -191,14 +213,16 @@ const ActionsBar = (props) => {
 
 const SubscriptionList = () => {
   const [status, setStatus] = useState('')
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState<PaginatedData<
+    WasteAvailableSubscription & { _id: string }
+  > | null>(null)
   const router = useRouter()
   const query = router.query
-  const [selected, setSelected] = useState<any>([])
+  const [selected, setSelected] = useState<string[]>([])
   const [isSticky, setIsSticky] = useState(false)
-  const actionsBarRef = useRef<any>(null)
-  const firstItemRef = useRef<any>(null)
-  const scrollPosRef = useRef<any>(0)
+  const actionsBarRef = useRef<HTMLDivElement>(null)
+  const firstItemRef = useRef<HTMLDivElement>(null)
+  const scrollPosRef = useRef<number>(0)
   const { enqueueSnackbar } = useSnackbar()
 
   const selectRowLabel = {
@@ -247,6 +271,8 @@ const SubscriptionList = () => {
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
+      if (!data) return
+
       const newSelected = data.items.map((row) => row._id as string)
       setSelected(newSelected)
       return
@@ -261,12 +287,11 @@ const SubscriptionList = () => {
       const validPage = getValidPageNumber(query.page)
       const validPageSize = getValidPageSize(query.pageSize)
 
-      const options = {
-        page: String(validPage),
-        pageSize: String(validPageSize),
-      }
       const response = await fetch(
-        `/api/subscriptions/waste-available?${new URLSearchParams(options)}`,
+        `${apiUrl}?${new URLSearchParams({
+          page: String(validPage),
+          pageSize: String(validPageSize),
+        })}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -275,7 +300,7 @@ const SubscriptionList = () => {
       )
 
       if (!response.ok) {
-        throw new Error('Something went wrong')
+        throw new Error(fetchDataErrorText)
       }
       const data = await response.json()
       const page = data.pagination.page
@@ -306,7 +331,7 @@ const SubscriptionList = () => {
       let currentScroll =
         window.pageYOffset || document.documentElement.scrollTop
 
-      if (!actionsBarRef.current && !firstItemRef.current) return
+      if (!actionsBarRef.current || !firstItemRef.current) return
       const actionsBarRect = actionsBarRef.current.getBoundingClientRect()
       const firstItemRect = firstItemRef.current.getBoundingClientRect()
 
@@ -334,6 +359,8 @@ const SubscriptionList = () => {
 
     const actionsBar = actionsBarRef.current
     const parent = actionsBar.parentElement
+
+    if (!parent) return
 
     const minHeight = actionsBar.offsetHeight
     parent.style.minHeight = `${minHeight}px`
@@ -379,10 +406,10 @@ const SubscriptionList = () => {
               isSticky={isSticky}
               handleSelectAll={handleSelectAll}
               selectedCount={selected.length}
-              pageSize={data.pagination.pageSize}
+              total={Math.min(data.pagination.pageSize, data.items.length)}
             />
             <Stack spacing={2} sx={{ width: '100%' }}>
-              {data.items.map((item, idx) => {
+              {data.items.map((item, idx: number) => {
                 return (
                   <Box
                     sx={{ display: 'flex', width: '100%' }}
@@ -422,9 +449,11 @@ const SubscriptionList = () => {
                         </Box>
                         <Box sx={{ pb: 2 }}>
                           <Stack direction="row" spacing={1}>
-                            {item.wasteTypes.map((wasteType, idx) => {
-                              return <Chip label={`${wasteType}`} key={idx} />
-                            })}
+                            {item.wasteTypes.map(
+                              (wasteType: string, idx: number) => {
+                                return <Chip label={`${wasteType}`} key={idx} />
+                              },
+                            )}
                           </Stack>
                         </Box>
                         <Box sx={{ pb: 2, borderBottom: '1px solid #5a5a5a' }}>
@@ -432,26 +461,28 @@ const SubscriptionList = () => {
                             sx={{ color: 'grey.400', fontWeight: 'light' }}
                             variant="body2"
                           >
-                            {`Радиус поиска: ${item.radius || 0} км`}
+                            {getSearchRadiusText(item.radius)}
                           </Typography>
                         </Box>
                         <Box sx={{ pt: 1 }}>
                           <Stack direction="row" spacing={2}>
                             <Button
-                              href={`/my/subscriptions/waste-available/edit/${item._id}`}
+                              href={`${baseUrl}/edit/${item._id}`}
                               size="small"
                               color="secondary"
+                              startIcon={<EditIcon />}
                             >
-                              Редактировать
+                              {editButtonText}
                             </Button>
                             <Button
                               size="small"
                               color="secondary"
+                              startIcon={<DeleteIcon />}
                               onClick={async (_) => {
                                 await handleDelete(item._id)
                               }}
                             >
-                              Удалить
+                              {deleteButtonText}
                             </Button>
                           </Stack>
                         </Box>
@@ -469,9 +500,10 @@ const SubscriptionList = () => {
           pageSize={data.pagination.pageSize}
           page={data.pagination.page}
           handlePageChange={(
-            event: React.ChangeEvent<unknown>,
+            _: React.ChangeEvent<unknown>,
             newPage: number,
           ) => {
+            setSelected([])
             const href = getHref({
               page: newPage,
               pageSize: data.pagination.pageSize,
@@ -479,6 +511,7 @@ const SubscriptionList = () => {
             router.push(href)
           }}
           handlePageSizeChange={(event: SelectChangeEvent) => {
+            setSelected([])
             Cookies.set('pageSize', event.target.value.toString())
 
             const newPageSize = event.target.value
@@ -504,9 +537,7 @@ export default function WasteAvailableSubscriptions() {
       <RedirectUnathenticatedUser>
         <Box
           sx={{
-            // margin: 'auto',
             width: '100%',
-            // height: '100%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',

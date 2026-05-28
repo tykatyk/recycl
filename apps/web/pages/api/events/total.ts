@@ -5,7 +5,7 @@ import {
   dbConnect,
   WasteRemovalEventModel as Event,
 } from '@recycl/shared/dist/server/db'
-import type { Variant } from '../../../lib/types/event'
+import type { Variant } from '../../../lib/types/pagination'
 import { eventVariants } from '../../../lib/helpers/eventHelpers'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'

@@ -1,4 +1,4 @@
-import { Grid, Typography, Button } from '@mui/material'
+import { Grid, Button } from '@mui/material'
 import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import SelectFormik from '../uiParts/formInputs/SelectFormik'
@@ -16,7 +16,6 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
   return (
     <Form>
       <Grid
-        item
         container
         component="fieldset"
         sx={{
@@ -32,7 +31,7 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
           border: 'none',
         }}
       >
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Field
             id="location"
             name="location"
@@ -45,7 +44,7 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Field
             id="date"
             name="date"
@@ -58,7 +57,7 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <SelectFormik
             data={wasteTypes}
             name={'waste'}
@@ -68,7 +67,7 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Field
             component={TextFieldFormik}
             label="Телефон"
@@ -81,7 +80,7 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
             disabled={isSubmitting}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Field
             component={TextFieldFormik}
             multiline
@@ -95,7 +94,7 @@ const EventForm = (props: { wasteTypes?: [Waste] }) => {
         </Grid>
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Button
           variant="contained"
           color="secondary"

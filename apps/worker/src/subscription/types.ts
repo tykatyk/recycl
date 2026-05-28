@@ -1,4 +1,4 @@
-type AggregatedRemovalApplication = {
+type AggregatedSubscriptionData = {
   locationId: string
   locationName: string
   coordinates: number[]
@@ -41,7 +41,7 @@ type PrepareSubscriptionData = {
 }
 
 export type {
-  AggregatedRemovalApplication,
+  AggregatedSubscriptionData,
   SubscriptionVariantName,
   SendSubscriptionEmailJobData,
   PrepareSubscriptionRunJobData,

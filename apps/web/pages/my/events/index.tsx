@@ -1,6 +1,6 @@
 import { getSession } from 'next-auth/react'
 import MyEvents from '../../../components/events/MyEvents'
-import { Variant } from '../../../lib/types/event'
+import { Variant } from '../../../lib/types/pagination'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 
 export default function MyEventsIndexPage({
