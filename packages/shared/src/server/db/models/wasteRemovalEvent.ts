@@ -1,5 +1,9 @@
 import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
-import { contactPhone, locationSchema } from '../dbModelCommons'
+import {
+  contactPhone,
+  documentActivityStatus,
+  locationSchema,
+} from '../dbModelCommons'
 
 const wasteRemovalEventSchema = new Schema(
   {
@@ -24,7 +28,15 @@ const wasteRemovalEventSchema = new Schema(
     viewedBy: {
       type: Array,
     },
-    isActive: { type: Boolean, default: true, required: true },
+    status: {
+      type: String,
+      Enum: Object.keys(documentActivityStatus),
+      required: true,
+      default: 'active',
+    },
+    statusChangeReason: {
+      type: String,
+    },
     comment: String,
   },
   { timestamps: true },

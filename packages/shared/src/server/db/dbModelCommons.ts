@@ -3,6 +3,12 @@ import { phone as phoneValidator } from '../../validation/atomicValidators'
 
 const NUM_DAYS_TO_EXPIRE = 30
 
+export const documentActivityStatus = {
+  active: 'active',
+  blocked: 'blocked',
+  disabled: 'disabled',
+} as const
+
 //ToDo: використати цю схему також в removalApplication
 export const userSchema = new Schema({
   _id: {

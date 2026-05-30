@@ -1,6 +1,8 @@
 import {
   WasteRemovalEventModel,
   RemovalApplicationModel,
+  WasteRemovalSubscriptionModel,
+  documentActivityStatus,
 } from '@recycl/shared/dist/server/db'
 import type {
   AggregatedSubscriptionData,
@@ -8,17 +10,16 @@ import type {
   WasteTypeCounter,
 } from './types'
 import mongoose from 'mongoose'
+import { EARTH_RADIUS } from './constants'
 
-const EARTH_RADIUS = 6_378
-
-const getRemovalApplications = async (userId: string) => {
+const getUserAds = async (userId: string) => {
   const removalApplications =
     await RemovalApplicationModel.aggregate<AggregatedSubscriptionData>([
       {
         $match: {
           user: new mongoose.Types.ObjectId(userId),
-          isActive: true,
-          // expires: { $gte: new Date() },
+          status: documentActivityStatus.active,
+          expires: { $gte: new Date() },
         },
       },
       {
@@ -57,43 +58,47 @@ export const getWasteRemovalData = async (params: {
   lastRunDate: Date
 }) => {
   const { userId, runId, lastRunDate } = params
-  const removalApplications = await getRemovalApplications(userId)
+  const userAds = await getUserAds(userId)
 
-  if (removalApplications.length == 0) return []
+  if (userAds.length == 0) return []
 
   const data: WasteLocationCounter[] = []
 
-  for (const removalApplication of removalApplications) {
-    const { locationId, locationName, wasteTypes } = removalApplication
+  const subscriptionParams = await WasteRemovalSubscriptionModel.findOne({
+    user: new mongoose.Types.ObjectId(userId),
+  }).select('-_id radius')
+
+  const collectionPointSearchRadius = subscriptionParams?.radius
+
+  if (!collectionPointSearchRadius) return data
+
+  for (const ad of userAds) {
+    const { locationId, locationName, wasteTypes } = ad
     const eventCounters: WasteTypeCounter[] = []
 
     for (const wasteName of wasteTypes) {
       const newAdsCount = await WasteRemovalEventModel.countDocuments({
-        // location: {
-        //   $near: removalApplication.coordinates,
-        //   $maxDistance: 30_000 / EARTH_RADIUS,
-        // },
+        waste: wasteName,
+
         'location.position': {
           $geoWithin: {
             $centerSphere: [
-              removalApplication.coordinates,
-              removalApplication.radius / EARTH_RADIUS,
+              ad.coordinates,
+              collectionPointSearchRadius / EARTH_RADIUS,
             ],
           },
         },
-        // isActive: true,
-        // 'location.place_id': locationId,
-
-        // user: {
-        //   $ne: new mongoose.Types.ObjectId(userId),
-        // },
-        // waste: wasteName,
-        // createdAt: {
-        //   $gt: lastRunDate,
-        // },
-        // date: {
-        //   $gt: new Date(Date.now() + 12 * 60 * 60 * 1000),
-        // },
+        isActive: true,
+        user: {
+          $ne: new mongoose.Types.ObjectId(userId),
+        },
+        createdAt: {
+          $gt: lastRunDate,
+        },
+        //date exists only in mobile collection points
+        date: {
+          $gt: new Date(Date.now() + 12 * 60 * 60 * 1000), //12hours ahead
+        },
       })
 
       if (newAdsCount === 0) continue

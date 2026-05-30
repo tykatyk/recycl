@@ -1,16 +1,14 @@
-import mongoose, {
-  Schema,
-  models,
-  model,
-  InferSchemaType,
-  Model,
-} from 'mongoose'
+import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
 import type { ValidatorProps } from 'mongoose'
 import cryptoRandomString from 'crypto-random-string'
 import {
   phone as phoneValidator,
   email as emailValidator,
 } from '../../../validation/atomicValidators'
+
+import { documentActivityStatus } from '../dbModelCommons'
+
+const { active, blocked } = documentActivityStatus
 
 //validates email
 const checkEmail = (v: string) => {
@@ -105,13 +103,14 @@ const userSchema = new Schema(
       type: Date,
       required: false,
     },
-    isActive: {
-      type: Boolean,
-      default: true,
+    status: {
+      type: String,
+      Enum: [active, blocked],
+      default: 'active',
+      required: true,
     },
-    isBanned: {
-      type: Boolean,
-      default: false,
+    statusChangeReason: {
+      type: String,
     },
     roles: [
       {

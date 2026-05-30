@@ -1,5 +1,6 @@
 import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
 import { contactPhone, locationSchema, expires } from '../dbModelCommons'
+import { documentActivityStatus } from '../dbModelCommons'
 
 const removalApplicationSchema = new Schema(
   {
@@ -22,7 +23,15 @@ const removalApplicationSchema = new Schema(
     //ToDo: maybe make contactPhone required
     contactPhone,
     passDocumet: Boolean,
-    isActive: { type: Boolean, required: true, default: true },
+    status: {
+      type: String,
+      Enum: Object.keys(documentActivityStatus),
+      required: true,
+      default: 'active',
+    },
+    statusChangeReason: {
+      type: String,
+    },
     comment: String,
     notificationCities: [{ description: String, place_id: String }],
     notificationCitiesCheckbox: Boolean,

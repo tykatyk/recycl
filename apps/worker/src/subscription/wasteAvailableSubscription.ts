@@ -9,8 +9,7 @@ import {
 } from '@recycl/shared/dist/server/db'
 import { redisConnection as redis } from '@recycl/shared/dist/server/redis'
 import { Types } from 'mongoose'
-
-const EARTH_RADIUS = 6_378
+import { EARTH_RADIUS } from './constants'
 
 export const getWasteAvailableData = async (params: {
   userId: string
@@ -131,7 +130,7 @@ export const getWasteAvailableData = async (params: {
           createdAt: {
             $gt: lastRunDate,
           },
-          date: { $gt: new Date(Date.now() + 12 * 60 * 60 * 1000) },
+          expires: { $gt: new Date(Date.now() + 12 * 60 * 60 * 1000) }, //12 hours ahead
         })
         await redis.set(key, counter)
         await redis.expire(key, 30 * 60) //30 minutes
