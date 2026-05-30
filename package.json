@@ -13,7 +13,8 @@
     "dev:shared": "npm run dev -w @recycl/shared",
     "build": "npm run build --workspaces",
     "start:web": "npm run start -w web",
-    "start:worker": "npm run start -w worker"
+    "start:worker": "npm run start -w worker",
+    "reinstall": "npm rm -rf node_modules package-lock.json && npm install"
   },
   "devDependencies": {
     "prettier": "^3.8.3",

@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@recycl/shared": "^1.0.0",
-    "bullmq": "^5.74.1",
+    "bullmq": "^5.77.6",
     "dayjs": "^1.11.20",
     "dotenv": "^17.4.2",
     "mongoose": "^7.5.2"
