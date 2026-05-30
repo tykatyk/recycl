@@ -7,14 +7,6 @@ const subscriptionVariantSchema = new Schema({
     required: true,
     enum: Object.values(subscriptionVariantNames),
   },
-  userDescription: {
-    type: String,
-    required: true,
-  },
-  isConfigurable: {
-    type: Boolean,
-    default: false,
-  },
 })
 
 export type SubscriptionVariant = InferSchemaType<

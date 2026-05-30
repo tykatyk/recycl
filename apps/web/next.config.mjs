@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+export default {
   reactStrictMode: true,
   modularizeImports: {
     '@mui/material': {
@@ -17,5 +17,3 @@ const nextConfig = {
   },
   transpilePackages: ['@recycle/shared', 'formik-mui'],
 }
-
-module.exports = nextConfig

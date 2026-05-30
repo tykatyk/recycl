@@ -3,17 +3,17 @@ import {
   RemovalApplicationModel,
 } from '@recycl/shared/dist/server/db'
 import type {
-  AggregatedRemovalApplication,
+  AggregatedSubscriptionData,
   WasteLocationCounter,
   WasteTypeCounter,
 } from './types'
 import mongoose from 'mongoose'
 
-const EARTH_RADIUS = 6_378_100
+const EARTH_RADIUS = 6_378
 
 const getRemovalApplications = async (userId: string) => {
   const removalApplications =
-    await RemovalApplicationModel.aggregate<AggregatedRemovalApplication>([
+    await RemovalApplicationModel.aggregate<AggregatedSubscriptionData>([
       {
         $match: {
           user: new mongoose.Types.ObjectId(userId),
@@ -53,9 +53,10 @@ const getRemovalApplications = async (userId: string) => {
 
 export const getWasteRemovalData = async (params: {
   userId: string
+  runId: string
   lastRunDate: Date
 }) => {
-  const { userId, lastRunDate } = params
+  const { userId, runId, lastRunDate } = params
   const removalApplications = await getRemovalApplications(userId)
 
   if (removalApplications.length == 0) return []
@@ -76,7 +77,7 @@ export const getWasteRemovalData = async (params: {
           $geoWithin: {
             $centerSphere: [
               removalApplication.coordinates,
-              30_000 / EARTH_RADIUS,
+              removalApplication.radius / EARTH_RADIUS,
             ],
           },
         },

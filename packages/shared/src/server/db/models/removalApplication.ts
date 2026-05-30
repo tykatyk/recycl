@@ -9,7 +9,6 @@ const removalApplicationSchema = new Schema(
       ref: 'User',
       required: true,
     },
-    //ToDo: refactor wasteLocation schema. Use locationSchema from dbModelCommons
     wasteLocation: {
       type: locationSchema,
       required: true,

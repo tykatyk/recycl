@@ -31,48 +31,34 @@ export const contactPhone = {
   },
 }
 
-const pointSchema = new Schema({
-  type: {
-    type: String,
-    enum: ['Point'],
-    required: true,
+const pointSchema = new Schema(
+  {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
   },
-  coordinates: {
-    type: [Number],
-    required: true,
-  },
-})
+  { _id: false },
+)
 
-//ToDo: this should be replaced with location schema below, and then deleted
-export const wasteLocation = {
-  description: String,
-  place_id: String,
-  structured_formatting: {
-    main_text: String,
-    main_text_matched_substrings: [
-      {
-        length: Number,
-        offset: Number,
-      },
-    ],
-    secondary_text: String,
+const structuredFormattingSchema = new Schema(
+  {
+    main_text: {
+      type: String,
+      required: true,
+    },
+    secondary_text: {
+      type: String,
+      required: true,
+    },
   },
-  position: {
-    type: pointSchema,
-    required: true,
-  },
-}
-
-const structuredFormattingSchema = new Schema({
-  main_text: {
-    type: String,
-    required: true,
-  },
-  secondary_text: {
-    type: String,
-    required: true,
-  },
-})
+  { _id: false },
+)
 
 export const locationSchema = new Schema(
   {
@@ -85,6 +71,11 @@ export const locationSchema = new Schema(
       required: true,
     },
     structured_formatting: { type: structuredFormattingSchema, required: true },
+    position: {
+      type: pointSchema,
+      index: '2dsphere',
+      required: true,
+    },
   },
   { _id: false },
 )

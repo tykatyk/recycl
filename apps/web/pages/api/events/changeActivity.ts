@@ -1,11 +1,13 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import eventModel from '../../../../../packages/db/models/wasteRemovalEvent'
-import dbConnect from '../../../../../packages/db/connection'
+import {
+  dbConnect,
+  WasteRemovalEventModel,
+} from '@recycl/shared/dist/server/db'
 import type { AdActions } from '../../../lib/types/event'
 import { eventActions } from '../../../lib/helpers/eventHelpers'
-import { METHOD_NOT_ALLOWED } from '../../../lib/helpers/errorHelpers'
+import { METHOD_NOT_ALLOWED } from '../../../lib/errors/'
 
 const { activate } = eventActions
 
@@ -39,7 +41,7 @@ export default async function EventMassDeactivation(
     }
 
     try {
-      await eventModel.updateMany(
+      await WasteRemovalEventModel.updateMany(
         { user: session.id, _id: { $in: eventIds } },
         { isActive: action === activate ? true : false },
       )

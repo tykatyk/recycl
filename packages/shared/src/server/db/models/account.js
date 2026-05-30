@@ -62,7 +62,7 @@ const accountSchema = Schema(
       maxLength: 255,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 export default mongoose.models.Account ||
   mongoose.model('Account', accountSchema)

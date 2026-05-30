@@ -7,9 +7,8 @@ const wasteAvailableSubscriptionSchema = new Schema({
     ref: 'User',
     required: true,
   },
-  subscription: {
-    type: Schema.Types.ObjectId,
-    ref: 'Subscription',
+  radius: {
+    type: Number,
     required: true,
   },
   location: { type: locationSchema, required: true },
