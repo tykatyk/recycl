@@ -11,7 +11,7 @@ import {
 } from '../../../lib/helpers/eventHelpers'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
-import { Variant, SortOrder, OrderBy } from '../../../lib/types/event'
+import { Variant, SortOrder, OrderBy } from '../../../lib/types/pagination'
 import {
   paginationPageNumberSchema,
   paginationPageSizeSchema,
