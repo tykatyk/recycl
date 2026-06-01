@@ -30,7 +30,6 @@ export default function RemovalApplicationsPage() {
     GET_REMOVAL_APPLICATIONS_FOR_MAP
   )
   const [markers, setMarkers] = useState([])
-
   useEffect(() => {
     if (!getApplications || visibleRect.length == 0) return
 
@@ -175,6 +174,7 @@ export default function RemovalApplicationsPage() {
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}
         render={render}
         libraries={['places', 'geocoding']}
+        language='uk'
       >
         {content}
       </Wrapper>

@@ -1,5 +1,4 @@
 import getCoords from '../getCoords'
-//import removalApplication from '../../validation/removalApplication' //ToDo: Add validation before create and update operations
 import { RemovalApplicationModel } from '@recycl/shared/dist/server/db'
 import { INTERNAL_SERVER_ERROR } from '../../errors'
 
@@ -51,7 +50,7 @@ const removalApplicationQueries = {
       wasteTypes.length == 0
     )
       return null
-
+ 
     try {
       const result = await RemovalApplicationModel.aggregate([
         {

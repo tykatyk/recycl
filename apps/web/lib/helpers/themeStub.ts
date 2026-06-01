@@ -5,7 +5,8 @@ import type { ThemeColors } from '../types/themeColors'
 
 export const colors: ThemeColors = {
   secondary: '#9be1da', //teal
-  primary: '#ffbf3e', // yellow
+  // primary: '#ffbf3e', // yellow
+  primary: '#adce5d', // yellow
   background: '#223c4a', // blue-green
   brand: '#adce5d',
 }

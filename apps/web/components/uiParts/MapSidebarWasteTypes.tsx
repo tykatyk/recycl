@@ -8,6 +8,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  ListItemButton,
 } from '@mui/material'
 import { useQuery } from '@apollo/client'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
@@ -40,17 +41,17 @@ const Root = styled('div')(({ theme }) => ({
 
 export default function MapSidebarWasteTypes(props) {
   const { loading, data, error } = useQuery(GET_WASTE_TYPES)
-  const { open, onClick, checked, handleChange } = props
+  const { open, onClick, selectedValue, handleChange } = props
 
   return (
     <Root>
-      <ListItem button key={'Тип отходов'} onClick={onClick}>
+      <ListItemButton key={'Тип отходов'} onClick={onClick}>
         <ListItemIcon>
           <BlurOnIcon />
         </ListItemIcon>
         <ListItemText primary={'Тип отходов'} />
         {open ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
+      </ListItemButton>
       {loading && <PageLoadingCircle className={classes.loading} />}
       {error && (
         <Typography
@@ -67,16 +68,15 @@ export default function MapSidebarWasteTypes(props) {
           {data && data.getWasteTypes && (
             <List>
               {data.getWasteTypes.map((item) => {
-                const labelId = `checkbox-list-label-${item['_id']}`
+                const labelId = `checkbox-list-label-${item['name']}`
                 return (
-                  <ListItem
+                  <ListItemButton
                     role={undefined}
-                    button
                     key={item['_id']}
-                    onClick={handleChange(item['_id'])}
+                    onClick={handleChange(item['name'])}
                   >
                     <Radio
-                      checked={checked === item['_id']}
+                      checked={selectedValue === item['name']}
                       value={item['_id']}
                       name="waste-type"
                       inputProps={{ 'aria-label': item.name }}
@@ -89,7 +89,7 @@ export default function MapSidebarWasteTypes(props) {
                         noWrap: true,
                       }}
                     />
-                  </ListItem>
+                  </ListItemButton>
                 )
               })}
             </List>

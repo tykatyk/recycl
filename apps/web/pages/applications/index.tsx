@@ -1,7 +1,7 @@
 import IndexPage from '../../components/applications/Index'
 import AppliicationsOnMap from '../../components/applications/ApplicationsOnMap'
 
-export default function Index(props) {
+export default function Index(props:{city:any, wasteType: string}) {
   const { city, wasteType } = props
 
   if (city && wasteType) {

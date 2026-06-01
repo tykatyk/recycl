@@ -9,6 +9,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  ListItemButton,
 } from '@mui/material'
 import HomeIcon from '@mui/icons-material/Home'
 import AddIcon from '@mui/icons-material/Add'
@@ -20,7 +21,6 @@ const classes = {
   drawer: `${PREFIX}-drawer`,
   drawerOpen: `${PREFIX}-drawerOpen`,
   drawerClose: `${PREFIX}-drawerClose`,
-  secondaryColor: `${PREFIX}-secondaryColor`,
 }
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
@@ -46,10 +46,6 @@ const Root = styled('div')(({ theme }) => ({
     }),
     overflowX: 'hidden',
     width: 0,
-  },
-
-  [`& .${classes.secondaryColor}`]: {
-    color: theme.palette.secondary.main,
   },
 }))
 
@@ -80,18 +76,19 @@ export default function MapSidebar(props) {
       >
         <Toolbar />
         <List>
-          <ListItem
-            button
+          <ListItemButton
             component="a"
             href="/applications/create"
             key="Подать заявку"
-            className={classes.secondaryColor}
+            sx={{
+              color:'primary.main'
+            }}
           >
             <ListItemIcon>
               <AddIcon color="secondary" />
             </ListItemIcon>
             <ListItemText primary="Подать заявку" />
-          </ListItem>
+          </ListItemButton>
           <Divider variant="inset" component="li" />
           {children}
         </List>
