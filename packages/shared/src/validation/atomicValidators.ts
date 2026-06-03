@@ -72,6 +72,8 @@ const location = yup
   .nullable()
   .required(required)
 
+// const location = yup.object().nullable().required(required)
+
 const waste = yup.string().required(required).typeError(incorrectValue)
 
 const date = yup

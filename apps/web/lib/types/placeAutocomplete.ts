@@ -6,3 +6,8 @@ export type PlaceType = {
     secondary_text: string
   }
 }
+
+export type Position = {
+  lat: number
+  lng: number
+}

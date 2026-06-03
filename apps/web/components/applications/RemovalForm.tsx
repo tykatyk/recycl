@@ -65,7 +65,7 @@ export default function RemovalForm() {
   const { data: session } = useSession()
   const { id: userId } = session
   const { id: applicationId } = router.query
-  const [backendError, setBackendError] = useState(null)
+  const [backendError, setBackendError] = useState('')
 
   const {
     loading: gettingWasteTypes,
@@ -166,18 +166,13 @@ export default function RemovalForm() {
     }, [setFieldValue])
     return (
       <Form className={classes.formRoot}>
-        <Grid
-          item
-          container
-          component="fieldset"
-          className={classes.gridContainer}
-        >
-          <Grid item xs={12} className={classes.sectionTitle}>
+        <Grid container component="fieldset" className={classes.gridContainer}>
+          <Grid size={{ xs: 12 }} className={classes.sectionTitle}>
             <Typography gutterBottom variant="h4">
-              Сдать отходы
+              Создать объявление о наличии вторсырья
             </Typography>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Field
               id="wasteLocation"
               name="wasteLocation"
@@ -189,7 +184,7 @@ export default function RemovalForm() {
               disabled={shouldDisable}
             />
           </Grid>
-          <Grid item xs={12} className={classes.gridContainer}>
+          <Grid size={{ xs: 12 }} className={classes.gridContainer}>
             <SelectFormik
               error={wasteTypesError}
               loading={gettingWasteTypes}
@@ -200,7 +195,7 @@ export default function RemovalForm() {
               disabled={shouldDisable}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Field
               component={TextFieldFormik}
               label="Количество"
@@ -218,7 +213,7 @@ export default function RemovalForm() {
               disabled={shouldDisable}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Field
               component={TextFieldFormik}
               label="Контактный телефон"
@@ -231,7 +226,7 @@ export default function RemovalForm() {
               disabled={shouldDisable}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Field
               component={TextFieldFormik}
               multiline
@@ -243,7 +238,7 @@ export default function RemovalForm() {
               disabled={shouldDisable}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Field
               component={CheckboxWithLabel}
               type="checkbox"
@@ -256,20 +251,15 @@ export default function RemovalForm() {
           </Grid>
         </Grid>
 
-        <Grid
-          item
-          container
-          component="fieldset"
-          className={classes.gridContainer}
-        >
-          <Grid item xs={12} className={classes.sectionTitle}>
+        <Grid container component="fieldset" className={classes.gridContainer}>
+          <Grid size={{ xs: 12 }} className={classes.sectionTitle}>
             <Typography gutterBottom variant="h4">
               Параметры уведомлений
             </Typography>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Grid container>
-              <Grid item xs={11}>
+              <Grid size={{ xs: 11 }}>
                 <Field
                   component={CheckboxWithLabel}
                   type="checkbox"
@@ -283,7 +273,7 @@ export default function RemovalForm() {
               </Grid>
             </Grid>
             <Grid container>
-              <Grid item xs={11}>
+              <Grid size={{ xs: 11 }}>
                 <Field
                   component={TextFieldDependantFormik}
                   data-master="notificationRadiusCheckbox"
@@ -302,8 +292,7 @@ export default function RemovalForm() {
                 />
               </Grid>
               <Grid
-                item
-                xs={1}
+                size={{ xs: 1 }}
                 container
                 alignItems="center"
                 justifyContent="center"
@@ -317,9 +306,9 @@ export default function RemovalForm() {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Grid container>
-              <Grid item xs={11}>
+              <Grid size={{ xs: 11 }}>
                 <Field
                   component={CheckboxWithLabel}
                   type="checkbox"
@@ -333,7 +322,7 @@ export default function RemovalForm() {
               </Grid>
             </Grid>
             <Grid container>
-              <Grid item xs={11}>
+              <Grid size={{ xs: 11 }}>
                 <Field
                   name="notificationCities"
                   data-master="notificationCitiesCheckbox"
@@ -345,8 +334,7 @@ export default function RemovalForm() {
                 />
               </Grid>
               <Grid
-                item
-                xs={1}
+                size={{ xs: 1 }}
                 container
                 alignItems="center"
                 justifyContent="center"
@@ -362,7 +350,7 @@ export default function RemovalForm() {
           </Grid>
         </Grid>
 
-        <Grid item xs={12} component="fieldset">
+        <Grid size={{ xs: 12 }} component="fieldset">
           <Button
             variant="contained"
             color="secondary"
@@ -398,7 +386,7 @@ export default function RemovalForm() {
         open={!!backendError}
         message={backendError}
         handleClose={() => {
-          setBackendError(null)
+          setBackendError('')
         }}
       />
     </Root>

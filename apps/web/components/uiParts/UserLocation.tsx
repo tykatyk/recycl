@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { styled, useTheme } from '@mui/material/styles'
+import { useRef, useState } from 'react'
+import { css, useTheme } from '@mui/material/styles'
 import { Container, Button, Typography } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
@@ -7,43 +7,14 @@ import PlacesAutocomplete from './formInputs/PlacesAutocomplete'
 import Snackbar from './Snackbars'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { userLocationSchema } from '../../lib/validation'
-
-const PREFIX = 'UserLocation'
-
-const classes = {
-  root: `${PREFIX}-root`,
-  form: `${PREFIX}-form`,
-  submit: `${PREFIX}-submit`,
-}
-
-const StyledContainer = styled(Container)(({ theme }) => ({
-  [`&.${classes.root}`]: {
-    maxWidth: 600,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginTop: theme.spacing(12),
-  },
-
-  [`& .${classes.form}`]: {
-    width: '100%', // Fix IE 11 issue.
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-
-  [`& .${classes.submit}`]: {
-    flexGrow: 0,
-    margin: theme.spacing(3, 'auto', 2),
-  },
-}))
+import * as yup from 'yup'
 
 export default function UserLocation(props) {
   const theme = useTheme()
   const [recaptcha, setRecaptcha] = useState(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
   const recaptchaRef = useRef(null)
-  const [backendError, setBackendError] = useState(null)
+  const [backendError, setBackendError] = useState('')
   const loaded = useRef(false)
   const [geocoder, setGeocoder] = useState(null)
 
@@ -59,14 +30,26 @@ export default function UserLocation(props) {
   }
 
   return (
-    <StyledContainer className={classes.root}>
-      <Typography align="center" paragraph>
-        Для отображения карты, укажите пожалуйста населенный пункт в котором вы
-        хотите сдать отходы
+    <Container
+      sx={{
+        maxWidth: 600,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        mt: 12,
+      }}
+    >
+      <Typography align="center" component={'h1'} variant="h6" gutterBottom>
+        Мы не смогли загрузить карту наличия вторсырья, поскольку не смогли
+        определить местоположение
       </Typography>
-      <Formik
+      <Typography align="center" gutterBottom>
+        Выберите, пожалуйста, населенный пункт вручную
+      </Typography>
+      <Formik<yup.InferType<typeof userLocationSchema>>
+        enableReinitialize
         initialValues={{
-          userLocation: '',
+          userLocation: null as any,
         }}
         validationSchema={userLocationSchema}
         onSubmit={(values, { setSubmitting, resetForm }) => {
@@ -90,16 +73,15 @@ export default function UserLocation(props) {
                 response.results[0].geometry &&
                 response.results[0].geometry.location
               ) {
-                let coords = {}
-                coords.lng = response.results[0].geometry.location.lng()
-                coords.lat = response.results[0].geometry.location.lat()
-
-                setCenter(coords)
+                setCenter({
+                  lng: response.results[0].geometry.location.lng(),
+                  lat: response.results[0].geometry.location.lat(),
+                })
                 resetForm()
                 setLocationError(false)
               } else {
                 setBackendError(
-                  'Не удалось получить координаты населенного пункта'
+                  'Не удалось получить координаты населенного пункта',
                 )
               }
             })
@@ -115,7 +97,14 @@ export default function UserLocation(props) {
       >
         {({ isSubmitting }) => {
           return (
-            <Form className={classes.form} noValidate autoComplete="off">
+            <Form
+              css={css({
+                width: '100%', // Fix IE 11 issue.
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              })}
+            >
               <Field
                 id="userLocation"
                 name="userLocation"
@@ -130,8 +119,7 @@ export default function UserLocation(props) {
               <Button
                 type="submit"
                 variant="contained"
-                color="secondary"
-                className={classes.submit}
+                sx={{ flexGrow: 0, margin: theme.spacing(3, 'auto', 2) }}
                 disabled={isSubmitting}
               >
                 Продолжить
@@ -160,10 +148,10 @@ export default function UserLocation(props) {
           open={!!backendError}
           message={backendError}
           handleClose={() => {
-            setBackendError(null)
+            setBackendError('')
           }}
         />
       )}
-    </StyledContainer>
+    </Container>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import MapLayout from '../layouts/MapLayout'
 import Map from '../uiParts/Map'
 import Marker from '../uiParts/Marker'
@@ -7,27 +7,30 @@ import MapSidebarWasteTypes from '../uiParts/MapSidebarWasteTypes'
 import MapSidebar from '../uiParts/MapSidebar'
 import UserLocation from '../uiParts/UserLocation'
 import MapInfoWindow from '../uiParts/MapInfoWindow'
-import getUserLocation from '../../lib/helpers/getUserLocation.js'
+import getUserLocation from '../../lib/helpers/getUserLocation'
 import { GET_REMOVAL_APPLICATIONS_FOR_MAP } from '../../lib/graphql/queries/removalApplication'
 import { useLazyQuery } from '@apollo/client'
 import { Wrapper, Status } from '@googlemaps/react-wrapper'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { css } from '@emotion/react'
+import { Box } from '@mui/material'
+import type { Position } from '../../lib/types/placeAutocomplete'
 
-const containerCss = css({
+const containerCss = {
+  maxWidth: 'md',
   display: 'flex',
   flex: '1 1 auto',
-})
+}
 
 export default function RemovalApplicationsPage() {
-  const [center, setCenter] = useState(null)
+  const [center, setCenter] = useState<Position | null>(null)
   const [zoom, setZoom] = useState(11)
   const [locationError, setLocationError] = useState(false)
   const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
   const [selectedValue, setSelectedValue] = useState('')
   const [visibleRect, setVisibleRect] = useState([])
   const [getApplications, { loading, error, data }] = useLazyQuery(
-    GET_REMOVAL_APPLICATIONS_FOR_MAP
+    GET_REMOVAL_APPLICATIONS_FOR_MAP,
   )
   const [markers, setMarkers] = useState([])
   useEffect(() => {
@@ -48,10 +51,12 @@ export default function RemovalApplicationsPage() {
       data.getRemovalApplicationsForMap.length > 0
     ) {
       const markersToShow = data.getRemovalApplicationsForMap.map(
-        (element, index) => {
-          const coords = {}
-          coords.lat = element.wasteLocation[1]
-          coords.lng = element.wasteLocation[0]
+        (element, index: number) => {
+          const coords = {
+            lat: element.wasteLocation[1],
+            lng: element.wasteLocation[0],
+          }
+
           return (
             <Marker key={index} position={coords}>
               <MapInfoWindow
@@ -62,7 +67,7 @@ export default function RemovalApplicationsPage() {
               />
             </Marker>
           )
-        }
+        },
       )
       setMarkers(markersToShow)
     } else {
@@ -86,11 +91,11 @@ export default function RemovalApplicationsPage() {
     const boundsSwLatLng = bounds.getSouthWest()
     const boundsNwLatLng = new google.maps.LatLng(
       boundsNeLatLng.lat(),
-      boundsSwLatLng.lng()
+      boundsSwLatLng.lng(),
     )
     const boundsSeLatLng = new google.maps.LatLng(
       boundsSwLatLng.lat(),
-      boundsNeLatLng.lng()
+      boundsNeLatLng.lng(),
     )
 
     const visibleRect = [
@@ -99,7 +104,7 @@ export default function RemovalApplicationsPage() {
         [boundsSeLatLng.lng(), boundsSeLatLng.lat()],
         [boundsSwLatLng.lng(), boundsSwLatLng.lat()],
         [boundsNwLatLng.lng(), boundsNwLatLng.lat()],
-        [boundsNeLatLng.lng(), boundsNeLatLng.lat()],
+        // [boundsNeLatLng.lng(), boundsNeLatLng.lat()],
       ],
     ]
     setVisibleRect(visibleRect)
@@ -107,7 +112,7 @@ export default function RemovalApplicationsPage() {
 
   useEffect(() => {
     getUserLocation().then((coordinates) => {
-      if (!coordinates.lat || !coordinates.lng) {
+      if (!coordinates) {
         setLocationError(true)
         return
       }
@@ -119,12 +124,12 @@ export default function RemovalApplicationsPage() {
 
   if (locationError) {
     content = (
-      <main css={containerCss}>
+      <Box component="main" sx={containerCss}>
         <UserLocation
           setCenter={setCenter}
           setLocationError={setLocationError}
         />
-      </main>
+      </Box>
     )
   } else {
     content = (
@@ -144,11 +149,11 @@ export default function RemovalApplicationsPage() {
             open={true}
           />
         )}
-        <main css={containerCss}>
+        <Box component="main" sx={containerCss}>
           <Map center={center} zoom={zoom} onIdle={onIdle}>
             {markers}
           </Map>
-        </main>
+        </Box>
       </>
     )
   }
@@ -171,10 +176,10 @@ export default function RemovalApplicationsPage() {
   return (
     <MapLayout title="Сдать отходы | Recycl">
       <Wrapper
-        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}
+        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY || ''}
         render={render}
         libraries={['places', 'geocoding']}
-        language='uk'
+        language="uk"
       >
         {content}
       </Wrapper>

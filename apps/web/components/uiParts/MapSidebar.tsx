@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import clsx from 'clsx'
 import {
   Drawer,
   Toolbar,
   List,
-  ListItem,
   ListItemIcon,
   ListItemText,
   Divider,
@@ -14,6 +13,9 @@ import {
 import HomeIcon from '@mui/icons-material/Home'
 import AddIcon from '@mui/icons-material/Add'
 import MapActionButton from './MapActionButton'
+import variant from '../../pages/api/subscriptions/variant'
+
+const createAddButtonText = "Подать объявление о наличии вторсырья"
 
 const PREFIX = 'MapSidebar'
 
@@ -52,7 +54,7 @@ const Root = styled('div')(({ theme }) => ({
 const drawerWidth = 240
 
 export default function MapSidebar(props) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const handleDrawerToggle = () => {
     setOpen(!open)
   }
@@ -79,15 +81,15 @@ export default function MapSidebar(props) {
           <ListItemButton
             component="a"
             href="/applications/create"
-            key="Подать заявку"
+            key={createAddButtonText}
             sx={{
               color:'primary.main'
             }}
           >
             <ListItemIcon>
-              <AddIcon color="secondary" />
+              <AddIcon color="primary" />
             </ListItemIcon>
-            <ListItemText primary="Подать заявку" />
+            <ListItemText primary={createAddButtonText} primaryTypographyProps={{variant:'body2'}} sx={{whiteSpace: "normal"}} />
           </ListItemButton>
           <Divider variant="inset" component="li" />
           {children}

@@ -13,7 +13,7 @@ export default function HeaderLinks(props) {
     },
     {
       text: 'Объявления о наличии вторсырья',
-      href: '/availability',
+      href: '/applications',
     },
   ]
 
