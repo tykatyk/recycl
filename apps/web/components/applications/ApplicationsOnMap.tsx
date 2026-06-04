@@ -3,7 +3,7 @@ import MapLayout from '../layouts/MapLayout'
 import Map from '../uiParts/Map'
 import Marker from '../uiParts/Marker'
 import Snackbars from '../uiParts/Snackbars'
-import MapSidebarWasteTypes from '../uiParts/MapSidebarWasteTypes'
+import WasteTypesList from '../uiParts/WasteTypesList'
 import MapSidebar from '../uiParts/MapSidebar'
 import UserLocation from '../uiParts/UserLocation'
 import MapInfoWindow from '../uiParts/MapInfoWindow'
@@ -13,11 +13,100 @@ import { useLazyQuery } from '@apollo/client'
 import { Wrapper, Status } from '@googlemaps/react-wrapper'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { css } from '@emotion/react'
-import { Box } from '@mui/material'
+import {
+  Box,
+  Divider,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from '@mui/material'
 import type { Position } from '../../lib/types/placeAutocomplete'
+import Link from '../uiParts/Link'
+import CreateIcon from '@mui/icons-material/Create'
+import AddIcon from '@mui/icons-material/Add'
+import TroubleshootIcon from '@mui/icons-material/Troubleshoot'
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 
-const containerCss = {
-  maxWidth: 'md',
+const createAddButtonText = 'Добавить объявление о наличии вторсырья'
+
+const ContactAdmin = () => {
+  return (
+    <ListItem disableGutters dense>
+      <ListItemButton
+        key={'Написать администратору'}
+        sx={
+          {
+            // color: 'primary.main',
+            // color: 'secondary.main',
+          }
+        }
+      >
+        <ListItemIcon>
+          <CreateIcon />
+        </ListItemIcon>
+        <ListItemText
+          primary={'Написать администратору'}
+          primaryTypographyProps={{ variant: 'body2' }}
+          sx={{ whiteSpace: 'normal' }}
+        />
+      </ListItemButton>
+    </ListItem>
+  )
+}
+
+const NoWasteTypeRequest = () => {
+  return (
+    <ListItem disableGutters dense>
+      <ListItemButton
+        key={'Нет нужного типа вторсырья в списке'}
+        sx={
+          {
+            // color: 'primary.main',
+            // color: 'secondary.main',
+          }
+        }
+      >
+        <ListItemIcon>
+          <TroubleshootIcon />
+        </ListItemIcon>
+        <ListItemText
+          primary={'Нет нужного типа вторсырья в списке'}
+          primaryTypographyProps={{ variant: 'body2' }}
+          sx={{ whiteSpace: 'normal' }}
+        />
+      </ListItemButton>
+    </ListItem>
+  )
+}
+
+const SupportProject = () => {
+  return (
+    <ListItem disableGutters dense>
+      <ListItemButton
+        key={'Поддержать проект'}
+        sx={
+          {
+            // color: 'primary.main',
+            // color: 'secondary.main',
+          }
+        }
+      >
+        <ListItemIcon>
+          <AttachMoneyIcon />
+        </ListItemIcon>
+        <ListItemText
+          primary={'Поддержать проект'}
+          primaryTypographyProps={{ variant: 'body2' }}
+          sx={{ whiteSpace: 'normal' }}
+        />
+      </ListItemButton>
+    </ListItem>
+  )
+}
+
+const mainCss = {
   display: 'flex',
   flex: '1 1 auto',
 }
@@ -104,7 +193,7 @@ export default function RemovalApplicationsPage() {
         [boundsSeLatLng.lng(), boundsSeLatLng.lat()],
         [boundsSwLatLng.lng(), boundsSwLatLng.lat()],
         [boundsNwLatLng.lng(), boundsNwLatLng.lat()],
-        // [boundsNeLatLng.lng(), boundsNeLatLng.lat()],
+        [boundsNeLatLng.lng(), boundsNeLatLng.lat()],
       ],
     ]
     setVisibleRect(visibleRect)
@@ -124,7 +213,7 @@ export default function RemovalApplicationsPage() {
 
   if (locationError) {
     content = (
-      <Box component="main" sx={containerCss}>
+      <Box component="main" sx={mainCss}>
         <UserLocation
           setCenter={setCenter}
           setLocationError={setLocationError}
@@ -135,12 +224,39 @@ export default function RemovalApplicationsPage() {
     content = (
       <>
         <MapSidebar>
-          <MapSidebarWasteTypes
-            open={wasteTypeOpen}
-            onClick={handleWasteTypeToggle}
-            handleChange={handleChange}
-            selectedValue={selectedValue}
-          />
+          <ListItem disableGutters dense alignItems="flex-start">
+            <ListItemButton
+              component="a"
+              href="/applications/create"
+              key={createAddButtonText}
+            >
+              <ListItemIcon>
+                <AddIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={createAddButtonText}
+                primaryTypographyProps={{ variant: 'body2' }}
+                sx={{ whiteSpace: 'normal' }}
+              />
+            </ListItemButton>
+          </ListItem>
+
+          <Divider component="li" />
+          <ListItem disableGutters dense>
+            <WasteTypesList
+              open={wasteTypeOpen}
+              onClick={handleWasteTypeToggle}
+              handleChange={handleChange}
+              selectedValue={selectedValue}
+            />
+          </ListItem>
+          <Divider component="li" />
+          <NoWasteTypeRequest />
+          <Divider component="li" />
+          <ContactAdmin />
+          <Divider component="li" />
+          <SupportProject />
+          <Divider component="li" />
         </MapSidebar>
         {!!error && (
           <Snackbars
@@ -149,7 +265,7 @@ export default function RemovalApplicationsPage() {
             open={true}
           />
         )}
-        <Box component="main" sx={containerCss}>
+        <Box component="main" sx={mainCss}>
           <Map center={center} zoom={zoom} onIdle={onIdle}>
             {markers}
           </Map>

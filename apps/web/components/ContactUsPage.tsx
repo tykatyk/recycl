@@ -1,50 +1,15 @@
-import React, { useState, useRef } from 'react'
-import { styled, useTheme } from '@mui/material/styles'
+import { useState, useRef } from 'react'
+import { useTheme } from '@mui/material/styles'
 import { Typography, Box, Button, Container } from '@mui/material'
 import Layout from './layouts/Layout'
 import { contactUsSchema } from '../lib/validation'
-import { whitespaceRegex } from '../lib/validation/regularExpressions'
+import { whitespaceRegex } from '@recycl/shared/dist/validation/regularExpressions'
 import submitWithCapthca from '../lib/helpers/submitWithCaptcha'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik'
 import Snackbars from './uiParts/Snackbars'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import ReCAPTCHA from 'react-google-recaptcha'
-
-const PREFIX = 'ContactUsPage'
-
-const classes = {
-  container: `${PREFIX}-container`,
-  header: `${PREFIX}-header`,
-  form: `${PREFIX}-form`,
-  remainedSymbols: `${PREFIX}-remainedSymbols`,
-}
-
-const StyledLayout = styled(Layout)(({ theme }) => ({
-  [`& .${classes.container}`]: {
-    display: 'flex',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    maxWidth: 800,
-  },
-
-  [`& .${classes.header}`]: {
-    marginBottom: theme.spacing(5),
-  },
-
-  [`& .${classes.form}`]: {
-    '& > fieldset': {
-      margin: 0,
-      marginBottom: theme.spacing(5),
-      padding: 0,
-      border: 'none',
-    },
-  },
-
-  [`& .${classes.remainedSymbols}`]: {
-    color: theme.palette.text.secondary,
-  },
-}))
 
 export default function SupportUsPage() {
   const limit = 1000
@@ -60,8 +25,8 @@ export default function SupportUsPage() {
   }
 
   return (
-    <StyledLayout title="Связаться с нами | Recycl">
-      <Container className={classes.container}>
+    <Layout title="Связаться с нами | Recycl">
+      <Container>
         {!!notification && (
           <Snackbars
             open={!!notification}
@@ -73,7 +38,7 @@ export default function SupportUsPage() {
           />
         )}
 
-        <Typography variant="h6" className={classes.header} align="center">
+        <Typography component="h1" variant="h6" align="center" gutterBottom>
           Если у вас есть вопросы, предложения или замечания относительно работы
           сайта, заполните, пожалуйста, приведенную ниже форму и мы свяжемся с
           вами в ближайшее время
@@ -113,14 +78,20 @@ export default function SupportUsPage() {
               setFieldValue(
                 'message',
                 values.message.substring(0, limit),
-                false
+                false,
               )
             }
 
             return (
-              <Form className={classes.form}>
+              <Form>
                 <Box mb={3}>
-                  <Typography gutterBottom>Тема письма</Typography>
+                  <Typography
+                    gutterBottom
+                    color="textSecondary"
+                    sx={{ fontWeight: 'bold' }}
+                  >
+                    Тема письма
+                  </Typography>
                   <Field
                     component={TextFieldFormik}
                     variant="outlined"
@@ -129,7 +100,13 @@ export default function SupportUsPage() {
                   />
                 </Box>
                 <Box mb={3}>
-                  <Typography gutterBottom>Ваше имя</Typography>
+                  <Typography
+                    gutterBottom
+                    color="textSecondary"
+                    sx={{ fontWeight: 'bold' }}
+                  >
+                    Ваше имя
+                  </Typography>
                   <Field
                     component={TextFieldFormik}
                     variant="outlined"
@@ -139,7 +116,13 @@ export default function SupportUsPage() {
                 </Box>
 
                 <Box mb={3}>
-                  <Typography gutterBottom>Email для обратной связи</Typography>
+                  <Typography
+                    gutterBottom
+                    color="textSecondary"
+                    sx={{ fontWeight: 'bold' }}
+                  >
+                    Email для обратной связи
+                  </Typography>
                   <Field
                     component={TextFieldFormik}
                     variant="outlined"
@@ -149,7 +132,13 @@ export default function SupportUsPage() {
                 </Box>
 
                 <Box mb={3}>
-                  <Typography gutterBottom>Текст сообщения</Typography>
+                  <Typography
+                    gutterBottom
+                    color="textSecondary"
+                    sx={{ fontWeight: 'bold' }}
+                  >
+                    Текст сообщения
+                  </Typography>
                   <Field
                     component={TextFieldFormik}
                     multiline
@@ -161,7 +150,8 @@ export default function SupportUsPage() {
 
                   <Typography
                     variant="body2"
-                    className={classes.remainedSymbols}
+                    color="textSecondary"
+                    sx={{ fontWeight: 'fontWeightLight' }}
                   >
                     Осталось: {availableSymbols}
                   </Typography>
@@ -169,7 +159,6 @@ export default function SupportUsPage() {
                 <Box>
                   <Button
                     variant="contained"
-                    color="secondary"
                     type="submit"
                     disabled={
                       values.message.replace(whitespaceRegex, '') === '' ||
@@ -198,6 +187,6 @@ export default function SupportUsPage() {
           />
         </div>
       </Container>
-    </StyledLayout>
+    </Layout>
   )
 }

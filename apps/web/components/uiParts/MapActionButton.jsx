@@ -45,7 +45,8 @@ export default function MapActionButton(props) {
 
   return (
     <StyledFab
-      color="primary"
+      color="secondary"
+      // sx={{ color: '#ffbf3e' }}
       aria-label="show panel"
       className={clsx(classes.fab, {
         [classes.fabOpen]: open,

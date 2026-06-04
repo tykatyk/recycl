@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { css, useTheme } from '@mui/material/styles'
-import { Container, Button, Typography } from '@mui/material'
+import { Container, Button, Typography, Box } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import PlacesAutocomplete from './formInputs/PlacesAutocomplete'
@@ -31,21 +31,24 @@ export default function UserLocation(props) {
 
   return (
     <Container
+      maxWidth={'md'}
       sx={{
-        maxWidth: 600,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        mt: 12,
+        m: 'auto',
       }}
     >
-      <Typography align="center" component={'h1'} variant="h6" gutterBottom>
-        Мы не смогли загрузить карту наличия вторсырья, поскольку не смогли
-        определить местоположение
-      </Typography>
-      <Typography align="center" gutterBottom>
-        Выберите, пожалуйста, населенный пункт вручную
-      </Typography>
+      <Box sx={{ mb: 2 }}>
+        <Typography align="center" component={'h1'} variant="h6" gutterBottom>
+          Мы не смогли загрузить карту с объявлениями о наличия вторсырья, так
+          как не смогли определить местоположение
+        </Typography>
+        <Typography align="center" gutterBottom>
+          Выберите, пожалуйста, населенный пункт вручную
+        </Typography>
+      </Box>
+
       <Formik<yup.InferType<typeof userLocationSchema>>
         enableReinitialize
         initialValues={{
@@ -105,26 +108,35 @@ export default function UserLocation(props) {
                 justifyContent: 'center',
               })}
             >
-              <Field
-                id="userLocation"
-                name="userLocation"
-                variant="outlined"
-                fullWidth
-                component={PlacesAutocomplete}
-                label="Населенный пункт"
-                helperText="*Обязательное поле"
-                disabled={isSubmitting}
-              />
+              <Box sx={{ mb: 2 }}>
+                <Field
+                  id="userLocation"
+                  name="userLocation"
+                  variant="outlined"
+                  fullWidth
+                  component={PlacesAutocomplete}
+                  label="Населенный пункт"
+                  helperText="*Обязательное поле"
+                  disabled={isSubmitting}
+                />
+              </Box>
 
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{ flexGrow: 0, margin: theme.spacing(3, 'auto', 2) }}
-                disabled={isSubmitting}
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  mb: 2,
+                }}
               >
-                Продолжить
-                {isSubmitting && <ButtonSubmittingCircle />}
-              </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={isSubmitting}
+                >
+                  Продолжить
+                  {isSubmitting && <ButtonSubmittingCircle />}
+                </Button>
+              </Box>
             </Form>
           )
         }}

@@ -44,8 +44,6 @@ const getPositionByGeolocationAPI = () => {
 }
 
 export default async function getUserLocation() {
-  // return []
-
   try {
     return await getPositionByGeolocationAPI()
   } catch (error) {
