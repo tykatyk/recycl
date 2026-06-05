@@ -13,6 +13,7 @@ import { useLazyQuery } from '@apollo/client'
 import { Wrapper, Status } from '@googlemaps/react-wrapper'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { css } from '@emotion/react'
+import ProposeWasteType from '../ProposeWasteType'
 import {
   Box,
   Divider,
@@ -20,6 +21,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Modal,
   Typography,
 } from '@mui/material'
 import type { Position } from '../../lib/types/placeAutocomplete'
@@ -31,11 +33,29 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 
 const createAddButtonText = 'Добавить объявление о наличии вторсырья'
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  maxWidth: 600,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+  maxHeight: '100vh',
+  overflowY: 'auto',
+}
+
 const ContactAdmin = () => {
   return (
-    <ListItem disableGutters dense>
+    <ListItem disableGutters dense divider>
       <ListItemButton
         key={'Написать администратору'}
+        component="a"
+        href="/contact-us"
+        target="_blank"
+        rel="noopener"
         sx={
           {
             // color: 'primary.main',
@@ -56,10 +76,26 @@ const ContactAdmin = () => {
   )
 }
 
-const NoWasteTypeRequest = () => {
+const AddWasteTypeModal = ({ open, setOpen, handleClose }) => {
   return (
-    <ListItem disableGutters dense>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <ProposeWasteType setOpen={setOpen} />
+      </Box>
+    </Modal>
+  )
+}
+
+const NoWasteTypeRequest = ({ handleOpen }) => {
+  return (
+    <ListItem disableGutters dense divider>
       <ListItemButton
+        onClick={handleOpen}
         key={'Нет нужного типа вторсырья в списке'}
         sx={
           {
@@ -83,9 +119,13 @@ const NoWasteTypeRequest = () => {
 
 const SupportProject = () => {
   return (
-    <ListItem disableGutters dense>
+    <ListItem disableGutters dense divider>
       <ListItemButton
         key={'Поддержать проект'}
+        component="a"
+        href="/support-us"
+        target="_blank"
+        rel="noopener"
         sx={
           {
             // color: 'primary.main',
@@ -122,6 +162,10 @@ export default function RemovalApplicationsPage() {
     GET_REMOVAL_APPLICATIONS_FOR_MAP,
   )
   const [markers, setMarkers] = useState([])
+  const [open, setOpen] = useState(false)
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
+
   useEffect(() => {
     if (!getApplications || visibleRect.length == 0) return
 
@@ -224,7 +268,7 @@ export default function RemovalApplicationsPage() {
     content = (
       <>
         <MapSidebar>
-          <ListItem disableGutters dense alignItems="flex-start">
+          <ListItem disableGutters dense divider>
             <ListItemButton
               component="a"
               href="/applications/create"
@@ -241,7 +285,6 @@ export default function RemovalApplicationsPage() {
             </ListItemButton>
           </ListItem>
 
-          <Divider component="li" />
           <ListItem disableGutters dense>
             <WasteTypesList
               open={wasteTypeOpen}
@@ -250,13 +293,9 @@ export default function RemovalApplicationsPage() {
               selectedValue={selectedValue}
             />
           </ListItem>
-          <Divider component="li" />
-          <NoWasteTypeRequest />
-          <Divider component="li" />
+          <NoWasteTypeRequest handleOpen={handleOpen} />
           <ContactAdmin />
-          <Divider component="li" />
           <SupportProject />
-          <Divider component="li" />
         </MapSidebar>
         {!!error && (
           <Snackbars
@@ -270,6 +309,11 @@ export default function RemovalApplicationsPage() {
             {markers}
           </Map>
         </Box>
+        <AddWasteTypeModal
+          open={open}
+          setOpen={setOpen}
+          handleClose={handleClose}
+        />
       </>
     )
   }
@@ -290,7 +334,9 @@ export default function RemovalApplicationsPage() {
   }
 
   return (
-    <MapLayout title="Сдать отходы | Recycl">
+    <MapLayout
+      title={`Объявления о наличии вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
+    >
       <Wrapper
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY || ''}
         render={render}

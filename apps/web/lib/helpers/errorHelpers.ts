@@ -34,7 +34,10 @@ export function showErrorMessages(
   setErrors: FormikHelpers<FormikValues>['setErrors'],
   setNotification: Dispatch<SetStateAction<string>>,
 ) {
-  if (!error) return
+  if (!error) {
+    setNotification(INTERNAL_SERVER_ERROR)
+    return
+  }
 
   switch (error.type) {
     case 'perField':

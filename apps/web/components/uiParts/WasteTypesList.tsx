@@ -56,7 +56,7 @@ export default function WasteTypesList(props) {
         )}
       </ListItem>
 
-      <ListItem disableGutters dense>
+      <ListItem disableGutters dense divider>
         {data && (
           <Collapse
             in={open}

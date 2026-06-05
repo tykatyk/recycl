@@ -36,9 +36,9 @@ export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
     EmailProvider({
-      server: 'smtp-pulse.com',
+      server: process.env.SMTP_HOST,
 
-      from: 'notify@yoused.com.ua',
+      from: process.env.EMAIL_FROM,
       sendVerificationRequest: async (params) => {
         const { identifier, url, provider } = params
         const { host } = new URL(url)
