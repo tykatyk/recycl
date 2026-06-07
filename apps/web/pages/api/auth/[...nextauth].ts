@@ -15,8 +15,8 @@ import { loginSchema } from '../../../lib/validation/index'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/helpers/nextAuthClientPromise'
 import { URL } from 'url'
-import { createTransport } from 'nodemailer'
 import { colors as theme } from '../../../lib/helpers/themeStub'
+import { sendEmail } from '../../../lib/helpers/email/mailer'
 
 const apolloClient = initializeApollo()
 
@@ -29,6 +29,8 @@ declare global {
   }
 }
 
+const subjectText = 'Вход в учётную запись'
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
@@ -36,35 +38,25 @@ export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
     EmailProvider({
-      server: process.env.SMTP_HOST,
-
-      from: process.env.EMAIL_FROM,
       sendVerificationRequest: async (params) => {
-        const { identifier, url, provider } = params
+        const { identifier, url } = params
         const { host } = new URL(url)
-        // NOTE: You are not required to use `nodemailer`, use whatever you want.
-        const transport = createTransport({
-          host: provider.server,
-          port: 2525,
 
-          auth: {
-            user: 'tykatyk@gmail.com',
-            pass: 'MXo8Ca4AQo',
-          },
-          logger: true,
-          transactionLog: true, // include SMTP traffic in the logs
-          allowInternalNetworkInterfaces: false,
-        })
-        const result = await transport.sendMail({
+        const partialEmailParams = {
           to: identifier,
-          from: provider.from,
-          subject: `Вход в учётную запись ${host}`,
+          subject: `${subjectText} ${process.env.BRAND}`,
           text: text({ url, host }),
+        }
+        const emailParams = {
+          ...partialEmailParams,
           html: html({ url, host, theme }),
-        })
-        const failed = result.rejected.concat(result.pending).filter(Boolean)
-        if (failed.length) {
-          throw new Error(`Email(s) (${failed.join(', ')}) could not be sent`)
+        }
+
+        try {
+          await sendEmail(emailParams)
+        } catch (err) {
+          console.log(err)
+          throw new Error(`An email to ${identifier} could not be sent`)
         }
       },
     }),

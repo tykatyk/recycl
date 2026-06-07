@@ -13,6 +13,7 @@ import UnsubscribeToken from './unsubscribeToken'
 import UserModel from './user'
 import SubscriptionRunModel from './subscriptionRun'
 import SubscriptionBatchModel from './subscriptionBatch'
+import EmailLetterModel from './emailLetter'
 
 export {
   Message,
@@ -30,4 +31,5 @@ export {
   UserModel,
   SubscriptionRunModel,
   SubscriptionBatchModel,
+  EmailLetterModel,
 }

@@ -14,7 +14,7 @@ import changePasswordSchema from './changePassword'
 import quantitySchema from './quantity'
 import contactUsForm from './contactUsForm'
 import chatForm from './chatForm'
-import { addWasteTypeSchema } from './addWasteType'
+import { proposeWasteTypeSchema } from './proposeWasteType'
 import { eventValidationSchema } from './eventFormValidator'
 import {
   wasteAvailableSubscriptionSchema,
@@ -39,5 +39,5 @@ export {
   wasteRemovalSubscriptionSchema,
   paginationPageNumberSchema,
   paginationPageSizeSchema,
-  addWasteTypeSchema,
+  proposeWasteTypeSchema,
 }

@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import { Typography, Box, Button, Container } from '@mui/material'
-import { addWasteTypeSchema } from '../lib/validation'
-import { whitespaceRegex } from '@recycl/shared/dist/validation/regularExpressions'
+import { proposeWasteTypeSchema } from '../lib/validation'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
@@ -11,7 +10,7 @@ import * as yup from 'yup'
 import { showErrorMessages } from '../lib/helpers/errorHelpers'
 
 const errorMessage = 'Ошибка при отправкве формы'
-const successMessage = 'Запрос успешно отправлен'
+const successMessage = 'Сообщение успешно отправлено'
 const submitButtonText = 'Отправить'
 const headerText =
   ' Если вы не нашли нужного вам типа вторсырья в списке, вы можете отправить запрос на его добавление'
@@ -22,7 +21,7 @@ const wasteTypeToAddHeadingText = '  Тип вторсырья, который �
 const emailHeadingText = 'Email для обратной связи'
 const remainedSymbolsText = 'Осталось'
 
-const apiRoute = '/api/waste-types'
+const apiRoute = '/api/contact-us/propose-waste-type'
 
 export default function ProposeWasteType({ setOpen }) {
   const limit = 1000
@@ -31,11 +30,11 @@ export default function ProposeWasteType({ setOpen }) {
   const { enqueueSnackbar } = useSnackbar()
 
   const formHandler = async (
-    values: yup.InferType<typeof addWasteTypeSchema>,
+    values: yup.InferType<typeof proposeWasteTypeSchema>,
     {
       setSubmitting,
       setErrors,
-    }: FormikHelpers<yup.InferType<typeof addWasteTypeSchema>>,
+    }: FormikHelpers<yup.InferType<typeof proposeWasteTypeSchema>>,
   ) => {
     if (!recaptchaToken) return
     setSubmitting(true)
@@ -81,10 +80,10 @@ export default function ProposeWasteType({ setOpen }) {
           wasteTypeToAdd: '',
           additionalNotes: '',
         }}
-        validationSchema={addWasteTypeSchema}
+        validationSchema={proposeWasteTypeSchema}
         onSubmit={formHandler}
       >
-        {({ isSubmitting, values, errors, setFieldValue }) => {
+        {({ isSubmitting, values, setFieldValue }) => {
           let availableSymbols = limit - values.additionalNotes.length
           availableSymbols = availableSymbols >= 0 ? availableSymbols : 0
 

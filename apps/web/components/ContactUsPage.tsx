@@ -3,41 +3,32 @@ import { useTheme } from '@mui/material/styles'
 import { Typography, Box, Button, Container } from '@mui/material'
 import Layout from './layouts/Layout'
 import { contactUsSchema } from '../lib/validation'
-import { whitespaceRegex } from '@recycl/shared/dist/validation/regularExpressions'
-import submitWithCapthca from '../lib/helpers/submitWithCaptcha'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik'
-import Snackbars from './uiParts/Snackbars'
 import ButtonSubmittingCircle from './uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import ReCAPTCHA from 'react-google-recaptcha'
+import { useSnackbar } from 'notistack'
+import { showErrorMessages } from '../lib/helpers/errorHelpers'
+
+const apiRoute = 'api/contact-us/general'
+const successMessage = 'Сообщение успешно отправлено'
+const errorMessage = 'Ошибка при отправкве формы'
+const limit = 1000
 
 export default function SupportUsPage() {
-  const limit = 1000
   const theme = useTheme()
-  const [notification, setNotification] = useState('')
-  const [severity, setSeverity] = useState('')
-  const [recaptcha, setRecaptcha] = useState(null)
-  const [showRecaptcha, setShowRecaptcha] = useState(false)
-  const recaptchaRef = useRef(null)
+  const [recaptchaToken, setRecaptchaToken] = useState(null)
+  const recaptchaRef = useRef<ReCAPTCHA>(null)
+
+  const { enqueueSnackbar } = useSnackbar()
 
   const handleChange = (token) => {
-    setRecaptcha(token)
+    setRecaptchaToken(token)
   }
 
   return (
-    <Layout title="Связаться с нами | Recycl">
-      <Container>
-        {!!notification && (
-          <Snackbars
-            open={!!notification}
-            handleClose={() => {
-              setNotification('')
-            }}
-            message={notification}
-            severity={severity}
-          />
-        )}
-
+    <Layout title={`Связаться с нами | ${process.env.NEXT_PUBLIC_BRAND}`}>
+      <Container maxWidth="md">
         <Typography component="h1" variant="h6" align="center" gutterBottom>
           Если у вас есть вопросы, предложения или замечания относительно работы
           сайта, заполните, пожалуйста, приведенную ниже форму и мы свяжемся с
@@ -47,27 +38,38 @@ export default function SupportUsPage() {
           enableReinitialize
           initialValues={{
             subject: '',
-            username: '',
+            userName: '',
             email: '',
             message: '',
           }}
           validationSchema={contactUsSchema}
-          onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-            const options = {
-              recaptcha,
-              recaptchaRef,
-              showRecaptcha,
-              values,
-              endpointUrl: '/api/contact-us',
-              setRecaptcha,
-              setShowRecaptcha,
-              setSubmitting,
-              setNotification,
-              setErrors,
-              setSeverity,
-              resetForm,
+          onSubmit={async (values, { setSubmitting, setErrors, resetForm }) => {
+            if (!recaptchaToken) return
+            setSubmitting(true)
+
+            try {
+              const response = await fetch(apiRoute, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...values, recaptchaToken }),
+              })
+
+              if (!response.ok) {
+                const data = await response.json()
+
+                showErrorMessages(data.error, setErrors, (message: string) => {
+                  enqueueSnackbar(message, { variant: 'error' })
+                })
+                return
+              }
+              enqueueSnackbar(successMessage, { variant: 'success' })
+              resetForm()
+            } catch (error) {
+              enqueueSnackbar(errorMessage, { variant: 'error' })
+            } finally {
+              recaptchaRef.current?.reset()
+              setSubmitting(false)
             }
-            submitWithCapthca(options)
           }}
         >
           {({ isSubmitting, values, setFieldValue }) => {
@@ -111,7 +113,7 @@ export default function SupportUsPage() {
                     component={TextFieldFormik}
                     variant="outlined"
                     fullWidth
-                    name="username"
+                    name="userName"
                   />
                 </Box>
 
@@ -156,14 +158,18 @@ export default function SupportUsPage() {
                     Осталось: {availableSymbols}
                   </Typography>
                 </Box>
-                <Box>
+                <Box mb={3}>
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                    onChange={handleChange}
+                  />
+                </Box>
+                <Box mb={3}>
                   <Button
                     variant="contained"
                     type="submit"
-                    disabled={
-                      values.message.replace(whitespaceRegex, '') === '' ||
-                      isSubmitting
-                    }
+                    disabled={isSubmitting}
                   >
                     Отправить
                     {isSubmitting && <ButtonSubmittingCircle />}
@@ -173,19 +179,6 @@ export default function SupportUsPage() {
             )
           }}
         </Formik>
-        <div
-          style={{
-            display: showRecaptcha ? 'flex' : 'none',
-            justifyContent: 'center',
-            margin: theme.spacing(2, 0),
-          }}
-        >
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-            onChange={handleChange}
-          />
-        </div>
       </Container>
     </Layout>
   )

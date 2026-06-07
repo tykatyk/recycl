@@ -1,5 +1,8 @@
 import { Schema, Types } from 'mongoose'
-import { phone as phoneValidator } from '../../validation/atomicValidators'
+import {
+  phone as phoneValidator,
+  email as emailValidator,
+} from '../../validation/atomicValidators'
 
 const NUM_DAYS_TO_EXPIRE = 30
 
@@ -93,4 +96,13 @@ export const expires = {
     const date = new Date()
     return date.setDate(date.getDate() + NUM_DAYS_TO_EXPIRE)
   },
+}
+
+//validates email in db schemas
+export const checkEmail = (v: string) => {
+  try {
+    return !!emailValidator.validateSync(v)
+  } catch (error) {
+    return false
+  }
 }

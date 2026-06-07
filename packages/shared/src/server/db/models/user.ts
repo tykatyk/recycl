@@ -1,23 +1,15 @@
 import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
 import type { ValidatorProps } from 'mongoose'
 import cryptoRandomString from 'crypto-random-string'
-import {
-  phone as phoneValidator,
-  email as emailValidator,
-} from '../../../validation/atomicValidators'
-
+import { phone as phoneValidator } from '../../../validation/atomicValidators'
+import { checkEmail } from '../dbModelCommons'
 import { documentActivityStatus } from '../dbModelCommons'
+import { validationMessages } from '../../../validation'
+
+const { email: invalidEmailAddress, phone: invalidPhoneNumber } =
+  validationMessages
 
 const { active, blocked } = documentActivityStatus
-
-//validates email
-const checkEmail = (v: string) => {
-  try {
-    return !!emailValidator.validateSync(v)
-  } catch (error) {
-    return false
-  }
-}
 
 const locationSchema = new Schema({
   description: {
@@ -49,8 +41,7 @@ const userSchema = new Schema(
             return false
           }
         },
-        message: (props: ValidatorProps) =>
-          `${props.value} Недействительный номер телефона!`,
+        message: (props: ValidatorProps) => `${props.value} invalidPhoneNumber`,
       },
     },
     email: {
@@ -60,7 +51,7 @@ const userSchema = new Schema(
       validate: {
         validator: checkEmail,
         message: (props: ValidatorProps) =>
-          `${props.value} Недействительный адрес электронной почты!`,
+          `${props.value} invalidEmailAddress`,
       },
       lowercase: true,
       trim: true,
@@ -73,7 +64,7 @@ const userSchema = new Schema(
       validate: {
         validator: checkEmail,
         message: (props: ValidatorProps) =>
-          `${props.value} Недействительный адрес электронной почты!`,
+          `${props.value} ${invalidEmailAddress}`,
       },
       lowercase: true,
     },
