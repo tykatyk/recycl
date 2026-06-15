@@ -3,12 +3,15 @@ import { ruRU as coreRuRu } from '@mui/material/locale'
 import { ruRU } from '@mui/x-date-pickers/locales'
 import type { ThemeColors } from '../types/themeColors'
 
+const lime = '#adce5d'
+
 export const colors: ThemeColors = {
+  primary: lime,
   secondary: '#9be1da', //teal
-  // primary: '#ffbf3e', // yellow
-  primary: '#adce5d', // yellow
   background: '#223c4a', // blue-green
-  brand: '#adce5d',
+  brand: lime,
+  yellow: '#ffbf3e',
+  darkBlueGreen: '#1a2b34',
 }
 
 const theme = createTheme(

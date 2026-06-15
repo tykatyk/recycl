@@ -1,20 +1,9 @@
 import React from 'react'
-import { useTheme } from '@mui/material/styles'
-import {
-  Box,
-  Button,
-  IconButton,
-  Link,
-  Menu,
-  MenuItem,
-  useMediaQuery,
-} from '@mui/material'
+import { Box, Button, IconButton, Link, Menu, MenuItem } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 
-export default function CreateButton(props) {
-  const theme = useTheme()
-  const matches = useMediaQuery(theme.breakpoints.down('md'))
+export default function HeaderActions() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
@@ -34,14 +23,44 @@ export default function CreateButton(props) {
   ]
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget)
+    setAnchorEl(document.getElementById('anchor'))
   }
   const handleClose = () => {
     setAnchorEl(null)
   }
 
-  const CreateAdMenu = () => {
-    return (
+  return (
+    <Box id="anchor">
+      <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+        <Button
+          sx={{
+            textTransform: 'capitalize',
+
+            fontSize: '1rem',
+            fontWeight: '400',
+          }}
+          variant="outlined"
+          color="inherit"
+          id="basic-button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          endIcon={<KeyboardArrowDownIcon />}
+        >
+          Добавить
+        </Button>
+      </Box>
+      <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+        <IconButton
+          aria-label="создать объявление"
+          color="inherit"
+          size="large"
+          onClick={handleClick}
+        >
+          <AddCircleIcon />
+        </IconButton>
+      </Box>
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
@@ -50,6 +69,7 @@ export default function CreateButton(props) {
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
+        keepMounted
       >
         {menuItems.map((item, index) => {
           return (
@@ -71,46 +91,6 @@ export default function CreateButton(props) {
           )
         })}
       </Menu>
-    )
-  }
-
-  if (matches) {
-    return (
-      <Box>
-        <IconButton
-          aria-label="создать объявление"
-          color="inherit"
-          size="large"
-          onClick={handleClick}
-        >
-          <AddCircleIcon />
-        </IconButton>
-        <CreateAdMenu />
-      </Box>
-    )
-  }
-
-  return (
-    <Box>
-      <Button
-        sx={{
-          textTransform: 'capitalize',
-          marginRight: theme.spacing(2),
-          fontSize: '1rem',
-          fontWeight: '400',
-        }}
-        variant="outlined"
-        color="inherit"
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-        endIcon={<KeyboardArrowDownIcon />}
-      >
-        Добавить
-      </Button>
-      <CreateAdMenu />
     </Box>
   )
 }
