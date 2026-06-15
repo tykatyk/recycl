@@ -11,6 +11,7 @@
     "worker": "tsx workers/index.ts"
   },
   "devDependencies": {
+    "@types/google.maps": "^3.65.1",
     "@types/js-cookie": "^3.0.6",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^18.0.3",
@@ -43,7 +44,6 @@
     "cross-env": "^7.0.3",
     "crypto-random-string": "^5.0.0",
     "dayjs": "^1.11.9",
-    "fetch-jsonp": "^1.2.1",
     "formik": "^2.4.9",
     "formik-mui": "^5.0.0-alpha.1",
     "formik-mui-lab": "^1.0.0",

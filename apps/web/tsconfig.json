@@ -7,7 +7,8 @@
     "jsxImportSource": "@emotion/react",
     // "typeRoots": ["./lib/types", "node_modules/@types"]
     "moduleResolution": "node",
-    "module": "esnext"
+    "module": "esnext",
+    "types": ["google.maps"]
   },
   // "include": [
   //   "next-env.d.ts",

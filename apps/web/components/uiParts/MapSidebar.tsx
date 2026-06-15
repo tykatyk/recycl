@@ -2,9 +2,7 @@ import { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import clsx from 'clsx'
 import { Drawer, Toolbar, List } from '@mui/material'
-import HomeIcon from '@mui/icons-material/Home'
 import MapActionButton from './MapActionButton'
-import variant from '../../pages/api/subscriptions/variant'
 
 const PREFIX = 'MapSidebar'
 
@@ -14,10 +12,12 @@ const classes = {
   drawerClose: `${PREFIX}-drawerClose`,
 }
 
+const drawerWidth = 240
+
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
 const Root = styled('div')(({ theme }) => ({
   [`& .${classes.drawer}`]: {
-    width: drawerWidth,
+    maxWidth: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
   },
@@ -39,8 +39,6 @@ const Root = styled('div')(({ theme }) => ({
     width: 0,
   },
 }))
-
-const drawerWidth = 240
 
 export default function MapSidebar(props) {
   const [open, setOpen] = useState(true)

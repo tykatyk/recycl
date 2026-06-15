@@ -1,7 +1,7 @@
 import React from 'react'
 import Autocomplete from '@mui/material/Autocomplete'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
-import { Grid, Typography, TextField, Chip } from '@mui/material'
+import { Box, Typography, TextField, Chip } from '@mui/material'
 import { fieldToTextField } from 'formik-mui'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
@@ -16,7 +16,7 @@ function loadScript(src, position, id) {
   position.appendChild(script)
 }
 
-const autocompleteService = { current: null }
+let autocompleteService = null
 
 export default function PlacesAutocomplete(props) {
   const {
@@ -45,10 +45,11 @@ export default function PlacesAutocomplete(props) {
 
     loaded.current = true
   }
+
   const fetch = React.useMemo(
     () =>
       throttle((request, callback) => {
-        autocompleteService.current.getPlacePredictions(request, callback)
+        autocompleteService.getPlacePredictions(request, callback)
       }, 200),
     [],
   )
@@ -57,20 +58,20 @@ export default function PlacesAutocomplete(props) {
     let active = true
 
     if (
-      !autocompleteService.current &&
+      !autocompleteService &&
       window.google &&
       window.google.maps &&
       window.google.maps.places
     ) {
-      autocompleteService.current = new google.maps.places.AutocompleteService()
+      autocompleteService = new google.maps.places.AutocompleteService()
       setSessionToken(new google.maps.places.AutocompleteSessionToken())
     }
 
-    if (!autocompleteService.current) return undefined
+    if (!autocompleteService) return
 
     if (inputValue === '') {
       setOptions(value ? (multiple ? value : [value]) : [])
-      return undefined
+      return
     }
 
     fetch(
@@ -154,9 +155,9 @@ export default function PlacesAutocomplete(props) {
           setOptions(newValue ? [newValue] : [])
         }
         setFieldValue(name, newValue)
-        if (autocompleteService.current && window.google) {
-          setSessionToken(new google.maps.places.AutocompleteSessionToken())
-        }
+        // if (autocompleteService && window.google) {
+        //   setSessionToken(new google.maps.places.AutocompleteSessionToken())
+        // }
       }}
       onBlur={handleBlur}
       autoComplete
@@ -197,25 +198,41 @@ export default function PlacesAutocomplete(props) {
 
         return (
           <li key={key} {...rest}>
-            <Grid container alignItems="center">
-              <Grid item>
+            <Box
+              sx={{
+                display: 'flex',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                justifyContent: 'center',
+              }}
+            >
+              <Box>
                 <LocationOnIcon sx={{ mr: 2 }} />
-              </Grid>
-              <Grid item xs>
+              </Box>
+              <Box sx={{ overflow: 'hidden', dispay: 'flex', flexShrink: 1 }}>
                 {parts.map((part, index) => (
-                  <span
+                  <Box
+                    component="span"
+                    variant="body2"
                     key={index}
-                    style={{ fontWeight: part.highlight ? 700 : 400 }}
+                    sx={{
+                      fontWeight: part.highlight ? 700 : 400,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
                   >
                     {part.text}
-                  </span>
+                  </Box>
                 ))}
 
-                <Typography variant="body2">
+                <Typography
+                  variant="body2"
+                  sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                >
                   {option.structured_formatting.secondary_text}
                 </Typography>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </li>
         )
       }}

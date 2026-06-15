@@ -6,7 +6,7 @@ import { Box } from '@mui/material'
 export default function Map(props) {
   const { center, zoom = 11, onIdle, children } = props
   const mapRef = useRef()
-  const [map, setMap] = useState(null)
+  const [map, setMap] = useState<google.maps.Map | undefined>(undefined)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -18,8 +18,8 @@ export default function Map(props) {
 
     const listener = autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace()
-      console.log(place)
-      if (!place.geometry?.location) return
+
+      if (!map || !place.geometry?.location) return
 
       map.panTo(place.geometry.location)
     })
@@ -28,20 +28,25 @@ export default function Map(props) {
   }, [map, mapRef.current, inputRef.current])
 
   useEffect(() => {
+    if (!(window as any).google) return
+
     if (mapRef.current && !map) {
       setMap(
-        new window.google.maps.Map(mapRef.current, {
+        new (window as any).google.maps.Map(mapRef.current, {
           center,
           zoom,
+          mapTypeControlOptions: {
+            position: google.maps.ControlPosition.BOTTOM_LEFT,
+          },
         }),
       )
     }
   }, [mapRef, map, center, zoom])
 
   useEffect(() => {
-    if (!map) return
-    ;[('click', 'idle')].forEach((eventName) =>
-      google.maps.event.clearListeners(map, eventName),
+    if (!(window as any).google || !map) return
+    ;['click', 'idle'].forEach((eventName) =>
+      (window as any).google.maps.event.clearListeners(map, eventName),
     )
 
     if (onIdle) {
@@ -54,10 +59,9 @@ export default function Map(props) {
   return (
     <Box sx={{ display: 'flex', flexGrow: 1, position: 'relative' }}>
       <PlacesSearchBar map={map} />
-
       <Box style={{ flexGrow: 1 }} ref={mapRef} id="map" />
       {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
+        if (React.isValidElement<{ map: google.maps.Map }>(child)) {
           // set the map prop on the child component
           return React.cloneElement(child, { map })
         }

@@ -7,26 +7,30 @@ import parse from 'autosuggest-highlight/parse'
 import Listbox from '../uiParts/formInputs/Listbox'
 import React from 'react'
 import throttle from 'lodash/throttle'
+import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutocomplete'
 
 export default function PlacesSearchBar({ map }) {
   const [inputValue, setInputValue] = React.useState('')
-  const [value, setValue] = React.useState('')
-  const [options, setOptions] = React.useState([])
-  const [sessionToken, setSessionToken] = React.useState(null)
+  const [value, setValue] =
+    React.useState<PlaceTypeWithMatchedSubstrings | null>(null)
+  const [options, setOptions] = React.useState<
+    readonly PlaceTypeWithMatchedSubstrings[]
+  >([])
+  const [sessionToken, setSessionToken] = React.useState<any>(null)
 
   const autocompleteService = useMemo(() => {
-    if (!window.google) return null
+    if (!(window as any).google) return null
 
-    return new google.maps.places.AutocompleteService()
+    return new (window as any).google.maps.places.AutocompleteService()
   }, [])
 
   const placesService = useMemo(() => {
-    if (!window.google || !map) return null
+    if (!(window as any).google || !map) return null
 
-    return new google.maps.places.PlacesService(map)
+    return new (window as any).google.maps.places.PlacesService(map)
   }, [map])
 
-  const fetch = React.useMemo(
+  const fetch = useMemo(
     () =>
       throttle((request, callback) => {
         if (!autocompleteService) return
@@ -35,11 +39,10 @@ export default function PlacesSearchBar({ map }) {
     [autocompleteService],
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     let active = true
-    // if (!map) return
 
-    if (!window.google) return
+    if (!(window as any).google) return
 
     if (!autocompleteService) {
       setOptions([])
@@ -61,7 +64,7 @@ export default function PlacesSearchBar({ map }) {
       },
       (results) => {
         if (active) {
-          let newOptions = []
+          let newOptions: readonly PlaceTypeWithMatchedSubstrings[] = []
 
           if (value) {
             newOptions = [value]
@@ -82,10 +85,12 @@ export default function PlacesSearchBar({ map }) {
   }, [value, inputValue, fetch, autocompleteService])
 
   useEffect(() => {
-    if (!window.google) return
+    if (!(window as any).google || !autocompleteService) return
 
-    setSessionToken(new google.maps.places.AutocompleteSessionToken())
-  }, [])
+    setSessionToken(
+      new (window as any).google.maps.places.AutocompleteSessionToken(),
+    )
+  }, [autocompleteService])
 
   useEffect(() => {
     if (!value || !placesService) return
@@ -99,7 +104,7 @@ export default function PlacesSearchBar({ map }) {
         if (!place?.geometry?.location) return
 
         map.panTo(place.geometry.location)
-        map.setZoom(13)
+        map.setZoom(14)
       },
     )
   }, [value, placesService])
@@ -154,30 +159,32 @@ export default function PlacesSearchBar({ map }) {
               },
             },
           },
+          listbox: {
+            component: Listbox,
+          },
         }}
         filterOptions={(x) => x}
-        ListboxComponent={Listbox}
         options={options}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue)
         }}
         onChange={(event, newValue) => {
-          // setOptions(newValue ? [newValue] : [])
+          setOptions(newValue ? [newValue] : [])
 
           setValue(newValue)
 
-          if (autocompleteService.current && window.google) {
-            setSessionToken(new google.maps.places.AutocompleteSessionToken())
+          if (autocompleteService && (window as any).google) {
+            setSessionToken(
+              new (window as any).google.maps.places.AutocompleteSessionToken(),
+            )
           }
         }}
-        // onBlur={handleBlur}
         autoComplete
         includeInputInList
         filterSelectedOptions
         renderTags={(value, getTagProps) => {
           return value.map((option, index) => (
             <Chip
-              key={index}
               variant="outlined"
               label={option.description}
               {...getTagProps({ index })}
@@ -194,18 +201,19 @@ export default function PlacesSearchBar({ map }) {
               name={'search'}
               size={'small'}
               sx={{
-                '& .MuiInputLabel-root.Mui-focused': { color: '#1a2b34' }, // Focused
+                '& .MuiInputLabel-root.Mui-focused': { color: darkBlueGreen },
 
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a2b34',
+                    borderColor: darkBlueGreen,
                   },
                 },
               }}
-              InputLabelProps={{
-                sx: {
-                  color: 'grey.600', // Normal state color
-                  // '& .MuiInputLabel-root': { color: 'red' }, // Default
+              slotProps={{
+                inputLabel: {
+                  sx: {
+                    color: 'grey.600',
+                  },
                 },
               }}
             />

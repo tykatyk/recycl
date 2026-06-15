@@ -1,14 +1,8 @@
-import fetchJsonp from 'fetch-jsonp'
 import type { Position } from '../types/placeAutocomplete'
 
-//seems like this function is not used
 const getPositionByIp = async () => {
-  return await fetchJsonp('https://geolocation-db.com/jsonp', {
-    jsonpCallbackFunction: 'callback',
-  })
-    .then(function (response) {
-      return response.json()
-    })
+  return await fetch('https://geolocation-db.com/json/')
+    .then((response) => response.json())
     .then(function (result) {
       return { lat: result.latitude, lng: result.longitude } as Position
     })

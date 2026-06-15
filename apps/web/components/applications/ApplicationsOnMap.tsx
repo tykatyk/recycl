@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MapLayout from '../layouts/MapLayout'
 import Map from '../uiParts/Map'
 import Marker from '../uiParts/Marker'
@@ -12,40 +12,22 @@ import { GET_REMOVAL_APPLICATIONS_FOR_MAP } from '../../lib/graphql/queries/remo
 import { useLazyQuery } from '@apollo/client'
 import { Wrapper, Status } from '@googlemaps/react-wrapper'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
-import { css } from '@emotion/react'
 import ProposeWasteType from '../ProposeWasteType'
 import {
   Box,
-  Divider,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Modal,
-  Typography,
 } from '@mui/material'
-import type { Position } from '../../lib/types/placeAutocomplete'
-import Link from '../uiParts/Link'
 import CreateIcon from '@mui/icons-material/Create'
 import AddIcon from '@mui/icons-material/Add'
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
+import type { Position } from '../../lib/types/placeAutocomplete'
 
 const createAddButtonText = 'Добавить объявление о наличии вторсырья'
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  maxWidth: 600,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-  maxHeight: '100vh',
-  overflowY: 'auto',
-}
 
 const ContactAdmin = () => {
   return (
@@ -56,12 +38,6 @@ const ContactAdmin = () => {
         href="/contact-us"
         target="_blank"
         rel="noopener"
-        sx={
-          {
-            // color: 'primary.main',
-            // color: 'secondary.main',
-          }
-        }
       >
         <ListItemIcon>
           <CreateIcon />
@@ -77,6 +53,20 @@ const ContactAdmin = () => {
 }
 
 const AddWasteTypeModal = ({ open, setOpen, handleClose }) => {
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    maxWidth: 600,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+    maxHeight: '100vh',
+    overflowY: 'auto',
+  }
+
   return (
     <Modal
       open={open}
@@ -97,12 +87,6 @@ const NoWasteTypeRequest = ({ handleOpen }) => {
       <ListItemButton
         onClick={handleOpen}
         key={'Нет нужного типа вторсырья в списке'}
-        sx={
-          {
-            // color: 'primary.main',
-            // color: 'secondary.main',
-          }
-        }
       >
         <ListItemIcon>
           <TroubleshootIcon />
@@ -126,12 +110,6 @@ const SupportProject = () => {
         href="/support-us"
         target="_blank"
         rel="noopener"
-        sx={
-          {
-            // color: 'primary.main',
-            // color: 'secondary.main',
-          }
-        }
       >
         <ListItemIcon>
           <AttachMoneyIcon />
@@ -151,13 +129,18 @@ const mainCss = {
   flex: '1 1 auto',
 }
 
+type Lng = number
+type Lat = number
+
+type PositionArray = number[][]
+
 export default function RemovalApplicationsPage() {
   const [center, setCenter] = useState<Position | null>(null)
   const [zoom, setZoom] = useState(11)
   const [locationError, setLocationError] = useState(false)
   const [wasteTypeOpen, setWasteTypeOpen] = useState(true)
   const [selectedValue, setSelectedValue] = useState('')
-  const [visibleRect, setVisibleRect] = useState([])
+  const [visibleRect, setVisibleRect] = useState<number[][][]>([])
   const [getApplications, { loading, error, data }] = useLazyQuery(
     GET_REMOVAL_APPLICATIONS_FOR_MAP,
   )
@@ -216,10 +199,18 @@ export default function RemovalApplicationsPage() {
     setWasteTypeOpen(!wasteTypeOpen)
   }
 
-  const onIdle = (m) => {
-    setZoom(m.getZoom())
-    setCenter(m.getCenter().toJSON())
+  const onIdle = (m: google.maps.Map) => {
+    const zoom = m.getZoom()
+    const centerObj = m.getCenter()
     const bounds = m.getBounds()
+
+    if (!zoom || !centerObj || !bounds) throw new Error('Cannot get map params')
+
+    const center = centerObj.toJSON()
+
+    setZoom(zoom)
+    setCenter(center)
+
     const boundsNeLatLng = bounds.getNorthEast()
     const boundsSwLatLng = bounds.getSouthWest()
     const boundsNwLatLng = new google.maps.LatLng(
@@ -253,6 +244,21 @@ export default function RemovalApplicationsPage() {
     })
   }, [])
 
+  const render = (status: Status) => {
+    if (status === Status.LOADING) return <PageLoadingCircle />
+
+    if (status === Status.FAILURE) {
+      return (
+        <Snackbars
+          severity="error"
+          open={true}
+          message="Не могу загрузить карту"
+        />
+      )
+    }
+    return <React.Fragment />
+  }
+
   let content
 
   if (locationError) {
@@ -279,7 +285,9 @@ export default function RemovalApplicationsPage() {
               </ListItemIcon>
               <ListItemText
                 primary={createAddButtonText}
-                primaryTypographyProps={{ variant: 'body2' }}
+                primaryTypographyProps={{
+                  sx: { fontWeight: 'bold' },
+                }}
                 sx={{ whiteSpace: 'normal' }}
               />
             </ListItemButton>
@@ -305,9 +313,16 @@ export default function RemovalApplicationsPage() {
           />
         )}
         <Box component="main" sx={mainCss}>
-          <Map center={center} zoom={zoom} onIdle={onIdle}>
-            {markers}
-          </Map>
+          <Wrapper
+            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY || ''}
+            render={render}
+            libraries={['places', 'geocoding']}
+            language="uk"
+          >
+            <Map center={center} zoom={zoom} onIdle={onIdle}>
+              {markers}
+            </Map>
+          </Wrapper>
         </Box>
         <AddWasteTypeModal
           open={open}
@@ -318,33 +333,11 @@ export default function RemovalApplicationsPage() {
     )
   }
 
-  const render = (status) => {
-    if (status === Status.LOADING) return <PageLoadingCircle />
-
-    if (status === Status.FAILURE) {
-      return (
-        <Snackbars
-          severity="error"
-          open={true}
-          message="Не могу загрузить карту"
-        />
-      )
-    }
-    return null
-  }
-
   return (
     <MapLayout
       title={`Объявления о наличии вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
     >
-      <Wrapper
-        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY || ''}
-        render={render}
-        libraries={['places', 'geocoding']}
-        language="uk"
-      >
-        {content}
-      </Wrapper>
+      {content}
     </MapLayout>
   )
 }
