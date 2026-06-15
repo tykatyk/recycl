@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { styled, useTheme } from '@mui/material/styles'
-import { Avatar, Button, Grid, Typography, Container } from '@mui/material'
+import { Avatar, Button, Grid, Typography, Container, Box } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
@@ -14,11 +14,11 @@ import LayoutWithoutHeader from '../layouts/LayoutWithoutHeader'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
-import GoogleIcon from '@mui/icons-material/Google'
+import Image from 'next/image'
 
 const USER_NOT_FOUND = 'Пользователь с таким email не найден'
 const LINK_SENT = 'На вашу электронную почту отправлена ссылка для входа'
-const LOGIN_WITH_GOOGLE = 'Войти с аккаунтом Google'
+const LOGIN_WITH_GOOGLE = 'Войти через Google'
 const EMAIL_LABEL = 'Электронная почта'
 const SIGN_IN = 'Войти'
 const SIGN_UP = 'Регистрация'
@@ -52,7 +52,7 @@ const Root = styled('div')(({ theme }) => ({
   },
 
   [`& .${classes.submit}`]: {
-    margin: theme.spacing(3, 0, 2),
+    marginBottom: theme.spacing(2),
   },
 }))
 
@@ -144,16 +144,18 @@ export default function SignIn() {
               {({ isSubmitting }) => {
                 return (
                   <Form className={classes.form} noValidate autoComplete="off">
-                    <Field
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="email"
-                      label={EMAIL_LABEL}
-                      name="email"
-                      component={TextFieldFormik}
-                    />
+                    <Box sx={{ mb: 2 }}>
+                      <Field
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label={EMAIL_LABEL}
+                        name="email"
+                        component={TextFieldFormik}
+                      />
+                    </Box>
 
                     <Button
                       type="submit"
@@ -191,15 +193,26 @@ export default function SignIn() {
                       component={TextFieldFormik}
                     />
                     <Button
-                      style={{
-                        marginTop: 0,
+                      sx={{
+                        background: '#fff',
+                        '&.Mui-disabled': {
+                          color: 'grey.900', // Your custom text color
+                          backgroundColor: '#fff', // Optional: background color
+                        },
                       }}
                       type="submit"
                       fullWidth
                       variant="contained"
                       className={classes.submit}
                       disabled={isSubmitting}
-                      startIcon={<GoogleIcon />}
+                      startIcon={
+                        <Image
+                          src="/images/googleLogo.svg"
+                          alt="Google"
+                          width={24}
+                          height={24}
+                        />
+                      }
                     >
                       {LOGIN_WITH_GOOGLE}
                       {isSubmitting && <ButtonSubmittingCircle />}
@@ -216,7 +229,7 @@ export default function SignIn() {
                 justifyContent: 'flex-end',
               }}
             >
-              <Grid item>
+              <Grid>
                 <Link
                   href={REGISTER_URL}
                   variant="body2"
