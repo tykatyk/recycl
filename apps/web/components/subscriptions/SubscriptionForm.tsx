@@ -64,7 +64,6 @@ const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
             component={TextFieldFormik}
             fullWidth
             select
-            color="secondary"
             variant="outlined"
             SelectProps={{
               renderValue: (selected) => (

@@ -1,12 +1,13 @@
-import { Grid } from '@mui/material'
+import { Box, Grid, Typography } from '@mui/material'
 import Layout from '../layouts/Layout'
 import RemovalForm from './RemovalForm'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 
+const title = 'Создать объявление о наличии вторсырья'
 export default function CreateUpdate() {
   return (
     <RedirectUnathenticatedUser>
-      <Layout title="Создать (обновить) заявку на вывоз отходов | Recycl">
+      <Layout title={`${title} | Recycl`}>
         <Grid
           container
           direction="column"
@@ -16,6 +17,11 @@ export default function CreateUpdate() {
             padding: '16px',
           }}
         >
+          <Box sx={{ mb: 2 }}>
+            <Typography component="h1" variant="h4">
+              {title}
+            </Typography>
+          </Box>
           <RemovalForm />
         </Grid>
       </Layout>

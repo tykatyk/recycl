@@ -25,6 +25,7 @@ export default gql`
 
   type RemovalApplicationOutput {
     _id: String!
+    title: String!
     wasteLocation: LocationOutput!
     wasteType: String!
     contactPhone: String
@@ -53,6 +54,7 @@ export default gql`
   }
 
   input RemovalApplication {
+    title: String!
     wasteLocation: Location!
     wasteType: String!
     quantity: Int!

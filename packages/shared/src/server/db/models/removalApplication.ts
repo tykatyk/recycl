@@ -5,6 +5,10 @@ import { documentActivityStatus } from '../dbModelCommons'
 const removalApplicationSchema = new Schema(
   {
     //ToDo: refactor user schema. Use one from dbModelCommons
+    title: {
+      type: String,
+      required: true,
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -19,10 +23,12 @@ const removalApplicationSchema = new Schema(
       type: String,
       required: true,
     },
-    quantity: Number,
+    quantity: {
+      type: Number,
+      required: true,
+    },
     //ToDo: maybe make contactPhone required
     contactPhone,
-    passDocumet: Boolean,
     status: {
       type: String,
       Enum: Object.keys(documentActivityStatus),
@@ -33,10 +39,6 @@ const removalApplicationSchema = new Schema(
       type: String,
     },
     comment: String,
-    notificationCities: [{ description: String, place_id: String }],
-    notificationCitiesCheckbox: Boolean,
-    notificationRadius: String,
-    notificationRadiusCheckbox: Boolean,
     expires,
   },
   { timestamps: true },

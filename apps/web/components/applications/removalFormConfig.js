@@ -1,16 +1,15 @@
-export function getInitialValues() {
-  return {
-    wasteLocation: null,
-    wasteType: '',
-    quantity: '',
-    contactPhone: '',
-    comment: '',
-    passDocumet: false,
-    notificationCities: [],
-    notificationCitiesCheckbox: false,
-    notificationRadius: '',
-    notificationRadiusCheckbox: false,
-  }
+export const initialValues = {
+  title: '',
+  wasteLocation: null,
+  wasteType: '',
+  quantity: '',
+  contactPhone: '',
+  comment: '',
+  passDocumet: false,
+  notificationCities: [],
+  notificationCitiesCheckbox: false,
+  notificationRadius: '',
+  notificationRadiusCheckbox: false,
 }
 
 export function getNormalizedValues(values) {
