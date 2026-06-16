@@ -40,7 +40,12 @@ export const contactPhone = {
   },
 }
 
-const pointSchema = new Schema(
+type GeoPoint = {
+  type: 'Point'
+  coordinates: [number, number] // [lng, lat]
+}
+
+const pointSchema = new Schema<GeoPoint>(
   {
     type: {
       type: String,
@@ -50,6 +55,10 @@ const pointSchema = new Schema(
     coordinates: {
       type: [Number],
       required: true,
+      validate: {
+        validator: (v: number[]) => v.length === 2,
+        message: 'Coordinates must be [longitude, latitude]',
+      },
     },
   },
   { _id: false },
