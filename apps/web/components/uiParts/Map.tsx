@@ -35,6 +35,13 @@ export default function Map(props) {
         new (window as any).google.maps.Map(mapRef.current, {
           center,
           zoom,
+          styles: [
+            {
+              featureType: 'poi',
+              stylers: [{ visibility: 'off' }],
+            },
+          ],
+          clickableIcons: false,
           mapTypeControlOptions: {
             position: google.maps.ControlPosition.BOTTOM_LEFT,
           },
