@@ -5,6 +5,7 @@ import {
   QUEUE_SUBSCRIPTION_RUN,
   QUEUE_PREPARE_SUBSCRIPTION_RUN,
   QUEUE_ENSURE_USERS_SUBSCRIBED,
+  QUEUE_REBUILD_SUPERCLUSTER_INDEX,
 } from '@recycl/shared/dist/server/worker'
 import type {
   PrepareSubscriptionRunJobData,
@@ -16,6 +17,22 @@ export const getJobName = (options: { offset: number; limit: number }) => {
   const { offset = 0, limit = 1 } = options
   return `${JOB_ENSURE_USERS_SUBSCRIBED}-page-${Math.floor(offset / limit)}`
 }
+
+export const rebuildSuperclusterIndexQueue = new Queue<any>(
+  QUEUE_REBUILD_SUPERCLUSTER_INDEX,
+  {
+    connection: redisConnection,
+    defaultJobOptions: {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 1000,
+      },
+      removeOnComplete: true,
+      removeOnFail: 100,
+    },
+  },
+)
 
 export const subscriptionRunQueue = new Queue<SendSubscriptionEmailJobData>(
   QUEUE_SUBSCRIPTION_RUN,
