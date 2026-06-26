@@ -1,22 +1,20 @@
-import { useRef, useState } from 'react'
-import { css, useTheme } from '@mui/material/styles'
+import { useMemo, useRef, useState } from 'react'
+import { css } from '@mui/material/styles'
 import { Container, Button, Typography, Box } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import PlacesAutocomplete from './formInputs/PlacesAutocomplete'
-import Snackbar from './Snackbars'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { userLocationSchema } from '../../lib/validation'
 import * as yup from 'yup'
+import { useSnackbar } from 'notistack'
+import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 
-export default function UserLocation(props) {
-  const theme = useTheme()
-  const [recaptcha, setRecaptcha] = useState(null)
-  const [showRecaptcha, setShowRecaptcha] = useState(false)
-  const recaptchaRef = useRef(null)
-  const [backendError, setBackendError] = useState('')
-  const loaded = useRef(false)
-  const [geocoder, setGeocoder] = useState(null)
+function UserLocationComponent(props) {
+  const [recaptcha, setRecaptcha] = useState('')
+  const recaptchaRef = useRef<ReCAPTCHA | null>(null)
+  const { enqueueSnackbar } = useSnackbar()
+  const geocodingLib = useMapsLibrary('geocoding')
 
   const handleChange = (token) => {
     setRecaptcha(token)
@@ -24,10 +22,10 @@ export default function UserLocation(props) {
 
   const { setCenter, setLocationError } = props
 
-  if (typeof window !== 'undefined' && window.google && !loaded.current) {
-    setGeocoder(new google.maps.Geocoder())
-    loaded.current = true
-  }
+  const geocoder = useMemo(
+    () => geocodingLib && new geocodingLib.Geocoder(),
+    [geocodingLib],
+  )
 
   return (
     <Container
@@ -41,8 +39,7 @@ export default function UserLocation(props) {
     >
       <Box sx={{ mb: 2 }}>
         <Typography align="center" component={'h1'} variant="h6" gutterBottom>
-          Мы не смогли загрузить карту с объявлениями о наличия вторсырья, так
-          как не смогли определить местоположение
+          Мы не смогли определить местоположение для отображения карты
         </Typography>
         <Typography align="center" gutterBottom>
           Выберите, пожалуйста, населенный пункт вручную
@@ -56,43 +53,37 @@ export default function UserLocation(props) {
         }}
         validationSchema={userLocationSchema}
         onSubmit={(values, { setSubmitting, resetForm }) => {
-          setSubmitting(true)
-          if (!showRecaptcha) {
-            setShowRecaptcha(true)
-            setSubmitting(false)
-            return
-          }
-
           if (!recaptcha || !geocoder) {
             setSubmitting(false)
             return
           }
+
           geocoder
             .geocode({ placeId: values.userLocation['place_id'] })
             .then((response) => {
               if (
                 response.results &&
                 response.results.length > 0 &&
-                response.results[0].geometry &&
+                response.results[0]?.geometry &&
                 response.results[0].geometry.location
               ) {
                 setCenter({
                   lng: response.results[0].geometry.location.lng(),
                   lat: response.results[0].geometry.location.lat(),
                 })
-                resetForm()
                 setLocationError(false)
+                resetForm()
               } else {
-                setBackendError(
+                enqueueSnackbar(
                   'Не удалось получить координаты населенного пункта',
+                  { variant: 'error' },
                 )
               }
             })
             .finally(() => {
               if (recaptchaRef && recaptchaRef.current) {
                 recaptchaRef.current.reset()
-                setShowRecaptcha(false)
-                setRecaptcha(null)
+                setRecaptcha('')
                 setSubmitting(false)
               }
             })
@@ -125,7 +116,21 @@ export default function UserLocation(props) {
                 sx={{
                   display: 'flex',
                   justifyContent: 'center',
-                  mb: 2,
+                  mb: 3,
+                }}
+              >
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  onChange={handleChange}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  mb: 3,
                 }}
               >
                 <Button
@@ -141,29 +146,22 @@ export default function UserLocation(props) {
           )
         }}
       </Formik>
-      <div
-        style={{
-          display: showRecaptcha ? 'flex' : 'none',
-          justifyContent: 'center',
-          margin: theme.spacing(2, 0),
-        }}
-      >
-        <ReCAPTCHA
-          ref={recaptchaRef}
-          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-          onChange={handleChange}
-        />
-      </div>
-      {!!backendError && (
-        <Snackbar
-          severity="error"
-          open={!!backendError}
-          message={backendError}
-          handleClose={() => {
-            setBackendError('')
-          }}
-        />
-      )}
     </Container>
+  )
+}
+
+export default function UserLocation(props) {
+  const { setCenter, setLocationError } = props
+
+  return (
+    <APIProvider
+      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY || ''}
+      language="uk"
+    >
+      <UserLocationComponent
+        setCenter={setCenter}
+        setLocationError={setLocationError}
+      />
+    </APIProvider>
   )
 }

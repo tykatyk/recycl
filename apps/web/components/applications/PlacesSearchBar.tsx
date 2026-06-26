@@ -8,27 +8,33 @@ import Listbox from '../uiParts/formInputs/Listbox'
 import React from 'react'
 import throttle from 'lodash/throttle'
 import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutocomplete'
+import { APIProvider, useMap, useMapsLibrary } from '@vis.gl/react-google-maps'
 
-export default function PlacesSearchBar({ map }) {
+export default function PlacesSearchBar() {
   const [inputValue, setInputValue] = React.useState('')
   const [value, setValue] =
     React.useState<PlaceTypeWithMatchedSubstrings | null>(null)
   const [options, setOptions] = React.useState<
     readonly PlaceTypeWithMatchedSubstrings[]
   >([])
+  const placesLib = useMapsLibrary('places')
   const [sessionToken, setSessionToken] = React.useState<any>(null)
+  const map = useMap()
 
   const autocompleteService = useMemo(() => {
-    if (!(window as any).google) return null
+    if (!placesLib) return null
 
-    return new (window as any).google.maps.places.AutocompleteService()
-  }, [])
+    const service = new placesLib.AutocompleteService()
+    new placesLib.AutocompleteSessionToken()
+
+    return service
+  }, [placesLib])
 
   const placesService = useMemo(() => {
-    if (!(window as any).google || !map) return null
+    if (!placesLib || !map) return null
 
-    return new (window as any).google.maps.places.PlacesService(map)
-  }, [map])
+    return new placesLib.PlacesService(map)
+  }, [placesLib, map])
 
   const fetch = useMemo(
     () =>
@@ -85,15 +91,7 @@ export default function PlacesSearchBar({ map }) {
   }, [value, inputValue, fetch, autocompleteService])
 
   useEffect(() => {
-    if (!(window as any).google || !autocompleteService) return
-
-    setSessionToken(
-      new (window as any).google.maps.places.AutocompleteSessionToken(),
-    )
-  }, [autocompleteService])
-
-  useEffect(() => {
-    if (!value || !placesService) return
+    if (!map || !value || !placesService) return
 
     placesService.getDetails(
       {
@@ -112,163 +110,171 @@ export default function PlacesSearchBar({ map }) {
   if (!map) return null
 
   return (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: 8,
-        left: 0,
-        right: 0,
-        margin: 'auto',
-        width: 300,
-        zIndex: 1,
-        borderRadius: '8px',
-        background: '#fff',
-        p: 1,
-        boxShadow: '1px 1px 5px #6e6d6d',
-      }}
+    <APIProvider
+      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY || ''}
+      language="uk"
     >
-      <Autocomplete
-        value={value}
-        noOptionsText="Нет вариантов"
-        loadingText="Загрузка"
-        getOptionLabel={(option) =>
-          typeof option === 'string'
-            ? option
-            : option.description
-              ? option.description
-              : ''
-        }
+      <Box
         sx={{
-          input: { color: 'grey.800' },
+          position: 'absolute',
+          top: 8,
+          left: 0,
+          right: 0,
+          margin: 'auto',
+          width: 300,
+          zIndex: 1,
+          borderRadius: '8px',
+          background: '#fff',
+          p: 1,
+          boxShadow: '1px 1px 5px #6e6d6d',
         }}
-        slotProps={{
-          clearIndicator: {
-            sx: {
-              color: '#1a2b34',
-              '&:hover': {
-                backgroundColor: 'rgba(26, 43, 52, 0.08)',
-              },
-            },
-          },
-
-          popupIndicator: {
-            sx: {
-              color: '#1a2b34',
-              '&:hover': {
-                backgroundColor: 'rgba(26, 43, 52, 0.08)',
-              },
-            },
-          },
-          listbox: {
-            component: Listbox,
-          },
-        }}
-        filterOptions={(x) => x}
-        options={options}
-        onInputChange={(event, newInputValue) => {
-          setInputValue(newInputValue)
-        }}
-        onChange={(event, newValue) => {
-          setOptions(newValue ? [newValue] : [])
-
-          setValue(newValue)
-
-          if (autocompleteService && (window as any).google) {
-            setSessionToken(
-              new (window as any).google.maps.places.AutocompleteSessionToken(),
-            )
+      >
+        <Autocomplete
+          value={value}
+          noOptionsText="Нет вариантов"
+          loadingText="Загрузка"
+          getOptionLabel={(option) =>
+            typeof option === 'string'
+              ? option
+              : option.description
+                ? option.description
+                : ''
           }
-        }}
-        autoComplete
-        includeInputInList
-        filterSelectedOptions
-        renderTags={(value, getTagProps) => {
-          return value.map((option, index) => (
-            <Chip
-              variant="outlined"
-              label={option.description}
-              {...getTagProps({ index })}
-            />
-          ))
-        }}
-        renderInput={(params) => {
-          return (
-            <TextField
-              {...params}
-              fullWidth
-              variant={'outlined'}
-              label={'Поиск на карте'}
-              name={'search'}
-              size={'small'}
-              sx={{
-                '& .MuiInputLabel-root.Mui-focused': { color: darkBlueGreen },
-
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
-                    borderColor: darkBlueGreen,
-                  },
+          sx={{
+            input: { color: 'grey.800' },
+          }}
+          slotProps={{
+            clearIndicator: {
+              sx: {
+                color: '#1a2b34',
+                '&:hover': {
+                  backgroundColor: 'rgba(26, 43, 52, 0.08)',
                 },
-              }}
-              slotProps={{
-                inputLabel: {
-                  sx: {
-                    color: 'grey.600',
-                  },
+              },
+            },
+
+            popupIndicator: {
+              sx: {
+                color: '#1a2b34',
+                '&:hover': {
+                  backgroundColor: 'rgba(26, 43, 52, 0.08)',
                 },
-              }}
-            />
-          )
-        }}
-        renderOption={(props, option) => {
-          const { key, ...rest } = props
-          const matches =
-            option.structured_formatting.main_text_matched_substrings || []
+              },
+            },
+            listbox: {
+              component: Listbox,
+            },
+          }}
+          filterOptions={(x) => x}
+          options={options}
+          onInputChange={(event, newInputValue) => {
+            setInputValue(newInputValue)
+          }}
+          onChange={(event, newValue) => {
+            setOptions(newValue ? [newValue] : [])
 
-          const parts = parse(
-            option.structured_formatting.main_text,
-            matches.map((match) => [match.offset, match.offset + match.length]),
-          )
+            setValue(newValue)
 
-          return (
-            <li key={key} {...rest}>
-              <Box
+            if (placesLib) {
+              setSessionToken(new placesLib.AutocompleteSessionToken())
+            }
+          }}
+          autoComplete
+          includeInputInList
+          filterSelectedOptions
+          renderTags={(value, getTagProps) => {
+            return value.map((option, index) => (
+              <Chip
+                variant="outlined"
+                label={option.description}
+                {...getTagProps({ index })}
+              />
+            ))
+          }}
+          renderInput={(params) => {
+            return (
+              <TextField
+                {...params}
+                fullWidth
+                variant={'outlined'}
+                label={'Поиск на карте'}
+                name={'search'}
+                size={'small'}
                 sx={{
-                  display: 'flex',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  justifyContent: 'center',
-                }}
-              >
-                <Box>
-                  <LocationOnIcon sx={{ mr: 2 }} />
-                </Box>
-                <Box sx={{ overflow: 'hidden', dispay: 'flex', flexShrink: 1 }}>
-                  {parts.map((part, index) => (
-                    <Box
-                      component="span"
-                      key={index}
-                      sx={{
-                        fontWeight: part.highlight ? 700 : 400,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {part.text}
-                    </Box>
-                  ))}
+                  '& .MuiInputLabel-root.Mui-focused': { color: darkBlueGreen },
 
-                  <Typography
-                    variant="body2"
-                    sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: darkBlueGreen,
+                    },
+                  },
+                }}
+                slotProps={{
+                  inputLabel: {
+                    sx: {
+                      color: 'grey.600',
+                    },
+                  },
+                }}
+              />
+            )
+          }}
+          renderOption={(props, option) => {
+            const { key, ...rest } = props
+            const matches =
+              option.structured_formatting.main_text_matched_substrings || []
+
+            const parts = parse(
+              option.structured_formatting.main_text,
+              matches.map((match) => [
+                match.offset,
+                match.offset + match.length,
+              ]),
+            )
+
+            return (
+              <li key={key} {...rest}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Box>
+                    <LocationOnIcon sx={{ mr: 2 }} />
+                  </Box>
+                  <Box
+                    sx={{ overflow: 'hidden', dispay: 'flex', flexShrink: 1 }}
                   >
-                    {option.structured_formatting.secondary_text}
-                  </Typography>
+                    {parts.map((part, index) => (
+                      <Box
+                        component="span"
+                        key={index}
+                        sx={{
+                          fontWeight: part.highlight ? 700 : 400,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {part.text}
+                      </Box>
+                    ))}
+
+                    <Typography
+                      variant="body2"
+                      sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    >
+                      {option.structured_formatting.secondary_text}
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-            </li>
-          )
-        }}
-      />
-    </Box>
+              </li>
+            )
+          }}
+        />
+      </Box>
+    </APIProvider>
   )
 }

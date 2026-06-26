@@ -1,5 +1,4 @@
-import React from 'react'
-import { css, styled } from '@mui/material/styles'
+import { css } from '@mui/material/styles'
 import {
   Collapse,
   Radio,
@@ -31,16 +30,22 @@ export default function WasteTypesList(props) {
           <ListItemText primary={'Тип вторсырья'} />
           {open ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        {loading && (
+      </ListItem>
+      {loading && (
+        <ListItem>
           <PageLoadingCircle
+            size={20}
             css={css({
               display: 'flex',
               justifyContent: 'center',
               position: 'relative',
             })}
           />
-        )}
-        {error && (
+        </ListItem>
+      )}
+
+      {error && (
+        <ListItem>
           <Typography
             sx={{
               whiteSpace: 'normal',
@@ -51,13 +56,13 @@ export default function WasteTypesList(props) {
             variant="body2"
             align="center"
           >
-            Не удалось загрузить типы отходов
+            Не удалось загрузить список вторсырья
           </Typography>
-        )}
-      </ListItem>
+        </ListItem>
+      )}
 
-      <ListItem disableGutters dense divider>
-        {data && (
+      {data && (
+        <ListItem disableGutters dense divider>
           <Collapse
             in={open}
             timeout="auto"
@@ -72,7 +77,7 @@ export default function WasteTypesList(props) {
                     <ListItemButton
                       role={undefined}
                       key={item['_id']}
-                      onClick={handleChange(item['name'])}
+                      onClick={() => handleChange(item['name'])}
                     >
                       <Radio
                         checked={selectedValue === item['name']}
@@ -94,8 +99,8 @@ export default function WasteTypesList(props) {
               </List>
             )}
           </Collapse>
-        )}
-      </ListItem>
+        </ListItem>
+      )}
     </List>
   )
 }

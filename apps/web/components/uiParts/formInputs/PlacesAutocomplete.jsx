@@ -6,19 +6,11 @@ import { fieldToTextField } from 'formik-mui'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox'
-
-function loadScript(src, position, id) {
-  if (!position) return
-  const script = document.createElement('script')
-  script.setAttribute('async', '')
-  script.setAttribute('id', id)
-  script.src = src
-  position.appendChild(script)
-}
+import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 
 let autocompleteService = null
 
-export default function PlacesAutocomplete(props) {
+function PlacesAutocompleteComponent(props) {
   const {
     form: { setFieldValue, handleBlur, setFieldTouched, values },
     field: { name },
@@ -32,19 +24,7 @@ export default function PlacesAutocomplete(props) {
 
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
-  const loaded = React.useRef(false)
-
-  if (typeof window !== 'undefined' && !window.google && !loaded.current) {
-    if (!document.querySelector('#google-maps')) {
-      loadScript(
-        `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY}&libraries=places&language=uk`,
-        document.querySelector('head'),
-        'google-maps',
-      )
-    }
-
-    loaded.current = true
-  }
+  const placesLib = useMapsLibrary('places')
 
   const fetch = React.useMemo(
     () =>
@@ -57,14 +37,9 @@ export default function PlacesAutocomplete(props) {
   React.useEffect(() => {
     let active = true
 
-    if (
-      !autocompleteService &&
-      window.google &&
-      window.google.maps &&
-      window.google.maps.places
-    ) {
-      autocompleteService = new google.maps.places.AutocompleteService()
-      setSessionToken(new google.maps.places.AutocompleteSessionToken())
+    if (!autocompleteService && placesLib) {
+      autocompleteService = new placesLib.AutocompleteService()
+      setSessionToken(new placesLib.AutocompleteSessionToken())
     }
 
     if (!autocompleteService) return
@@ -102,7 +77,7 @@ export default function PlacesAutocomplete(props) {
     return () => {
       active = false
     }
-  }, [value, inputValue, fetch, multiple, sessionToken])
+  }, [value, inputValue, fetch, multiple, sessionToken, placesLib])
 
   const masterField = props['data-master']
   const masterFieldValue = values[masterField]
@@ -141,7 +116,11 @@ export default function PlacesAutocomplete(props) {
             : ''
       }
       filterOptions={(x) => x}
-      ListboxComponent={Listbox}
+      slotProps={{
+        listbox: {
+          component: Listbox,
+        },
+      }}
       options={options}
       multiple={multiple || false}
       disabled={disabled}
@@ -237,5 +216,16 @@ export default function PlacesAutocomplete(props) {
         )
       }}
     />
+  )
+}
+
+export default function PlacesAutocomplete(props) {
+  return (
+    <APIProvider
+      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY || ''}
+      language="uk"
+    >
+      <PlacesAutocompleteComponent {...props} />
+    </APIProvider>
   )
 }

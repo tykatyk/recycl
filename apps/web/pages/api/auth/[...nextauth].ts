@@ -12,13 +12,13 @@ import {
 import { GET_USER_BY_EMAIL } from '../../../lib/graphql/queries/user'
 import { loginSchema } from '../../../lib/validation/index'
 // import nextAuthDbAdapter from '../../../lib/helpers/nextAuthDbAdapter'
-import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
+import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import clientPromise from '../../../lib/helpers/nextAuthClientPromise'
 import { URL } from 'url'
 import { colors as theme } from '../../../lib/helpers/themeStub'
 import { sendEmail } from '../../../lib/helpers/email/mailer'
 
-const apolloClient = initializeApollo()
+// const apolloClient = initializeApollo()
 
 declare global {
   namespace NodeJS {
@@ -64,88 +64,6 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
       allowDangerousEmailAccountLinking: true,
-    }),
-    CredentialsProvider({
-      credentials: {},
-      async authorize(credentials: { email: string; password: string }) {
-        // Any object returned will be saved in `user` property of the JWT
-        // If you return null or false then the credentials will be rejected
-        // You can also Reject this callback with an Error or with a URL:
-        // throw new Error('error message') // Redirect to error page
-        // throw '/path/to/redirect'        // Redirect to a URL
-
-        const { email } = credentials
-
-        //check correctness of the data needed to login a user
-        try {
-          await loginSchema.validate(
-            {
-              email,
-            },
-            { abortEarly: false },
-          )
-        } catch (error) {
-          console.log('Error during validation request body')
-          if (error.inner && error.inner.length > 0) {
-            let mappedErrors = {}
-            error.inner.forEach((item, i) => {
-              if (!mappedErrors[item.path])
-                mappedErrors[item.path] = item.message
-            })
-            throw new Error(
-              JSON.stringify({
-                error: {
-                  type: 'perField',
-                  message: mappedErrors,
-                },
-              }),
-            )
-          } else {
-            throw new Error(
-              JSON.stringify({
-                type: 'perForm',
-                message: 'Возникла ошибка при проверке данных формы',
-              }),
-            )
-          }
-        }
-
-        //check if user exists
-        let result
-        try {
-          result = await apolloClient.query({
-            query: GET_USER_BY_EMAIL,
-            variables: { email },
-          })
-        } catch (error) {
-          console.log('Error while checking user existance')
-          throw new Error(
-            JSON.stringify({
-              type: 'perForm',
-              message:
-                'Возникла ошибка при проверке существования пользователя',
-            }),
-          )
-        }
-
-        if (result.data && !result.data.getUserByEmail) {
-          throw new Error(
-            JSON.stringify({
-              type: 'perForm',
-              message: 'Пользователь с такими учетными данными не найден',
-            }),
-          )
-        }
-
-        const user = result.data.getUserByEmail
-
-        return {
-          email: user.email,
-          id: user['_id'],
-          name: user.name,
-          image: user.image,
-        }
-      }, //end of authorize function
     }),
   ],
   pages: {

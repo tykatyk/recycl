@@ -5,7 +5,7 @@ import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import SelectFormik from '../uiParts/formInputs/SelectFormik'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
-import { Formik, Form, Field, useFormikContext } from 'formik'
+import { Formik, Form, Field } from 'formik'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
@@ -20,14 +20,23 @@ import { initialValues, getNormalizedValues } from './removalFormConfig'
 import { removalApplicationSchema } from '../../lib/validation'
 import { useSnackbar } from 'notistack'
 
+const errorMessage = 'Возникла ошибка при создании заявки'
+
 const fields = Object.keys(initialValues)
 
 export default function RemovalForm() {
   const router = useRouter()
+  const { enqueueSnackbar } = useSnackbar()
+
   const { data: session } = useSession()
+  if (!session) {
+    enqueueSnackbar(errorMessage, {
+      variant: 'error',
+    })
+    return null
+  }
   const { id: userId } = session
   const { id: applicationId } = router.query
-  const { enqueueSnackbar } = useSnackbar()
 
   const {
     loading: gettingWasteTypes,
@@ -61,7 +70,7 @@ export default function RemovalForm() {
         router.push('/my/applications')
       })
       .catch((error) => {
-        enqueueSnackbar('Возникла ошибка при создании заявки', {
+        enqueueSnackbar(errorMessage, {
           variant: 'error',
         })
       })

@@ -1,7 +1,19 @@
 import React from 'react'
-import { Box, Button, IconButton, Link, Menu, MenuItem } from '@mui/material'
+import {
+  Box,
+  Button,
+  IconButton,
+  Link,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+} from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
+import InventoryIcon from '@mui/icons-material/Inventory'
+import PlaceIcon from '@mui/icons-material/Place'
+import EmailIcon from '@mui/icons-material/Email'
 
 export default function HeaderActions() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -11,14 +23,17 @@ export default function HeaderActions() {
     {
       text: 'Объявление о наличии вторсырья',
       href: '/applications/create',
+      icon: InventoryIcon,
     },
     {
       text: 'Пункт приема вторсырья',
       href: '/my/events/create',
+      icon: PlaceIcon,
     },
     {
       text: 'Подписку на уведомления\n о появлении вторсырья',
       href: '/my/subscriptions/waste-available/create',
+      icon: EmailIcon,
     },
   ]
 
@@ -72,21 +87,25 @@ export default function HeaderActions() {
         keepMounted
       >
         {menuItems.map((item, index) => {
+          const Icon = item.icon
           return (
             <MenuItem onClick={handleClose} key={index}>
-              <Link
-                href={item.href}
-                onClick={() => false}
-                color="inherit"
-                underline="none"
-                sx={{
-                  whiteSpace: 'pre-line',
-                  display: 'inline-block',
-                  width: '100%',
-                }}
-              >
-                {item.text}
-              </Link>
+              <ListItemIcon>{Icon ? <Icon /> : null}</ListItemIcon>
+              <ListItemText>
+                <Link
+                  href={item.href}
+                  onClick={() => false}
+                  color="inherit"
+                  underline="none"
+                  sx={{
+                    whiteSpace: 'pre-line',
+                    display: 'inline-block',
+                    width: '100%',
+                  }}
+                >
+                  {item.text}
+                </Link>
+              </ListItemText>
             </MenuItem>
           )
         })}

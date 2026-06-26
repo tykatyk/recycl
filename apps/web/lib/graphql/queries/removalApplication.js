@@ -29,23 +29,6 @@ export const GET_REMOVAL_APPLICATIONS = gql`
     }
   }
 `
-export const GET_REMOVAL_APPLICATIONS_FOR_MAP = gql`
-  query GetRemovalApplicationsForMap(
-    $visibleRect: [[[Float!]]]
-    $wasteTypes: String!
-  ) {
-    getRemovalApplicationsForMap(
-      visibleRect: $visibleRect
-      wasteTypes: $wasteTypes
-    ) {
-      _id
-      wasteTypeId
-      totalWeight
-      totalProposals
-      wasteLocation
-    }
-  }
-`
 export const GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT = gql`
   query GetRemovalApplicationsWithMessageCount {
     getRemovalApplicationsWithMessageCount {

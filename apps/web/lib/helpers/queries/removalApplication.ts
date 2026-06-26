@@ -42,52 +42,6 @@ const removalApplicationQueries = {
     }
   },
 
-  getForMap: async (visibleRect, wasteTypes) => {
-    if (
-      !visibleRect ||
-      visibleRect.length == 0 ||
-      !wasteTypes ||
-      wasteTypes.length == 0
-    )
-      return null
- 
-    try {
-      const result = await RemovalApplicationModel.aggregate([
-        {
-          $match: {
-            'wasteLocation.position.coordinates': {
-              $geoWithin: {
-                $geometry: {
-                  type: 'Polygon',
-                  coordinates: visibleRect,
-                },
-              },
-            },
-            wasteType: {
-              $eq: wasteTypes,
-            },
-          },
-        },
-        {
-          $group: {
-            _id: '$wasteLocation.place_id',
-            totalWeight: { $sum: '$quantity' },
-            totalProposals: { $sum: 1 },
-            // wasteTypeId: { $first: '$wasteType' },
-            wasteLocation: {
-              $first: '$wasteLocation.position.coordinates',
-            },
-          },
-        },
-      ]).allowDiskUse(true)
-
-      return result
-    } catch (error) {
-      console.log(error)
-      throw new Error(INTERNAL_SERVER_ERROR)
-    }
-  },
-
   getAll: async (queryParams, user) => {
     try {
       if (!user) return null

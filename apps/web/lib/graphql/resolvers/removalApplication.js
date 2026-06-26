@@ -8,12 +8,7 @@ const removalApplicationResolvers = {
     getRemovalApplications(parent, args, context) {
       return dbQueries.removalApplication.getAll(args.queryParams, context.user)
     },
-    getRemovalApplicationsForMap(parent, args, context) {
-      return dbQueries.removalApplication.getForMap(
-        args.visibleRect,
-        args.wasteTypes,
-      )
-    },
+
     getRemovalApplicationsWithMessageCount(parent, args, context) {
       return dbQueries.removalApplication.getWithMessageCount(context.user)
     },
