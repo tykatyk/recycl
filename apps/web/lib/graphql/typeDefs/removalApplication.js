@@ -23,6 +23,11 @@ export default gql`
     deleteRemovalApplications(ids: [String!]!): DeleteManyOutput
   }
 
+  type UserOutputForRemovalApplication {
+    _id: String!
+    name: String!
+  }
+
   type RemovalApplicationOutput {
     _id: String!
     title: String!
@@ -30,7 +35,7 @@ export default gql`
     wasteType: String!
     contactPhone: String
     quantity: Int!
-    user: String!
+    user: UserOutputForRemovalApplication!
     comment: String
     passDocumet: Boolean
     notificationCitiesCheckbox: Boolean
@@ -38,6 +43,7 @@ export default gql`
     notificationRadius: String
     notificationRadiusCheckbox: Boolean
     expires: Date!
+    createdAt: Date!
   }
 
   type RemovalApplicationForMapOutput {

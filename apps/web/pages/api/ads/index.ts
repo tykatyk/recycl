@@ -4,6 +4,10 @@ import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
 import { getClusters } from '../../../lib/helpers/clusterMaker'
 import type { BBox } from '@recycl/shared/dist/server/types'
+import {
+  dbConnect,
+  RemovalApplicationModel,
+} from '@recycl/shared/dist/server/db'
 
 const minZoom = 0
 const maxZoom = 22
@@ -20,38 +24,50 @@ const queryValidationSchema = yup.object({
 })
 
 async function adsHandler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET')
-    return res.status(405).json({ error: METHOD_NOT_ALLOWED })
+  if (req.method === 'GET') {
+    const { bbox: bboxRaw, zoom: zoomRaw, wasteType } = req.query
 
-  const { bbox: bboxRaw, zoom: zoomRaw, wasteType } = req.query
+    if (
+      typeof bboxRaw !== 'string' ||
+      typeof zoomRaw !== 'string' ||
+      typeof wasteType !== 'string'
+    ) {
+      return res.status(400).end()
+    }
 
-  if (
-    typeof bboxRaw !== 'string' ||
-    typeof zoomRaw !== 'string' ||
-    typeof wasteType !== 'string'
-  ) {
-    return res.status(400).end()
+    const bbox = bboxRaw.split(',').map(Number) as [
+      number,
+      number,
+      number,
+      number,
+    ]
+
+    const zoom = Number(zoomRaw)
+
+    await queryValidationSchema.validate(
+      { bbox, zoom, wasteType },
+      {
+        stripUnknown: true,
+      },
+    )
+
+    const clusters = await getClusters(bbox as BBox, zoom, wasteType)
+
+    return res.json({ clusters })
   }
 
-  const bbox = bboxRaw.split(',').map(Number) as [
-    number,
-    number,
-    number,
-    number,
-  ]
+  if (req.method === 'POST') {
+    const { adId, fields } = req.body
 
-  const zoom = Number(zoomRaw)
+    await dbConnect()
+    const data = await RemovalApplicationModel.findById(adId)
+    if (!data) return res.status(404)
+    if (!fields.includes('phone')) return res.status(400)
 
-  await queryValidationSchema.validate(
-    { bbox, zoom, wasteType },
-    {
-      stripUnknown: true,
-    },
-  )
+    res.json(data.contactPhone)
+  }
 
-  const clusters = await getClusters(bbox as BBox, zoom, wasteType)
-
-  res.json({ clusters })
+  return res.status(405).json({ error: METHOD_NOT_ALLOWED })
 }
 
 export default apiHandler(adsHandler)

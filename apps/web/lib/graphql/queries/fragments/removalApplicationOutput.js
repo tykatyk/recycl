@@ -5,15 +5,18 @@ export const REMOVAL_APPLICATION_OUTPUT_FRAGMENT = gql`
   ${STRUCTURED_FORMATTING_FRAGMENT}
   fragment RemovalApplicationOutputFragment on RemovalApplicationOutput {
     _id
+    title
     wasteLocation {
       description
       place_id
       ...StructuredFormattingFragment
     }
     wasteType
-    contactPhone
     quantity
-    user
+    user {
+      _id
+      name
+    }
     comment
     passDocumet
     notificationCitiesCheckbox
@@ -25,5 +28,6 @@ export const REMOVAL_APPLICATION_OUTPUT_FRAGMENT = gql`
     notificationRadius
     notificationRadiusCheckbox
     expires
+    createdAt
   }
 `

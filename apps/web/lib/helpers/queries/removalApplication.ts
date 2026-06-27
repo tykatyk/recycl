@@ -33,8 +33,9 @@ const removalApplicationQueries = {
     //ToDo: check if id is of type ObjectId
     try {
       const result = await RemovalApplicationModel.findById(id)
-        // .populate('user')
-        .exec()
+        .populate('user', 'name')
+        .lean()
+
       return result
     } catch (error) {
       console.log(error)

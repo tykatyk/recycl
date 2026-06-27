@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Autocomplete from '@mui/material/Autocomplete'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { Box, Typography, TextField, Chip } from '@mui/material'
@@ -17,6 +17,9 @@ function PlacesAutocompleteComponent(props) {
     multiple,
   } = props
 
+  const masterField = props['data-master']
+  const masterFieldValue = values[masterField]
+
   const { label, variant, value, error, helperText, disabled } =
     fieldToTextField(props)
 
@@ -26,7 +29,7 @@ function PlacesAutocompleteComponent(props) {
   const [sessionToken, setSessionToken] = React.useState(null)
   const placesLib = useMapsLibrary('places')
 
-  const fetch = React.useMemo(
+  const fetch = useMemo(
     () =>
       throttle((request, callback) => {
         autocompleteService.getPlacePredictions(request, callback)
@@ -34,7 +37,7 @@ function PlacesAutocompleteComponent(props) {
     [],
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     let active = true
 
     if (!autocompleteService && placesLib) {
@@ -79,10 +82,7 @@ function PlacesAutocompleteComponent(props) {
     }
   }, [value, inputValue, fetch, multiple, sessionToken, placesLib])
 
-  const masterField = props['data-master']
-  const masterFieldValue = values[masterField]
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (masterField && !masterFieldValue) {
       setOptions([])
 

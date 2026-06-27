@@ -28,6 +28,7 @@ export default function Layout({
             paddingTop: 3,
             paddingBottom: 3,
             display: 'flex',
+            justifyContent: 'center',
             flex: 1,
           }}
         >
