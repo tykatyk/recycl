@@ -215,7 +215,6 @@ export default function SignIn() {
                       }
                     >
                       {LOGIN_WITH_GOOGLE}
-                      {isSubmitting && <ButtonSubmittingCircle />}
                     </Button>
                   </Form>
                 )

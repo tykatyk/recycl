@@ -20,13 +20,14 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import PlaceIcon from '@mui/icons-material/Place'
 import EmailIcon from '@mui/icons-material/Email'
+import { useRouter } from 'next/router'
 
 const authenticated = 'authenticated'
-
 const apolloClient = initializeApollo()
 
 export default function UserMenu(props) {
   const theme = useTheme()
+  const { asPath } = useRouter()
 
   const { data: session, status } = useSession()
   const preventDefault = () => false
@@ -109,7 +110,7 @@ export default function UserMenu(props) {
       </ListItemIcon>
       <ListItemText>
         <Link
-          href="/auth/login"
+          href={`/auth/login/?from=${asPath}`}
           color="inherit"
           underline="none"
           sx={{ display: 'inline-block', width: '100%' }}

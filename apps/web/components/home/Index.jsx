@@ -55,12 +55,12 @@ const StyledHomeLayout = styled(HomeLayout)(({ theme }) => ({
       backgroundImage: `url(${images.largePortrait})`, // 1280px
     },
     [`${theme.breakpoints.up(
-      'xs'
+      'xs',
     )} and (min-resolution: 2dppx) and (orientation: portrait)`]: {
       backgroundImage: `url(${images.smallRetinaPortrait})`, // 1200px
     },
     [`${theme.breakpoints.up(
-      'sm'
+      'sm',
     )} and (min-resolution: 2dppx) and (orientation: portrait), ${theme.breakpoints
       .up('lg')
       .replace('@media ', '')} and (orientation: portrait)`]: {
@@ -140,13 +140,13 @@ export default function HomePage() {
     handleResize(isLoaded, options, setSplashMinHeight)
 
     window.addEventListener('resize', () =>
-      handleResize(isLoaded, options, setSplashMinHeight)
+      handleResize(isLoaded, options, setSplashMinHeight),
     )
 
     return () => {
       isLoaded = false
       window.removeEventListener('resize', () =>
-        handleResize(isLoaded, options, setSplashMinHeight)
+        handleResize(isLoaded, options, setSplashMinHeight),
       )
     }
   }, [])
@@ -168,7 +168,7 @@ export default function HomePage() {
       <section className={classes.cardContainer}>
         <Grid container spacing={5}>
           {cardsContent.map((card) => (
-            <Grid item key={card.title} xs={12} sm={6} md={4}>
+            <Grid key={card.title} size={{ xs: 12, sm: 6, md: 4 }}>
               <Card className={classes.card}>
                 <CardHeader
                   title={card.title}
