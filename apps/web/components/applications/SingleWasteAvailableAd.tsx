@@ -6,6 +6,7 @@ const background = '#264352'
 import GppMaybeIcon from '@mui/icons-material/GppMaybe'
 import { useCallback, useState } from 'react'
 import { useSnackbar } from 'notistack'
+import LocationPinIcon from '@mui/icons-material/LocationPin'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
 const phoneLoadingErrorMessage = 'Что то пошло не так'
@@ -51,7 +52,7 @@ export default function SingleWasteAvailableAd(props) {
 
   return (
     <Box>
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 3 }}>
         <Box sx={{ mb: 1 }}>
           <Typography component="h1" variant="h4">
             {data.title}
@@ -59,19 +60,28 @@ export default function SingleWasteAvailableAd(props) {
         </Box>
 
         <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" sx={{ color: 'grey.400' }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'grey.400',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+            }}
+          >
+            <LocationPinIcon />
             {data.wasteLocation.description}
           </Typography>
         </Box>
+      </Box>
 
-        <Box>
-          <Grid container spacing={2}>
-            <Chip label={`Тип вторсырья: ${data.wasteType}`} size="small" />
+      <Box sx={{ mb: 4 }}>
+        <Grid container spacing={2}>
+          <Chip label={`Тип вторсырья: ${data.wasteType}`} size="small" />
 
-            <Chip label={`Объявление создано: ${formattedDate}`} size="small" />
-            <Chip label={`Автор: ${data.user.name}`} size="small" />
-          </Grid>
-        </Box>
+          <Chip label={`Объявление создано: ${formattedDate}`} size="small" />
+          <Chip label={`Автор: ${data.user.name}`} size="small" />
+        </Grid>
       </Box>
 
       {data.comment && (
@@ -128,7 +138,7 @@ export default function SingleWasteAvailableAd(props) {
               color: 'secondary.main',
               display: 'flex',
               alignItems: 'center',
-              gap: 1,
+              gap: 0.5,
             }}
             align="right"
           >

@@ -3,29 +3,92 @@ import {
   dbConnect,
   RemovalApplicationModel,
 } from '@recycl/shared/dist/server/db'
+import { constants } from '@recycl/shared/dist'
 import Layout from '../../components/layouts/Layout'
+import { FORBIDDEN } from '../../lib/errors'
+import { Box, Button, Typography } from '@mui/material'
+import BlockIcon from '@mui/icons-material/Block'
+import { useRouter } from 'next/router'
 
-export default function wasteAvailableAd(props) {
-  const { data } = props
-  const { title } = data
-  const brand = process.env.NEXT_PUBLIC_BRAND || ''
-  const titleDescription = `${title} | Вторсырьё на ${brand}`
+const { documentActivityStatus } = constants
+const { active } = documentActivityStatus
+const headerText = 'Это объявление не активно'
+const backButtonText = 'Назад'
+
+function ContentNotAvailableView() {
+  const router = useRouter()
 
   return (
-    <Layout title={`${titleDescription}`}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
+        <Box
+          sx={{
+            mb: 1,
+          }}
+        >
+          <BlockIcon fontSize="large" color="error" />
+        </Box>
+        <Typography component="h1" variant="h5" mb={3}>
+          {headerText}
+        </Typography>
+      </Box>
+
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Button
+          sx={{ mb: 1 }}
+          variant="contained"
+          color="secondary"
+          onClick={() => router.back()}
+        >
+          {backButtonText}
+        </Button>
+      </Box>
+    </Box>
+  )
+}
+
+export default function wasteAvailableAd(props) {
+  const { data, error } = props
+
+  if (error) {
+    return (
+      <Layout title={'Обьявление больше не доступно'}>
+        <ContentNotAvailableView />
+      </Layout>
+    )
+  }
+  const titleDescription = `${data.title} | Вторсырьё на ${process.env.NEXT_PUBLIC_BRAND}`
+
+  return (
+    <Layout title={titleDescription}>
       <SingleWasteAvailableAd data={data} />
     </Layout>
   )
 }
 
 export async function getServerSideProps(context) {
+  const { res } = context
   const { id } = context.query
 
   await dbConnect()
 
   const data = await RemovalApplicationModel.findById(id)
     .select(
-      'title user wasteLocation.description wasteLocation.structured_formatting.main_text wasteType quantity contactPhone comment createdAt',
+      'status title user wasteLocation.description wasteLocation.structured_formatting.main_text wasteType quantity contactPhone comment createdAt',
     )
     .populate('user', 'name')
     .lean()
@@ -33,6 +96,16 @@ export async function getServerSideProps(context) {
   if (!data) {
     return {
       notFound: true,
+    }
+  }
+
+  if (data.status !== active) {
+    res.statusCode = 403
+    return {
+      props: {
+        data: null,
+        error: FORBIDDEN,
+      },
     }
   }
 

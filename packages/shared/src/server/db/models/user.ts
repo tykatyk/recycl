@@ -3,7 +3,7 @@ import type { ValidatorProps } from 'mongoose'
 import cryptoRandomString from 'crypto-random-string'
 import { phone as phoneValidator } from '../../../validation/atomicValidators'
 import { checkEmail } from '../dbModelCommons'
-import { documentActivityStatus } from '../dbModelCommons'
+import { documentActivityStatus } from '../../../constants'
 import { validationMessages } from '../../../validation'
 
 const { email: invalidEmailAddress, phone: invalidPhoneNumber } =

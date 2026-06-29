@@ -1,6 +1,6 @@
 import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
 import { contactPhone, locationSchema, expires } from '../dbModelCommons'
-import { documentActivityStatus } from '../dbModelCommons'
+import { documentActivityStatus } from '../../../constants'
 
 const removalApplicationSchema = new Schema(
   {

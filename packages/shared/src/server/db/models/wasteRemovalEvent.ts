@@ -1,9 +1,6 @@
 import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
-import {
-  contactPhone,
-  documentActivityStatus,
-  locationSchema,
-} from '../dbModelCommons'
+import { contactPhone, locationSchema } from '../dbModelCommons'
+import { documentActivityStatus } from '../../../constants'
 
 const wasteRemovalEventSchema = new Schema(
   {

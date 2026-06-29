@@ -2,8 +2,10 @@ import {
   WasteRemovalEventModel,
   RemovalApplicationModel,
   WasteRemovalSubscriptionModel,
-  documentActivityStatus,
 } from '@recycl/shared/dist/server/db'
+import { constants } from '@recycl/shared/dist'
+const { documentActivityStatus } = constants
+
 import type {
   AggregatedSubscriptionData,
   WasteLocationCounter,
