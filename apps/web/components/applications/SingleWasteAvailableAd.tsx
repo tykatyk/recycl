@@ -1,45 +1,22 @@
 import { Grid, Typography, Box, Button } from '@mui/material'
-import Layout from '../layouts/Layout'
-import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 // import SendMessage from '../uiParts/SendMessage'
-import { useQuery } from '@apollo/client'
-import { GET_REMOVAL_APPLICATION } from '../../lib/graphql/queries/removalApplication'
 import Chip from '@mui/material/Chip'
 import Link from '../uiParts/Link'
 const background = '#264352'
 import GppMaybeIcon from '@mui/icons-material/GppMaybe'
-import { ReactElement, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useSnackbar } from 'notistack'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
 const phoneLoadingErrorMessage = 'Что то пошло не так'
 
-export default function ShowSingle(props) {
-  const { id } = props
-  const { loading, data, error } = useQuery(GET_REMOVAL_APPLICATION, {
-    variables: { id },
-  })
-  let content: ReactElement | null = null
-
-  if (loading) return <PageLoadingCircle />
-
-  if (error) {
-    content = <ErrorMessage />
-  } else {
-    //data is already available here
-    content = <ShowData applicationData={data.getRemovalApplication} />
-  }
-
-  return <Layout title="Заявка на вывоз отходов | Recycl">{content}</Layout>
-}
-
-function ShowData(props) {
-  const { applicationData } = props
+export default function SingleWasteAvailableAd(props) {
+  const { data } = props
   const [showPhone, setShowPhone] = useState(false)
   const [phone, setPhone] = useState(defaultPhone)
   const [loading, setLoading] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
-  const creationDate = new Date(applicationData.createdAt)
+  const creationDate = new Date(data.createdAt)
 
   const formattedDate = new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
@@ -49,9 +26,9 @@ function ShowData(props) {
 
   const buttonHandler = useCallback(async () => {
     if (phone !== defaultPhone) return
-    if (!applicationData) return
+    if (!data) return
 
-    const adId = applicationData._id
+    const adId = data._id
 
     try {
       setLoading(true)
@@ -70,42 +47,39 @@ function ShowData(props) {
     } finally {
       setLoading(false)
     }
-  }, [phone, applicationData])
+  }, [phone, data])
 
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
         <Box sx={{ mb: 1 }}>
           <Typography component="h1" variant="h4">
-            {applicationData.title}
+            {data.title}
           </Typography>
         </Box>
 
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" sx={{ color: 'grey.400' }}>
-            {applicationData.wasteLocation.description}
+            {data.wasteLocation.description}
           </Typography>
         </Box>
 
         <Box>
           <Grid container spacing={2}>
-            <Chip
-              label={`Тип вторсырья: ${applicationData.wasteType}`}
-              size="small"
-            />
+            <Chip label={`Тип вторсырья: ${data.wasteType}`} size="small" />
 
             <Chip label={`Объявление создано: ${formattedDate}`} size="small" />
-            <Chip label={`Автор: ${applicationData.user.name}`} size="small" />
+            <Chip label={`Автор: ${data.user.name}`} size="small" />
           </Grid>
         </Box>
       </Box>
 
-      {applicationData.comment && (
+      {data.comment && (
         <Box sx={{ mb: 4, p: 2, background: `${background}`, borderRadius: 2 }}>
           <Typography component={'h2'} variant="h5" gutterBottom>
             Опиcание
           </Typography>
-          <Typography>{applicationData.comment}</Typography>
+          <Typography>{data.comment}</Typography>
         </Box>
       )}
       <Box sx={{ mb: 4, p: 2, background: `${background}`, borderRadius: 2 }}>
@@ -114,7 +88,7 @@ function ShowData(props) {
           variant="h5"
           gutterBottom
         >{`Вес вторсырья`}</Typography>
-        <Typography>{`${applicationData.quantity} кг`}</Typography>
+        <Typography>{`${data.quantity} кг`}</Typography>
       </Box>
       <Box sx={{ mb: 4, p: 2, background: `${background}`, borderRadius: 2 }}>
         <Typography component={'h2'} variant="h5" gutterBottom>
@@ -166,15 +140,5 @@ function ShowData(props) {
         </Box>
       </Box>
     </Box>
-  )
-}
-
-function ErrorMessage(props) {
-  return (
-    <Grid>
-      <Typography align="center" color="error">
-        Ошибка при загрузке данных
-      </Typography>
-    </Grid>
   )
 }

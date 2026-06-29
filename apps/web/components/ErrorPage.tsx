@@ -1,5 +1,5 @@
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
-import { Avatar, Box, Button, Typography, Container } from '@mui/material'
+import { Box, Button, Typography, Container } from '@mui/material'
 import LayoutWithoutHeader from './layouts/LayoutWithoutHeader'
 
 const GO_HOME_TEXT = 'На главную'
@@ -24,24 +24,23 @@ export default function ErrorPage(props: ErrorPageProps) {
               alignItems: 'center',
             }}
           >
-            <Avatar
+            <Box
               sx={{
                 m: 1,
-                backgroundColor: 'secondary.main',
               }}
             >
-              <ErrorOutlineIcon />
-            </Avatar>
+              <ErrorOutlineIcon color="error" fontSize="large" />
+            </Box>
             <Typography component="h1" variant="h5" mb={3}>
               {headerText}
             </Typography>
-            <Typography component="div" align="center" mb={10}>
+            <Typography component="div" align="center" mb={4}>
               {contentText}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button
-                sx={{ mb: 4 }}
+                sx={{ mb: 1 }}
                 variant="contained"
                 href={HOME_URL}
                 color="secondary"

@@ -2,13 +2,9 @@ import dbQueries from '../../helpers/queries'
 
 const removalApplicationResolvers = {
   Query: {
-    getRemovalApplication(parent, args, context) {
-      return dbQueries.removalApplication.get(args.id)
-    },
     getRemovalApplications(parent, args, context) {
       return dbQueries.removalApplication.getAll(args.queryParams, context.user)
     },
-
     getRemovalApplicationsWithMessageCount(parent, args, context) {
       return dbQueries.removalApplication.getWithMessageCount(context.user)
     },

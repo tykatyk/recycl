@@ -9,14 +9,6 @@ export const CREATE_REMOVAL_APPLICATION = gql`
     }
   }
 `
-export const GET_REMOVAL_APPLICATION = gql`
-  ${REMOVAL_APPLICATION_OUTPUT_FRAGMENT}
-  query GetRemovalApplication($id: String!) {
-    getRemovalApplication(id: $id) {
-      ...RemovalApplicationOutputFragment
-    }
-  }
-`
 export const GET_REMOVAL_APPLICATIONS = gql`
   query GetRemovalApplications($queryParams: QueryParams) {
     getRemovalApplications(queryParams: $queryParams) {

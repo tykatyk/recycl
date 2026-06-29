@@ -2,12 +2,7 @@ import gql from 'graphql-tag'
 
 export default gql`
   type Query {
-    getRemovalApplication(id: String!): RemovalApplicationOutput
     getRemovalApplications(queryParams: QueryParams): [RemovalApplicationOutput]
-    getRemovalApplicationsForMap(
-      visibleRect: [[[Float]]]
-      wasteTypes: String!
-    ): [RemovalApplicationForMapOutput]
     getRemovalApplicationsWithMessageCount: [RemovalApplicationsWithMessageCountOutput]
   }
 
@@ -44,14 +39,6 @@ export default gql`
     notificationRadiusCheckbox: Boolean
     expires: Date!
     createdAt: Date!
-  }
-
-  type RemovalApplicationForMapOutput {
-    _id: String
-    wasteTypeId: String
-    totalWeight: Int!
-    totalProposals: Int!
-    wasteLocation: [Float!]!
   }
 
   type RemovalApplicationsWithMessageCountOutput {
