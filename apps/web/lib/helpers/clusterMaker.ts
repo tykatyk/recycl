@@ -20,6 +20,7 @@ type AggregatedAd = {
   _id: string
   weight: number
   totalAds: number
+  wasteType: string
   firstAdId: mongoose.Types.ObjectId
   firstAdTitle: string
   wasteLocation: {
@@ -84,6 +85,7 @@ const getPopulatedIndex = (ads: AggregatedAd[]) => {
           coordinates: [lng, lat],
         },
         properties: {
+          wasteType: ad.wasteType,
           weight,
           placeId: wasteLocation.placeId,
           placeDescription: wasteLocation.description,
@@ -133,6 +135,7 @@ const rebuildIndexOnServer = async () => {
                   weight: { $sum: '$quantity' },
                   totalAds: { $sum: 1 },
                   // wasteTypeId: { $first: '$wasteType' },
+                  wasteType: { $first: wasteType.name },
                   firstAdId: { $first: '$_id' },
                   firstAdTitle: { $first: '$title' },
                   wasteLocation: {
@@ -147,22 +150,14 @@ const rebuildIndexOnServer = async () => {
                 },
               },
             ])
-          // console.log('adsByWasteType')
-          // console.log(adsByWasteType)
           const indexByWasteType = getPopulatedIndex(adsByWasteType)
 
           indexMap.set(wasteType.name, indexByWasteType)
-          // allAds.push(...adsByWasteType)
         } catch (err) {
           console.log(err)
           throw new Error('Cannot create an index')
         }
       }
-      //Also build an index for all waste types
-      // const allAdsIndex = getPopulatedIndex(allAds)
-
-      // indexMap.set('all', allAdsIndex)
-
       refreshPromise = null
     })()
     return refreshPromise

@@ -72,6 +72,7 @@ export function IndividualPointMarker({
 
 export function CollectivelPointMarker({
   weight,
+  wasteType,
   placeId,
   placeDescription,
   position,
@@ -112,7 +113,7 @@ export function CollectivelPointMarker({
             <Box>
               <Typography variant="body2" sx={{ color: 'blue' }}>
                 <Link
-                  href={`/applications`}
+                  href={`/ads/?placeId=${placeId}&wasteType=${wasteType}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
@@ -150,12 +151,11 @@ export function ClusterMarker({ totalPoints, position }) {
       position={position}
       onClick={() => {
         if (!map) return
-        // Smoothly pan to the marker location
-        map.panTo(position)
+
         const currZoom = map.getZoom()
         if (!currZoom) return
-        // Set your desired zoom level (e.g., 15)
         map.setZoom(currZoom + 2)
+        map.panTo(position)
       }}
     >
       <>

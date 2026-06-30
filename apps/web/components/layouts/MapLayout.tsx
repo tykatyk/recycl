@@ -14,7 +14,6 @@ export default function MapLayout({
     <>
       <Head title={title} />
       <Wrapper>
-        <Header />
         <Box sx={{ display: 'flex', flex: '1 1 auto' }}>{children}</Box>
       </Wrapper>
     </>

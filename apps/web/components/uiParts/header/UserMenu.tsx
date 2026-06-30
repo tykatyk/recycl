@@ -39,7 +39,7 @@ export default function UserMenu(props) {
       items: [
         {
           text: 'Обьявления о наличии вторсырья',
-          href: '/my/applications',
+          href: '/my/ads',
           icon: InventoryIcon,
         },
         {

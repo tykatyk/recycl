@@ -25,7 +25,7 @@ export default function WasteTypesList(props) {
       <ListItem disableGutters dense>
         <ListItemButton key={'Тип вторсырья'} onClick={onClick}>
           <ListItemIcon>
-            <BlurOnIcon />
+            <BlurOnIcon color="secondary" />
           </ListItemIcon>
           <ListItemText primary={'Тип вторсырья'} />
           {open ? <ExpandLess /> : <ExpandMore />}

@@ -17,7 +17,7 @@ const links = [
   },
   {
     text: 'Объявления о наличии вторсырья',
-    href: '/applications',
+    href: '/ads',
   },
 ]
 

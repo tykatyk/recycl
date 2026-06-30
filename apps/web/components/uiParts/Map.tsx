@@ -4,7 +4,13 @@ import {
   IndividualPointMarker,
   CollectivelPointMarker,
 } from './Marker'
-import { useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
+import type {
+  FeatureProperties,
+  BBox,
+  MapCenter,
+} from '@recycl/shared/dist/server/types'
+import Supercluster, { ClusterProperties } from 'supercluster'
 
 //Ukraine
 const countryBounds = {
@@ -17,7 +23,18 @@ const countryBounds = {
 const googleMapId = 'd80f8976374eb93b825a20cf'
 const initialZoom = 13
 
-export default function MapComponent(props) {
+type MapComponentProps = {
+  data: (
+    | Supercluster.ClusterFeature<ClusterProperties>
+    | Supercluster.PointFeature<FeatureProperties>
+  )[]
+  children: ReactElement
+  setVisibleRect: (bbox: BBox) => void
+  setZoom: (zoom: number) => void
+  center: MapCenter
+}
+
+export default function MapComponent(props: MapComponentProps) {
   const [mounted, setMounted] = useState(false)
   const [selectedMarker, setSelectedMarker] = useState('')
   const { setVisibleRect, data, setZoom, center, children } = props
@@ -61,7 +78,12 @@ export default function MapComponent(props) {
           const ne = bounds.getNorthEast()
           const sw = bounds.getSouthWest()
 
-          const visibleRect = [sw.lng(), sw.lat(), ne.lng(), ne.lat()]
+          const visibleRect = [
+            sw.lng(),
+            sw.lat(),
+            ne.lng(),
+            ne.lat(),
+          ] as unknown as BBox
           setVisibleRect(visibleRect)
           setZoom(zoom)
         }}
@@ -107,6 +129,7 @@ export default function MapComponent(props) {
                     position={coords}
                     placeId={element.properties.placeId}
                     placeDescription={element.properties.placeDescription}
+                    wasteType={element.properties.wasteType}
                     weight={element.properties.weight}
                     selectedMarker={selectedMarker}
                     setSelectedMarker={setSelectedMarker}

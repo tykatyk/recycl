@@ -1,16 +1,12 @@
-import { Types } from 'mongoose'
-
 export type Lng = number
 export type Lat = number
 
+export type MapCenter = { lat: number; lng: number }
+
 interface WasteAdPoint {
   weight: number
-  wasteLocation: {
-    description: string
-    position: {
-      coordinates: [Lng, Lat]
-    }
-  }
+  placeId: string
+  placeDescription: string
 }
 
 export interface WasteAdIndividualPoint extends WasteAdPoint {
@@ -20,6 +16,7 @@ export interface WasteAdIndividualPoint extends WasteAdPoint {
 
 export interface WasteAdCollectivePoint extends WasteAdPoint {
   totalAds: number
+  wasteType: string
 }
 
 export type FeatureProperties = WasteAdIndividualPoint | WasteAdCollectivePoint

@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
 import MapLayout from '../layouts/MapLayout'
 import Map from '../uiParts/Map'
-import MapSidebar from '../uiParts/MapSidebar'
+import MapSidebar from '../uiParts/AdSidebarMapView'
 import { Box } from '@mui/material'
 import getUserLocation from '../../lib/helpers/getUserLocation'
 import { useSnackbar } from 'notistack'
 import UserLocation from '../uiParts/UserLocation'
 import Supercluster from 'supercluster'
 import type {
+  BBox,
   ClusterProperties,
   FeatureProperties,
+  MapCenter,
 } from '@recycl/shared/dist/server/types'
 import PlacesSearchBar from './PlacesSearchBar'
 
@@ -20,9 +22,9 @@ const mainCss = {
   flex: '1 1 auto',
 }
 
-export default function RemovalApplicationsPage() {
+export default function AdsOnMap() {
   const [selectedValue, setSelectedValue] = useState('')
-  const [visibleRect, setVisibleRect] = useState<number[]>([])
+  const [visibleRect, setVisibleRect] = useState<BBox | null>(null)
   const [clusters, setClusters] = useState<
     (
       | Supercluster.ClusterFeature<ClusterProperties>
@@ -32,9 +34,7 @@ export default function RemovalApplicationsPage() {
   const { enqueueSnackbar } = useSnackbar()
   const [zoom, setZoom] = useState(11)
   const [locationError, setLocationError] = useState(false)
-  const [center, setCenter] = useState<{ lat: number; lng: number } | null>(
-    null,
-  )
+  const [center, setCenter] = useState<MapCenter | null>(null)
 
   const handleChange = (value: string) => setSelectedValue(value)
 
@@ -49,7 +49,7 @@ export default function RemovalApplicationsPage() {
   }, [])
 
   useEffect(() => {
-    if (visibleRect.length == 0 || !selectedValue) return
+    if (!visibleRect || !selectedValue) return
 
     const fetcher = async () => {
       try {
@@ -94,7 +94,7 @@ export default function RemovalApplicationsPage() {
 
   return (
     <MapLayout
-      title={`Объявления о наличии вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
+      title={`Карта наличия вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
     >
       <MapSidebar handleChange={handleChange} selectedValue={selectedValue} />
 
