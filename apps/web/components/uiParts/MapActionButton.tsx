@@ -11,7 +11,7 @@ export default function MapActionButton(props) {
       sx={(theme) => ({
         position: 'fixed',
         top: '50%',
-        left: open ? 250 : 5,
+        left: open ? 290 : 5,
         zIndex: 1,
 
         transition: theme.transitions.create('left', {

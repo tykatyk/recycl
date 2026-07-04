@@ -33,6 +33,7 @@ function UserLocationComponent(props) {
       sx={{
         display: 'flex',
         flexDirection: 'column',
+        flexGrow: 1,
         alignItems: 'center',
         m: 'auto',
       }}

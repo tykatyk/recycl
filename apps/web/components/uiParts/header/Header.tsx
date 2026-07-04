@@ -24,8 +24,14 @@ const links = [
 export default function Header(props) {
   const theme = useTheme()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'))
 
-  const { currentDialogId } = props
+  const {
+    currentDialogId,
+    desktopBreakpoints = { xs: 'none', lg: 'flex' },
+    mobileViewport,
+    ...rest
+  } = props
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget)
@@ -42,6 +48,7 @@ export default function Header(props) {
 
   return (
     <AppBar
+      {...rest}
       position="static"
       id="mainHeader"
       sx={{
@@ -64,7 +71,7 @@ export default function Header(props) {
             <Logo />
           </Box>
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, pl: 1 }}>
+          <Box sx={{ flexGrow: 1, display: desktopBreakpoints, pl: 1 }}>
             <DesktopNavigation links={links} />
           </Box>
 
@@ -85,7 +92,11 @@ export default function Header(props) {
             handleListKeyDown={handleListKeyDown}
           />
           <Box id="mobile-anchor">
-            <MobileNavigation links={links} />
+            <MobileNavigation
+              links={links}
+              isMobile={isMobile}
+              mobileViewport={mobileViewport}
+            />
           </Box>
         </Toolbar>
       </Container>

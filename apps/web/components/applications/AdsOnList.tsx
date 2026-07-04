@@ -1,28 +1,27 @@
 import { useEffect, useState } from 'react'
-import MapLayout from '../layouts/MapLayout'
-import AdsSidebarListView from '../uiParts/AdSidebarListView'
-import { Box } from '@mui/material'
+import { Box, Container } from '@mui/material'
 import { useSnackbar } from 'notistack'
-import type {
-  ClusterProperties,
-  FeatureProperties,
-} from '@recycl/shared/dist/server/types'
-import Header from '../uiParts/header/Header'
-import Footer from '../uiParts/Footer'
+import AdSidebarItemsList from '../uiParts/AdSidebarItemsList'
+import AdSidebar from '../uiParts/AdSidebar'
+import Head from '../uiParts/Head'
+import {
+  Main,
+  StyledFooter,
+  StyledHeader,
+  drawerWidth,
+} from '../uiParts/AdPageComponents'
 
 const errorMessage = 'Что-то пошло не так'
-
-const mainCss = {
-  display: 'flex',
-  flexDirection: 'column',
-  flex: '1 1 auto',
-}
 
 export default function AdsOnList() {
   const [selectedValue, setSelectedValue] = useState('')
   const { enqueueSnackbar } = useSnackbar()
 
   const handleChange = (value: string) => setSelectedValue(value)
+  const [drawerOpen, setDrawerOpen] = useState(true)
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen)
+  }
 
   useEffect(() => {
     if (!selectedValue) return
@@ -58,19 +57,49 @@ export default function AdsOnList() {
   }, [selectedValue])
 
   return (
-    <MapLayout
-      title={`Объявления о наличии вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
-    >
-      <AdsSidebarListView
-        handleChange={handleChange}
-        selectedValue={selectedValue}
+    <>
+      <Head
+        title={`Объявления о наличии вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
       />
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          minHeight: '100vh',
+          backgroundColor: 'background.default',
+        }}
+      >
+        <StyledHeader drawerOpen={drawerOpen} />
+        <Box sx={{ display: 'flex', flexBasis: '100%' }}>
+          <AdSidebar
+            sx={{
+              width: drawerWidth,
+            }}
+            drawerOpen={drawerOpen}
+            drawerWidth={drawerWidth}
+            handleDrawerToggle={handleDrawerToggle}
+          >
+            <AdSidebarItemsList handleChange={setSelectedValue} />
+          </AdSidebar>
 
-      <Box component="main" sx={mainCss}>
-        <Header />
+          <Main drawerOpen={drawerOpen}>
+            <Box
+              sx={(theme) => ({
+                display: 'flex',
+                alignItems: 'center',
+                padding: theme.spacing(0, 1),
+                // necessary for content to be below app bar
+                ...theme.mixins.toolbar,
+                justifyContent: 'flex-end',
+              })}
+            />
+            {/* //content here */}
+            <Container></Container>
+          </Main>
+        </Box>
 
-        <Footer />
+        <StyledFooter drawerOpen={drawerOpen} />
       </Box>
-    </MapLayout>
+    </>
   )
 }

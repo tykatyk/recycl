@@ -14,9 +14,17 @@ type LinkData = {
   text: string
   href: string
 }
-export default function MobileNavigation({ links }: { links: LinkData[] }) {
+export default function MobileNavigation({
+  links,
+  isMobile = useMediaQuery(theme.breakpoints.down('md')),
+  mobileViewport = { show: 'xs', hide: 'md' },
+}: {
+  links: LinkData[]
+  isMobile: boolean
+  mobileViewport: any
+}) {
   const [anchorNavMenu, setAnchorNavMenu] = useState<null | HTMLElement>(null)
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const { show, hide } = mobileViewport
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     // setAnchorNavMenu(event.currentTarget)
@@ -35,9 +43,9 @@ export default function MobileNavigation({ links }: { links: LinkData[] }) {
     <Box
       component={'nav'}
       sx={{
-        display: { xs: 'flex', md: 'none' },
+        display: { [show]: 'flex', [hide]: 'none' },
         alignItems: 'center',
-        pl: 2,
+        pl: 1,
       }}
     >
       <IconButton
@@ -64,7 +72,7 @@ export default function MobileNavigation({ links }: { links: LinkData[] }) {
         }}
         open={Boolean(anchorNavMenu)}
         onClose={handleCloseNavMenu}
-        sx={{ display: { xs: 'block', md: 'none' } }}
+        sx={{ display: { [show]: 'block', [hide]: 'none' } }}
       >
         {links.map((link, index: number) => (
           <MenuItem

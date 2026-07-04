@@ -43,41 +43,58 @@ const Root = styled('footer')(({ theme }) => ({
   },
 }))
 
-export default function Footer() {
+const sizes = { xs: 12, md: 3 }
+
+export default function Footer(props) {
   return (
-    <Root className={classes.root}>
-      <Container component="div" className={classes.container}>
+    <Box
+      component={'footer'}
+      sx={{
+        mt: 'auto',
+        pt: 3,
+        pb: 3,
+        backgroundColor: '#1a2b34',
+        color: 'primary',
+        width: '100%',
+      }}
+      {...props}
+    >
+      <Container
+        component="div"
+        sx={{
+          '& > *': {
+            mb: 1,
+          },
+          '& > :last-child': {
+            mb: 0,
+          },
+        }}
+      >
         <Grid container component="nav">
-          <Grid
-            container
-            direction="column"
-            size={{ xs: 12, sm: 3 }}
-            style={{ paddingLeft: 16, paddingRight: 16, paddingBottom: 24 }}
-          >
+          <Grid container direction="column" size={sizes} sx={{ pb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
               <Logo />
             </Box>
           </Grid>
-          <Grid
-            container
-            direction="column"
-            size={{ xs: 12, sm: 3 }}
-            style={{ paddingBottom: 24 }}
-          >
+          <Grid container direction="column" size={sizes} sx={{ pb: 3 }}>
             <Typography
               component="h5"
               variant="overline"
-              className={classes.title}
+              sx={{ padding: `0 16px `, fontWeight: 'bold' }}
             >
               Компания
             </Typography>
-            <List style={{ padding: 0 }}>
+            <List sx={{ p: 0 }}>
               <ListItem dense>
                 <Link
                   color="textSecondary"
                   underline="none"
                   href="/about-us"
-                  className={classes.link}
+                  sx={{
+                    '&:hover': {
+                      color: 'primary',
+                    },
+                  }}
                 >
                   О нас
                 </Link>
@@ -87,7 +104,11 @@ export default function Footer() {
                   color="textSecondary"
                   underline="none"
                   href="/contact-us"
-                  className={classes.link}
+                  sx={{
+                    '&:hover': {
+                      color: 'primary',
+                    },
+                  }}
                 >
                   Связаться с нами
                 </Link>
@@ -97,19 +118,18 @@ export default function Footer() {
                   color="textSecondary"
                   underline="none"
                   href="/support-us"
-                  className={classes.link}
+                  sx={{
+                    '&:hover': {
+                      color: 'primary',
+                    },
+                  }}
                 >
                   Поддержать проект
                 </Link>
               </ListItem>
             </List>
           </Grid>
-          <Grid
-            container
-            direction="column"
-            size={{ xs: 12, sm: 3 }}
-            style={{ paddingBottom: 24 }}
-          >
+          <Grid container direction="column" size={sizes} sx={{ pb: 3 }}>
             <Typography
               variant="overline"
               component="h5"
@@ -123,7 +143,11 @@ export default function Footer() {
                   color="textSecondary"
                   underline="none"
                   href="/terms-of-service"
-                  className={classes.link}
+                  sx={{
+                    '&:hover': {
+                      color: 'primary',
+                    },
+                  }}
                 >
                   Условия использования
                 </Link>
@@ -133,7 +157,11 @@ export default function Footer() {
                   color="textSecondary"
                   underline="none"
                   href="/privacy-policy"
-                  className={classes.link}
+                  sx={{
+                    '&:hover': {
+                      color: 'primary',
+                    },
+                  }}
                 >
                   Политика приватности
                 </Link>
@@ -143,18 +171,22 @@ export default function Footer() {
                   color="textSecondary"
                   underline="none"
                   href="/cookie-policy"
-                  className={classes.link}
+                  sx={{
+                    '&:hover': {
+                      color: 'primary',
+                    },
+                  }}
                 >
                   Политика Cookie
                 </Link>
               </ListItem>
             </List>
           </Grid>
-          <Grid container direction="column" size={{ xs: 12, sm: 3 }}>
+          <Grid container direction="column" size={sizes}>
             <Typography
               variant="caption"
               color="textSecondary"
-              style={{ paddingLeft: 16, paddingRight: 16 }}
+              sx={{ pl: 2, pr: 2 }}
             >
               {`Использование материалов сайта возможно только с разрешения правообладателя Recycl World
               Company © ${new Date().getFullYear()}`}
@@ -162,6 +194,6 @@ export default function Footer() {
           </Grid>
         </Grid>
       </Container>
-    </Root>
+    </Box>
   )
 }

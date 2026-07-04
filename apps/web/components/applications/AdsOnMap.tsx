@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import MapLayout from '../layouts/MapLayout'
 import Map from '../uiParts/Map'
-import MapSidebar from '../uiParts/AdSidebarMapView'
 import { Box } from '@mui/material'
 import getUserLocation from '../../lib/helpers/getUserLocation'
 import { useSnackbar } from 'notistack'
@@ -14,12 +12,18 @@ import type {
   MapCenter,
 } from '@recycl/shared/dist/server/types'
 import PlacesSearchBar from './PlacesSearchBar'
+import Header from '../uiParts/header/Header'
+import Footer from '../uiParts/Footer'
+import AdSidebar from '../uiParts/AdSidebar'
+import AdSidebarItemsMap from '../uiParts/AdSidebarItemsMap'
+import Head from '../uiParts/Head'
+import { Main, StyledHeader, drawerWidth } from '../uiParts/AdPageComponents'
+import { debounce } from 'lodash'
 
 const errorMessage = 'Что-то пошло не так'
 
-const mainCss = {
-  display: 'flex',
-  flex: '1 1 auto',
+interface HeaderProps {
+  drawerOpen: boolean
 }
 
 export default function AdsOnMap() {
@@ -35,8 +39,11 @@ export default function AdsOnMap() {
   const [zoom, setZoom] = useState(11)
   const [locationError, setLocationError] = useState(false)
   const [center, setCenter] = useState<MapCenter | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(true)
 
-  const handleChange = (value: string) => setSelectedValue(value)
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen)
+  }
 
   useEffect(() => {
     getUserLocation().then((coordinates) => {
@@ -82,7 +89,6 @@ export default function AdsOnMap() {
           setClusters([])
         }
       } catch (error) {
-        console.log(error)
         enqueueSnackbar(errorMessage, {
           variant: 'error',
         })
@@ -93,28 +99,80 @@ export default function AdsOnMap() {
   }, [visibleRect, selectedValue])
 
   return (
-    <MapLayout
-      title={`Карта наличия вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
-    >
-      <MapSidebar handleChange={handleChange} selectedValue={selectedValue} />
-
-      <Box component="main" sx={mainCss}>
+    <>
+      <Head
+        title={`Карта наличия вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
+      />
+      <Box
+        sx={{
+          display: 'flex',
+          minHeight: '100vh',
+          backgroundColor: 'background.default',
+        }}
+      >
         {locationError ? (
-          <UserLocation
-            setCenter={setCenter}
-            setLocationError={setLocationError}
-          />
+          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Header />
+            <Box
+              component="main"
+              sx={{
+                display: 'flex',
+                flexGrow: 1,
+                flexDirection: 'column',
+                p: 3,
+              }}
+            >
+              <UserLocation
+                setCenter={setCenter}
+                setLocationError={setLocationError}
+              />
+            </Box>
+            <Footer />
+          </Box>
         ) : center ? (
-          <Map
-            center={center}
-            setVisibleRect={setVisibleRect}
-            data={clusters}
-            setZoom={setZoom}
-          >
-            {<PlacesSearchBar />}
-          </Map>
+          <Box sx={{ display: 'flex', flexGrow: 1 }}>
+            <StyledHeader
+              drawerOpen={drawerOpen}
+              desktopBreakpoints={{ xs: 'none', lg: 'flex' }}
+              mobileViewport={{ show: 'xs', hide: 'lg' }}
+            />
+            <AdSidebar
+              sx={{
+                width: drawerWidth,
+              }}
+              drawerOpen={drawerOpen}
+              drawerWidth={drawerWidth}
+              handleDrawerToggle={handleDrawerToggle}
+            >
+              <AdSidebarItemsMap handleChange={setSelectedValue} />
+            </AdSidebar>
+
+            <Main
+              drawerOpen={drawerOpen}
+              sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+            >
+              <Box
+                sx={(theme) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: theme.spacing(0, 1),
+                  // necessary for content to be below app bar
+                  ...theme.mixins.toolbar,
+                  justifyContent: 'flex-end',
+                })}
+              />
+              <Map
+                center={center}
+                setVisibleRect={setVisibleRect}
+                data={clusters}
+                setZoom={setZoom}
+              >
+                <PlacesSearchBar />
+              </Map>
+            </Main>
+          </Box>
         ) : null}
       </Box>
-    </MapLayout>
+    </>
   )
 }
