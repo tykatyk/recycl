@@ -4,7 +4,7 @@ import {
   IndividualPointMarker,
   CollectivelPointMarker,
 } from './Marker'
-import { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react'
 import type {
   FeatureProperties,
   BBox,
@@ -37,11 +37,54 @@ type MapComponentProps = {
 export default function MapComponent(props: MapComponentProps) {
   const [mounted, setMounted] = useState(false)
   const [selectedMarker, setSelectedMarker] = useState('')
+  const mapRef = useRef<google.maps.Map | null>(null)
+  const isResizing = useRef(false)
+  const resizeTimeout = useRef<NodeJS.Timeout | null>(null)
   const { setVisibleRect, data, setZoom, center, children } = props
+
+  const updateMapState = useCallback((map: google.maps.Map) => {
+    const bounds = map.getBounds()
+    const zoom = map.getZoom()
+
+    if (!bounds || zoom == null) return
+
+    const ne = bounds.getNorthEast()
+    const sw = bounds.getSouthWest()
+
+    setVisibleRect([sw.lng(), sw.lat(), ne.lng(), ne.lat()] as BBox)
+
+    setZoom(zoom)
+  }, [])
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      isResizing.current = true
+
+      if (resizeTimeout.current) {
+        clearTimeout(resizeTimeout.current)
+      }
+
+      resizeTimeout.current = setTimeout(() => {
+        if (mapRef.current) {
+          updateMapState(mapRef.current)
+        }
+        isResizing.current = false
+      }, 300)
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      if (resizeTimeout.current) {
+        clearTimeout(resizeTimeout.current)
+      }
+    }
+  }, [updateMapState])
 
   if (!mounted || !center) {
     return null
@@ -66,26 +109,11 @@ export default function MapComponent(props: MapComponentProps) {
           latLngBounds: countryBounds,
         }}
         onIdle={(event) => {
-          const map = event.map
-          const bounds = map.getBounds()
-          const zoom = map.getZoom()
+          mapRef.current = event.map
 
-          if (!bounds || !zoom) {
-            console.error('Cannot get map params')
-            return
+          if (!isResizing.current) {
+            updateMapState(event.map)
           }
-
-          const ne = bounds.getNorthEast()
-          const sw = bounds.getSouthWest()
-
-          const visibleRect = [
-            sw.lng(),
-            sw.lat(),
-            ne.lng(),
-            ne.lat(),
-          ] as unknown as BBox
-          setVisibleRect(visibleRect)
-          setZoom(zoom)
         }}
       >
         <>
