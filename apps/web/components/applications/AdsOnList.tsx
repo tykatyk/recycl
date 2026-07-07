@@ -69,7 +69,11 @@ export default function AdsOnList() {
           backgroundColor: 'background.default',
         }}
       >
-        <StyledHeader drawerOpen={drawerOpen} />
+        <StyledHeader
+          drawerOpen={drawerOpen}
+          desktopBreakpoints={{ xs: 'none', lg: 'flex' }}
+          mobileViewport={{ show: 'xs', hide: 'lg' }}
+        />
         <Box sx={{ display: 'flex', flexBasis: '100%' }}>
           <AdSidebar
             sx={{

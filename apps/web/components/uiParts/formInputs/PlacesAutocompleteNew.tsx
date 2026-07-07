@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import Autocomplete from '@mui/material/Autocomplete'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { Box, Typography, TextField, Chip, ListItem } from '@mui/material'
@@ -6,10 +6,21 @@ import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
+import type { PlaceTypeWithMatchedSubstrings } from '../../../lib/types/placeAutocomplete'
 
-let autocompleteService = null
+type PlacesAutocompleteProps = {
+  name: string
+  label: string
+  variant: 'outlined' | 'filled' | 'standard'
+  onBlur: (e) => void
+  onChange: (e) => void
+  value: PlaceTypeWithMatchedSubstrings
+  error?: boolean
+  helperText?: string
+  disabled?: boolean
+}
 
-function PlacesAutocompleteNew(props) {
+function PlacesAutocompleteNew(props: PlacesAutocompleteProps) {
   const {
     name,
     label,
@@ -22,16 +33,23 @@ function PlacesAutocompleteNew(props) {
     disabled,
   } = props
 
+  const autocompleteService =
+    useRef<google.maps.places.AutocompleteService | null>(null)
+
   const [inputValue, setInputValue] = React.useState('')
 
-  const [options, setOptions] = React.useState([])
-  const [sessionToken, setSessionToken] = React.useState(null)
+  const [options, setOptions] = React.useState<
+    PlaceTypeWithMatchedSubstrings[]
+  >([])
+  const [sessionToken, setSessionToken] =
+    React.useState<google.maps.places.AutocompleteSessionToken | null>(null)
   const placesLib = useMapsLibrary('places')
 
   const fetch = useMemo(
     () =>
       throttle((request, callback) => {
-        autocompleteService.getPlacePredictions(request, callback)
+        if (!autocompleteService.current) return
+        autocompleteService.current.getPlacePredictions(request, callback)
       }, 200),
     [],
   )
@@ -39,12 +57,12 @@ function PlacesAutocompleteNew(props) {
   useEffect(() => {
     let active = true
 
-    if (!autocompleteService && placesLib) {
-      autocompleteService = new placesLib.AutocompleteService()
+    if (!autocompleteService.current && placesLib) {
+      autocompleteService.current = new placesLib.AutocompleteService()
       setSessionToken(new placesLib.AutocompleteSessionToken())
     }
 
-    if (!autocompleteService) return
+    if (!autocompleteService.current) return
 
     if (inputValue === '') {
       setOptions(value ? [value] : [])
@@ -61,7 +79,7 @@ function PlacesAutocompleteNew(props) {
       },
       (results) => {
         if (active) {
-          let newOptions = []
+          let newOptions: PlaceTypeWithMatchedSubstrings[] = []
 
           if (value) {
             newOptions = [value]
@@ -142,11 +160,7 @@ function PlacesAutocompleteNew(props) {
         )
 
         return (
-          <ListItem
-            key={key}
-            {...rest}
-            // sx={{ background: (theme) => theme.palette.grey[700] }}
-          >
+          <ListItem key={key} {...rest}>
             <Box
               sx={{
                 display: 'flex',
@@ -162,7 +176,6 @@ function PlacesAutocompleteNew(props) {
                 {parts.map((part, index) => (
                   <Box
                     component="span"
-                    variant="body2"
                     key={index}
                     sx={{
                       fontWeight: part.highlight ? 700 : 400,

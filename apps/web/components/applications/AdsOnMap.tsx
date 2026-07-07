@@ -18,13 +18,8 @@ import AdSidebar from '../uiParts/AdSidebar'
 import AdSidebarItemsMap from '../uiParts/AdSidebarItemsMap'
 import Head from '../uiParts/Head'
 import { Main, StyledHeader, drawerWidth } from '../uiParts/AdPageComponents'
-import { debounce } from 'lodash'
 
 const errorMessage = 'Что-то пошло не так'
-
-interface HeaderProps {
-  drawerOpen: boolean
-}
 
 export default function AdsOnMap() {
   const [selectedValue, setSelectedValue] = useState('')

@@ -1,13 +1,6 @@
 import * as yup from 'yup'
 import { validation } from '@recycl/shared'
 
-const radiusSchema = yup
-  .number()
-  .typeError('Введите целое цисло')
-  .required(validation.validationMessages.required)
-  .min(1, (min) => `Значение не должно быть меньше ${min.min}`)
-  .max(200, (max) => `Значение не должно быть больше ${max.max}`)
-
 export const wasteAvailableSubscriptionSchema = yup.object({
   location: validation.location,
   wasteTypes: yup
@@ -15,9 +8,9 @@ export const wasteAvailableSubscriptionSchema = yup.object({
     .of(yup.string().required(validation.validationMessages.required))
     .required()
     .min(1, (min) => `Выберите хотя бы ${min.min} элемент`),
-  radius: radiusSchema,
+  radius: validation.radius,
 })
 
 export const wasteRemovalSubscriptionSchema = yup.object({
-  radius: radiusSchema,
+  radius: validation.radius,
 })

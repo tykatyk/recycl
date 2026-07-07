@@ -16,6 +16,7 @@ import contactUsForm from './contactUsForm'
 import chatForm from './chatForm'
 import { proposeWasteTypeSchema } from './proposeWasteType'
 import { eventValidationSchema } from './eventFormValidator'
+import { adSearchFormSchema } from './adSearchForm'
 import {
   wasteAvailableSubscriptionSchema,
   wasteRemovalSubscriptionSchema,
@@ -40,4 +41,5 @@ export {
   paginationPageNumberSchema,
   paginationPageSizeSchema,
   proposeWasteTypeSchema,
+  adSearchFormSchema,
 }

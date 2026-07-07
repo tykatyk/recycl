@@ -2,42 +2,63 @@ import {
   Autocomplete,
   Box,
   Button,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   ListItem,
+  Radio,
+  RadioGroup,
   TextField,
   Typography,
 } from '@mui/material'
-import WasteTypesList from './WasteTypesList'
 import { useEffect, useState } from 'react'
 import PlacesAutocompleteNew from './formInputs/PlacesAutocompleteNew'
 import { useFormik } from 'formik'
+import NumberField from './formInputs/NumberField'
+import { adSearchFormSchema } from '../../lib/validation'
+import { useSnackbar } from 'notistack'
 
-type WasteItem = {
-  _id: string
-  name: string
-}
+const errorMessage = 'Что-то пошло не так'
 
 export default function AdSidebarItemsList(props) {
-  const [wasteTypes, setWasteTypes] = useState<WasteItem[]>([])
+  const [wasteTypes, setWasteTypes] = useState<string[]>([])
 
   const formik = useFormik({
     initialValues: {
-      wasteType: '',
-      wasteLocation: '',
+      wasteType: null,
+      wasteLocation: null,
+      searchType: 'point',
+      searchRadius: null,
     },
+    validationSchema: adSearchFormSchema,
+    //ToDo: implement onSubmit
     onSubmit: (values) => console.log(values),
   })
 
-  // const { selectedValue, handleChange } = props
+  const { enqueueSnackbar } = useSnackbar()
+
+  const [numberFieldDisabled, setumberFieldDisabled] = useState(false)
+
+  useEffect(() => {
+    if (formik.values.searchType !== 'radius' || !formik.values.wasteLocation) {
+      formik.setFieldValue('searchRadius', null)
+      formik.setFieldTouched('searchRadius', false)
+      formik.setFieldError('searchRadius', undefined)
+      setumberFieldDisabled(true)
+      return
+    }
+    setumberFieldDisabled(false)
+  }, [formik.values.searchType, formik.values.wasteLocation])
 
   useEffect(() => {
     const fetcher = async () => {
       try {
         const response = await fetch('/api/waste-types')
         const data = await response.json()
-
-        setWasteTypes(data)
+        const mapped = data.map((item) => item.name)
+        setWasteTypes(mapped)
       } catch (error) {
-        console.log(error)
+        enqueueSnackbar(errorMessage, { variant: 'error' })
       }
     }
     fetcher()
@@ -63,31 +84,13 @@ export default function AdSidebarItemsList(props) {
             Объявления о наличии вторсырья
           </Typography>
         </Box>
-        <Box
-          component="form"
-          onSubmit={formik.handleSubmit}
-          sx={{ width: '100%' }}
-        >
-          <Box sx={{ width: '100%', p: 1 }}>
-            <Box sx={{ pb: 1 }}>
-              <PlacesAutocompleteNew
-                name="wasteLocation"
-                label="Местоположение"
-                value={formik.values.wasteLocation}
-                onChange={(event, newValue) => {
-                  formik.setFieldValue('wasteLocation', newValue)
-                }}
-                onBlur={() => formik.setFieldTouched('wasteLocation', true)}
-                error={
-                  formik.touched.wasteLocation &&
-                  Boolean(formik.errors.wasteLocation)
-                }
-                helperText={
-                  formik.touched.wasteLocation && formik.errors.wasteLocation
-                }
-                disabled={formik.isSubmitting}
-              />
-            </Box>
+
+        <Box sx={{ width: '100%', p: 1 }}>
+          <Box
+            component="form"
+            onSubmit={formik.handleSubmit}
+            sx={{ width: '100%' }}
+          >
             <Box sx={{ mb: 3 }}>
               <Autocomplete
                 disablePortal
@@ -95,19 +98,12 @@ export default function AdSidebarItemsList(props) {
                 sx={{ width: '100%' }}
                 value={formik.values.wasteType}
                 onChange={(event, newValue) => {
+                  console.log(newValue)
                   formik.setFieldValue('wasteType', newValue)
                 }}
-                getOptionLabel={(option) => {
-                  if (option) {
-                    return option.name
-                  }
-                  return ''
-                }}
-                // renderOption={}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    // size="small"
                     id="wasteType"
                     name="wasteType"
                     label="Тип вторсырья"
@@ -123,11 +119,95 @@ export default function AdSidebarItemsList(props) {
                 )}
               />
             </Box>
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ mb: 1 }}>
+                <PlacesAutocompleteNew
+                  name="wasteLocation"
+                  label="Местоположение"
+                  value={formik.values.wasteLocation}
+                  onChange={(event, newValue) => {
+                    formik.setFieldValue('wasteLocation', newValue)
+                  }}
+                  onBlur={() => formik.setFieldTouched('wasteLocation', true)}
+                  error={
+                    formik.touched.wasteLocation &&
+                    Boolean(formik.errors.wasteLocation)
+                  }
+                  helperText={
+                    formik.touched.wasteLocation && formik.errors.wasteLocation
+                  }
+                  disabled={formik.isSubmitting}
+                />
+              </Box>
+              <Box>
+                <Box sx={{ mb: 1 }}>
+                  <FormControl disabled={!formik.values.wasteLocation}>
+                    <FormLabel id="search-params-label">Искать в</FormLabel>
+                    <RadioGroup
+                      aria-labelledby="search-params-label"
+                      name="searchType"
+                      value={formik.values.searchType}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    >
+                      <FormControlLabel
+                        value="point"
+                        control={<Radio />}
+                        label="Указанной точке"
+                        slotProps={{
+                          typography: {
+                            variant: 'body2',
+                          },
+                        }}
+                      />
+                      <FormControlLabel
+                        value="radius"
+                        control={<Radio />}
+                        label="Указанном радиусе"
+                        slotProps={{
+                          typography: {
+                            variant: 'body2',
+                          },
+                        }}
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Box>
+                <Box>
+                  <NumberField
+                    size="small"
+                    disabled={numberFieldDisabled}
+                    label="Радиус, км"
+                    id="searchRadius"
+                    name="searchRadius"
+                    value={formik.values.searchRadius}
+                    onValueChange={(value) => {
+                      formik.setFieldValue('searchRadius', value)
+
+                      if (!formik.touched.searchRadius) {
+                        formik.setFieldTouched('searchRadius', true, false)
+                      }
+                    }}
+                    error={
+                      formik.touched.searchRadius &&
+                      Boolean(formik.errors.searchRadius)
+                    }
+                    helperText={
+                      formik.touched.searchRadius && formik.errors.searchRadius
+                    }
+                  />
+                </Box>
+              </Box>
+            </Box>
+
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
               <Button
                 type="submit"
                 variant="contained"
-                disabled={formik.isSubmitting}
+                disabled={
+                  formik.isSubmitting ||
+                  (!formik.values.wasteType && !formik.values.wasteLocation)
+                }
                 size="small"
               >
                 Поиск

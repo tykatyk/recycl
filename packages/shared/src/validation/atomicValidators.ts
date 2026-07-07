@@ -54,6 +54,13 @@ const comment = yup
   .max(1000, maxLength)
   .concat(notOnlySpaces)
 
+const radius = yup
+  .number()
+  .typeError('Введите целое цисло')
+  .required(required)
+  .min(1, (min) => `Значение не должно быть меньше ${min.min}`)
+  .max(200, (max) => `Значение не должно быть больше ${max.max}`)
+
 const location = yup
   .object({
     description: yup.string().typeError(incorrectValue).required(required),
@@ -98,6 +105,7 @@ export {
   notOnlySpaces,
   message,
   comment,
+  radius,
   location,
   waste,
   date,
