@@ -21,7 +21,9 @@ import { useSnackbar } from 'notistack'
 const errorMessage = 'Что-то пошло не так'
 
 export default function AdSidebarItemsList(props) {
+  const [ads, setAds] = useState([])
   const [wasteTypes, setWasteTypes] = useState<string[]>([])
+  const { enqueueSnackbar } = useSnackbar()
 
   const formik = useFormik({
     initialValues: {
@@ -32,10 +34,34 @@ export default function AdSidebarItemsList(props) {
     },
     validationSchema: adSearchFormSchema,
     //ToDo: implement onSubmit
-    onSubmit: (values) => console.log(values),
-  })
+    onSubmit: async (values) => {
+      try {
+        const { wasteType, wasteLocation, searchType, searchRadius } = values
 
-  const { enqueueSnackbar } = useSnackbar()
+        const query = new URLSearchParams()
+
+        if (wasteType) {
+          query.set('wasteType', wasteType)
+        }
+        if (wasteLocation) {
+          query.set('wasteLocation', wasteLocation.place_id)
+        }
+        if (searchType) {
+          query.set('searchType', searchType)
+        }
+        if (searchRadius) {
+          query.set('searchRadius', String(searchRadius))
+        }
+        console.log(query.toString())
+        const response = await fetch(`/api/ads/list?${query.toString()}`)
+        const data = await response.json()
+        setAds(data || [])
+      } catch (error) {
+        enqueueSnackbar(errorMessage, { variant: 'error' })
+      }
+      setAds([])
+    },
+  })
 
   const [numberFieldDisabled, setumberFieldDisabled] = useState(false)
 
