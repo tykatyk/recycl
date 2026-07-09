@@ -2,12 +2,7 @@ import {
   Autocomplete,
   Box,
   Button,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
   ListItem,
-  Radio,
-  RadioGroup,
   TextField,
   Typography,
 } from '@mui/material'
@@ -17,64 +12,39 @@ import { useFormik } from 'formik'
 import NumberField from './formInputs/NumberField'
 import { adSearchFormSchema } from '../../lib/validation'
 import { useSnackbar } from 'notistack'
+import { InferType } from 'yup'
 
 const errorMessage = 'Что-то пошло не так'
 
 export default function AdSidebarItemsList(props) {
-  const [ads, setAds] = useState([])
+  const { handleSubmit, initialFormValues } = props
+  const { validSearchRadius } = props
   const [wasteTypes, setWasteTypes] = useState<string[]>([])
   const { enqueueSnackbar } = useSnackbar()
 
-  const formik = useFormik({
+  type AdSearchForm = InferType<typeof adSearchFormSchema>
+  const formik = useFormik<AdSearchForm>({
     initialValues: {
       wasteType: null,
       wasteLocation: null,
-      searchType: 'point',
-      searchRadius: null,
+      searchRadius: validSearchRadius,
     },
     validationSchema: adSearchFormSchema,
-    //ToDo: implement onSubmit
-    onSubmit: async (values) => {
-      try {
-        const { wasteType, wasteLocation, searchType, searchRadius } = values
-
-        const query = new URLSearchParams()
-
-        if (wasteType) {
-          query.set('wasteType', wasteType)
-        }
-        if (wasteLocation) {
-          query.set('wasteLocation', wasteLocation.place_id)
-        }
-        if (searchType) {
-          query.set('searchType', searchType)
-        }
-        if (searchRadius) {
-          query.set('searchRadius', String(searchRadius))
-        }
-        console.log(query.toString())
-        const response = await fetch(`/api/ads/list?${query.toString()}`)
-        const data = await response.json()
-        setAds(data || [])
-      } catch (error) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
-      }
-      setAds([])
-    },
+    onSubmit: handleSubmit,
   })
 
   const [numberFieldDisabled, setumberFieldDisabled] = useState(false)
 
   useEffect(() => {
-    if (formik.values.searchType !== 'radius' || !formik.values.wasteLocation) {
-      formik.setFieldValue('searchRadius', null)
+    if (!formik.values.wasteLocation) {
+      formik.setFieldValue('searchRadius', 0)
       formik.setFieldTouched('searchRadius', false)
       formik.setFieldError('searchRadius', undefined)
       setumberFieldDisabled(true)
       return
     }
     setumberFieldDisabled(false)
-  }, [formik.values.searchType, formik.values.wasteLocation])
+  }, [formik.values.wasteLocation])
 
   useEffect(() => {
     const fetcher = async () => {
@@ -117,14 +87,13 @@ export default function AdSidebarItemsList(props) {
             onSubmit={formik.handleSubmit}
             sx={{ width: '100%' }}
           >
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 2 }}>
               <Autocomplete
                 disablePortal
                 options={wasteTypes}
                 sx={{ width: '100%' }}
                 value={formik.values.wasteType}
                 onChange={(event, newValue) => {
-                  console.log(newValue)
                   formik.setFieldValue('wasteType', newValue)
                 }}
                 renderInput={(params) => (
@@ -145,95 +114,55 @@ export default function AdSidebarItemsList(props) {
                 )}
               />
             </Box>
+            <Box sx={{ mb: 2 }}>
+              <PlacesAutocompleteNew
+                name="wasteLocation"
+                label="Местоположение"
+                value={formik.values.wasteLocation}
+                onChange={(event, newValue) => {
+                  formik.setFieldValue('wasteLocation', newValue)
+                }}
+                onBlur={() => formik.setFieldTouched('wasteLocation', true)}
+                error={
+                  formik.touched.wasteLocation &&
+                  Boolean(formik.errors.wasteLocation)
+                }
+                helperText={
+                  formik.touched.wasteLocation && formik.errors.wasteLocation
+                }
+                disabled={formik.isSubmitting}
+              />
+            </Box>
             <Box sx={{ mb: 3 }}>
-              <Box sx={{ mb: 1 }}>
-                <PlacesAutocompleteNew
-                  name="wasteLocation"
-                  label="Местоположение"
-                  value={formik.values.wasteLocation}
-                  onChange={(event, newValue) => {
-                    formik.setFieldValue('wasteLocation', newValue)
-                  }}
-                  onBlur={() => formik.setFieldTouched('wasteLocation', true)}
-                  error={
-                    formik.touched.wasteLocation &&
-                    Boolean(formik.errors.wasteLocation)
-                  }
-                  helperText={
-                    formik.touched.wasteLocation && formik.errors.wasteLocation
-                  }
-                  disabled={formik.isSubmitting}
-                />
-              </Box>
-              <Box>
-                <Box sx={{ mb: 1 }}>
-                  <FormControl disabled={!formik.values.wasteLocation}>
-                    <FormLabel id="search-params-label">Искать в</FormLabel>
-                    <RadioGroup
-                      aria-labelledby="search-params-label"
-                      name="searchType"
-                      value={formik.values.searchType}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    >
-                      <FormControlLabel
-                        value="point"
-                        control={<Radio />}
-                        label="Указанной точке"
-                        slotProps={{
-                          typography: {
-                            variant: 'body2',
-                          },
-                        }}
-                      />
-                      <FormControlLabel
-                        value="radius"
-                        control={<Radio />}
-                        label="Указанном радиусе"
-                        slotProps={{
-                          typography: {
-                            variant: 'body2',
-                          },
-                        }}
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Box>
-                <Box>
-                  <NumberField
-                    size="small"
-                    disabled={numberFieldDisabled}
-                    label="Радиус, км"
-                    id="searchRadius"
-                    name="searchRadius"
-                    value={formik.values.searchRadius}
-                    onValueChange={(value) => {
-                      formik.setFieldValue('searchRadius', value)
+              <NumberField
+                size="small"
+                disabled={numberFieldDisabled}
+                label="Радиус поиска, км"
+                id="searchRadius"
+                name="searchRadius"
+                value={formik.values.searchRadius}
+                onValueChange={(value) => {
+                  formik.setFieldValue('searchRadius', value)
 
-                      if (!formik.touched.searchRadius) {
-                        formik.setFieldTouched('searchRadius', true, false)
-                      }
-                    }}
-                    error={
-                      formik.touched.searchRadius &&
-                      Boolean(formik.errors.searchRadius)
-                    }
-                    helperText={
-                      formik.touched.searchRadius && formik.errors.searchRadius
-                    }
-                  />
-                </Box>
-              </Box>
+                  if (!formik.touched.searchRadius) {
+                    formik.setFieldTouched('searchRadius', true, false)
+                  }
+                }}
+                error={
+                  formik.touched.searchRadius &&
+                  Boolean(formik.errors.searchRadius)
+                }
+                helperText={
+                  formik.touched.searchRadius && formik.errors.searchRadius
+                }
+              />
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
               <Button
                 type="submit"
                 variant="contained"
-                disabled={
-                  formik.isSubmitting ||
-                  (!formik.values.wasteType && !formik.values.wasteLocation)
-                }
+                disabled={formik.isSubmitting}
                 size="small"
               >
                 Поиск

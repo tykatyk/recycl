@@ -6,16 +6,11 @@ import {
   dbConnect,
   WasteRemovalEventModel as eventModel,
 } from '@recycl/shared/dist/server/db'
-import {
-  errorResponse,
-  perFormErrorResponse,
-} from '../../../lib/helpers/responses'
-import { METHOD_NOT_ALLOWED } from '../../../lib/helpers/errorHelpers'
+import { perFormErrorResponse } from '../../../lib/helpers/responses'
+import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
+import { apiHandler } from '../../../lib/helpers/errorHelpers'
 
-export default async function UpdateEvent(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+async function updateEvent(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'PUT') {
     //check if user is authenticated
     const session = await getServerSession(req, res, authOptions)
@@ -32,14 +27,9 @@ export default async function UpdateEvent(
 
     const { id }: { id?: string } = req.query
 
-    try {
-      await eventValidationSchema.validate(event, {
-        abortEarly: false,
-      })
-    } catch (error) {
-      console.log(error)
-      return errorResponse(error, res)
-    }
+    await eventValidationSchema.validate(event, {
+      abortEarly: false,
+    })
 
     try {
       await eventModel.updateOne({ _id: id, user: userId }, event)
@@ -54,3 +44,5 @@ export default async function UpdateEvent(
     res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 }
+
+export default apiHandler(updateEvent)

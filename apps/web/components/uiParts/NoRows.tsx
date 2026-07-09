@@ -10,11 +10,11 @@ export default function NoRows({ text = 'Нет данных' }) {
         alignItems: 'center',
       }}
     >
-      <InfoIcon color="secondary" fontSize="large" />
+      <InfoIcon color="warning" fontSize="large" />
       <Box
         sx={{
           marginTop: 1,
-          color: 'secondary.main',
+          color: 'warning.main',
         }}
       >
         {text}
