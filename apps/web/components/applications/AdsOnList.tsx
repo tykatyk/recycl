@@ -1,14 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import {
-  Box,
-  Button,
-  Checkbox,
-  Chip,
-  Container,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, Chip, Container, Paper, Stack, Typography } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import AdSidebarItemsList from '../uiParts/AdSidebarItemsList'
 import AdSidebar from '../uiParts/AdSidebar'
@@ -23,32 +14,37 @@ import { useRouter } from 'next/router'
 const errorMessage = 'Что-то пошло не так'
 
 //ToDo: add ads type
-export default function AdsOnList({ ads }) {
-  const [selectedValue, setSelectedValue] = useState('')
+export default function AdsOnList(props) {
   const { enqueueSnackbar } = useSnackbar()
+  const [selectedValue, setSelectedValue] = useState('')
   const handleChange = (value: string) => setSelectedValue(value)
   const [drawerOpen, setDrawerOpen] = useState(true)
+  const [initialFormValues, setInitialFormValues] = useState({
+    wasteType: null,
+    wasteLocation: null,
+    searchRadius: null,
+  })
   const router = useRouter()
+  const { data } = props
+
+  useEffect(() => {
+    if (!data) {
+      enqueueSnackbar(errorMessage, { variant: 'error' })
+      return
+    }
+
+    const { wasteType, wasteLocation, searchRadius } = data
+
+    setInitialFormValues({
+      wasteType,
+      wasteLocation,
+      searchRadius,
+    })
+  }, [data])
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen)
   }
-
-  const {
-    wasteType: queryWasteType,
-    wasteLocation: queryWasteLocation,
-    searchRadius: querySearchRadius,
-    page: queryPage,
-    limit: queryLimit,
-  } = router.query
-
-  const validSearchRadius =
-    Number.parseInt(
-      querySearchRadius && typeof querySearchRadius === 'string'
-        ? querySearchRadius
-        : '',
-      10,
-    ) || 0
 
   const handleSubmit = useCallback(async (values) => {
     try {
@@ -60,11 +56,13 @@ export default function AdsOnList({ ads }) {
         query.set('wasteType', wasteType)
       }
       if (wasteLocation) {
-        query.set('wasteLocation', wasteLocation.place_id)
-      }
+        query.set('locationDescription', wasteLocation.description)
+        query.set('locationId', wasteLocation.place_id)
+        // query.set('wasteLocation', JSON.stringify(wasteLocation))
 
-      if (searchRadius) {
-        query.set('searchRadius', String(searchRadius))
+        if (searchRadius) {
+          query.set('searchRadius', String(searchRadius))
+        }
       }
 
       const queryString = query.toString()
@@ -72,43 +70,9 @@ export default function AdsOnList({ ads }) {
 
       router.push(pageRoute)
     } catch (error) {
-      // console.log(error)
       enqueueSnackbar(errorMessage, { variant: 'error' })
     }
   }, [])
-
-  useEffect(() => {
-    if (!selectedValue) return
-
-    // const fetcher = async () => {
-    //   try {
-    //     const query = new URLSearchParams({
-    //       wasteType: selectedValue,
-    //     })
-
-    //     const response = await fetch(`/api/ads?${query.toString()}`)
-
-    //     if (!response.ok) {
-    //       throw new Error('Response is not OK')
-    //     }
-
-    //     const data  = await response.json()
-
-    //     if (data) {
-    //       //ToDo: implement
-    //     } else {
-    //       //ToDo: implement
-    //     }
-    //   } catch (error) {
-    //     console.log(error)
-    //     enqueueSnackbar(errorMessage, {
-    //       variant: 'error',
-    //     })
-    //   }
-    // }
-
-    // fetcher()
-  }, [selectedValue])
 
   return (
     <>
@@ -122,7 +86,6 @@ export default function AdsOnList({ ads }) {
         }}
       >
         <AdSidebar
-          id="22"
           sx={{
             width: drawerWidth,
           }}
@@ -133,11 +96,11 @@ export default function AdsOnList({ ads }) {
           <AdSidebarItemsList
             handleChange={setSelectedValue}
             handleSubmit={handleSubmit}
-            initialFormValues={{ searchRadius: validSearchRadius }}
+            initialFormValues={initialFormValues}
           />
         </AdSidebar>
 
-        <AdWrapper drawerOpen={drawerOpen} id="21">
+        <AdWrapper drawerOpen={drawerOpen}>
           <Box
             sx={{
               display: 'flex',
@@ -156,14 +119,20 @@ export default function AdsOnList({ ads }) {
               sx={{
                 display: 'flex',
                 flexGrow: 1,
-                justifyContent: ads.length > 0 ? 'flex-start' : 'center',
-                alignItems: ads.length > 0 ? 'flex-start' : 'center',
+                justifyContent:
+                  data && data.ads && data.ads.length > 0
+                    ? 'flex-start'
+                    : 'center',
+                alignItems:
+                  data && data.ads && data.ads.length > 0
+                    ? 'flex-start'
+                    : 'center',
               }}
             >
-              {ads.length > 0 ? (
+              {data && data.ads && data.ads.length > 0 ? (
                 <Container maxWidth="md" sx={{ pt: 2, pb: 2 }}>
                   <Stack spacing={2} sx={{ width: '100%' }}>
-                    {ads.map((item, index) => {
+                    {data.ads.map((item, index) => {
                       const creationDate = new Date(item.updatedAt)
 
                       const formattedDate = new Intl.DateTimeFormat('ru-RU', {

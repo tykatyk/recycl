@@ -64,11 +64,6 @@ function PlacesAutocompleteNew(props: PlacesAutocompleteProps) {
 
     if (!autocompleteService.current) return
 
-    if (inputValue === '') {
-      setOptions(value ? [value] : [])
-      return
-    }
-
     fetch(
       {
         input: inputValue,
@@ -121,20 +116,14 @@ function PlacesAutocompleteNew(props: PlacesAutocompleteProps) {
       options={options}
       disabled={disabled}
       onInputChange={(event, newInputValue) => {
+        if (!newInputValue) {
+          setOptions([])
+        }
         setInputValue(newInputValue)
       }}
       autoComplete
       includeInputInList
       filterSelectedOptions
-      renderTags={(value, getTagProps) => {
-        return value.map((option, index) => (
-          <Chip
-            {...getTagProps({ index })}
-            variant="outlined"
-            label={option.description}
-          />
-        ))
-      }}
       renderInput={(params) => {
         return (
           <TextField

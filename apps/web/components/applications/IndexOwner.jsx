@@ -152,7 +152,7 @@ export default function RemovalApplications(props) {
           day: '2-digit',
           month: 'short',
         })
-        newItem.edit = `/my/applications/edit/${item.document['_id']}`
+        newItem.edit = `/my/ads/edit/${item.document['_id']}`
         return newItem
       })
     }
@@ -192,7 +192,7 @@ export default function RemovalApplications(props) {
                       return
                     }
                     if (params.field !== '__check__')
-                      Router.push(`/my/applications/edit/${params.id}`)
+                      Router.push(`/my/ads/edit/${params.id}`)
                   }}
                   onRowSelectionModelChange={(params) => {
                     setSelected(params)

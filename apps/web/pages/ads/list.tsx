@@ -6,6 +6,7 @@ import AdsOnList from '../../components/applications/AdsOnList'
 import { INTERNAL_SERVER_ERROR } from '../../lib/errors'
 import { adSearchFormSchema } from '../../lib/validation'
 import getCoords from '../../lib/helpers/getCoords'
+import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
 
 async function getPlaceCoordinates(placeId: string) {
   const existing = await RemovalApplicationModel.findOne({
@@ -19,32 +20,35 @@ async function getPlaceCoordinates(placeId: string) {
   return getCoords(placeId)
 }
 
-export default function AdsListView({ ads }) {
-  return <AdsOnList ads={ads} />
+export default function AdsListView(props) {
+  return <AdsOnList {...props} />
 }
 
 export async function getServerSideProps(context) {
-  const { res } = context
-
+  //ToDo: add verification that locationDescription really belongs to locationId
   const {
     searchRadius = 0,
-    wasteLocation,
-    wasteType,
-    page,
-    limit,
-  } = context.query as any
+    locationDescription = '',
+    locationId = '',
+    wasteType = '',
+    page = 1,
+    pageSize = 10,
+  } = context.query
 
   await adSearchFormSchema.validate(
-    { searchRadius, wasteLocation, wasteType },
+    { searchRadius, wasteLocation: locationDescription, wasteType },
     {
       stripUnknown: true,
     },
   )
 
-  const validPage = Number.parseInt(page ?? '', 10) || 1
-  const validLimit = Number.parseInt(limit ?? '', 10) || 10
+  await dbConnect()
 
-  const skip = Math.max(validPage - 1, 0) * validLimit
+  const validPage = Number.parseInt(page ?? '', 10) || 1
+  const validPageSize =
+    Number.parseInt(pageSize ?? '', 10) || rowsPerPageOptions[0]
+
+  const skip = Math.max(validPage - 1, 0) * validPageSize
 
   const filter: Record<string, unknown> = {
     status: 'active',
@@ -54,18 +58,19 @@ export async function getServerSideProps(context) {
     filter.wasteType = wasteType
   }
 
-  if (wasteLocation) {
-    if (searchRadius) {
-      const coordinates = await getPlaceCoordinates(wasteLocation)
+  if (locationDescription && locationId) {
+    const coordinates = await getPlaceCoordinates(locationId)
 
-      if (!coordinates || coordinates.length < 2) {
-        //ToDo return an error prop
-        return res.status(500).json({
-          error: INTERNAL_SERVER_ERROR,
-          message: 'Cannot get coordinates',
-        })
+    if (!coordinates || coordinates.length < 2) {
+      return {
+        props: {
+          status: 'error',
+          message: INTERNAL_SERVER_ERROR,
+        },
       }
+    }
 
+    if (searchRadius) {
       filter['wasteLocation.position'] = {
         $near: {
           $geometry: {
@@ -76,23 +81,32 @@ export async function getServerSideProps(context) {
         },
       }
     } else {
-      filter['wasteLocation.place_id'] = wasteLocation
+      filter['wasteLocation.place_id'] = locationId
     }
   }
 
-  await dbConnect()
   const query = RemovalApplicationModel.find(filter)
     .skip(skip)
-    .limit(validLimit)
+    .limit(validPageSize)
     .sort({ updatedAt: -1 })
-    .select('title user wasteLocation.description wasteType quantity updatedAt')
+    .select('title user wasteLocation wasteType quantity updatedAt')
     .lean()
 
   const ads = await query
 
   return {
     props: {
-      ads: JSON.parse(JSON.stringify(ads)),
+      status: 'success',
+
+      data: {
+        ads: JSON.parse(JSON.stringify(ads)),
+        wasteType,
+        wasteLocation: {
+          description: locationDescription,
+          place_id: locationId,
+        },
+        searchRadius,
+      },
     },
   }
 }
