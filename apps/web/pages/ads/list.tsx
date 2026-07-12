@@ -4,11 +4,18 @@ import {
 } from '@recycl/shared/dist/server/db'
 import AdsOnList from '../../components/applications/AdsOnList'
 import { INTERNAL_SERVER_ERROR } from '../../lib/errors'
-import { adSearchFormSchema } from '../../lib/validation'
+import {
+  adSearchFormSchema,
+  paginationPageNumberSchema,
+  paginationPageSizeSchema,
+} from '../../lib/validation'
 import getCoords from '../../lib/helpers/getCoords'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
+import * as yup from 'yup'
+import type { RemovalApplication } from '@recycl/shared/dist/server/db/models/removalApplication'
 
 async function getPlaceCoordinates(placeId: string) {
+  await dbConnect()
   const existing = await RemovalApplicationModel.findOne({
     'wasteLocation.place_id': placeId,
   })
@@ -32,7 +39,7 @@ export async function getServerSideProps(context) {
     locationId = '',
     wasteType = '',
     page = 1,
-    pageSize = 10,
+    pageSize = rowsPerPageOptions[0],
   } = context.query
 
   await adSearchFormSchema.validate(
@@ -42,13 +49,19 @@ export async function getServerSideProps(context) {
     },
   )
 
-  await dbConnect()
+  const paginationValidationSchema = yup.object({
+    page: paginationPageNumberSchema,
+    pageSize: paginationPageSizeSchema,
+  })
 
-  const validPage = Number.parseInt(page ?? '', 10) || 1
-  const validPageSize =
-    Number.parseInt(pageSize ?? '', 10) || rowsPerPageOptions[0]
+  const validatedQuery = await paginationValidationSchema.validate(
+    { page, pageSize },
+    {
+      stripUnknown: true,
+    },
+  )
 
-  const skip = Math.max(validPage - 1, 0) * validPageSize
+  const { page: validPage, pageSize: validPageSize } = validatedQuery
 
   const filter: Record<string, unknown> = {
     status: 'active',
@@ -58,7 +71,15 @@ export async function getServerSideProps(context) {
     filter.wasteType = wasteType
   }
 
-  if (locationDescription && locationId) {
+  const wasteLocation =
+    locationDescription && locationId
+      ? {
+          description: locationDescription,
+          place_id: locationId,
+        }
+      : null
+
+  if (wasteLocation) {
     const coordinates = await getPlaceCoordinates(locationId)
 
     if (!coordinates || coordinates.length < 2) {
@@ -85,19 +106,23 @@ export async function getServerSideProps(context) {
     }
   }
 
-  const query = RemovalApplicationModel.find(filter)
-    .skip(skip)
-    .limit(validPageSize)
-    .sort({ updatedAt: -1 })
-    .select('title user wasteLocation wasteType quantity updatedAt')
-    .lean()
+  await dbConnect()
+  const skip = Math.max(validPage - 1, 0) * validPageSize
+  const total = await RemovalApplicationModel.countDocuments(filter)
+  let ads: RemovalApplication[] = []
 
-  const ads = await query
+  if (skip < total) {
+    ads = await RemovalApplicationModel.find(filter)
+      .skip(skip)
+      .limit(validPageSize)
+      .sort({ updatedAt: -1 })
+      .select('title user wasteLocation wasteType quantity updatedAt')
+      .lean()
+  }
 
   return {
     props: {
       status: 'success',
-
       data: {
         ads: JSON.parse(JSON.stringify(ads)),
         wasteType,
@@ -109,6 +134,11 @@ export async function getServerSideProps(context) {
               }
             : null,
         searchRadius,
+        pagination: {
+          total,
+          page: validPage,
+          pageSize: validPageSize,
+        },
       },
     },
   }

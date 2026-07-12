@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Box, Chip, Container, Paper, Stack, Typography } from '@mui/material'
+import {
+  Box,
+  Chip,
+  Container,
+  PaginationItem,
+  Paper,
+  SelectChangeEvent,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { useSnackbar } from 'notistack'
 import AdSidebarItemsList from '../uiParts/AdSidebarItemsList'
 import AdSidebar from '../uiParts/AdSidebar'
@@ -10,11 +19,24 @@ import NoRows from '../uiParts/NoRows'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import { useRouter } from 'next/router'
+import DataGridFooter from '../uiParts/DataGridFooter'
+import Cookies from 'js-cookie'
+import type { HrefOptions } from '../../lib/types/pagination'
 
 const errorMessage = 'Что-то пошло не так'
 
+const baseUrl = '/ads/list'
+
+const getHref = (options: HrefOptions) => {
+  const { page, pageSize } = options
+  const href = `${baseUrl}?page=${page}&pageSize=${pageSize}`
+
+  return href
+}
+
 //ToDo: add ads type
 export default function AdsOnList(props) {
+  // console.log(props)
   const { enqueueSnackbar } = useSnackbar()
   const [selectedValue, setSelectedValue] = useState('')
   const handleChange = (value: string) => setSelectedValue(value)
@@ -24,6 +46,7 @@ export default function AdsOnList(props) {
     wasteLocation: null,
     searchRadius: null,
   })
+  // console.log(props)
   const router = useRouter()
   const { data } = props
 
@@ -58,8 +81,6 @@ export default function AdsOnList(props) {
       if (wasteLocation) {
         query.set('locationDescription', wasteLocation.description)
         query.set('locationId', wasteLocation.place_id)
-        // query.set('wasteLocation', JSON.stringify(wasteLocation))
-
         if (searchRadius) {
           query.set('searchRadius', String(searchRadius))
         }
@@ -212,6 +233,34 @@ export default function AdsOnList(props) {
                       )
                     })}
                   </Stack>
+                  <DataGridFooter
+                    numRows={data.pagination.total}
+                    pageSize={data.pagination.pageSize}
+                    page={data.pagination.page}
+                    handlePageChange={(
+                      _: React.ChangeEvent<unknown>,
+                      newPage: number,
+                    ) => {
+                      const href = getHref({
+                        page: newPage,
+                        pageSize: data.pagination.pageSize,
+                      })
+                      router.push(href)
+                    }}
+                    handlePageSizeChange={(event: SelectChangeEvent) => {
+                      Cookies.set('pageSize', event.target.value.toString())
+
+                      const newPageSize = event.target.value
+
+                      const href = getHref({
+                        page: 1,
+                        pageSize: parseInt(newPageSize, 10),
+                      })
+
+                      router.push(href)
+                    }}
+                    renderItem={(item) => <PaginationItem {...item} />}
+                  />
                 </Container>
               ) : (
                 <NoRows />
