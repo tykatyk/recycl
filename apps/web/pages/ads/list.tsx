@@ -101,10 +101,13 @@ export async function getServerSideProps(context) {
       data: {
         ads: JSON.parse(JSON.stringify(ads)),
         wasteType,
-        wasteLocation: {
-          description: locationDescription,
-          place_id: locationId,
-        },
+        wasteLocation:
+          locationDescription && locationId
+            ? {
+                description: locationDescription,
+                place_id: locationId,
+              }
+            : null,
         searchRadius,
       },
     },

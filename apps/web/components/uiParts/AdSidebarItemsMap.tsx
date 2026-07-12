@@ -5,7 +5,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import WasteTypesList from './WasteTypesList'
 import { useEffect, useState } from 'react'
 
 type WasteItem = {
@@ -61,9 +60,7 @@ export default function AdSidebarItemsMap(props: {
               disablePortal
               options={wasteTypes}
               sx={{ width: '100%' }}
-              // value={formik.values.wasteType}
               onChange={(event, newValue) => {
-                // formik.setFieldValue('wasteType', newValue)
                 handleChange(newValue ? newValue.name : '')
               }}
               getOptionLabel={(option) => {
@@ -72,22 +69,12 @@ export default function AdSidebarItemsMap(props: {
                 }
                 return ''
               }}
-              // renderOption={}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  // size="small"
                   id="wasteType"
                   name="wasteType"
                   label="Тип вторсырья"
-                  // onBlur={formik.handleBlur}
-                  // error={
-                  //   formik.touched.wasteType &&
-                  //   Boolean(formik.errors.wasteType)
-                  // }
-                  // helperText={
-                  //   formik.touched.wasteType && formik.errors.wasteType
-                  // }
                 />
               )}
             />

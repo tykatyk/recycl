@@ -10,27 +10,38 @@ import { useEffect, useState } from 'react'
 import PlacesAutocompleteNew from './formInputs/PlacesAutocompleteNew'
 import { useFormik } from 'formik'
 import NumberField from './formInputs/NumberField'
-import { adSearchFormSchema } from '../../lib/validation'
+import {
+  adSearchFormSchema,
+  minRadius,
+  maxRadius,
+} from '../../lib/validation/adSearchForm'
 import { useSnackbar } from 'notistack'
 import { InferType } from 'yup'
+import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutocomplete'
 
 const errorMessage = 'Что-то пошло не так'
 
 export default function AdSidebarItemsList(props) {
   const { handleSubmit, initialFormValues } = props
-  const { validSearchRadius } = props
+  const {
+    wasteType = null,
+    searchRadius = null,
+    wasteLocation = null,
+  } = initialFormValues
+
   const [wasteTypes, setWasteTypes] = useState<string[]>([])
   const { enqueueSnackbar } = useSnackbar()
 
   type AdSearchForm = InferType<typeof adSearchFormSchema>
   const formik = useFormik<AdSearchForm>({
     initialValues: {
-      wasteType: null,
-      wasteLocation: null,
-      searchRadius: validSearchRadius,
+      wasteType,
+      wasteLocation,
+      searchRadius,
     },
     validationSchema: adSearchFormSchema,
     onSubmit: handleSubmit,
+    enableReinitialize: true,
   })
 
   const [numberFieldDisabled, setumberFieldDisabled] = useState(false)
@@ -119,7 +130,7 @@ export default function AdSidebarItemsList(props) {
                 name="wasteLocation"
                 label="Местоположение"
                 value={formik.values.wasteLocation}
-                onChange={(event, newValue) => {
+                onChange={(event, newValue: PlaceTypeWithMatchedSubstrings) => {
                   formik.setFieldValue('wasteLocation', newValue)
                 }}
                 onBlur={() => formik.setFieldTouched('wasteLocation', true)}
@@ -135,6 +146,8 @@ export default function AdSidebarItemsList(props) {
             </Box>
             <Box sx={{ mb: 3 }}>
               <NumberField
+                min={minRadius}
+                max={maxRadius}
                 size="small"
                 disabled={numberFieldDisabled}
                 label="Радиус поиска, км"

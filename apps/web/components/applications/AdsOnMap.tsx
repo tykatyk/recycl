@@ -17,7 +17,7 @@ import Footer from '../uiParts/Footer'
 import AdSidebar from '../uiParts/AdSidebar'
 import AdSidebarItemsMap from '../uiParts/AdSidebarItemsMap'
 import Head from '../uiParts/Head'
-import { Main, StyledHeader, drawerWidth } from '../uiParts/AdPageComponents'
+import { AdWrapper, drawerWidth } from '../uiParts/AdPageComponents'
 
 const errorMessage = 'Что-то пошло не так'
 
@@ -126,11 +126,6 @@ export default function AdsOnMap() {
           </Box>
         ) : center ? (
           <Box sx={{ display: 'flex', flexGrow: 1 }}>
-            <StyledHeader
-              drawerOpen={drawerOpen}
-              desktopBreakpoints={{ xs: 'none', lg: 'flex' }}
-              mobileViewport={{ show: 'xs', hide: 'lg' }}
-            />
             <AdSidebar
               sx={{
                 width: drawerWidth,
@@ -142,29 +137,32 @@ export default function AdsOnMap() {
               <AdSidebarItemsMap handleChange={setSelectedValue} />
             </AdSidebar>
 
-            <Main
+            <AdWrapper
               drawerOpen={drawerOpen}
               sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
             >
               <Box
-                sx={(theme) => ({
+                sx={{
                   display: 'flex',
-                  alignItems: 'center',
-                  padding: theme.spacing(0, 1),
-                  // necessary for content to be below app bar
-                  ...theme.mixins.toolbar,
-                  justifyContent: 'flex-end',
-                })}
-              />
-              <Map
-                center={center}
-                setVisibleRect={setVisibleRect}
-                data={clusters}
-                setZoom={setZoom}
+                  width: '100%',
+                  flexDirection: 'column',
+                  minHeight: '100vh',
+                }}
               >
-                <PlacesSearchBar />
-              </Map>
-            </Main>
+                <Header
+                  desktopBreakpoints={{ xs: 'none', lg: 'flex' }}
+                  mobileViewport={{ show: 'xs', hide: 'lg' }}
+                />
+                <Map
+                  center={center}
+                  setVisibleRect={setVisibleRect}
+                  data={clusters}
+                  setZoom={setZoom}
+                >
+                  <PlacesSearchBar />
+                </Map>
+              </Box>
+            </AdWrapper>
           </Box>
         ) : null}
       </Box>

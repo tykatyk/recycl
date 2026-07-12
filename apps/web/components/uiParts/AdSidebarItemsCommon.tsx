@@ -17,7 +17,12 @@ import {
 } from '@mui/material'
 
 const createAddButtonText = 'Добавить объявление'
-const changeViewButtonText = 'Смотреть списком'
+
+const viewOnList = 'Смотреть списком'
+const viewOnMap = 'Смотреть на карте'
+
+const listHref = '/ads/list'
+const mapHref = '/ads'
 
 function ContactAdmin() {
   return (
@@ -119,12 +124,8 @@ export default function AdSidebarItemsCommon() {
   const [modalOpen, setModalOpen] = useState(false)
   const router = useRouter()
 
-  const viewItemHref = router.asPath === '/ads/list' ? '/ads' : '/ads/list'
-  const viewItemText =
-    router.asPath === '/ads/list' ? 'Смотреть на карте' : 'Смотреть списком'
-
   useEffect(() => {
-    if (router.asPath === '/ads/list') {
+    if (router.asPath.split('?')[0] === '/ads/list') {
       setIsMapView(false)
     }
   }, [router.asPath])
@@ -132,11 +133,7 @@ export default function AdSidebarItemsCommon() {
   return (
     <>
       <ListItem disableGutters dense divider>
-        <ListItemButton
-          component="a"
-          href="/ads/create"
-          key={createAddButtonText}
-        >
+        <ListItemButton component="a" href="/ads/create">
           <ListItemIcon>
             <AddIcon color="secondary" />
           </ListItemIcon>
@@ -147,11 +144,7 @@ export default function AdSidebarItemsCommon() {
         </ListItemButton>
       </ListItem>
       <ListItem disableGutters dense divider>
-        <ListItemButton
-          component="a"
-          href={viewItemHref}
-          key={changeViewButtonText}
-        >
+        <ListItemButton component="a" href={isMapView ? listHref : mapHref}>
           <ListItemIcon>
             {isMapView ? (
               <ListIcon color="secondary" />
@@ -159,9 +152,7 @@ export default function AdSidebarItemsCommon() {
               <LocationPinIcon color="secondary" />
             )}
           </ListItemIcon>
-          <ListItemText
-            primary={isMapView ? 'Смотреть списком' : 'Смотреть на карте'}
-          />
+          <ListItemText primary={isMapView ? viewOnList : viewOnMap} />
         </ListItemButton>
       </ListItem>
 
