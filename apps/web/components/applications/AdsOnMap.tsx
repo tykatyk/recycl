@@ -142,6 +142,7 @@ export default function AdsOnMap() {
               sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
             >
               <Box
+                component={'main'}
                 sx={{
                   display: 'flex',
                   width: '100%',

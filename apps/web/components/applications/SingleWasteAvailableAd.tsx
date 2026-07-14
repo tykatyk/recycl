@@ -33,10 +33,10 @@ export default function SingleWasteAvailableAd(props) {
 
     try {
       setLoading(true)
-      const result = await fetch('/api/ads', {
+      const result = await fetch('/api/ads/phone', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adId, fields: ['phone'] }),
+        body: JSON.stringify({ adId }),
       })
       const data = await result.json()
 
@@ -44,7 +44,6 @@ export default function SingleWasteAvailableAd(props) {
       setShowPhone(true)
     } catch (error) {
       enqueueSnackbar(phoneLoadingErrorMessage, { variant: 'error' })
-      console.log('error')
     } finally {
       setLoading(false)
     }

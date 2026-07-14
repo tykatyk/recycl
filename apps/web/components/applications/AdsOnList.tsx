@@ -24,30 +24,54 @@ import Cookies from 'js-cookie'
 import type { HrefOptions } from '../../lib/types/pagination'
 
 const errorMessage = 'Что-то пошло не так'
-
 const baseUrl = '/ads/list'
-
-const getHref = (options: HrefOptions) => {
-  const { page, pageSize } = options
-  const href = `${baseUrl}?page=${page}&pageSize=${pageSize}`
-
-  return href
-}
 
 //ToDo: add ads type
 export default function AdsOnList(props) {
-  // console.log(props)
   const { enqueueSnackbar } = useSnackbar()
-  const [selectedValue, setSelectedValue] = useState('')
-  const handleChange = (value: string) => setSelectedValue(value)
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [initialFormValues, setInitialFormValues] = useState({
     wasteType: null,
     wasteLocation: null,
     searchRadius: null,
   })
-  // console.log(props)
+
   const router = useRouter()
+
+  const getHref = useCallback(
+    (options: HrefOptions) => {
+      const { page, pageSize } = options
+
+      const queryExists = Object.keys(router.query).length > 0
+      if (!queryExists) return `${baseUrl}?page=${page}&pageSize=${pageSize}`
+
+      const { wasteType, locationDescription, locationId, searchRadius } =
+        router.query
+
+      const query = new URLSearchParams()
+
+      if (wasteType) {
+        query.set('wasteType', wasteType as string)
+      }
+      if (locationDescription && locationId) {
+        query.set('locationDescription', locationDescription as string)
+        query.set('locationId', locationId as string)
+
+        if (searchRadius) {
+          query.set('searchRadius', searchRadius as string)
+        }
+      }
+      query.set('page', String(page))
+      query.set('pageSize', String(pageSize))
+
+      const queryString = query.toString()
+      const pageRoute = queryString ? `${baseUrl}?${queryString}` : baseUrl
+
+      return pageRoute
+    },
+    [router.query],
+  )
+
   const { data } = props
 
   useEffect(() => {
@@ -87,7 +111,7 @@ export default function AdsOnList(props) {
       }
 
       const queryString = query.toString()
-      const pageRoute = queryString ? `/ads/list?${queryString}` : '/ads/list'
+      const pageRoute = queryString ? `${baseUrl}?${queryString}` : baseUrl
 
       router.push(pageRoute)
     } catch (error) {
@@ -115,7 +139,6 @@ export default function AdsOnList(props) {
           handleDrawerToggle={handleDrawerToggle}
         >
           <AdSidebarItemsList
-            handleChange={setSelectedValue}
             handleSubmit={handleSubmit}
             initialFormValues={initialFormValues}
           />

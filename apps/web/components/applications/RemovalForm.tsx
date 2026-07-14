@@ -8,10 +8,9 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { useMutation, useLazyQuery, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import {
   CREATE_REMOVAL_APPLICATION,
-  GET_REMOVAL_APPLICATION,
   UPDATE_REMOVAL_APPLICATION,
 } from '../../lib/graphql/queries/removalApplication'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
@@ -46,15 +45,8 @@ export default function RemovalForm() {
 
   const { data: phoneData } = useQuery(GET_PHONE, { variables: { id: userId } })
 
-  const [
-    getRemovalApplication,
-    {
-      called,
-      loading: gettingApplication,
-      data: applicationData,
-      error: gettingError,
-    },
-  ] = useLazyQuery(GET_REMOVAL_APPLICATION)
+  const [gettingApplication, setGettingApplication] = useState(false)
+  const [gettingError, setGettingError] = useState(false)
 
   const [createMutation] = useMutation(CREATE_REMOVAL_APPLICATION)
   const [updateMutation] = useMutation(UPDATE_REMOVAL_APPLICATION)
@@ -67,7 +59,7 @@ export default function RemovalForm() {
       fetchPolicy: 'no-cache',
     })
       .then((data) => {
-        router.push('/my/applications')
+        router.push('/my/ads')
       })
       .catch((error) => {
         enqueueSnackbar(errorMessage, {
@@ -124,22 +116,25 @@ export default function RemovalForm() {
             gettingApplication || gettingWasteTypes || isSubmitting
 
           useEffect(() => {
-            if (applicationId && !called)
-              getRemovalApplication({ variables: { id: applicationId } })
-            if (applicationData) {
-              if (applicationData.getRemovalApplication === null) {
-                router.push('/404')
-              } else {
+            if (!applicationId) return
+
+            const fetcher = async () => {
+              try {
+                setGettingApplication(true)
+                const response = await fetch(`/api/ads/${applicationId}`)
+                const data = await response.json()
+                if (!data) router.push('/404')
                 fields.forEach((field) => {
-                  setFieldValue(
-                    field,
-                    applicationData.getRemovalApplication[field],
-                    false,
-                  )
+                  setFieldValue(field, data[field], false)
                 })
+              } catch (error) {
+                setGettingError(true)
+              } finally {
+                setGettingApplication(false)
               }
             }
-          }, [setFieldValue])
+            fetcher()
+          }, [applicationId])
 
           useEffect(() => {
             if (

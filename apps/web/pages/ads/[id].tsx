@@ -88,7 +88,7 @@ export async function getServerSideProps(context) {
 
   const data = await RemovalApplicationModel.findById(id)
     .select(
-      'status title user wasteLocation.description wasteLocation.structured_formatting.main_text wasteType quantity contactPhone comment createdAt',
+      'status title user wasteLocation.description wasteLocation.structured_formatting.main_text wasteType quantity comment createdAt',
     )
     .populate('user', 'name')
     .lean()

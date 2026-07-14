@@ -29,11 +29,18 @@ export default function DataGridFooter(props: DataGridFooterProps) {
   } = props
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2, pb: 2 }}>
-      <Box sx={{ minWidth: 120, mr: 1 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-end',
+      }}
+    >
+      <Box sx={{ minWidth: 120, mr: 1, pt: 2 }}>
         <FormControl fullWidth size="small">
           <InputLabel id="rowsPerPageLabel">{labelText}</InputLabel>
           <Select
+            // size="small"
             labelId="rowsPerPageLabel"
             id="rowsPerPage"
             label={labelText}
@@ -52,6 +59,8 @@ export default function DataGridFooter(props: DataGridFooterProps) {
       </Box>
 
       <Pagination
+        sx={{ pt: 2 }}
+        size="small"
         count={Math.ceil(numRows / pageSize)}
         page={page}
         onChange={handlePageChange}

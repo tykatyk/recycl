@@ -11,8 +11,8 @@ async function adsPhoneViewHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 
-  const { adId, fields } = req.body
-  if (!adId || !fields.includes('phone')) return res.status(400).end()
+  const { adId } = req.body
+  if (!adId) return res.status(400).end()
 
   await dbConnect()
   const data = await RemovalApplicationModel.findById(adId)

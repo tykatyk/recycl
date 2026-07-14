@@ -11,6 +11,8 @@ const {
 } = validation
 
 const ONE_HUNDRED = 100
+const min = rowsPerPageOptions[0]
+const max = rowsPerPageOptions[rowsPerPageOptions.length - 1] ?? ONE_HUNDRED
 
 export const password = yup.object().shape({
   password: passwordValidator,
@@ -36,13 +38,17 @@ export const paginationPageNumberSchema = yup
   .number()
   .transform((value) => (value === '' || isNaN(value) ? undefined : value))
   .integer()
-  .min(0)
-  .default(0)
+  .min(1)
+  .default(1)
 
 export const paginationPageSizeSchema = yup
   .number()
-  .transform((value) => (value === '' || isNaN(value) ? undefined : value))
+  .transform((value) => {
+    if (value === '' || isNaN(value)) {
+      return undefined
+    }
+
+    return Math.min(Math.max(value, min), max)
+  })
   .integer()
-  .min(rowsPerPageOptions[0])
-  .max(rowsPerPageOptions[rowsPerPageOptions.length - 1] || ONE_HUNDRED)
-  .default(rowsPerPageOptions[0])
+  .default(min)

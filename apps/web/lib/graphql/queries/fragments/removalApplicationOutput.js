@@ -15,7 +15,6 @@ export const REMOVAL_APPLICATION_OUTPUT_FRAGMENT = gql`
     quantity
     user {
       _id
-      name
     }
     comment
     passDocumet
