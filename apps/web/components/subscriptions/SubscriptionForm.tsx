@@ -10,7 +10,7 @@ import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { Form, Field, useFormikContext } from 'formik'
 import 'dayjs/locale/ru'
-import type { Event } from '../../lib/types/event'
+import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import type { Waste } from '../../lib/types/waste'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 
@@ -19,7 +19,7 @@ const ITEM_PADDING_TOP = 8
 
 const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
   const { wasteTypes } = props
-  const { isSubmitting } = useFormikContext<Event>()
+  const { isSubmitting } = useFormikContext<CollectionPoint>()
 
   return (
     <Form>

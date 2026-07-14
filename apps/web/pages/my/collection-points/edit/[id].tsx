@@ -1,6 +1,6 @@
 import CreateUpdate from '../../../../components/events/CreateUpdate'
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next'
-import type { Event } from '../../../../lib/types/event'
+import type { CollectionPoint } from '../../../../lib/types/collectionPoint'
 import type { Waste } from '../../../../lib/types/waste'
 import queries from '../../../../lib/helpers/queries'
 import {
@@ -52,11 +52,11 @@ export const getServerSideProps = (async (context) => {
 
   return {
     props: {
-      event: JSON.parse(JSON.stringify(event)) as Event,
+      event: JSON.parse(JSON.stringify(event)) as CollectionPoint,
       wasteTypes: JSON.parse(JSON.stringify(wasteTypes)) as [Waste],
     },
   }
 }) satisfies GetServerSideProps<{
-  event: Event
+  event: CollectionPoint
   wasteTypes: [Waste]
 }>

@@ -6,31 +6,39 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { DateTime } from '../uiParts/formInputs/DateTime'
 import { Form, Field, useFormikContext } from 'formik'
 import 'dayjs/locale/ru'
-import type { Event } from '../../lib/types/event'
+import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import type { Waste } from '../../lib/types/waste'
 
 const EventForm = (props: { wasteTypes?: [Waste] }) => {
   const { wasteTypes } = props
-  const { isSubmitting } = useFormikContext<Event>()
+  const { isSubmitting } = useFormikContext<CollectionPoint>()
 
   return (
     <Form>
       <Grid
         container
-        component="fieldset"
+        maxWidth={'md'}
         sx={{
-          m: 0,
-          p: 0,
-          mb: 5,
           '& > div': {
-            pb: 2,
+            pb: 3,
           },
-          '& > div:last-child': {
-            pb: 0,
-          },
+
           border: 'none',
         }}
       >
+        <Grid size={{ xs: 12 }}>
+          <Field
+            component={TextFieldFormik}
+            label="Тип пункта приема"
+            color="secondary"
+            fullWidth
+            name="collectionPointType"
+            variant="outlined"
+            helperText="*Обязательное поле"
+            disabled={isSubmitting}
+          />
+        </Grid>
+
         <Grid size={{ xs: 12 }}>
           <Field
             id="location"

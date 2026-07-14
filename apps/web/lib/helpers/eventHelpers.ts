@@ -1,17 +1,21 @@
 import { ReactNode } from 'react'
 import dayjs from 'dayjs'
-import type { Event, AdActions } from '../types/event'
+import type { CollectionPoint, AdActions } from '../types/collectionPoint'
 import type { OrderBy, SortOrder, Variant } from '../types/pagination'
 import type { PlaceType } from '../types/placeAutocomplete'
 
-export function getInitialValues(event?: Event, userPhone: string = ''): Event {
+export function getInitialValues(
+  event?: CollectionPoint,
+  userPhone: string = '',
+): CollectionPoint {
   return {
     user: event?.user || '',
     location: event?.location || null,
-    waste: event?.waste || '',
+    waste: event?.waste || [],
     date: event ? dayjs(event.date) : null,
     phone: event?.phone || userPhone,
     comment: event?.comment || '',
+    collectionPointType: event?.collectionPointType || '',
   }
 }
 

@@ -2,6 +2,7 @@ import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { TextFieldProps, fieldToTextField } from 'formik-mui'
+import { useEffect, useState } from 'react'
 
 const oneYearAfterNow = dayjs().add(1, 'year')
 
@@ -11,6 +12,13 @@ export const DateTime = (props: TextFieldProps) => {
     field: { name },
   } = props
   const { error, value, onChange, label, ...rest } = fieldToTextField(props)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">

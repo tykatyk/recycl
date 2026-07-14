@@ -1,4 +1,4 @@
-import type { Event as RecycleEvent } from '../../lib/types/event'
+import type { CollectionPoint as RecycleEvent } from '../../lib/types/collectionPoint'
 import ShowSingleEvent from '../../components/events/ShowSingleEvent'
 import {
   dbConnect,
