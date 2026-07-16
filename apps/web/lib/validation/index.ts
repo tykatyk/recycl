@@ -15,7 +15,7 @@ import quantitySchema from './quantity'
 import contactUsForm from './contactUsForm'
 import chatForm from './chatForm'
 import { proposeWasteTypeSchema } from './proposeWasteType'
-import { eventValidationSchema } from './eventFormValidator'
+import { collectionPointSchema } from './collectionPointForm'
 import { adSearchFormSchema } from './adSearchForm'
 import {
   wasteAvailableSubscriptionSchema,
@@ -35,7 +35,7 @@ export {
   quantitySchema,
   contactUsForm as contactUsSchema,
   chatForm as chatSchema,
-  eventValidationSchema as eventSchema,
+  collectionPointSchema,
   wasteAvailableSubscriptionSchema,
   wasteRemovalSubscriptionSchema,
   paginationPageNumberSchema,

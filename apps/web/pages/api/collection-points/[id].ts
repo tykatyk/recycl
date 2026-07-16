@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { eventValidationSchema } from '../../../lib/validation/eventFormValidator'
+import { eventValidationSchema } from '../../../lib/validation/collectionPointForm'
 import {
   dbConnect,
   WasteRemovalEventModel as eventModel,
@@ -9,8 +9,35 @@ import {
 import { perFormErrorResponse } from '../../../lib/helpers/responses'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { isValidObjectId } from 'mongoose'
 
-async function updateEvent(req: NextApiRequest, res: NextApiResponse) {
+async function collectionPointHandler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  if (req.method === 'GET') {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) {
+      res.status(401).end()
+      return
+    }
+
+    const { id } = req.query
+    if (!isValidObjectId(id)) {
+      res.status(404).end()
+      return
+    }
+
+    await dbConnect()
+    const event = await eventModel.findOne({ _id: id, user: session.id }).lean()
+    if (!event) {
+      res.status(404).end()
+      return
+    }
+
+    res.json({ event })
+  }
+
   if (req.method === 'PUT') {
     //check if user is authenticated
     const session = await getServerSession(req, res, authOptions)
@@ -45,4 +72,4 @@ async function updateEvent(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default apiHandler(updateEvent)
+export default apiHandler(collectionPointHandler)

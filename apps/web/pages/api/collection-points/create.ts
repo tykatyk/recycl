@@ -1,10 +1,10 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { eventValidationSchema } from '../../../lib/validation/eventFormValidator'
+import { collectionPointSchema } from '../../../lib/validation'
 import {
   dbConnect,
-  WasteRemovalEventModel as EventModel,
+  CollectionPointContainerModel,
 } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
@@ -21,11 +21,11 @@ async function createEvent(req: NextApiRequest, res: NextApiResponse) {
 
   const userId = session.id
 
-  await eventValidationSchema.validate(req.body, {
+  await collectionPointSchema.validate(req.body, {
     abortEarly: false,
   })
 
-  const event = new EventModel(req.body)
+  const event = new CollectionPointContainerModel(req.body)
   event.user = new mongoose.Types.ObjectId(userId)
 
   const placeId = event.location.place_id

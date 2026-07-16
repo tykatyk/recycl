@@ -26,7 +26,11 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import clsx from 'clsx'
-import type { Event, IsInactive, AdActions } from '../../lib/types/event'
+import type {
+  CollectionPoint,
+  IsInactive,
+  AdActions,
+} from '../../lib/types/collectionPoint'
 import type { Variant, SortOrder, OrderBy } from '../../lib/types/pagination'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
@@ -106,7 +110,7 @@ export default function EventsTable({
   sortOrder,
   changedRows,
   rowAction,
-}: TableProps<Event>) {
+}: TableProps<CollectionPoint>) {
   const isSelected = (id: string) => selectedRows.indexOf(id) !== -1
   const [validationError, setValidationError] = useState('')
   const [staleAd, setStaleAd] = useState('')
@@ -253,7 +257,7 @@ export default function EventsTable({
             <Spacer />
           </TableHead>
           <TableBody>
-            {rows.map((row: Event, index: number) => {
+            {rows.map((row: CollectionPoint, index: number) => {
               if (!row._id) return
               const labelId = `checkbox-${index}`
               const isItemSelected = isSelected(row._id)

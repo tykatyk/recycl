@@ -5,7 +5,7 @@ import {
   eventActions,
   getEventTableStyles,
 } from '../../lib/helpers/eventHelpers'
-import { AdActions } from '../../lib/types/event'
+import { AdActions } from '../../lib/types/collectionPoint'
 
 const { activate, deactivate } = eventActions
 const adActivated = 'Объявление активировано'

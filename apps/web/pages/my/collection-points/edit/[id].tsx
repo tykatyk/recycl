@@ -1,12 +1,9 @@
-import CreateUpdate from '../../../../components/events/CreateUpdate'
+import CreateUpdate from '../../../../components/collectionPoints/CreateUpdate'
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 import type { CollectionPoint } from '../../../../lib/types/collectionPoint'
 import type { Waste } from '../../../../lib/types/waste'
 import queries from '../../../../lib/helpers/queries'
-import {
-  WasteRemovalEventModel as eventModel,
-  dbConnect,
-} from '@recycl/shared/dist/server/db'
+import { CollectionPointModel, dbConnect } from '@recycl/shared/dist/server/db'
 import { getSession } from 'next-auth/react'
 import { ParsedUrlQuery } from 'querystring'
 import { isValidObjectId } from 'mongoose'
@@ -42,7 +39,10 @@ export const getServerSideProps = (async (context) => {
   }
 
   await dbConnect()
-  const event = await eventModel.findOne({ _id: id, user: session.id })
+  const event = await CollectionPointModel.findOne({
+    _id: id,
+    user: session.id,
+  })
   if (!event) {
     return {
       notFound: true,

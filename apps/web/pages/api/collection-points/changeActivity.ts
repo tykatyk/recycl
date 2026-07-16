@@ -7,7 +7,7 @@ import {
 } from '@recycl/shared/dist/server/db'
 import type { AdActions } from '../../../lib/types/collectionPoint'
 import { eventActions } from '../../../lib/helpers/eventHelpers'
-import { METHOD_NOT_ALLOWED } from '../../../lib/errors/'
+import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
 
 const { activate } = eventActions
 

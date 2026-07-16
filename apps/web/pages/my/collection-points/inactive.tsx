@@ -1,4 +1,4 @@
-import Events from '../../../components/events/MyEvents'
+import Events from '../../../components/collectionPoints/MyEvents'
 import type { Variant } from '../../../lib/types/pagination'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 

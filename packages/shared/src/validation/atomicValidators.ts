@@ -79,6 +79,12 @@ const location = yup
 // const location = yup.object().nullable().required(required)
 
 const waste = yup.string().required(required).typeError(incorrectValue)
+const wasteArray = yup
+  .array()
+  .of(yup.string())
+  .min(1, 'Укажите хотя бы 1 значение')
+  .required(required)
+  .typeError(incorrectValue)
 
 const date = yup
   .string()
@@ -105,5 +111,6 @@ export {
   radius,
   location,
   waste,
+  wasteArray,
   date,
 }

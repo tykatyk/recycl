@@ -1,9 +1,6 @@
 import type { CollectionPoint as RecycleEvent } from '../../lib/types/collectionPoint'
-import ShowSingleEvent from '../../components/events/ShowSingleEvent'
-import {
-  dbConnect,
-  WasteRemovalEventModel,
-} from '@recycl/shared/dist/server/db'
+import ShowSingleEvent from '../../components/collectionPoints/ShowSingleEvent'
+import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
 import { GetServerSideProps } from 'next'
 import { ParsedUrlQuery } from 'querystring'
 import { isValidObjectId } from 'mongoose'
@@ -38,7 +35,7 @@ export const getServerSideProps = (async (context) => {
 
   try {
     // Check if the IP address has already viewed this ad
-    const ad = await WasteRemovalEventModel.findById(adId).populate([
+    const ad = await CollectionPointModel.findById(adId).populate([
       'user',
       'waste',
     ])

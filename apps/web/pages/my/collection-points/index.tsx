@@ -1,5 +1,5 @@
 import { getSession } from 'next-auth/react'
-import MyEvents from '../../../components/events/MyEvents'
+import MyEvents from '../../../components/collectionPoints/MyEvents'
 import { Variant } from '../../../lib/types/pagination'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 

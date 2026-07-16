@@ -1,20 +1,31 @@
-import CreateUpdate from '../../../components/collectionPoints/CreateUpdate'
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
   GetServerSideProps,
 } from 'next'
-import { Waste } from '../../../lib/types/waste'
-import queries from '../../../lib/helpers/queries'
+import { Waste } from '../../../../lib/types/waste'
+import queries from '../../../../lib/helpers/queries'
 import { dbConnect } from '@recycl/shared/dist/server/db'
-import { getServerSidePropsHandler } from '../../../lib/helpers/errorHelpers'
+import { getServerSidePropsHandler } from '../../../../lib/helpers/errorHelpers'
 import { getSession } from 'next-auth/react'
+import Layout from '../../../../components/layouts/Layout'
+// import EventCreateUpdateUI from '../../../events/[id]'
+import CollectionPointContainerForm from '../../../../components/collectionPoints/CollectionPointContainerForm'
 
-export default function CreateEvent({
-  wasteTypes,
-  userPhone,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  return <CreateUpdate wasteTypes={wasteTypes} userPhone={userPhone} />
+export default function CreateContainerCollectionPoint(
+  props: InferGetServerSidePropsType<typeof getServerSideProps>,
+) {
+  const { collectionPoint } = props
+
+  const title = collectionPoint
+    ? 'Редактировать пункт приема вторсырья | Recycl'
+    : 'Добавить пункт приема вторсырья | Recycl'
+
+  return (
+    <Layout title={title}>
+      <CollectionPointContainerForm {...props} />
+    </Layout>
+  )
 }
 
 const callback = (async (context: GetServerSidePropsContext) => {

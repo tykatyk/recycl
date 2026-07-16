@@ -7,7 +7,7 @@ import SendMessage from '../uiParts/SendMessage'
 import NoRows from '../uiParts/NoRows'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
-import type { Event as RecycleEvent } from '../../lib/types/event'
+import type { CollectionPoint as RecycleEvent } from '../../lib/types/collectionPoint'
 import { useSession } from 'next-auth/react'
 
 interface PopulatedProp {

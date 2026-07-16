@@ -23,14 +23,14 @@ import {
 
 import EventsTable from './EventsTable'
 import type {
-  Event,
+  CollectionPoint,
   Variant,
   AdActions,
   SortOrder,
   OrderBy,
   PaginationOptions,
   HrefOptions,
-} from '../../lib/types/event'
+} from '../../lib/types/collectionPoint'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import Cookies from 'js-cookie'
 import {

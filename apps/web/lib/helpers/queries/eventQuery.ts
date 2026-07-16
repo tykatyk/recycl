@@ -1,5 +1,4 @@
-import { WasteRemovalEventModel } from '@recycl/shared/dist/server/db'
-import { _id } from '@next-auth/mongodb-adapter'
+import { CollectionPointModel } from '@recycl/shared/dist/server/db'
 import {
   eventVariants,
   validSortOrder,
@@ -72,7 +71,7 @@ const eventQueries = {
     const sort = getSortQuery(sortProperty, sortOrder)
     const skip = pageInt * pageSizeInt
 
-    return await WasteRemovalEventModel.find(select)
+    return await CollectionPointModel.find(select)
       .sort(sort)
       .skip(skip)
       .limit(pageSizeInt)

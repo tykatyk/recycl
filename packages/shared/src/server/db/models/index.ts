@@ -3,7 +3,11 @@ import RemovalApplicationModel from './removalApplication'
 import Account from './account'
 import UserRole from './userRole'
 import WasteType from './wasteType'
-import WasteRemovalEventModel from './wasteRemovalEvent'
+import CollectionPointModel, {
+  CollectionPointContainerModel,
+  CollectionPointStationeryModel,
+  CollectionPointMobileModel,
+} from './collectionPoint'
 import SubscriptionModel from './subscription'
 import SubscriptionEmailDeliveryModel from './subscriptionEmailDelivery'
 import WasteAvailableSubscriptionModel from './wasteAvailableSubsciption'
@@ -21,7 +25,10 @@ export {
   UserRole,
   WasteType,
   Account,
-  WasteRemovalEventModel,
+  CollectionPointModel,
+  CollectionPointContainerModel,
+  CollectionPointStationeryModel,
+  CollectionPointMobileModel,
   SubscriptionVariantModel,
   SubscriptionModel,
   SubscriptionEmailDeliveryModel,

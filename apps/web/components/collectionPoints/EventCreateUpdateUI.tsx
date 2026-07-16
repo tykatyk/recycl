@@ -7,7 +7,7 @@ import {
   getInitialValues,
   getNormalizedValues,
 } from '../../lib/helpers/eventHelpers'
-import { eventSchema } from '../../lib/validation'
+import { collectionPointSchema } from '../../lib/validation'
 import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import type {
   CollectionPoint,
@@ -26,7 +26,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import Select from '@mui/material/Select'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 // import { DateTime } from '../uiParts/formInputs/DateTime'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
@@ -47,29 +47,190 @@ const collectionPointTypes = {
   sortingContainer: 'Сортировочный контейнер',
 } as const
 
+function DateField({ formik }) {
+  return (
+    <Grid size={{ xs: 12 }}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+        <DateTimePicker
+          name="date"
+          slotProps={{
+            textField: {
+              id: 'date',
+              variant: 'outlined',
+              fullWidth: true,
+              error: formik.touched.date && Boolean(formik.errors.date),
+              helperText:
+                (formik.touched.date && formik.errors.date) ||
+                '*Обязательное поле',
+              onBlur: () => formik.setFieldTouched('startDate', true),
+            },
+          }}
+          label="Дата и время начала приема вторсырья"
+          disabled={formik.isSubmitting}
+          value={formik.values.date}
+          onChange={(value) => {
+            formik.setFieldValue('date', value)
+          }}
+          onAccept={() => {
+            formik.setFieldTouched('date', true)
+          }}
+        />
+      </LocalizationProvider>
+    </Grid>
+  )
+}
+
+function PhoneField({ formik }) {
+  return (
+    <Grid size={{ xs: 12 }}>
+      <TextField
+        label="Контактный телефон"
+        color="secondary"
+        type="tel"
+        fullWidth
+        name="phone"
+        variant="outlined"
+        helperText={
+          (formik.touched.phone && formik.errors.phone) || '*Обязательное поле'
+        }
+        value={formik.values.phone}
+        disabled={formik.isSubmitting}
+        onBlur={formik.handleBlur}
+        onChange={formik.handleChange}
+      />
+    </Grid>
+  )
+}
+
+function PlaceAutocompleteField({ collectionPointType, formik }) {
+  return (
+    <Grid size={{ xs: 12 }}>
+      <PlacesAutocompleteNew
+        id="location"
+        name="location"
+        variant="outlined"
+        fullWidth
+        label={
+          collectionPointType === 'mobile'
+            ? 'Место приема вторсырья'
+            : collectionPointType === 'sortingContainer'
+              ? 'Местоположение сортировочного контейнера'
+              : 'Местоположение пункта приема'
+        }
+        value={formik.values.location}
+        onChange={(event, newValue) => {
+          formik.setFieldValue('location', newValue)
+        }}
+        onBlur={() => formik.setFieldTouched('location', true)}
+        error={formik.touched.location && Boolean(formik.errors.location)}
+        helperText={
+          (formik.touched.location && formik.errors.location) ||
+          '*Обязательное поле'
+        }
+        disabled={formik.isSubmitting}
+      />
+    </Grid>
+  )
+}
+
+function WasteTypeField({ wasteTypes, formik }) {
+  return (
+    <Grid size={{ xs: 12 }}>
+      <FormControl fullWidth>
+        <InputLabel id="waste-label">
+          {'Типы принимаемого вторсырья'}
+        </InputLabel>
+        <Select
+          id={'waste'}
+          name={'waste'}
+          multiple
+          labelId="demo-simple-select-label"
+          disabled={formik.isSubmitting}
+          value={formik.values.waste}
+          onChange={(event) => {
+            const value = event.target.value
+            formik.setFieldValue(
+              'waste',
+              typeof value === 'string' ? value.split(',') : value,
+            )
+          }}
+          label={'Типы принимаемого вторсырья'}
+        >
+          {wasteTypes.map((item, index: number) => (
+            <MenuItem key={index} value={item.name}>
+              {item.name}
+            </MenuItem>
+          ))}
+        </Select>
+        <FormHelperText>
+          {(formik.touched.waste && formik.errors.waste) ||
+            '*Обязательное поле'}
+        </FormHelperText>
+      </FormControl>
+    </Grid>
+  )
+}
+
+function CommentField({ formik }) {
+  return (
+    <Grid size={{ xs: 12 }}>
+      <TextField
+        multiline
+        rows={3}
+        variant="outlined"
+        fullWidth
+        name="comment"
+        id="comment"
+        label="Описание"
+        helperText={formik.touched.comment && formik.errors.comment}
+        value={formik.values.comment}
+        disabled={formik.isSubmitting}
+        onBlur={formik.handleBlur}
+        onChange={formik.handleChange}
+      />
+    </Grid>
+  )
+}
+
+function SubmitButton({ formik }) {
+  return (
+    <Grid size={{ xs: 12 }}>
+      <Button
+        variant="contained"
+        color="secondary"
+        type="submit"
+        disabled={formik.isSubmitting}
+      >
+        Сохранить
+        {formik.isSubmitting && <ButtonSubmittingCircle />}
+      </Button>
+    </Grid>
+  )
+}
+
 export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
-  const { event, userPhone, wasteTypes } = props
+  const { event: collectionPoint, userPhone, wasteTypes } = props
   const [severity, setSeverity] = useState<string>('success')
   const router = useRouter()
   const { isInactive }: IsInactive = router.query
   const [notification, setNotification] = useState<string>('')
   const [mounted, setMounted] = useState(false)
 
-  const initialValues = getInitialValues(event, userPhone)
+  const initialValues = getInitialValues(collectionPoint, userPhone)
   const formik = useFormik({
     initialValues,
-    validationSchema: eventSchema,
+    validationSchema: collectionPointSchema,
     onSubmit: (
       values: CollectionPoint,
       actions: FormikHelpers<CollectionPoint>,
     ) => {
-      if (event) {
+      if (collectionPoint) {
         updateHandler(values, actions)
       } else {
         createHandler(values, actions)
       }
     },
-    enableReinitialize: true,
+    // enableReinitialize: true,
   })
 
   useEffect(() => {
@@ -86,6 +247,7 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
     values: CollectionPoint,
     { setSubmitting, setErrors, resetForm }: FormikHelpers<CollectionPoint>,
   ) => {
+    console.log(values)
     setSubmitting(true)
 
     const normalizedValues = getNormalizedValues(values)
@@ -120,18 +282,18 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
     values: CollectionPoint,
     { setSubmitting, setErrors }: FormikHelpers<CollectionPoint>,
   ) => {
-    //though event._id always exists in update handler
+    //though collectionPoint._id always exists in update handler
     //we check it anyway to narrow its type and prevent Typescript error
-    if (!event || !event._id) return
+    if (!collectionPoint || !collectionPoint._id) return
     setSubmitting(true)
     //delete user property from modifiedValues
     const { user, ...modifiedValues } = values
     const searchParams = isInactive ? new URLSearchParams({ isInactive }) : ''
-    fetch(`${updateRoute(event._id)}?${searchParams}`, {
+    fetch(`${updateRoute(collectionPoint._id)}?${searchParams}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        // _id: event?._id,
+        // _id: collectionPoint?._id,
         ...modifiedValues,
       }),
     })
@@ -155,141 +317,6 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
       .finally(() => {
         setSubmitting(false)
       })
-  }
-  console.log(formik.values)
-  function DateField() {
-    return (
-      <Grid size={{ xs: 12 }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
-          <DateTimePicker
-            name="date"
-            slotProps={{
-              textField: {
-                id: 'date',
-                variant: 'outlined',
-                fullWidth: true,
-                error: formik.touched.date && Boolean(formik.errors.date),
-                helperText:
-                  (formik.touched.date && formik.errors.date) ||
-                  '*Обязательное поле',
-                onBlur: () => formik.setFieldTouched('startDate', true),
-              },
-            }}
-            label="Дата и время начала приема вторсырья"
-            disabled={formik.isSubmitting}
-            value={formik.values.date}
-            onChange={(value) => {
-              formik.setFieldValue('date', value)
-            }}
-            onAccept={() => {
-              formik.setFieldTouched('date', true)
-            }}
-          />
-        </LocalizationProvider>
-      </Grid>
-    )
-  }
-
-  function PhoneField() {
-    return (
-      <Grid size={{ xs: 12 }}>
-        <TextField
-          label="Контактный телефон"
-          color="secondary"
-          type="tel"
-          fullWidth
-          name="phone"
-          variant="outlined"
-          helperText="*Обязательное поле"
-          disabled={formik.isSubmitting}
-        />
-      </Grid>
-    )
-  }
-
-  function PlaceAutocompleteField({ collectionPointType }) {
-    return (
-      <Grid size={{ xs: 12 }}>
-        <PlacesAutocompleteNew
-          id="location"
-          name="location"
-          variant="outlined"
-          fullWidth
-          label={
-            collectionPointType === 'mobile'
-              ? 'Место приема вторсырья'
-              : collectionPointType === 'sortingContainer'
-                ? 'Местоположение сортировочного контейнера'
-                : 'Местоположение пункта приема'
-          }
-          helperText="*Обязательное поле"
-          disabled={formik.isSubmitting}
-        />
-      </Grid>
-    )
-  }
-
-  function WasteTypeField({ wasteTypes }) {
-    return (
-      <Grid size={{ xs: 12 }}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">
-            {'Типы принимаемого вторсырья'}
-          </InputLabel>
-          <Select
-            name={'waste'}
-            multiple
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            // helperText={'*Обязательное поле'}
-            disabled={formik.isSubmitting}
-            value={formik.values.waste}
-            onChange={formik.handleChange}
-            label={'Типы принимаемого вторсырья'}
-            renderValue={(selected) => selected.join(', ')}
-          >
-            {wasteTypes.map((item, index) => (
-              <MenuItem key={index} value={item.name}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>*Обязательное поле</FormHelperText>
-        </FormControl>
-      </Grid>
-    )
-  }
-
-  function CommentField() {
-    return (
-      <Grid size={{ xs: 12 }}>
-        <TextField
-          multiline
-          rows={3}
-          variant="outlined"
-          fullWidth
-          name="comment"
-          label="Описание"
-          disabled={formik.isSubmitting}
-        />
-      </Grid>
-    )
-  }
-
-  function SubmitButton() {
-    return (
-      <Grid size={{ xs: 12 }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          type="submit"
-          disabled={formik.isSubmitting}
-        >
-          Сохранить
-          {formik.isSubmitting && <ButtonSubmittingCircle />}
-        </Button>
-      </Grid>
-    )
   }
 
   return (
@@ -337,13 +364,14 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
           {formik.values.collectionPointType === 'mobile' && (
             <>
               <PlaceAutocompleteField
+                formik={formik}
                 collectionPointType={formik.values.collectionPointType}
               />
-              <WasteTypeField wasteTypes={wasteTypes} />
-              <DateField />
-              <PhoneField />
-              <CommentField />
-              <SubmitButton />
+              <WasteTypeField wasteTypes={wasteTypes} formik={formik} />
+              <DateField formik={formik} />
+              <PhoneField formik={formik} />
+              <CommentField formik={formik} />
+              <SubmitButton formik={formik} />
             </>
           )}
 
@@ -351,11 +379,12 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
             <>
               <PlaceAutocompleteField
                 collectionPointType={formik.values.collectionPointType}
+                formik={formik}
               />
-              <WasteTypeField wasteTypes={wasteTypes} />
-              <PhoneField />
-              <CommentField />
-              <SubmitButton />
+              <WasteTypeField wasteTypes={wasteTypes} formik={formik} />
+              <PhoneField formik={formik} />
+              <CommentField formik={formik} />
+              <SubmitButton formik={formik} />
             </>
           )}
 
@@ -363,10 +392,11 @@ export default function EventCreateUpdateUI(props: EventCreateUpdateProps) {
             <>
               <PlaceAutocompleteField
                 collectionPointType={formik.values.collectionPointType}
+                formik={formik}
               />
-              <WasteTypeField wasteTypes={wasteTypes} />
-              <CommentField />
-              <SubmitButton />
+              <WasteTypeField wasteTypes={wasteTypes} formik={formik} />
+              <CommentField formik={formik} />
+              <SubmitButton formik={formik} />
             </>
           )}
         </Grid>
