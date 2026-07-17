@@ -1,24 +1,12 @@
 import { useEffect, useState } from 'react'
-import Error from '../uiParts/Error'
-// import EventForm from './EventForm'
 import { FormikHelpers, useFormik } from 'formik'
-import {
-  //   getInitialValues,
-  getNormalizedValues,
-} from '../../lib/helpers/eventHelpers'
 import { collectionPointSchema } from '../../lib/validation'
-// import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import type {
-  CollectionPoint,
   CollectionPointBase,
   CollectionPointContainer,
-  CollectionPointContainerProps,
-  EventCreateUpdateProps,
-  IsInactive,
 } from '../../lib/types/collectionPoint'
 import { useRouter } from 'next/router'
 import { Box, Grid, TextField, Typography } from '@mui/material'
-// import { DateTime } from '../uiParts/formInputs/DateTime'
 import 'dayjs/locale/ru'
 import {
   PhoneField,
@@ -28,73 +16,71 @@ import {
   PlaceAutocompleteField,
 } from '../uiParts/CollectionPointComponents'
 import { useSnackbar } from 'notistack'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 const api = '/api/collection-points'
-const createRoute = `${api}/create`
-const updateRoute = (id: string) => `${api}/${id}`
 const indexRoute = '/my/collection-points/container'
-const inactiveEventsRoute = '/my/collection-points/container/inactive'
 
-export default function CollectionPointContainerForm(
-  props: CollectionPointContainerProps,
-) {
-  const { userPhone, wasteTypes } = props
+export default function CollectionPointContainerForm() {
   const router = useRouter()
-  const { isInactive }: IsInactive = router.query
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [collectionPoint, setCollectionPoint] = useState<
-    (CollectionPointContainer & { _id: string }) | null
-  >(null)
+  const [wasteTypes, setWasteTypes] = useState<any>([]) //ToDo: add type
+  const { id } = router.query
 
   const { enqueueSnackbar } = useSnackbar()
   const [initialValues, setInitialValues] = useState<CollectionPointContainer>({
     user: '',
     location: null as any,
     waste: [],
-    phone: userPhone || '',
+    phone: '',
     comment: '',
     variant: 'container' as const,
     viewCount: 0,
   })
 
-  const { id } = router.query
-
   useEffect(() => {
-    if (!collectionPoint) return
-
-    setInitialValues({
-      user: collectionPoint.user,
-      location: collectionPoint.location,
-      waste: collectionPoint.waste,
-      phone: collectionPoint.phone,
-      comment: collectionPoint.comment,
-      variant: collectionPoint.variant,
-      viewCount: collectionPoint.viewCount,
-    })
-  }, [collectionPoint])
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!id) return
 
-    const fetcher = async () => {
+    const wasteTypeFetcher = async () => {
+      const result = await fetch(`/api/waste-types`)
+      const data = await result.json()
+      setWasteTypes(data)
+    }
+
+    const collectionPointFetcher = async () => {
+      const result = await fetch(`/api/collection-points/${id}`)
+      const collectionPoint = await result.json()
+
+      setInitialValues({
+        user: collectionPoint.user,
+        location: collectionPoint.location,
+        waste: collectionPoint.waste,
+        phone: collectionPoint.phone,
+        comment: collectionPoint.comment,
+        variant: collectionPoint.variant,
+        viewCount: collectionPoint.viewCount,
+      })
+    }
+    const dataFetcher = async () => {
       try {
         setLoading(true)
-        const result = await fetch(`/api/events/${id}`)
-        const data = await result.json()
-
-        setCollectionPoint(data)
+        await wasteTypeFetcher()
+        await collectionPointFetcher()
       } catch (error) {
         enqueueSnackbar(errorMessage, { variant: 'error' })
       } finally {
         setLoading(false)
       }
     }
-    fetcher()
+    dataFetcher()
   }, [id])
 
-  //   const initialValues = getInitialValues(collectionPoint, userPhone)
   const formik = useFormik({
     initialValues,
     validationSchema: collectionPointSchema,
@@ -102,11 +88,7 @@ export default function CollectionPointContainerForm(
       values: CollectionPointContainer,
       actions: FormikHelpers<CollectionPointContainer>,
     ) => {
-      if (collectionPoint) {
-        updateHandler(values, actions)
-      } else {
-        createHandler(values, actions)
-      }
+      updateHandler(values, actions)
     },
     enableReinitialize: true,
   })
@@ -116,55 +98,16 @@ export default function CollectionPointContainerForm(
   }, [])
 
   if (!mounted) return null
-
-  //show error if no wasteTypes found
-  if (!wasteTypes) return <Error />
-
-  //ToDo: refactor to helper function, since this handler can also be used for creating removalApplications
-  const createHandler = (
-    values: CollectionPoint,
-    { setSubmitting, resetForm }: FormikHelpers<CollectionPoint>,
-  ) => {
-    setSubmitting(true)
-
-    const normalizedValues = getNormalizedValues(values)
-
-    fetch(createRoute, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(normalizedValues),
-    })
-      .then((response) => {
-        return response.json()
-      })
-      .then((data) => {
-        if (data.error) {
-          enqueueSnackbar(errorMessage, { variant: 'error' })
-        } else if (data.message) {
-          resetForm()
-          router.push(indexRoute)
-        }
-      })
-      .catch((error) => {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
-  }
+  if (loading) return <PageLoadingCircle />
 
   const updateHandler = (
     values: CollectionPointBase,
-    { setSubmitting, setErrors }: FormikHelpers<CollectionPointBase>,
+    { setSubmitting }: FormikHelpers<CollectionPointBase>,
   ) => {
-    //though collectionPoint._id always exists in update handler
-    //we check it anyway to narrow its type and prevent Typescript error
-    if (!collectionPoint || !collectionPoint._id) return
     setSubmitting(true)
     //delete user property from modifiedValues
     const { user, ...modifiedValues } = values
-    const searchParams = isInactive ? new URLSearchParams({ isInactive }) : ''
-    fetch(`${updateRoute(collectionPoint._id)}?${searchParams}`, {
+    fetch(`${api}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -179,9 +122,7 @@ export default function CollectionPointContainerForm(
         if (data.error) {
           enqueueSnackbar(errorMessage, { variant: 'error' })
         } else if (data.message) {
-          isInactive
-            ? router.push(inactiveEventsRoute)
-            : router.push(indexRoute)
+          router.push(indexRoute)
         }
       })
       .catch((error) => {
@@ -191,11 +132,11 @@ export default function CollectionPointContainerForm(
         setSubmitting(false)
       })
   }
-  // console.log(formik.errors)
+
   return (
     <Box>
       <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
-        Добавить контейнер приема вторсырья
+        Редактировать контейнер приема вторсырья
       </Typography>
 
       <form onSubmit={formik.handleSubmit}>

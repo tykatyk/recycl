@@ -82,7 +82,7 @@ const waste = yup.string().required(required).typeError(incorrectValue)
 const wasteArray = yup
   .array()
   .of(yup.string())
-  .min(1, 'Укажите хотя бы 1 значение')
+  .min(1, 'Выберите хотя бы 1 значение')
   .required(required)
   .typeError(incorrectValue)
 

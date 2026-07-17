@@ -82,7 +82,7 @@ export function PlaceAutocompleteField({ collectionPointType, formik }) {
             ? 'Место приема вторсырья'
             : collectionPointType === 'container'
               ? 'Местоположение сортировочного контейнера'
-              : 'Местоположение пункта приема'
+              : 'Местоположение пункта приема вторсырья'
         }
         value={formik.values.location}
         onChange={(event, newValue) => {

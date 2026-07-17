@@ -33,11 +33,11 @@ export type CollectionPointContainerProps = {
   wasteTypes?: [Waste]
   userPhone?: string
 }
-export type EventCreateUpdateProps = {
-  event?: CollectionPoint & { _id: string }
-  wasteTypes?: [Waste]
-  userPhone?: string
-}
+// export type EventCreateUpdateProps = {
+//   event?: CollectionPoint & { _id: string }
+//   wasteTypes?: [Waste]
+//   userPhone?: string
+// }
 
 // export type CollectionPoint = {
 //   _id?: string
