@@ -44,7 +44,7 @@ export default function UserMenu(props) {
         },
         {
           text: 'Пункты приема вторсырья',
-          href: '/my/events',
+          href: '/my/collection-points',
           icon: PlaceIcon,
         },
         {

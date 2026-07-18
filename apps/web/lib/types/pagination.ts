@@ -1,4 +1,6 @@
-export type Variant = 'inactive' | 'active'
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
+// export type Variant = 'inactive' | 'active'
+export type Variant = keyof typeof documentActivityStatus
 export type SortOrder = 'asc' | 'desc'
 export type OrderBy = 'date' | 'waste' | 'location' | 'createdAt'
 
@@ -12,8 +14,8 @@ export type PaginatedData<T> = {
 }
 
 export type PaginationOptions = {
-  page?: string
-  pageSize?: string
+  page?: number
+  pageSize?: number
   sortProperty?: OrderBy
   sortOrder?: SortOrder
 }

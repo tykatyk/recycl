@@ -20,7 +20,7 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 const api = '/api/collection-points'
-const indexRoute = '/my/collection-points/container'
+const indexRoute = '/my/collection-points'
 
 export default function CollectionPointContainerForm() {
   const router = useRouter()
@@ -33,7 +33,7 @@ export default function CollectionPointContainerForm() {
   const [initialValues, setInitialValues] = useState<CollectionPointContainer>({
     user: '',
     location: null as any,
-    waste: [],
+    wasteTypes: [],
     phone: '',
     comment: '',
     variant: 'container' as const,
@@ -60,7 +60,7 @@ export default function CollectionPointContainerForm() {
       setInitialValues({
         user: collectionPoint.user,
         location: collectionPoint.location,
-        waste: collectionPoint.waste,
+        wasteTypes: collectionPoint.wasteTypes,
         phone: collectionPoint.phone,
         comment: collectionPoint.comment,
         variant: collectionPoint.variant,

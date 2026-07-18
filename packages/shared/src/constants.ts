@@ -3,3 +3,9 @@ export const documentActivityStatus = {
   blocked: 'blocked',
   disabled: 'disabled',
 } as const
+
+export const collectionPointTypes = {
+  stationery: 'Стационарный',
+  mobile: 'Передвижной',
+  container: 'Сортировочный контейнер',
+} as const

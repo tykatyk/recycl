@@ -7,6 +7,8 @@ import {
   Button,
   TextField,
   Select,
+  Typography,
+  Box,
 } from '@mui/material'
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -105,27 +107,27 @@ export function WasteTypeField({ wasteTypes, formik }) {
     <Grid size={{ xs: 12 }}>
       <FormControl
         fullWidth
-        error={formik.touched.waste && Boolean(formik.errors.waste)}
+        error={formik.touched.wasteTypes && Boolean(formik.errors.wasteTypes)}
       >
-        <InputLabel id="waste-label">
+        <InputLabel id="wasteTypes-label">
           {'Типы принимаемого вторсырья'}
         </InputLabel>
         <Select
-          id={'waste'}
-          name={'waste'}
+          id={'wasteTypes'}
+          name={'wasteTypes'}
           multiple
           labelId="demo-simple-select-label"
           disabled={formik.isSubmitting}
-          value={formik.values.waste}
+          value={formik.values.wasteTypes}
           onChange={(event) => {
             const value = event.target.value
             formik.setFieldValue(
-              'waste',
+              'wasteTypes',
               typeof value === 'string' ? value.split(',') : value,
             )
           }}
           onBlur={(event) => {
-            formik.setFieldTouched('waste', true)
+            formik.setFieldTouched('wasteTypes', true)
           }}
           label={'Типы принимаемого вторсырья'}
         >
@@ -136,7 +138,7 @@ export function WasteTypeField({ wasteTypes, formik }) {
           ))}
         </Select>
         <FormHelperText>
-          {(formik.touched.waste && formik.errors.waste) ||
+          {(formik.touched.wasteTypes && formik.errors.wasteTypes) ||
             '*Обязательное поле'}
         </FormHelperText>
       </FormControl>
@@ -173,5 +175,53 @@ export function SubmitButton({ formik }) {
         {formik.isSubmitting && <ButtonSubmittingCircle />}
       </Button>
     </Grid>
+  )
+}
+
+export function CollectionPointsDescription() {
+  return (
+    <Box
+      bgcolor="secondary.main"
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        color: 'secondary.contrastText',
+        fontSize: '0.875rem',
+        fontWeight: 300,
+
+        '& p, & li': {
+          fontSize: 'inherit',
+          fontWeight: 'inherit',
+          color: 'inherit',
+        },
+      }}
+    >
+      <Typography gutterBottom>
+        Пункты приема вторсырья делятся на три вида:
+      </Typography>
+      <Box component="ol" sx={{ pl: 3, pb: 1, m: 0 }}>
+        <li>Сортировочные контейнеры.</li>
+        <li>Передвижные (мобильные) пункты.</li>
+        <li>Стационарные пункты.</li>
+      </Box>
+      <Typography gutterBottom>
+        Сортировочные контейнеры это любые емкости для сбора вторсырья, которые
+        устанавливаются в магазинах, торговых центрах или на улице. Например
+        коробки для сбора отработанных батареек, текстиля и т.д.
+      </Typography>
+      <Typography gutterBottom>
+        Передвижные (мобильные) пункты, это пункты которые принимают вторсырье в
+        определенное время и в определенном месте. При добавлении этих пунктов
+        необходимо указать дату начала события по сбору вторсырья.
+      </Typography>
+      <Typography gutterBottom>
+        Стационарные пункты, это площадки или здания где принимают вторсырье.
+      </Typography>
+      <Typography gutterBottom>
+        При добавлении пункта приема вторсырья необходимо указать его вид,
+        местоположение, типы вторсырья, которые принимаются этим пунктом, а
+        также контактный телефон лица, отвечающего за данный пункт.
+      </Typography>
+    </Box>
   )
 }

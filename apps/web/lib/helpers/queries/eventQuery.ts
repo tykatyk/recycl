@@ -1,26 +1,20 @@
 import { CollectionPointModel } from '@recycl/shared/dist/server/db'
-import {
-  eventVariants,
-  validSortOrder,
-  validOrderBy,
-} from '../../helpers/eventHelpers'
+import { validSortOrder, validOrderBy } from '../../helpers/eventHelpers'
 import type {
   Variant,
   SortOrder,
   OrderBy,
   PaginationOptions,
 } from '../../types/pagination'
-const { active } = eventVariants
 const { asc, desc } = validSortOrder
 
 interface SelectQuery {
   user: string
-  isActive: boolean
+  status: Variant
 }
 
 const getSelectQuery = (variant: Variant, user: string): SelectQuery => {
-  const status = variant === active ? true : false
-  const selectQuery = { user, isActive: status }
+  const selectQuery = { user, status: variant }
 
   return selectQuery
 }
@@ -57,7 +51,7 @@ const eventQueries = {
     const {
       page = 0,
       pageSize = 0,
-      variant,
+      variant = 'active',
       sortOrder = desc,
       sortProperty,
     } = queryParams
@@ -69,13 +63,12 @@ const eventQueries = {
 
     const select = getSelectQuery(variant, user)
     const sort = getSortQuery(sortProperty, sortOrder)
-    const skip = pageInt * pageSizeInt
+    const skip = Math.max(pageInt - 1, 0) * pageSizeInt
 
     return await CollectionPointModel.find(select)
       .sort(sort)
       .skip(skip)
       .limit(pageSizeInt)
-      .populate('waste')
   },
 }
 export default eventQueries

@@ -57,11 +57,6 @@ export const eventActions: AdActions = {
   remove: 'remove',
 }
 
-export const eventVariants: Record<Variant, Variant> = {
-  active: 'active',
-  inactive: 'inactive',
-}
-
 export const validSortOrder: Record<SortOrder, SortOrder> = {
   asc: 'asc',
   desc: 'desc',

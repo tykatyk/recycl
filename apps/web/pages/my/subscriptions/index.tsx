@@ -15,7 +15,9 @@ import { useEffect, useMemo, useState } from 'react'
 import type { SubscriptionVariant } from '@recycl/shared/dist/server/db/models/subscriptionVariant'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import { subscriptionConfig } from '../../../lib/helpers/subscription'
-import HeadingWithDescription from '../../../components/uiParts/HeadingWithDescription'
+import HeadingWithDescription, {
+  HeadingDetails,
+} from '../../../components/uiParts/HeadingWithDescription'
 
 const loadingErrorText = 'Ошибка при загрузке данных'
 const updatingErrorMessage = 'Ошибка при обновлении данных'
@@ -133,7 +135,11 @@ export default function MySubscriptions() {
       >
         <Grid size={{ xs: 12 }}>
           <HeadingWithDescription
-            detailedDescription={subscriptionConfig[sub.name].description}
+            detailedDescription={
+              <HeadingDetails
+                details={subscriptionConfig[sub.name].description}
+              />
+            }
           >
             <Typography>{subscriptionConfig[sub.name].title}</Typography>
           </HeadingWithDescription>

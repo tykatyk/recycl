@@ -12,7 +12,7 @@ const collectionPointSchema = new Schema(
       required: true,
     },
     location: { type: locationSchema, required: true },
-    waste: {
+    wasteTypes: {
       type: [String],
       required: true,
     },

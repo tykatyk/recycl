@@ -18,7 +18,9 @@ import Cookies from 'js-cookie'
 import Layout from '../../../../components/layouts/Layout'
 import ScrollTopButton from '../../../../components/uiParts/ScrollToTopButton'
 import NoRows from '../../../../components/uiParts/NoRows'
-import HeadingWithDescription from '../../../../components/uiParts/HeadingWithDescription'
+import HeadingWithDescription, {
+  HeadingDetails,
+} from '../../../../components/uiParts/HeadingWithDescription'
 import DataGridFooter from '../../../../components/uiParts/DataGridFooter'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
@@ -102,7 +104,11 @@ const NoData = () => {
 const Header = () => {
   return (
     <HeadingWithDescription
-      detailedDescription={subscriptionConfig.wasteAvailable.description}
+      detailedDescription={
+        <HeadingDetails
+          details={subscriptionConfig.wasteAvailable.description}
+        />
+      }
     >
       <Typography
         component="h1"

@@ -54,7 +54,7 @@ async function collectionPointHandler(
     await dbConnect()
 
     const collectionPoint = req.body
-    await collectionPointSchema.validate(event, {
+    await collectionPointSchema.validate(collectionPoint, {
       abortEarly: false,
     })
 
@@ -88,7 +88,7 @@ async function collectionPointHandler(
     try {
       await CollectionPointContainerModel.updateOne(
         { _id: id, user: userId },
-        event,
+        collectionPoint,
       )
     } catch (e) {
       console.log(e)

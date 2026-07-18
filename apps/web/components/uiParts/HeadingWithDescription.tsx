@@ -3,7 +3,7 @@ import HelpIcon from '@mui/icons-material/Help'
 
 import { useState } from 'react'
 
-const SubscriptionDetails = (props: { details: string }) => {
+export const HeadingDetails = (props: { details: string }) => {
   const { details } = props
 
   return (
@@ -46,7 +46,7 @@ const HeadingWithDescription = ({ children, detailedDescription }) => {
       >
         {children}
 
-        <Tooltip title="Подробнее об этой подписке">
+        <Tooltip title="Подробнее об этом">
           <IconButton
             onClick={() => {
               setShowDetails(!showDetails)
@@ -56,9 +56,7 @@ const HeadingWithDescription = ({ children, detailedDescription }) => {
           </IconButton>
         </Tooltip>
       </Box>
-      {showDetails ? (
-        <SubscriptionDetails details={detailedDescription} />
-      ) : null}
+      {showDetails ? detailedDescription : null}
     </Box>
   )
 }

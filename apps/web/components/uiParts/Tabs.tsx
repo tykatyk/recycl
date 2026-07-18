@@ -59,15 +59,19 @@ export default function AdTabs(props: AdTabProps) {
           onChange={handleChange}
           aria-label="Предложения о вывозе отходов"
         >
-          <Tab value="active" label="Активные" {...a11yProps(0)} />
-          <Tab value="inactive" label="Неактивные" {...a11yProps(1)} />
+          <Tab value="container" label="Контейнеры" {...a11yProps(0)} />
+          <Tab value="mobile" label="Передвижные" {...a11yProps(1)} />
+          <Tab value="stationery" label="Стационарные" {...a11yProps(2)} />
         </Tabs>
       </Box>
 
-      <TabPanel value={value} index={'active'}>
+      <TabPanel value={value} index={'container'}>
         {children}
       </TabPanel>
-      <TabPanel value={value} index={'inactive'}>
+      <TabPanel value={value} index={'mobile'}>
+        {children}
+      </TabPanel>
+      <TabPanel value={value} index={'stationery'}>
         {children}
       </TabPanel>
     </Box>

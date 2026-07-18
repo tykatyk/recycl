@@ -1,12 +1,10 @@
 import type { PlaceType } from './placeAutocomplete'
 import type { Waste } from './waste'
 
-type CollectionPointVariant = 'stationery' | 'mobile' | 'container'
-
 export interface CollectionPointBase {
   user: string
   location: PlaceType
-  waste: string[]
+  wasteTypes: string[]
   viewCount: number
   phone: string
   comment?: string

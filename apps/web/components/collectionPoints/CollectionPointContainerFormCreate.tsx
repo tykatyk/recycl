@@ -18,11 +18,12 @@ import {
 } from '../uiParts/CollectionPointComponents'
 import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
+import { collectionPointTypes } from '@recycl/shared/dist/constants'
 
 const errorMessage = 'Ошибка при сохранении документа'
 const api = '/api/collection-points'
 const createRoute = `${api}/create`
-const indexRoute = '/my/collection-points/container'
+const indexRoute = '/my/collection-points'
 
 export default function CollectionPointContainerForm() {
   const router = useRouter()
@@ -71,7 +72,7 @@ export default function CollectionPointContainerForm() {
     initialValues: {
       user: '',
       location: null as any,
-      waste: [],
+      wasteTypes: [],
       phone: userPhone || '',
       comment: '',
       variant: 'container' as const,
@@ -120,7 +121,7 @@ export default function CollectionPointContainerForm() {
   return (
     <Box>
       <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
-        Добавить пункт приема вторсырья
+        Добавить сортировочный контейнер для приема вторсырья
       </Typography>
       <form onSubmit={formik.handleSubmit}>
         <Grid
@@ -134,16 +135,6 @@ export default function CollectionPointContainerForm() {
             border: 'none',
           }}
         >
-          <Grid size={{ xs: 12 }}>
-            <TextField
-              label="Тип пункта приема вторсырья"
-              disabled={true}
-              value={'Контейнер'}
-              fullWidth
-              name="collectionPointType"
-              variant="outlined"
-            />
-          </Grid>
           <PlaceAutocompleteField
             collectionPointType={'container'}
             formik={formik}
