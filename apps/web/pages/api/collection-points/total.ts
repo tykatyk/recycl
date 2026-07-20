@@ -1,15 +1,12 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import {
-  dbConnect,
-  WasteRemovalEventModel as Event,
-} from '@recycl/shared/dist/server/db'
+import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
 import type { Variant } from '../../../lib/types/pagination'
-import { eventVariants } from '../../../lib/helpers/eventHelpers'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
-const { active } = eventVariants
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
+const { active } = documentActivityStatus
 
 interface CountQuery {
   user: string
@@ -23,7 +20,10 @@ const getCountQuery = (variant: Variant, user: string): CountQuery => {
   return countQuery
 }
 
-async function countTotalEvents(req: NextApiRequest, res: NextApiResponse) {
+async function countTotalCollectionPoints(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
@@ -37,8 +37,8 @@ async function countTotalEvents(req: NextApiRequest, res: NextApiResponse) {
   const countAll = getCountQuery(variant as Variant, session.id)
 
   await dbConnect()
-  const total = await Event.countDocuments(countAll)
+  const total = await CollectionPointModel.countDocuments(countAll)
   return res.json(total)
 }
 
-export default apiHandler(countTotalEvents)
+export default apiHandler(countTotalCollectionPoints)

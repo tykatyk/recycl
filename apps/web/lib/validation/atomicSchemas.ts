@@ -36,7 +36,9 @@ export const userLocation = yup.object().shape({
 
 export const paginationPageNumberSchema = yup
   .number()
-  .transform((value) => (value === '' || isNaN(value) ? undefined : value))
+  .transform((value) =>
+    value === '' || isNaN(value) ? undefined : Math.max(value, 1),
+  )
   .integer()
   .min(1)
   .default(1)

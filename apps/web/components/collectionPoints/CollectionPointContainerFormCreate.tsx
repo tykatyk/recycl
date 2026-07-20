@@ -22,7 +22,6 @@ import { collectionPointTypes } from '@recycl/shared/dist/constants'
 
 const errorMessage = 'Ошибка при сохранении документа'
 const api = '/api/collection-points'
-const createRoute = `${api}/create`
 const indexRoute = '/my/collection-points'
 
 export default function CollectionPointContainerForm() {
@@ -42,7 +41,7 @@ export default function CollectionPointContainerForm() {
 
       const normalizedValues = getNormalizedValues(values)
 
-      fetch(createRoute, {
+      fetch(api, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(normalizedValues),

@@ -45,7 +45,7 @@ const baseUrl = '/my/collection-points'
 const stationeryCollectionPointsRoute = `${baseUrl}/stationery`
 const mobileCollectionPointsRoute = `${baseUrl}/mobile`
 
-const createSubscriptionUrl = `${baseUrl}/create`
+const createUrl = `${baseUrl}/create`
 
 const noDataHeaderText = 'Еще нет ни одной подписки'
 const noDataHelperText =
@@ -109,7 +109,7 @@ const NoData = () => {
       <Typography sx={{ mb: 4 }} align="center">
         {noDataHelperText}
       </Typography>
-      <Button variant="contained" href={createSubscriptionUrl}>
+      <Button variant="contained" href={createUrl}>
         {addItemButtonText}
       </Button>
     </Box>
@@ -213,11 +213,7 @@ const ActionsBar = (props: ActionsBarProps) => {
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', pr: 2, pl: 2 }}>
-              <Button
-                size="small"
-                variant="outlined"
-                href={createSubscriptionUrl}
-              >
+              <Button size="small" variant="outlined" href={createUrl}>
                 {addItemButtonText}
               </Button>
             </Box>
@@ -251,9 +247,9 @@ const MyCollectionPointsList = () => {
 
   const handleDelete = async (id: string) => {
     setStatus('deleting')
-    const response = await fetch('/api/subscriptions/waste-available', {
+    const response = await fetch(apiUrl, {
       method: 'DELETE',
-      body: JSON.stringify({ documentId: id }),
+      body: JSON.stringify({ documentIds: [id] }),
       headers: {
         'Content-Type': 'application/json',
       },
