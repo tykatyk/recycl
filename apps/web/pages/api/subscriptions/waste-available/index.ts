@@ -96,12 +96,20 @@ async function wasteAvailableSubscriptionApiHandler(
     }
 
     case 'DELETE': {
-      const { documentId } = req.body
-      if (!Types.ObjectId.isValid(documentId)) return res.status(400)
+      const { documentIds } = req.body
+      if (!Array.isArray(documentIds) || !(documentIds.length > 0)) {
+        res
+          .status(400)
+          .json({ error: `Expected an array of ids but got ${documentIds}` })
+        return
+      }
 
-      const data =
-        await WasteAvailableSubscriptionModel.findByIdAndDelete(documentId)
-      if (!data) return res.status(404).end()
+      const result = await WasteAvailableSubscriptionModel.deleteMany({
+        user: session.id,
+        _id: { $in: documentIds },
+      })
+      const deletedCount = result.deletedCount
+      console.log(`${deletedCount} ads successfully deleted`)
       return res.status(204).end()
     }
 

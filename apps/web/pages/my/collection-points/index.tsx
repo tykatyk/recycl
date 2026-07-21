@@ -10,10 +10,11 @@ import {
   Modal,
   PaginationItem,
   Checkbox,
+  CircularProgress,
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import router, { useRouter } from 'next/router'
-import { useEffect, useState, useRef, RefObject } from 'react'
+import { useEffect, useState, useRef, RefObject, useLayoutEffect } from 'react'
 import Cookies from 'js-cookie'
 import Layout from '../../../components/layouts/Layout'
 import ScrollTopButton from '../../../components/uiParts/ScrollToTopButton'
@@ -23,20 +24,17 @@ import DataGridFooter from '../../../components/uiParts/DataGridFooter'
 import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../../../components/uiParts/PageLoadingCircle'
 import ErrorComponet from '../../../components/uiParts/Error'
-import { subscriptionConfig } from '../../../lib/helpers/subscription'
 import {
   getValidPageNumber,
   getValidPageSize,
 } from '../../../lib/helpers/pagination'
-import type { HrefOptions, Variant } from '../../../lib/types/pagination'
-import { WasteAvailableSubscription } from '@recycl/shared/dist/server/db/models/wasteAvailableSubsciption'
+import type { HrefOptions } from '../../../lib/types/pagination'
 import type { PaginatedData } from '../../../lib/types/pagination'
 import type { CollectionPointContainer } from '../../../lib/types/collectionPoint'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import AdTabs from '../../../components/uiParts/Tabs'
-// import { documentActivityStatus } from '@recycl/shared/dist/constants'
 import { CollectionPointsDescription } from '../../../components/uiParts/CollectionPointComponents'
 
 const title = 'Мои пункты приема вторсырья'
@@ -47,9 +45,8 @@ const mobileCollectionPointsRoute = `${baseUrl}/mobile`
 
 const createUrl = `${baseUrl}/create`
 
-const noDataHeaderText = 'Еще нет ни одной подписки'
-const noDataHelperText =
-  'Укажите типы вторсырья, которые вас интересуют и добавьте регион поиска'
+const noDataHeaderText = 'Ничего нет'
+const noDataHelperText = 'Вы можете добавить пункт приема вторсырья'
 const addItemButtonText = 'Добавить'
 const editButtonText = 'Редактировать'
 const deleteButtonText = 'Удалить'
@@ -75,20 +72,21 @@ const handleVariantChange = (
   }
 }
 
-const renderItem = (item: PaginationRenderItemParams) => {
-  return <PaginationItem {...item} />
-}
-
 const DeletingModal = (params: { open: boolean }) => {
   const { open } = params
 
   return (
-    <Modal
-      open={open}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <PageLoadingCircle />
+    <Modal open={open}>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <CircularProgress size={40} color="warning" />
+      </Box>
     </Modal>
   )
 }
@@ -124,7 +122,6 @@ const Header = () => {
       <Typography
         component="h1"
         variant="h4"
-        // align="center"
         sx={{ mt: 2, mb: 3, width: '100%' }}
       >
         {title}
@@ -136,13 +133,20 @@ type ActionsBarProps = {
   actionsBarRef: RefObject<HTMLDivElement | null>
   isSticky: boolean
   handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
+  handleDeleteMany: () => Promise<void>
   selectedCount: number
   total: number
 }
 
 const ActionsBar = (props: ActionsBarProps) => {
-  const { actionsBarRef, isSticky, handleSelectAll, selectedCount, total } =
-    props
+  const {
+    actionsBarRef,
+    isSticky,
+    handleSelectAll,
+    handleDeleteMany,
+    selectedCount,
+    total,
+  } = props
   const selectAllRowsLabel = {
     slotProps: {
       input: { 'aria-label': 'Выбрать все строки' },
@@ -206,6 +210,7 @@ const ActionsBar = (props: ActionsBarProps) => {
                   size="small"
                   disabled={selectedCount === 0}
                   color="secondary"
+                  onClick={handleDeleteMany}
                 >
                   Удалить выбранные
                 </Button>
@@ -233,7 +238,6 @@ const MyCollectionPointsList = () => {
   const query = router.query
   const [selected, setSelected] = useState<string[]>([])
   const [isSticky, setIsSticky] = useState(false)
-  const [variant, setVariant] = useState('container')
   const actionsBarRef = useRef<HTMLDivElement>(null)
   const firstItemRef = useRef<HTMLDivElement>(null)
   const scrollPosRef = useRef<number>(0)
@@ -245,11 +249,11 @@ const MyCollectionPointsList = () => {
     },
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (documentIds: string[]) => {
     setStatus('deleting')
     const response = await fetch(apiUrl, {
       method: 'DELETE',
-      body: JSON.stringify({ documentIds: [id] }),
+      body: JSON.stringify({ documentIds }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -260,7 +264,12 @@ const MyCollectionPointsList = () => {
     }
     setStatus('')
     enqueueSnackbar('Элемент удален', { variant: 'success' })
-    fetchData()
+    await fetchData()
+  }
+
+  const deleteMany = async () => {
+    await handleDelete(selected)
+    setSelected([])
   }
 
   const handleSelect = (id: string) => {
@@ -322,7 +331,7 @@ const MyCollectionPointsList = () => {
       const total = data.pagination.total
       const skip = (page - 1) * pageSize
 
-      if (skip >= total) {
+      if (skip && skip >= total) {
         const lastPage = Math.ceil(total / pageSize)
         const href = getHref({ page: lastPage, pageSize })
 
@@ -368,17 +377,25 @@ const MyCollectionPointsList = () => {
     }
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!actionsBarRef.current) return
 
-    const actionsBar = actionsBarRef.current
-    const parent = actionsBar.parentElement
+    const node = actionsBarRef.current
+    const parent = node.parentElement
 
     if (!parent) return
 
-    const minHeight = actionsBar.offsetHeight
-    parent.style.minHeight = `${minHeight}px`
-  }, [actionsBarRef.current])
+    const updateHeight = () => {
+      parent.style.minHeight = `${node.offsetHeight}px`
+    }
+
+    updateHeight()
+
+    const observer = new ResizeObserver(updateHeight)
+    observer.observe(node)
+
+    return () => observer.disconnect()
+  }, [])
 
   if (status === 'error') return <ErrorComponet />
 
@@ -420,6 +437,7 @@ const MyCollectionPointsList = () => {
                 actionsBarRef={actionsBarRef}
                 isSticky={isSticky}
                 handleSelectAll={handleSelectAll}
+                handleDeleteMany={deleteMany}
                 selectedCount={selected.length}
                 total={Math.min(data.pagination.pageSize, data.items.length)}
               />
@@ -463,19 +481,26 @@ const MyCollectionPointsList = () => {
                             </Typography>
                           </Box>
                           <Box sx={{ pb: 2 }}>
-                            <Typography component={'span'} variant="body2">
-                              {'Тип пункта приема вторсырья: '}
-                            </Typography>
                             <Typography
                               component={'span'}
                               sx={{ color: 'grey.400', fontWeight: 'light' }}
                               variant="body2"
                             >
+                              {'Тип пункта приема вторсырья: '}
+                            </Typography>
+                            <Typography component={'span'} variant="body2">
                               {collectionPointTypes[item.variant].toLowerCase()}
                             </Typography>
                           </Box>
                           <Box sx={{ pb: 2 }}>
-                            <Typography variant="body2" sx={{ pb: 1 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                pb: 1,
+                                color: 'grey.400',
+                                fontWeight: 'light',
+                              }}
+                            >
                               Виды вторсырья, которые принимаются:
                             </Typography>
                             <Stack direction="row" spacing={1}>
@@ -504,7 +529,7 @@ const MyCollectionPointsList = () => {
                                 color="secondary"
                                 startIcon={<DeleteIcon />}
                                 onClick={async (_) => {
-                                  await handleDelete(item._id)
+                                  await handleDelete([item._id])
                                 }}
                               >
                                 {deleteButtonText}
@@ -549,7 +574,9 @@ const MyCollectionPointsList = () => {
 
             router.push(href)
           }}
-          renderItem={renderItem}
+          renderItem={(item: PaginationRenderItemParams) => {
+            return <PaginationItem {...item} />
+          }}
         />
       </Box>
     )

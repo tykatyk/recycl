@@ -10,10 +10,11 @@ import {
   Modal,
   PaginationItem,
   Checkbox,
+  CircularProgress,
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import { useRouter } from 'next/router'
-import { useEffect, useState, useRef, RefObject } from 'react'
+import { useEffect, useState, useRef, RefObject, useLayoutEffect } from 'react'
 import Cookies from 'js-cookie'
 import Layout from '../../../../components/layouts/Layout'
 import ScrollTopButton from '../../../../components/uiParts/ScrollToTopButton'
@@ -68,12 +69,17 @@ const DeletingModal = (params: { open: boolean }) => {
   const { open } = params
 
   return (
-    <Modal
-      open={open}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <PageLoadingCircle />
+    <Modal open={open}>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <CircularProgress size={40} color="warning" />
+      </Box>
     </Modal>
   )
 }
@@ -125,13 +131,20 @@ type ActionsBarProps = {
   actionsBarRef: RefObject<HTMLDivElement | null>
   isSticky: boolean
   handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
+  handleDeleteMany: () => Promise<void>
   selectedCount: number
   total: number
 }
 
 const ActionsBar = (props: ActionsBarProps) => {
-  const { actionsBarRef, isSticky, handleSelectAll, selectedCount, total } =
-    props
+  const {
+    actionsBarRef,
+    isSticky,
+    handleSelectAll,
+    handleDeleteMany,
+    selectedCount,
+    total,
+  } = props
   const selectAllRowsLabel = {
     slotProps: {
       input: { 'aria-label': 'Выбрать все строки' },
@@ -195,6 +208,7 @@ const ActionsBar = (props: ActionsBarProps) => {
                   size="small"
                   disabled={selectedCount === 0}
                   color="secondary"
+                  onClick={handleDeleteMany}
                 >
                   Удалить выбранные
                 </Button>
@@ -237,11 +251,11 @@ const SubscriptionList = () => {
     },
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (documentIds: string[]) => {
     setStatus('deleting')
     const response = await fetch('/api/subscriptions/waste-available', {
       method: 'DELETE',
-      body: JSON.stringify({ documentId: id }),
+      body: JSON.stringify({ documentIds }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -253,6 +267,11 @@ const SubscriptionList = () => {
     setStatus('')
     enqueueSnackbar('Элемент удален', { variant: 'success' })
     fetchData()
+  }
+
+  const deleteMany = async () => {
+    await handleDelete(selected)
+    setSelected([])
   }
 
   const handleSelect = (id: string) => {
@@ -314,7 +333,7 @@ const SubscriptionList = () => {
       const total = data.pagination.total
       const skip = (page - 1) * pageSize
 
-      if (skip >= total) {
+      if (skip && skip >= total) {
         const lastPage = Math.ceil(total / pageSize)
         const href = getHref({ page: lastPage, pageSize })
 
@@ -360,17 +379,25 @@ const SubscriptionList = () => {
     }
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!actionsBarRef.current) return
 
-    const actionsBar = actionsBarRef.current
-    const parent = actionsBar.parentElement
+    const node = actionsBarRef.current
+    const parent = node.parentElement
 
     if (!parent) return
 
-    const minHeight = actionsBar.offsetHeight
-    parent.style.minHeight = `${minHeight}px`
-  }, [actionsBarRef.current])
+    const updateHeight = () => {
+      parent.style.minHeight = `${node.offsetHeight}px`
+    }
+
+    updateHeight()
+
+    const observer = new ResizeObserver(updateHeight)
+    observer.observe(node)
+
+    return () => observer.disconnect()
+  }, [])
 
   if (status === 'error') return <ErrorComponet />
 
@@ -411,6 +438,7 @@ const SubscriptionList = () => {
               actionsBarRef={actionsBarRef}
               isSticky={isSticky}
               handleSelectAll={handleSelectAll}
+              handleDeleteMany={deleteMany}
               selectedCount={selected.length}
               total={Math.min(data.pagination.pageSize, data.items.length)}
             />
@@ -485,7 +513,7 @@ const SubscriptionList = () => {
                               color="secondary"
                               startIcon={<DeleteIcon />}
                               onClick={async (_) => {
-                                await handleDelete(item._id)
+                                await handleDelete([item._id])
                               }}
                             >
                               {deleteButtonText}
