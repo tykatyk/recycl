@@ -5,7 +5,7 @@ import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnat
 import MyCollectionPointsList from '../../../components/collectionPoints/MyCollectionPointsList'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const h1 = 'Мои контейнеры для приема вторсырья'
+const h1 = 'Мои стационарные пункты приема вторсырья'
 const title = `${h1} | ${brand}`
 
 export default function MyCollectionPoints() {
@@ -21,7 +21,7 @@ export default function MyCollectionPoints() {
             alignItems: 'center',
           }}
         >
-          <MyCollectionPointsList variant="container" h1={h1} />
+          <MyCollectionPointsList variant="stationery" h1={h1} />
           <ScrollTopButton />
         </Box>
       </RedirectUnathenticatedUser>

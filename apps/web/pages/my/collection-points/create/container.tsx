@@ -1,14 +1,16 @@
 import Layout from '../../../../components/layouts/Layout'
-import CollectionPointContainerFormCreate from '../../../../components/collectionPoints/CollectionPointContainerFormCreate'
+import CollectionPointFormCreate from '../../../../components/collectionPoints/CollectionPointFormCreate'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 
 export default function CreateContainerCollectionPoint() {
-  const title = 'Добавить контейнер сбора вторсырья | Recycl'
+  const brand = process.env.NEXT_PUBLIC_BRAND || ''
+  const h1 = 'Добавить контейнер сбора вторсырья '
+  const title = `${h1} | ${brand}`
 
   return (
     <RedirectUnathenticatedUser>
       <Layout title={title}>
-        <CollectionPointContainerFormCreate />
+        <CollectionPointFormCreate variant={'container'} h1={h1} />
       </Layout>
     </RedirectUnathenticatedUser>
   )

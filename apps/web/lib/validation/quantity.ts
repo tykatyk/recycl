@@ -43,6 +43,9 @@ export default yup.object().shape(
         then: (schema) => {
           return schema.max(yup.ref('max'), 'Мин. больше макс.')
         },
+        otherwise: (schema) => {
+          return schema.optional()
+        },
       })
       .nullable()
       .transform((v, o) => (o === '' ? null : v)),

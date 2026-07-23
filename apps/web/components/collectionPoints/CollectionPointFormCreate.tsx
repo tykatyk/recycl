@@ -2,12 +2,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { FormikHelpers, useFormik } from 'formik'
 import { getNormalizedValues } from '../../lib/helpers/eventHelpers'
 import { collectionPointSchema } from '../../lib/validation'
-import type {
-  CollectionPoint,
-  CollectionPointContainer,
-} from '../../lib/types/collectionPoint'
+import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import { useRouter } from 'next/router'
-import { Box, Grid, TextField, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@mui/material'
 import 'dayjs/locale/ru'
 import {
   PhoneField,
@@ -15,6 +12,7 @@ import {
   CommentField,
   SubmitButton,
   PlaceAutocompleteField,
+  DateField,
 } from '../uiParts/CollectionPointComponents'
 import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
@@ -24,7 +22,14 @@ const errorMessage = 'Ошибка при сохранении документ�
 const api = '/api/collection-points'
 const indexRoute = '/my/collection-points'
 
-export default function CollectionPointContainerForm() {
+type CollectionPointFormProps = {
+  variant: keyof typeof collectionPointTypes
+  h1: string
+}
+export default function CollectionPointFormCreate(
+  props: CollectionPointFormProps,
+) {
+  const { variant = 'container', h1 } = props
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -54,7 +59,13 @@ export default function CollectionPointContainerForm() {
             enqueueSnackbar(errorMessage, { variant: 'error' })
           } else if (data.message) {
             resetForm()
-            router.push(indexRoute)
+            const route =
+              variant === 'mobile'
+                ? `${indexRoute}/mobile`
+                : variant === 'stationery'
+                  ? `${indexRoute}/stationery`
+                  : indexRoute
+            router.push(route)
           }
         })
         .catch((error) => {
@@ -68,19 +79,31 @@ export default function CollectionPointContainerForm() {
   )
 
   const formik = useFormik({
-    initialValues: {
-      user: '',
-      location: null as any,
-      wasteTypes: [],
-      phone: userPhone || '',
-      comment: '',
-      variant: 'container' as const,
-      viewCount: 0,
-    },
+    initialValues:
+      variant === 'mobile'
+        ? {
+            user: '',
+            location: null as any,
+            wasteTypes: [],
+            phone: userPhone,
+            comment: '',
+            variant,
+            viewCount: 0,
+            date: null as any,
+          }
+        : {
+            user: '',
+            location: null as any,
+            wasteTypes: [],
+            phone: userPhone,
+            comment: '',
+            variant,
+            viewCount: 0,
+          },
     validationSchema: collectionPointSchema,
     onSubmit: (
-      values: CollectionPointContainer,
-      actions: FormikHelpers<CollectionPointContainer>,
+      values: CollectionPoint,
+      actions: FormikHelpers<CollectionPoint>,
     ) => {
       createHandler(values, actions)
     },
@@ -120,7 +143,7 @@ export default function CollectionPointContainerForm() {
   return (
     <Box>
       <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
-        Добавить сортировочный контейнер для приема вторсырья
+        {h1}
       </Typography>
       <form onSubmit={formik.handleSubmit}>
         <Grid
@@ -135,9 +158,10 @@ export default function CollectionPointContainerForm() {
           }}
         >
           <PlaceAutocompleteField
-            collectionPointType={'container'}
+            collectionPointType={variant}
             formik={formik}
           />
+          {variant === 'mobile' && <DateField formik={formik} />}
           <WasteTypeField wasteTypes={wasteTypes} formik={formik} />
           <PhoneField formik={formik} />
           <CommentField formik={formik} />

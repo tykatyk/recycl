@@ -1,23 +1,12 @@
 import { CollectionPointModel } from '@recycl/shared/dist/server/db'
-import { validSortOrder, validOrderBy } from '../../helpers/eventHelpers'
+import { validSortOrder, validOrderBy } from '../eventHelpers'
 import type {
-  Variant,
   SortOrder,
   OrderBy,
   PaginationOptions,
 } from '../../types/pagination'
+import { collectionPointTypes } from '@recycl/shared/dist/constants'
 const { asc, desc } = validSortOrder
-
-interface SelectQuery {
-  user: string
-  status: Variant
-}
-
-const getSelectQuery = (variant: Variant, user: string): SelectQuery => {
-  const selectQuery = { user, status: variant }
-
-  return selectQuery
-}
 
 type SortOption = -1 | 1
 
@@ -43,15 +32,17 @@ const getSortQuery = (
   return sortQuery
 }
 
-const eventQueries = {
+const collectionPointsQueries = {
   getAll: async (
-    queryParams: PaginationOptions & { variant: Variant },
+    queryParams: PaginationOptions & {
+      variant: keyof typeof collectionPointTypes
+    },
     user: string,
   ) => {
     const {
       page = 0,
       pageSize = 0,
-      variant = 'active',
+      variant,
       sortOrder = desc,
       sortProperty,
     } = queryParams
@@ -61,14 +52,13 @@ const eventQueries = {
 
     if (!user || !variant) return []
 
-    const select = getSelectQuery(variant, user)
     const sort = getSortQuery(sortProperty, sortOrder)
     const skip = Math.max(pageInt - 1, 0) * pageSizeInt
 
-    return await CollectionPointModel.find(select)
+    return await CollectionPointModel.find({ user, variant })
       .sort(sort)
       .skip(skip)
       .limit(pageSizeInt)
   },
 }
-export default eventQueries
+export default collectionPointsQueries

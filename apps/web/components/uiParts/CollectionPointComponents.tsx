@@ -30,7 +30,7 @@ export function DateField({ formik }) {
               helperText:
                 (formik.touched.date && formik.errors.date) ||
                 '*Обязательное поле',
-              onBlur: () => formik.setFieldTouched('startDate', true),
+              onBlur: () => formik.setFieldTouched('date', true),
             },
           }}
           label="Дата и время начала приема вторсырья"
@@ -38,9 +38,6 @@ export function DateField({ formik }) {
           value={formik.values.date}
           onChange={(value) => {
             formik.setFieldValue('date', value)
-          }}
-          onAccept={() => {
-            formik.setFieldTouched('date', true)
           }}
         />
       </LocalizationProvider>

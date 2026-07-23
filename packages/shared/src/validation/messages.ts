@@ -10,7 +10,7 @@ export const validationMessages = {
   phone: 'Недействительный номер телефона',
   notOnlySpaces: 'Строка не может состоять только из пробелов',
   incorrectValue: 'Значение указано не верно',
-  dateIsSameOrAfter: 'Нельзя выбирать прошедшие даты',
+  dateIsSameOrAfter: 'Дата/время меньше текущих',
   dateIsOneYearAfterNow: 'Нелязя выбирать даты в далеком будущем',
   timeisNotOverdue: 'Это время уже прошло',
   endTimeIsGreaterThanStartTime: 'Значение не может быть меньше времени начала',

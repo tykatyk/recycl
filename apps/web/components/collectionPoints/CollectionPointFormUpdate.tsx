@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FormikHelpers, useFormik } from 'formik'
 import { collectionPointSchema } from '../../lib/validation'
 import type {
+  CollectionPoint,
   CollectionPointBase,
   CollectionPointContainer,
 } from '../../lib/types/collectionPoint'
@@ -14,15 +15,25 @@ import {
   CommentField,
   SubmitButton,
   PlaceAutocompleteField,
+  DateField,
 } from '../uiParts/CollectionPointComponents'
 import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
+import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import dayjs from 'dayjs'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 const api = '/api/collection-points'
 const indexRoute = '/my/collection-points'
 
-export default function CollectionPointContainerForm() {
+type CollectionPointFormProps = {
+  variant: keyof typeof collectionPointTypes
+  h1: string
+}
+export default function CollectionPointFormUpdate(
+  props: CollectionPointFormProps,
+) {
+  const { variant = 'container', h1 } = props
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -30,14 +41,21 @@ export default function CollectionPointContainerForm() {
   const { id } = router.query
 
   const { enqueueSnackbar } = useSnackbar()
-  const [initialValues, setInitialValues] = useState<CollectionPointContainer>({
-    user: '',
-    location: null as any,
-    wasteTypes: [],
-    phone: '',
-    comment: '',
-    variant: 'container' as const,
-    viewCount: 0,
+
+  const [initialValues, setInitialValues] = useState<CollectionPoint>(() => {
+    const initVal = {
+      user: '',
+      location: null as any,
+      wasteTypes: [],
+      phone: '',
+      comment: '',
+      variant: 'container' as const,
+      viewCount: 0,
+    }
+    if (variant === 'mobile') {
+      initVal['date'] = null
+    }
+    return initVal
   })
 
   useEffect(() => {
@@ -57,15 +75,32 @@ export default function CollectionPointContainerForm() {
       const result = await fetch(`/api/collection-points/${id}`)
       const collectionPoint = await result.json()
 
-      setInitialValues({
-        user: collectionPoint.user,
-        location: collectionPoint.location,
-        wasteTypes: collectionPoint.wasteTypes,
-        phone: collectionPoint.phone,
-        comment: collectionPoint.comment,
-        variant: collectionPoint.variant,
-        viewCount: collectionPoint.viewCount,
-      })
+      const {
+        user,
+        location,
+        wasteTypes,
+        phone,
+        comment,
+        variant,
+        viewCount,
+        date,
+      } = collectionPoint
+
+      const initialValues = {
+        user,
+        location,
+        wasteTypes,
+        phone,
+        comment,
+        variant,
+        viewCount,
+      }
+
+      if (variant === 'mobile') {
+        initialValues['date'] = dayjs(date)
+      }
+
+      setInitialValues(initialValues)
     }
     const dataFetcher = async () => {
       try {
@@ -122,7 +157,13 @@ export default function CollectionPointContainerForm() {
         if (data.error) {
           enqueueSnackbar(errorMessage, { variant: 'error' })
         } else if (data.message) {
-          router.push(indexRoute)
+          const route =
+            variant === 'mobile'
+              ? `${indexRoute}/mobile`
+              : variant === 'stationery'
+                ? `${indexRoute}/stationery`
+                : indexRoute
+          router.push(route)
         }
       })
       .catch((error) => {
@@ -136,7 +177,8 @@ export default function CollectionPointContainerForm() {
   return (
     <Box>
       <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
-        Редактировать контейнер приема вторсырья
+        {/* Редактировать контейнер приема вторсырья */}
+        {h1}
       </Typography>
 
       <form onSubmit={formik.handleSubmit}>
@@ -151,20 +193,11 @@ export default function CollectionPointContainerForm() {
             border: 'none',
           }}
         >
-          <Grid size={{ xs: 12 }}>
-            <TextField
-              label="Тип пункта приема вторсырья"
-              disabled={true}
-              value={'Контейнер'}
-              fullWidth
-              name="collectionPointType"
-              variant="outlined"
-            />
-          </Grid>
           <PlaceAutocompleteField
-            collectionPointType={'container'}
+            collectionPointType={variant}
             formik={formik}
           />
+          {variant === 'mobile' && <DateField formik={formik} />}
           <WasteTypeField wasteTypes={wasteTypes} formik={formik} />
           <PhoneField formik={formik} />
           <CommentField formik={formik} />

@@ -4,13 +4,13 @@ import RedirectUnathenticatedUser from '../../../../../components/uiParts/Redire
 
 export default function CreateContainerCollectionPoint() {
   const brand = process.env.NEXT_PUBLIC_BRAND || ''
-  const h1 = 'Редактировать информацию о контейнере сбора вторсырья'
+  const h1 = 'Редактировать информацию о передвижном пункте сбора вторсырья'
   const title = `${h1} | ${brand}`
 
   return (
     <RedirectUnathenticatedUser>
       <Layout title={title}>
-        <CollectionPointFormUpdate variant="container" h1={h1} />
+        <CollectionPointFormUpdate variant="mobile" h1={h1} />
       </Layout>
     </RedirectUnathenticatedUser>
   )
