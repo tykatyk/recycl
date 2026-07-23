@@ -7,7 +7,7 @@ import CustomSnackbar from '../../../../components/uiParts/Snackbars'
 import SuccessfullUnsubscribe from '../../../../components/subscriptions/SuccsesfulUnsubscribe'
 import TokenNotFound from '../../../../components/subscriptions/TokenNotFound'
 import TokenExpiredOrUsed from '../../../../components/subscriptions/TokenExpiredOrUsed'
-import { unsubscribeApiResponseCodes } from '../../../../lib/helpers/unsubscribeApiResponseCodes'
+import { unsubscribeApiResponseCodes } from '../../../../lib/helpers/responses'
 import { UnsubscribeApiResponse } from '../../../../lib/types/subscription'
 
 const { SUCCESS, NOT_FOUND, TOKEN_USED, TOKEN_EXPIRED } =
@@ -15,7 +15,7 @@ const { SUCCESS, NOT_FOUND, TOKEN_USED, TOKEN_EXPIRED } =
 
 const titleHeading = 'Отписаться от рассылки'
 const errorMessge = 'Ошибка при загрузке данных'
-const unsubscribeRoute = '/api/subscriptions/unsubscribe'
+const unsubscribeRoute = '/api/my/subscriptions/unsubscribe'
 
 const ShowUnsubscibe = ({
   data,

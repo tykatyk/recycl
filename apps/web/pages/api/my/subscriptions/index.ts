@@ -1,9 +1,9 @@
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../auth/[...nextauth]'
+import { authOptions } from '../../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { SubscriptionModel, dbConnect } from '@recycl/shared/dist/server/db/'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription/'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import cryptoRandomString from 'crypto-random-string'
 import * as yup from 'yup'
 

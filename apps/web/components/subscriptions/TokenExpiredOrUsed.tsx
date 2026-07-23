@@ -3,10 +3,10 @@ import { ReactElement, useCallback, useState } from 'react'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import CustomSnackbar from '../uiParts/Snackbars'
 import SuccessfullUnsubscribe from './SuccsesfulUnsubscribe'
-import { unsubscribeApiResponseCodes } from '../../lib/helpers/unsubscribeApiResponseCodes'
+import { unsubscribeApiResponseCodes } from '../../lib/helpers/responses'
 import type { UnsubscribeApiResponse } from '../../lib/types/subscription'
 
-const unsubscribeAPI = '/api/subscriptions/unsubscribe'
+const unsubscribeAPI = '/api/my/subscriptions/unsubscribe'
 
 const errorMessge = 'Ошибка при получении данных'
 const headingText = 'Cрок действия ссылки истек'

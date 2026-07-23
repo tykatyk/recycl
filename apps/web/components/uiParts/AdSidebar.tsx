@@ -1,6 +1,5 @@
 import { Drawer, Box } from '@mui/material'
 import MapActionButton from './MapActionButton'
-import AdSidebarItemsCommon from './AdSidebarItemsCommon'
 
 export default function AdSidebar(props) {
   const { children, drawerWidth, handleDrawerToggle, drawerOpen } = props
@@ -22,7 +21,6 @@ export default function AdSidebar(props) {
         })}
       >
         {children}
-        <AdSidebarItemsCommon />
       </Drawer>
     </Box>
   )

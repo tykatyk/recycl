@@ -35,7 +35,7 @@ import AdTabs from '../../components/uiParts/Tabs'
 import { CollectionPointsDescription } from '../../components/uiParts/CollectionPointComponents'
 import dayjs from 'dayjs'
 
-const apiUrl = '/api/collection-points'
+const apiUrl = '/api/my/collection-points'
 const baseUrl = '/my/collection-points'
 const createUrl = `${baseUrl}/create`
 

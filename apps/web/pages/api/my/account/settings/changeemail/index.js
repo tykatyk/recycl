@@ -1,4 +1,4 @@
-import { loginSchema as changeEmailSchema } from '../../../../../lib/validation'
+import { loginSchema as changeEmailSchema } from '../../../../../../lib/validation'
 import mail from '@sendgrid/mail'
 mail.setApiKey(process.env.SENDGRID_API_KEY)
 import dbConnect from '../../../../../lib/db/connection'
@@ -6,7 +6,7 @@ import { User } from '../../../../../lib/db/models'
 import sendEmail from '../../../../../lib/helpers/sendEmail'
 import { getSession } from 'next-auth/react'
 import { compare } from 'bcrypt'
-import { errorResponse } from '../../../../../lib/helpers/responses'
+import { errorResponse } from '../../../../../../lib/helpers/responses'
 
 const userNotFound = function (res) {
   return res.status(401).json({
@@ -101,7 +101,7 @@ export default async function changeEmailHandler(req, res) {
   }
 
   // send email
-  const actionUrl = `${process.env.NEXT_PUBLIC_URL}myaccount/settings/changeemail/${user.resetEmailToken}`
+  const actionUrl = `${process.env.NEXT_PUBLIC_URL}/my/account/settings/change-email/${user.resetEmailToken}`
   const dynamicTemplateData = {
     name: user.name,
     hostUrl: process.env.NEXT_PUBLIC_URL,

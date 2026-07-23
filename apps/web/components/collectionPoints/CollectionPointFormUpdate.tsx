@@ -23,7 +23,7 @@ import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import dayjs from 'dayjs'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
-const api = '/api/collection-points'
+const api = '/api/my/collection-points'
 const indexRoute = '/my/collection-points'
 
 type CollectionPointFormProps = {
@@ -72,7 +72,7 @@ export default function CollectionPointFormUpdate(
     }
 
     const collectionPointFetcher = async () => {
-      const result = await fetch(`/api/collection-points/${id}`)
+      const result = await fetch(`/api/my/collection-points/${id}`)
       const collectionPoint = await result.json()
 
       const {

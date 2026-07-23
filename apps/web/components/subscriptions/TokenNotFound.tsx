@@ -6,10 +6,10 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import CustomSnackbar from '../uiParts/Snackbars'
 import Link from '../uiParts/Link'
-import { unsubscribeApiResponseCodes } from '../../lib/helpers/unsubscribeApiResponseCodes'
+import { unsubscribeApiResponseCodes } from '../../lib/helpers/responses'
 import type { UnsubscribeApiResponse } from '../../lib/types/subscription'
 
-const unsubscribeAPI = '/api/subscriptions/unsubscribe'
+const unsubscribeAPI = '/api/my/subscriptions/unsubscribe'
 const errorMessge = 'Ошибка при получении данных'
 
 const { SUCCESS, NOT_FOUND } = unsubscribeApiResponseCodes
@@ -100,7 +100,6 @@ export default function TokenNotFound() {
             return (
               <Form>
                 <Grid
-                  item
                   container
                   component="fieldset"
                   sx={{
@@ -116,7 +115,7 @@ export default function TokenNotFound() {
                     border: 'none',
                   }}
                 >
-                  <Grid item xs={12} sx={{ mb: 4 }}>
+                  <Grid sx={{ mb: 4 }}>
                     <Field
                       component={TextFieldFormik}
                       label="Email"
@@ -129,7 +128,7 @@ export default function TokenNotFound() {
                       disabled={isSubmitting}
                     />
                   </Grid>
-                  <Grid display="flex" justifyContent="center" item xs={12}>
+                  <Grid display="flex" justifyContent="center">
                     <Button
                       variant="contained"
                       color="secondary"

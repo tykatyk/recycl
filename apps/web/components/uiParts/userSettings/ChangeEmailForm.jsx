@@ -68,7 +68,7 @@ export default function ChangeEmailForm() {
         onSubmit={async (values, { setSubmitting, setErrors }) => {
           setSubmitting(true)
 
-          await fetch('/api/myaccount/settings/changeemail', {
+          await fetch('/api/my/account/settings/change-email', {
             method: 'POST',
             body: JSON.stringify(values),
             headers: {
@@ -91,7 +91,7 @@ export default function ChangeEmailForm() {
                   return
                 }
                 setNotification(
-                  'Неизвестная ошибка при обработке ответа сервера'
+                  'Неизвестная ошибка при обработке ответа сервера',
                 )
                 return
               } else {

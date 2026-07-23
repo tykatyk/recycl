@@ -1,12 +1,12 @@
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../../api/auth/[...nextauth]'
+import { authOptions } from '../../../api/auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import {
   WasteRemovalSubscriptionModel,
   dbConnect,
 } from '@recycl/shared/dist/server/db'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
-import { wasteRemovalSubscriptionSchema } from '../../../lib/validation'
+import { apiHandler } from '../../../../lib/helpers/errorHelpers'
+import { wasteRemovalSubscriptionSchema } from '../../../../lib/validation'
 
 async function wasteRemovalSubscriptionApiHandler(
   req: NextApiRequest,

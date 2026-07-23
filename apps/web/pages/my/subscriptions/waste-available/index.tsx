@@ -38,7 +38,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 const title = 'Мои подписки на уведомления о появлении вторсырья '
-const apiUrl = '/api/subscriptions/waste-available'
+const apiUrl = '/api/my/subscriptions/waste-available'
 const baseUrl = '/my/subscriptions/waste-available'
 const createSubscriptionUrl = `${baseUrl}/create`
 
@@ -253,7 +253,7 @@ const SubscriptionList = () => {
 
   const handleDelete = async (documentIds: string[]) => {
     setStatus('deleting')
-    const response = await fetch('/api/subscriptions/waste-available', {
+    const response = await fetch('/api/my/subscriptions/waste-available', {
       method: 'DELETE',
       body: JSON.stringify({ documentIds }),
       headers: {

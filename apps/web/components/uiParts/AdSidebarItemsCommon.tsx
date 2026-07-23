@@ -4,8 +4,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 import CreateIcon from '@mui/icons-material/Create'
 import ProposeWasteType from '../ProposeWasteType'
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import { useState } from 'react'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
 import {
   ListItem,
@@ -16,13 +15,8 @@ import {
   Box,
 } from '@mui/material'
 
-const createAddButtonText = 'Добавить объявление'
-
 const viewOnList = 'Смотреть списком'
 const viewOnMap = 'Смотреть на карте'
-
-const listHref = '/ads/list'
-const mapHref = '/ads'
 
 function ContactAdmin() {
   return (
@@ -118,33 +112,41 @@ function SupportProject() {
     </ListItem>
   )
 }
-
-export default function AdSidebarItemsCommon() {
-  const [isMapView, setIsMapView] = useState(true)
+type AdSidebarItemsCommonProps = {
+  isMapView: boolean
+  createElementText: string
+  createElementUrl: string
+  listViewUrl: string
+  mapViewUrl: string
+}
+export default function AdSidebarItemsCommon(props: AdSidebarItemsCommonProps) {
+  const {
+    isMapView,
+    createElementText = 'Добавить',
+    createElementUrl = '#',
+    listViewUrl,
+    mapViewUrl,
+  } = props
   const [modalOpen, setModalOpen] = useState(false)
-  const router = useRouter()
-
-  useEffect(() => {
-    if (router.asPath.split('?')[0] === '/ads/list') {
-      setIsMapView(false)
-    }
-  }, [router.asPath])
 
   return (
     <>
       <ListItem disableGutters dense divider>
-        <ListItemButton component="a" href="/ads/create">
+        <ListItemButton component="a" href={`${createElementUrl}`}>
           <ListItemIcon>
             <AddIcon color="secondary" />
           </ListItemIcon>
           <ListItemText
-            primary={createAddButtonText}
+            primary={createElementText}
             sx={{ whiteSpace: 'normal' }}
           />
         </ListItemButton>
       </ListItem>
       <ListItem disableGutters dense divider>
-        <ListItemButton component="a" href={isMapView ? listHref : mapHref}>
+        <ListItemButton
+          component="a"
+          href={isMapView ? listViewUrl : mapViewUrl}
+        >
           <ListItemIcon>
             {isMapView ? (
               <ListIcon color="secondary" />

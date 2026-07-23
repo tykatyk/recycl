@@ -1,18 +1,17 @@
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../../auth/[...nextauth]'
+import { authOptions } from '../../../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import {
   WasteAvailableSubscriptionModel,
   dbConnect,
 } from '@recycl/shared/dist/server/db/'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
-import getCoords from '../../../../lib/helpers/getCoords'
+import { apiHandler } from '../../../../../lib/helpers/errorHelpers'
+import getCoords from '../../../../../lib/helpers/getCoords'
 import {
   wasteAvailableSubscriptionSchema,
   paginationPageNumberSchema,
   paginationPageSizeSchema,
-} from '../../../../lib/validation'
-import { Types } from 'mongoose'
+} from '../../../../../lib/validation'
 import * as yup from 'yup'
 
 async function wasteAvailableSubscriptionApiHandler(

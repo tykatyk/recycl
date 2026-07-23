@@ -26,8 +26,8 @@ const enabledText = 'Включено'
 const disabledText = 'Выключено'
 const configText = 'Настроить'
 
-const subscriptionVariantsApi = '/api/subscriptions/variant'
-const subscriptionsApi = '/api/subscriptions'
+const subscriptionVariantsApi = '/api/my/subscriptions/variant'
+const subscriptionsApi = '/api/my/subscriptions'
 
 type SubscriptionName = string[]
 
@@ -78,7 +78,7 @@ export default function MySubscriptions() {
   }
 
   async function fetchUserSubscriptions() {
-    return await fetch('/api/subscriptions?subscribed=true')
+    return await fetch('/api/my/subscriptions?subscribed=true')
       .then((respone) => {
         if (!respone.ok) {
           throw new Error('Ошибка сервера')

@@ -26,3 +26,23 @@ export type ClusterProperties = {
 }
 
 export type BBox = [number, number, number, number]
+
+//CollectionPoints
+
+interface CollectionPointFeature {
+  placeId: string
+  placeDescription: string
+}
+
+export interface IndividualCollectionPointFeature extends CollectionPointFeature {
+  adId: string
+  // title: string
+}
+export interface AggregatedCollectionPointFeature extends CollectionPointFeature {
+  totalAds: number
+  wasteType: string
+}
+
+export type CollectionPointFeatureProperties =
+  | IndividualCollectionPointFeature
+  | AggregatedCollectionPointFeature

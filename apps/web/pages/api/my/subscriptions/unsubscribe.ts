@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import dbConnect from '../../../../../packages/db/connection'
 import {
-  User,
-  Subscription,
+  dbConnect,
+  UserModel,
+  SubscriptionModel,
   UnsubscribeToken,
-} from '../../../../../packages/db/models'
-import { unsubscribeApiResponseCodes } from '../../../lib/helpers/unsubscribeApiResponseCodes'
-import { emailSchema } from '../../../lib/validation'
-import type { UnsubscribeApiResponse } from '../../../lib/types/subscription'
+} from '@recycl/shared/dist/server/db'
+import { unsubscribeApiResponseCodes } from '../../../../lib/helpers/responses'
+import { emailSchema } from '../../../../lib/validation'
+import type { UnsubscribeApiResponse } from '../../../../lib/types/subscription'
 
 const { NOT_FOUND, TOKEN_EXPIRED, TOKEN_USED, SUCCESS } =
   unsubscribeApiResponseCodes
@@ -25,13 +25,13 @@ const tokenNotFoundUnsubscribe = async (
   }
 
   await dbConnect()
-  const user = await User.findOne({ email: validatedEmail }).select('_id')
+  const user = await UserModel.findOne({ email: validatedEmail }).select('_id')
   if (!user) {
     return res.status(404).end()
   }
 
   //ToDo: Instead of immediate unsubscribe,send an email to the user with a link to unsubscribe
-  const subscription = await Subscription.findOneAndUpdate(
+  const subscription = await SubscriptionModel.findOneAndUpdate(
     { user: user._id, subscribed: true },
     {
       subscribed: false,
@@ -62,7 +62,7 @@ const initialUnsubscribe = async (
     return res.status(200).json({ status: NOT_FOUND })
   }
 
-  const subscription = await Subscription.findOne({
+  const subscription = await SubscriptionModel.findOne({
     _id: unsubscribeToken.subscription,
   })
 
@@ -107,7 +107,7 @@ const tokenExpiredOrUsedUnsubscribe = async (
     return res.status(404).json({ status: NOT_FOUND })
   }
 
-  const subscription = await Subscription.findOne({
+  const subscription = await SubscriptionModel.findOne({
     _id: unsubscribeToken.subscription,
   })
 

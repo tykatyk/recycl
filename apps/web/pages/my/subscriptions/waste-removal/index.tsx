@@ -46,7 +46,7 @@ const Content = () => {
 
   useEffect(() => {
     const getUserSubscriptions = async () => {
-      const response = await fetch(`/api/subscriptions`)
+      const response = await fetch(`/api/my/subscriptions`)
 
       if (!response.ok) {
         throw new Error('Response is not OK')
@@ -56,7 +56,7 @@ const Content = () => {
     }
 
     const dataFetcher = async () => {
-      const response = await fetch(`/api/subscriptions/waste-removal`)
+      const response = await fetch(`/api/my/subscriptions/waste-removal`)
 
       if (!response.ok) {
         throw new Error('Response is not OK')
@@ -92,7 +92,7 @@ const Content = () => {
   }, [])
 
   const formHandler = async (values) => {
-    const response = await fetch(`/api/subscriptions/waste-removal`, {
+    const response = await fetch(`/api/my/subscriptions/waste-removal`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ radius: values.radius }),

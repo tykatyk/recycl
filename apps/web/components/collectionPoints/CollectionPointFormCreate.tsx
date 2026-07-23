@@ -19,7 +19,7 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
 
 const errorMessage = 'Ошибка при сохранении документа'
-const api = '/api/collection-points'
+const api = '/api/my/collection-points'
 const indexRoute = '/my/collection-points'
 
 type CollectionPointFormProps = {
@@ -117,7 +117,7 @@ export default function CollectionPointFormCreate(
       setWasteTypes(data)
     }
     const userPhoneFetcher = async () => {
-      const result = await fetch(`/api/user/phone`)
+      const result = await fetch(`/api/my/account/phone`)
       const data = await result.json()
       setUserPhone(data ? data.phone : '')
     }

@@ -18,6 +18,7 @@ import AdSidebar from '../uiParts/AdSidebar'
 import AdSidebarItemsMap from '../uiParts/AdSidebarItemsMap'
 import Head from '../uiParts/Head'
 import { AdWrapper, drawerWidth } from '../uiParts/AdPageComponents'
+import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 
 const errorMessage = 'Что-то пошло не так'
 
@@ -135,6 +136,13 @@ export default function AdsOnMap() {
               handleDrawerToggle={handleDrawerToggle}
             >
               <AdSidebarItemsMap handleChange={setSelectedValue} />
+              <AdSidebarItemsCommon
+                isMapView={true}
+                createElementText="Добавить объявление"
+                createElementUrl={'/ads/create'}
+                listViewUrl={'/ads/list'}
+                mapViewUrl={'/ads'}
+              />
             </AdSidebar>
 
             <AdWrapper

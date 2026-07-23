@@ -22,6 +22,7 @@ import { useRouter } from 'next/router'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import Cookies from 'js-cookie'
 import type { HrefOptions } from '../../lib/types/pagination'
+import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 
 const errorMessage = 'Что-то пошло не так'
 const baseUrl = '/ads/list'
@@ -142,6 +143,13 @@ export default function AdsOnList(props) {
             handleSubmit={handleSubmit}
             initialFormValues={initialFormValues}
           />
+          <AdSidebarItemsCommon
+            isMapView={false}
+            createElementText="Добавить объявление"
+            createElementUrl={'/ads/create'}
+            listViewUrl={'/ads/list'}
+            mapViewUrl={'/ads'}
+          />
         </AdSidebar>
 
         <AdWrapper drawerOpen={drawerOpen}>
@@ -217,13 +225,7 @@ export default function AdsOnList(props) {
                                 </Typography>
                               </Box>
                               <Box sx={{ pb: 2 }}>
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    fontWeight: 'fontWeightLight',
-                                    color: 'grey.400',
-                                  }}
-                                >
+                                <Typography>
                                   {item.wasteLocation.description}
                                 </Typography>
                               </Box>

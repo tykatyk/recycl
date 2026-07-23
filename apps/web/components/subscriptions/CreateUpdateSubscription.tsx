@@ -25,8 +25,9 @@ const errorMessage = 'Возникла ошибка при сохранении 
 const notSubscribedMessage =
   ' У вас отключены уведомления о появлении вторсырья.'
 
-const createRoute = `/api/subscriptions/waste-available`
-const updateRoute = (id: string) => `/api/subscriptions/waste-available/${id}`
+const createRoute = `/api/my/subscriptions/waste-available`
+const updateRoute = (id: string) =>
+  `/api/my/subscriptions/waste-available/${id}`
 const indexRoute = '/my/subscriptions/waste-available'
 
 export default function CreateSubscription(params: { action: string }) {
@@ -45,7 +46,7 @@ export default function CreateSubscription(params: { action: string }) {
 
   useEffect(() => {
     const getUserSubscriptions = async () => {
-      const response = await fetch(`/api/subscriptions`)
+      const response = await fetch(`/api/my/subscriptions`)
 
       if (!response.ok) {
         throw new Error('Response is not OK')
@@ -92,7 +93,9 @@ export default function CreateSubscription(params: { action: string }) {
     const fetcher = async () => {
       if (!id) return
 
-      const response = await fetch(`/api/subscriptions/waste-available/${id}`)
+      const response = await fetch(
+        `/api/my/subscriptions/waste-available/${id}`,
+      )
 
       if (!response.ok) throw new Error(errorMessage)
 

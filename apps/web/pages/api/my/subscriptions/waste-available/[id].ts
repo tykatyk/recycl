@@ -1,13 +1,13 @@
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../../../api/auth/[...nextauth]'
+import { authOptions } from '../../../../api/auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import {
   WasteAvailableSubscriptionModel,
   dbConnect,
 } from '@recycl/shared/dist/server/db/'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
-import getCoords from '../../../../lib/helpers/getCoords'
-import { wasteAvailableSubscriptionSchema } from '../../../../lib/validation'
+import { apiHandler } from '../../../../../lib/helpers/errorHelpers'
+import getCoords from '../../../../../lib/helpers/getCoords'
+import { wasteAvailableSubscriptionSchema } from '../../../../../lib/validation'
 
 async function singleWasteAvailableSubscriptionApiHandler(
   req: NextApiRequest,

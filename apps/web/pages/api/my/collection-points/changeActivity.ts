@@ -1,10 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import {
-  dbConnect,
-  WasteRemovalEventModel,
-} from '@recycl/shared/dist/server/db'
+import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
 import type { AdActions } from '../../../lib/types/collectionPoint'
 import { eventActions } from '../../../lib/helpers/eventHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
@@ -41,7 +38,7 @@ export default async function EventMassDeactivation(
     }
 
     try {
-      await WasteRemovalEventModel.updateMany(
+      await CollectionPointModel.updateMany(
         { user: session.id, _id: { $in: eventIds } },
         { isActive: action === activate ? true : false },
       )

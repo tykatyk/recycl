@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../auth/[...nextauth]'
+import { authOptions } from '../../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { collectionPointSchema } from '../../../lib/validation/collectionPointForm'
+import { collectionPointSchema } from '../../../../lib/validation/collectionPointForm'
 import {
   dbConnect,
   CollectionPointContainerModel,
@@ -9,10 +9,10 @@ import {
   CollectionPointStationeryModel,
   CollectionPointModel,
 } from '@recycl/shared/dist/server/db'
-import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { METHOD_NOT_ALLOWED } from '../../../../lib/errors'
+import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import { isValidObjectId } from 'mongoose'
-import getCoords from '../../../lib/helpers/getCoords'
+import getCoords from '../../../../lib/helpers/getCoords'
 
 async function collectionPointHandler(
   req: NextApiRequest,

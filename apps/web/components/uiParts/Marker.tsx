@@ -7,10 +7,6 @@ import {
   useMap,
 } from '@vis.gl/react-google-maps'
 import Link from './Link'
-import type {
-  WasteAdIndividualPoint,
-  WasteAdCollectivePoint,
-} from '@recycl/shared/src/server/types'
 
 export function IndividualPointMarker({
   title,
@@ -113,22 +109,15 @@ export function CollectivelPointMarker({
             <Box>
               <Typography variant="body2" sx={{ color: 'blue' }}>
                 <Link
-                  href={`/ads/?placeId=${placeId}&wasteType=${wasteType}`}
+                  href={`/ads/list?wasteType=${wasteType}&locationDescription=${placeDescription}&locationId=${placeId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
-                    color: 'blue',
-                    '&:visited': {
-                      color: 'purple',
-                    },
-                    textDecoration: 'none',
-
-                    '&:hover': {
-                      textDecoration: 'underline',
-                      textDecorationColor: 'blue',
-                    },
-
+                    '&:link': { color: 'blue', textDecoration: 'none' },
+                    '&:visited': { color: 'purple' },
+                    '&:hover': { textDecoration: 'underline' }, // Applies to both unless overridden
                     '&:visited:hover': {
+                      textDecoration: 'underline',
                       textDecorationColor: 'purple',
                     },
                   }}
