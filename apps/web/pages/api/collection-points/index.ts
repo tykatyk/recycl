@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import * as yup from 'yup'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
-import { getClusters } from '../../../lib/helpers/collectionPointsClusterMaker'
+import { getCollectionPointClusters } from '../../../lib/helpers/collectionPointsClusterMaker'
 import type { BBox } from '@recycl/shared/dist/server/types'
 
 const minZoom = 0
@@ -53,8 +53,13 @@ async function collectionPointsHandler(
     },
   )
 
-  const clusters = await getClusters(bbox as BBox, zoom, wasteType)
-
+  const clusters = await getCollectionPointClusters(
+    bbox as BBox,
+    zoom,
+    wasteType,
+  )
+  console.log('clusters')
+  console.log(clusters)
   return res.json({ clusters })
 }
 

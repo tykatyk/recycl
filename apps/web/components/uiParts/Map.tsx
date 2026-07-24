@@ -1,16 +1,6 @@
 import { APIProvider, ControlPosition, Map } from '@vis.gl/react-google-maps'
-import {
-  ClusterMarker,
-  IndividualPointMarker,
-  CollectivelPointMarker,
-} from './Marker'
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react'
-import type {
-  FeatureProperties,
-  BBox,
-  MapCenter,
-} from '@recycl/shared/dist/server/types'
-import Supercluster, { ClusterProperties } from 'supercluster'
+import type { BBox, MapCenter } from '@recycl/shared/dist/server/types'
 
 //Ukraine
 const countryBounds = {
@@ -24,10 +14,6 @@ const googleMapId = 'd80f8976374eb93b825a20cf'
 const initialZoom = 13
 
 type MapComponentProps = {
-  data: (
-    | Supercluster.ClusterFeature<ClusterProperties>
-    | Supercluster.PointFeature<FeatureProperties>
-  )[]
   children: ReactElement
   setVisibleRect: (bbox: BBox) => void
   setZoom: (zoom: number) => void
@@ -36,11 +22,10 @@ type MapComponentProps = {
 
 export default function MapComponent(props: MapComponentProps) {
   const [mounted, setMounted] = useState(false)
-  const [selectedMarker, setSelectedMarker] = useState('')
   const mapRef = useRef<google.maps.Map | null>(null)
   const isResizing = useRef(false)
   const resizeTimeout = useRef<NodeJS.Timeout | null>(null)
-  const { setVisibleRect, data, setZoom, center, children } = props
+  const { setVisibleRect, setZoom, center, children } = props
 
   const updateMapState = useCallback((map: google.maps.Map) => {
     const bounds = map.getBounds()
@@ -116,56 +101,7 @@ export default function MapComponent(props: MapComponentProps) {
           }
         }}
       >
-        <>
-          {children}
-          {data && data.length > 0
-            ? data.map((element, index: number) => {
-                const coords = {
-                  lat: element.geometry.coordinates[1],
-                  lng: element.geometry.coordinates[0],
-                }
-
-                if ('cluster' in element.properties) {
-                  return (
-                    <ClusterMarker
-                      key={index}
-                      position={coords}
-                      totalPoints={element.properties.point_count}
-                    ></ClusterMarker>
-                  )
-                }
-
-                if ('adId' in element.properties) {
-                  return (
-                    <IndividualPointMarker
-                      key={index}
-                      position={coords}
-                      title={element.properties.title}
-                      placeId={element.properties.placeId}
-                      placeDescription={element.properties.placeDescription}
-                      weight={element.properties.weight}
-                      adId={element.properties.adId}
-                      selectedMarker={selectedMarker}
-                      setSelectedMarker={setSelectedMarker}
-                    />
-                  )
-                }
-
-                return (
-                  <CollectivelPointMarker
-                    key={index}
-                    position={coords}
-                    placeId={element.properties.placeId}
-                    placeDescription={element.properties.placeDescription}
-                    wasteType={element.properties.wasteType}
-                    weight={element.properties.weight}
-                    selectedMarker={selectedMarker}
-                    setSelectedMarker={setSelectedMarker}
-                  />
-                )
-              })
-            : null}
-        </>
+        {children}
       </Map>
     </APIProvider>
   )

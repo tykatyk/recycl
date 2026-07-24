@@ -1,7 +1,7 @@
 import Supercluster from 'supercluster'
 import type {
   CollectionPointFeatureProperties,
-  ClusterProperties,
+  // ClusterProperties,
   BBox,
 } from '@recycl/shared/dist/server/types'
 import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
@@ -31,7 +31,7 @@ const indexMap = new Map<
 let refreshPromise: Promise<any> | null = null
 let lastRebuild: Date | null = null
 
-export const getClusters = async (
+export const getCollectionPointClusters = async (
   bbox: BBox,
   zoom: number,
   wasteType: string,
@@ -107,7 +107,8 @@ const rebuildIndexOnServer = async () => {
             await CollectionPointModel.aggregate<AggregatedAd>([
               {
                 $match: {
-                  $expr: { $in: [wasteType, '$wasteTypes'] },
+                  wasteTypes: wasteType.name,
+                  // $expr: { $in: [wasteType, '$wasteTypes'] },
                   // expires: { $gt: new Date() },
                   status: {
                     $eq: 'active',
@@ -116,7 +117,7 @@ const rebuildIndexOnServer = async () => {
               },
               {
                 $group: {
-                  _id: '$wasteLocation.place_id',
+                  _id: '$location.place_id',
                   // weight: { $sum: '$quantity' },
                   totalAds: { $sum: 1 },
                   // wasteTypeId: { $first: '$wasteType' },
@@ -126,15 +127,16 @@ const rebuildIndexOnServer = async () => {
                   wasteLocation: {
                     $first: {
                       position: {
-                        coordinates: '$wasteLocation.position.coordinates',
+                        coordinates: '$location.position.coordinates',
                       },
-                      description: '$wasteLocation.description',
-                      placeId: '$wasteLocation.place_id',
+                      description: '$location.description',
+                      placeId: '$location.place_id',
                     },
                   },
                 },
               },
             ])
+
           const indexByWasteType = getPopulatedIndex(adsByWasteType)
 
           indexMap.set(wasteType.name, indexByWasteType)

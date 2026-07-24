@@ -4,14 +4,14 @@ import { Box } from '@mui/material'
 import getUserLocation from '../../lib/helpers/getUserLocation'
 import { useSnackbar } from 'notistack'
 import UserLocation from '../uiParts/UserLocation'
-import Supercluster from 'supercluster'
+import Supercluster, { ClusterProperties } from 'supercluster'
 import type {
   BBox,
-  WasteAdClusterProperties,
-  FeatureProperties,
+  CollectionPointFeatureProperties,
   MapCenter,
 } from '@recycl/shared/dist/server/types'
-import PlacesSearchBar from './PlacesSearchBar'
+//ToDo: move PlacesSearchBar out from applications
+import PlacesSearchBar from '../applications/PlacesSearchBar'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import AdSidebar from '../uiParts/AdSidebar'
@@ -19,17 +19,17 @@ import AdSidebarItemsMap from '../uiParts/AdSidebarItemsMap'
 import Head from '../uiParts/Head'
 import { AdWrapper, drawerWidth } from '../uiParts/AdPageComponents'
 import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
-import { AdMarkers } from '../uiParts/Marker'
+import { CollectionPointMarkers } from '../uiParts/Marker'
 
 const errorMessage = 'Что-то пошло не так'
 
-export default function AdsOnMap() {
+export default function CollectionPointsOnMap() {
   const [selectedValue, setSelectedValue] = useState('')
   const [visibleRect, setVisibleRect] = useState<BBox | null>(null)
   const [clusters, setClusters] = useState<
     (
-      | Supercluster.ClusterFeature<WasteAdClusterProperties>
-      | Supercluster.PointFeature<FeatureProperties>
+      | Supercluster.ClusterFeature<ClusterProperties>
+      | Supercluster.PointFeature<CollectionPointFeatureProperties>
     )[]
   >([])
   const { enqueueSnackbar } = useSnackbar()
@@ -67,17 +67,16 @@ export default function AdsOnMap() {
           console.log('zoom is not number')
           return
         }
-        const response = await fetch(`/api/ads?${query.toString()}`)
+        const response = await fetch(
+          `/api/collection-points?${query.toString()}`,
+        )
 
         if (!response.ok) {
           throw new Error('Response is not OK')
         }
 
         const data: {
-          clusters: (
-            | Supercluster.ClusterFeature<WasteAdClusterProperties>
-            | Supercluster.PointFeature<FeatureProperties>
-          )[]
+          clusters: Supercluster.PointFeature<CollectionPointFeatureProperties>[]
         } = await response.json()
 
         if (data && data.clusters && data.clusters.length > 0) {
@@ -98,7 +97,7 @@ export default function AdsOnMap() {
   return (
     <>
       <Head
-        title={`Карта наличия вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
+        title={`Пункты приема вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
       />
       <Box
         sx={{
@@ -166,11 +165,12 @@ export default function AdsOnMap() {
                 <Map
                   center={center}
                   setVisibleRect={setVisibleRect}
+                  // data={clusters}
                   setZoom={setZoom}
                 >
                   <>
                     <PlacesSearchBar />
-                    <AdMarkers data={clusters} />
+                    <CollectionPointMarkers data={clusters} />
                   </>
                 </Map>
               </Box>

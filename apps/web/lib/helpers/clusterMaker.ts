@@ -4,7 +4,7 @@
 import Supercluster from 'supercluster'
 import type {
   FeatureProperties,
-  ClusterProperties,
+  WasteAdClusterProperties,
   BBox,
 } from '@recycl/shared/dist/server/types'
 import {
@@ -34,7 +34,7 @@ type AggregatedAd = {
 
 const indexMap = new Map<
   string,
-  Supercluster<FeatureProperties, ClusterProperties>
+  Supercluster<FeatureProperties, WasteAdClusterProperties>
 >()
 let refreshPromise: Promise<any> | null = null
 let lastRebuild: Date | null = null
@@ -62,7 +62,7 @@ export const getClusters = async (
 }
 
 const getPopulatedIndex = (ads: AggregatedAd[]) => {
-  const index = new Supercluster<FeatureProperties, ClusterProperties>({
+  const index = new Supercluster<FeatureProperties, WasteAdClusterProperties>({
     radius: 40,
     maxZoom: 16,
     map: (props) => ({

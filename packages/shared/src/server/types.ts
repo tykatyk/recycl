@@ -21,7 +21,7 @@ export interface WasteAdCollectivePoint extends WasteAdPoint {
 
 export type FeatureProperties = WasteAdIndividualPoint | WasteAdCollectivePoint
 
-export type ClusterProperties = {
+export type WasteAdClusterProperties = {
   totalWeight: number
 }
 
