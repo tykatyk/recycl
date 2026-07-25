@@ -58,8 +58,7 @@ async function collectionPointsHandler(
     zoom,
     wasteType,
   )
-  console.log('clusters')
-  console.log(clusters)
+
   return res.json({ clusters })
 }
 

@@ -5,16 +5,20 @@ import type {
   BBox,
 } from '@recycl/shared/dist/server/types'
 import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
+import type { CollectionPoint } from '../types/collectionPoint'
 import WasteTypeModel from '@recycl/shared/dist/server/db/models/wasteType'
 import mongoose from 'mongoose'
 import type { Lng, Lat } from '@recycl/shared/dist/server/types'
+import { collectionPointTypes } from '@recycl/shared/dist/constants'
 
-type AggregatedAd = {
+type AggregatedCollectionPoint = {
   _id: string
-  totalAds: number
-  wasteType: string
-  firstAdId: mongoose.Types.ObjectId
-  // firstAdTitle: string
+  documents: [
+    CollectionPoint & {
+      _id: mongoose.Types.ObjectId
+      variant: keyof typeof collectionPointTypes
+    },
+  ]
   wasteLocation: {
     position: {
       coordinates: [Lng, Lat]
@@ -22,6 +26,7 @@ type AggregatedAd = {
     description: string
     placeId: string
   }
+  wasteType: string
 }
 
 const indexMap = new Map<
@@ -53,7 +58,7 @@ export const getCollectionPointClusters = async (
   return index.getClusters(bbox, zoom)
 }
 
-const getPopulatedIndex = (ads: AggregatedAd[]) => {
+const getPopulatedIndex = (ads: AggregatedCollectionPoint[]) => {
   const index = new Supercluster<CollectionPointFeatureProperties>({
     radius: 40,
     maxZoom: 16,
@@ -61,7 +66,7 @@ const getPopulatedIndex = (ads: AggregatedAd[]) => {
 
   index.load(
     ads.map((ad) => {
-      const { wasteLocation, totalAds } = ad
+      const { wasteLocation, documents } = ad
       const [lng, lat] = wasteLocation.position.coordinates
 
       return {
@@ -74,13 +79,19 @@ const getPopulatedIndex = (ads: AggregatedAd[]) => {
           wasteType: ad.wasteType,
           placeId: wasteLocation.placeId,
           placeDescription: wasteLocation.description,
-          ...(totalAds === 1
+          ...(documents.length === 1
             ? {
-                adId: ad.firstAdId.toString(),
-                // title: ad.firstAdTitle,
+                adId: documents[0]._id.toString(),
+                wasteTypes: documents[0].wasteTypes,
+                variant: documents[0].variant,
+                phone: documents[0].phone,
+                comment: documents[0].comment,
+                ...(documents[0].variant === 'mobile' && {
+                  date: documents[0].date,
+                }),
               }
             : {
-                totalAds,
+                totalAds: documents.length,
               }),
         },
       }
@@ -104,11 +115,10 @@ const rebuildIndexOnServer = async () => {
       for (const wasteType of wasteTypes) {
         try {
           const adsByWasteType =
-            await CollectionPointModel.aggregate<AggregatedAd>([
+            await CollectionPointModel.aggregate<AggregatedCollectionPoint>([
               {
                 $match: {
                   wasteTypes: wasteType.name,
-                  // $expr: { $in: [wasteType, '$wasteTypes'] },
                   // expires: { $gt: new Date() },
                   status: {
                     $eq: 'active',
@@ -118,12 +128,7 @@ const rebuildIndexOnServer = async () => {
               {
                 $group: {
                   _id: '$location.place_id',
-                  // weight: { $sum: '$quantity' },
-                  totalAds: { $sum: 1 },
-                  // wasteTypeId: { $first: '$wasteType' },
-                  wasteType: { $first: wasteType.name },
-                  firstAdId: { $first: '$_id' },
-                  // firstAdTitle: { $first: '$title' },
+                  documents: { $push: '$$ROOT' },
                   wasteLocation: {
                     $first: {
                       position: {
@@ -135,6 +140,7 @@ const rebuildIndexOnServer = async () => {
                   },
                 },
               },
+              { $addFields: { wasteType: wasteType.name } },
             ])
 
           const indexByWasteType = getPopulatedIndex(adsByWasteType)

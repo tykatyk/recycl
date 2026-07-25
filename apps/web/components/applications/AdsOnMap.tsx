@@ -11,7 +11,7 @@ import type {
   FeatureProperties,
   MapCenter,
 } from '@recycl/shared/dist/server/types'
-import PlacesSearchBar from './PlacesSearchBar'
+import PlacesSearchBar from '../uiParts/PlacesSearchBar'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import AdSidebar from '../uiParts/AdSidebar'
@@ -136,7 +136,10 @@ export default function AdsOnMap() {
               drawerWidth={drawerWidth}
               handleDrawerToggle={handleDrawerToggle}
             >
-              <AdSidebarItemsMap handleChange={setSelectedValue} />
+              <AdSidebarItemsMap
+                handleChange={setSelectedValue}
+                h1={'Карта наличия вторсырья'}
+              />
               <AdSidebarItemsCommon
                 isMapView={true}
                 createElementText="Добавить объявление"

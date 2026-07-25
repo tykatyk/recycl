@@ -1,13 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormikHelpers, useFormik } from 'formik'
 import { collectionPointSchema } from '../../lib/validation'
-import type {
-  CollectionPoint,
-  CollectionPointBase,
-  CollectionPointContainer,
-} from '../../lib/types/collectionPoint'
+import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import { useRouter } from 'next/router'
-import { Box, Grid, TextField, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@mui/material'
 import 'dayjs/locale/ru'
 import {
   PhoneField,
@@ -44,7 +40,7 @@ export default function CollectionPointFormUpdate(
 
   const [initialValues, setInitialValues] = useState<CollectionPoint>(() => {
     const initVal = {
-      user: '',
+      user: '' as any,
       location: null as any,
       wasteTypes: [],
       phone: '',
@@ -120,8 +116,8 @@ export default function CollectionPointFormUpdate(
     initialValues,
     validationSchema: collectionPointSchema,
     onSubmit: (
-      values: CollectionPointContainer,
-      actions: FormikHelpers<CollectionPointContainer>,
+      values: CollectionPoint,
+      actions: FormikHelpers<CollectionPoint>,
     ) => {
       updateHandler(values, actions)
     },
@@ -136,8 +132,8 @@ export default function CollectionPointFormUpdate(
   if (loading) return <PageLoadingCircle />
 
   const updateHandler = (
-    values: CollectionPointBase,
-    { setSubmitting }: FormikHelpers<CollectionPointBase>,
+    values: CollectionPoint,
+    { setSubmitting }: FormikHelpers<CollectionPoint>,
   ) => {
     setSubmitting(true)
     //delete user property from modifiedValues

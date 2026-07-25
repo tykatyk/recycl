@@ -10,8 +10,7 @@ import type {
   CollectionPointFeatureProperties,
   MapCenter,
 } from '@recycl/shared/dist/server/types'
-//ToDo: move PlacesSearchBar out from applications
-import PlacesSearchBar from '../applications/PlacesSearchBar'
+import PlacesSearchBar from '../uiParts/PlacesSearchBar'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import AdSidebar from '../uiParts/AdSidebar'
@@ -97,7 +96,7 @@ export default function CollectionPointsOnMap() {
   return (
     <>
       <Head
-        title={`Пункты приема вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
+        title={`Карта пунктов приема вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
       />
       <Box
         sx={{
@@ -135,7 +134,10 @@ export default function CollectionPointsOnMap() {
               drawerWidth={drawerWidth}
               handleDrawerToggle={handleDrawerToggle}
             >
-              <AdSidebarItemsMap handleChange={setSelectedValue} />
+              <AdSidebarItemsMap
+                handleChange={setSelectedValue}
+                h1={'Карта пунктов приема вторсырья'}
+              />
               <AdSidebarItemsCommon
                 isMapView={true}
                 createElementText="Добавить объявление"

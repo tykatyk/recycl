@@ -82,7 +82,7 @@ export default function CollectionPointFormCreate(
     initialValues:
       variant === 'mobile'
         ? {
-            user: '',
+            user: '' as any,
             location: null as any,
             wasteTypes: [],
             phone: userPhone,
@@ -92,7 +92,7 @@ export default function CollectionPointFormCreate(
             date: null as any,
           }
         : {
-            user: '',
+            user: '' as any,
             location: null as any,
             wasteTypes: [],
             phone: userPhone,

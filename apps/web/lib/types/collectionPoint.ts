@@ -1,53 +1,8 @@
-import type { PlaceType } from './placeAutocomplete'
-import type { Waste } from './waste'
-
-export interface CollectionPointBase {
-  user: string
-  location: PlaceType
-  wasteTypes: string[]
-  viewCount: number
-  phone: string
-  comment?: string
-}
-
-export interface CollectionPointMobile extends CollectionPointBase {
-  variant: 'mobile'
-  date: Date
-}
-export interface CollectionPointStationery extends CollectionPointBase {
-  variant: 'stationery'
-}
-export interface CollectionPointContainer extends CollectionPointBase {
-  variant: 'container'
-}
-
-export type CollectionPoint =
-  | CollectionPointStationery
-  | CollectionPointMobile
-  | CollectionPointContainer
-
-export type CollectionPointContainerProps = {
-  collectionPoint?: CollectionPointContainer & { _id: string }
-  wasteTypes?: [Waste]
-  userPhone?: string
-}
-// export type EventCreateUpdateProps = {
-//   event?: CollectionPoint & { _id: string }
-//   wasteTypes?: [Waste]
-//   userPhone?: string
-// }
-
-// export type CollectionPoint = {
-//   _id?: string
-//   user: string | { name: string; _id: string }
-//   location: PlaceType | null
-//   waste: string[]
-//   date: Dayjs | null
-//   phone: string
-//   comment?: string
-//   viewCount?: number
-//   variant: 'stationery' | 'mobile' | 'sortingContainer'
-// }
+import {
+  CollectionPointContainer,
+  CollectionPointMobile,
+  CollectionPointStationery,
+} from '@recycl/shared/dist/server/db/models/collectionPoint'
 
 export type IsInactive = {
   isInactive?: '1'
@@ -58,3 +13,17 @@ export type AdActions = {
   deactivate: 'deactivate'
   remove: 'remove'
 }
+
+export type CollectionPoint =
+  | (Omit<
+      CollectionPointContainer,
+      'createdAt' | 'updatedAt' | 'viewedBy' | 'status'
+    > & { variant: 'container' })
+  | (Omit<
+      CollectionPointMobile,
+      'createdAt' | 'updatedAt' | 'viewedBy' | 'status'
+    > & { variant: 'mobile' })
+  | (Omit<
+      CollectionPointStationery,
+      'createdAt' | 'updatedAt' | 'viewedBy' | 'status'
+    > & { variant: 'stationery' })

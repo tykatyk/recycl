@@ -14,9 +14,10 @@ type WasteItem = {
 
 export default function AdSidebarItemsMap(props: {
   handleChange: (newValue: string) => void
+  h1: string
 }) {
   const [wasteTypes, setWasteTypes] = useState<WasteItem[]>([])
-  const { handleChange } = props
+  const { handleChange, h1 } = props
 
   useEffect(() => {
     const fetcher = async () => {
@@ -51,7 +52,7 @@ export default function AdSidebarItemsMap(props: {
             align="center"
             color="#91d608"
           >
-            Карта наличия вторсырья
+            {h1}
           </Typography>
         </Box>
         <Box sx={{ width: '100%' }}>

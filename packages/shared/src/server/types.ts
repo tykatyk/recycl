@@ -36,6 +36,10 @@ interface CollectionPointFeature {
 
 export interface IndividualCollectionPointFeature extends CollectionPointFeature {
   adId: string
+  wasteTypes: string[]
+  variant: string
+  phone: string
+  comment?: string
   // title: string
 }
 export interface AggregatedCollectionPointFeature extends CollectionPointFeature {
