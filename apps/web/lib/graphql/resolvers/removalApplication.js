@@ -1,0 +1,27 @@
+import dbQueries from '../../helpers/queries'
+
+const removalApplicationResolvers = {
+  Query: {
+    getRemovalApplications(parent, args, context) {
+      return dbQueries.removalApplication.getAll(args.queryParams, context.user)
+    },
+    getRemovalApplicationsWithMessageCount(parent, args, context) {
+      return dbQueries.removalApplication.getWithMessageCount(context.user)
+    },
+  },
+  Mutation: {
+    createRemovalApplication(parent, args, context) {
+      return dbQueries.removalApplication.create(args.application, context.user)
+    },
+    updateRemovalApplication(parent, args, context) {
+      return dbQueries.removalApplication.update(args.id, args.newValues)
+    },
+    deleteRemovalApplication(parent, args, context) {
+      return dbQueries.removalApplication.delete(args.id)
+    },
+    deleteRemovalApplications(parent, args, context) {
+      return dbQueries.removalApplication.deleteMany(args.ids)
+    },
+  },
+}
+export default removalApplicationResolvers

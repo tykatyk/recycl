@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "isolatedModules": true,
+    "strictNullChecks": true,
+    "incremental": true,
+
+    /* =========================
+       Language & Environment
+    ========================= */
+    "target": "es6",
+    "lib": ["esnext"],
+    "ignoreDeprecations": "6.0",
+    /* =========================
+       Type Safety
+    ========================= */
+    "strict": false,
+    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+
+    /* =========================
+       Interop
+    ========================= */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* =========================
+       Paths (optional but useful)
+    ========================= */
+    "paths": {
+      "@recycl/shared": ["./packages/shared"]
+    },
+
+    /* =========================
+       Output (overridden in packages)
+    ========================= */
+    "declaration": true,
+    "sourceMap": true,
+
+    /* =========================
+       Misc
+    ========================= */
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
