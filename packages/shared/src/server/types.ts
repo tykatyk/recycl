@@ -1,52 +1,47 @@
 export type Lng = number
 export type Lat = number
-
+export type BBox = [number, number, number, number]
 export type MapCenter = { lat: number; lng: number }
 
-interface WasteAdPoint {
+interface WasteAdBaseFeature {
   weight: number
   placeId: string
   placeDescription: string
 }
 
-export interface WasteAdIndividualPoint extends WasteAdPoint {
+export interface IndividualWasteAdFeature extends WasteAdBaseFeature {
   adId: string
   title: string
 }
 
-export interface WasteAdCollectivePoint extends WasteAdPoint {
+export interface AggregatedWasteAdFeature extends WasteAdBaseFeature {
   totalAds: number
   wasteType: string
 }
 
-export type FeatureProperties = WasteAdIndividualPoint | WasteAdCollectivePoint
+export type AdFeature = IndividualWasteAdFeature | AggregatedWasteAdFeature
 
 export type WasteAdClusterProperties = {
   totalWeight: number
 }
 
-export type BBox = [number, number, number, number]
-
-//CollectionPoints
-
-interface CollectionPointFeature {
+interface CollectionPointBaseFeature {
   placeId: string
   placeDescription: string
 }
 
-export interface IndividualCollectionPointFeature extends CollectionPointFeature {
+export interface IndividualCollectionPointFeature extends CollectionPointBaseFeature {
   adId: string
   wasteTypes: string[]
   variant: string
   phone: string
   comment?: string
-  // title: string
 }
-export interface AggregatedCollectionPointFeature extends CollectionPointFeature {
+export interface AggregatedCollectionPointFeature extends CollectionPointBaseFeature {
   totalAds: number
   wasteType: string
 }
 
-export type CollectionPointFeatureProperties =
+export type CollectionPointFeature =
   | IndividualCollectionPointFeature
   | AggregatedCollectionPointFeature

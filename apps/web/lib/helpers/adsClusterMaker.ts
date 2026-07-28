@@ -3,7 +3,7 @@
 // import { JOB_REBUILD_SUPERCLUSTER_INDEX } from '@recycl/shared/dist/server/worker'
 import Supercluster from 'supercluster'
 import type {
-  FeatureProperties,
+  AdFeature,
   WasteAdClusterProperties,
   BBox,
 } from '@recycl/shared/dist/server/types'
@@ -11,7 +11,6 @@ import {
   dbConnect,
   RemovalApplicationModel,
 } from '@recycl/shared/dist/server/db'
-import { RemovalApplication } from '@recycl/shared/dist/server/db/models/removalApplication'
 import WasteTypeModel from '@recycl/shared/dist/server/db/models/wasteType'
 import mongoose from 'mongoose'
 import type { Lng, Lat } from '@recycl/shared/dist/server/types'
@@ -34,7 +33,7 @@ type AggregatedAd = {
 
 const indexMap = new Map<
   string,
-  Supercluster<FeatureProperties, WasteAdClusterProperties>
+  Supercluster<AdFeature, WasteAdClusterProperties>
 >()
 let refreshPromise: Promise<any> | null = null
 let lastRebuild: Date | null = null
@@ -62,7 +61,7 @@ export const getClusters = async (
 }
 
 const getPopulatedIndex = (ads: AggregatedAd[]) => {
-  const index = new Supercluster<FeatureProperties, WasteAdClusterProperties>({
+  const index = new Supercluster<AdFeature, WasteAdClusterProperties>({
     radius: 40,
     maxZoom: 16,
     map: (props) => ({

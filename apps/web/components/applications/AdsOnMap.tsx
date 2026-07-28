@@ -8,10 +8,9 @@ import Supercluster from 'supercluster'
 import type {
   BBox,
   WasteAdClusterProperties,
-  FeatureProperties,
+  AdFeature,
   MapCenter,
 } from '@recycl/shared/dist/server/types'
-import PlacesSearchBar from '../uiParts/PlacesSearchBar'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import AdSidebar from '../uiParts/AdSidebar'
@@ -29,7 +28,7 @@ export default function AdsOnMap() {
   const [clusters, setClusters] = useState<
     (
       | Supercluster.ClusterFeature<WasteAdClusterProperties>
-      | Supercluster.PointFeature<FeatureProperties>
+      | Supercluster.PointFeature<AdFeature>
     )[]
   >([])
   const { enqueueSnackbar } = useSnackbar()
@@ -37,6 +36,7 @@ export default function AdsOnMap() {
   const [locationError, setLocationError] = useState(false)
   const [center, setCenter] = useState<MapCenter | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(true)
+  const [selectedMarker, setSelectedMarker] = useState('')
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen)
@@ -76,7 +76,7 @@ export default function AdsOnMap() {
         const data: {
           clusters: (
             | Supercluster.ClusterFeature<WasteAdClusterProperties>
-            | Supercluster.PointFeature<FeatureProperties>
+            | Supercluster.PointFeature<AdFeature>
           )[]
         } = await response.json()
 
@@ -170,11 +170,14 @@ export default function AdsOnMap() {
                   center={center}
                   setVisibleRect={setVisibleRect}
                   setZoom={setZoom}
+                  setSelectedMarker={setSelectedMarker}
                 >
-                  <>
-                    <PlacesSearchBar />
-                    <AdMarkers data={clusters} />
-                  </>
+                  <AdMarkers
+                    data={clusters}
+                    selectedMarker={selectedMarker}
+                    setSelectedMarker={setSelectedMarker}
+                    contentVariant="wasteAvailableAds"
+                  />
                 </Map>
               </Box>
             </AdWrapper>

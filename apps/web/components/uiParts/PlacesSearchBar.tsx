@@ -105,30 +105,22 @@ export default function PlacesSearchBar() {
         map.setZoom(14)
       },
     )
-  }, [value, placesService])
+  }, [map, value, placesService])
 
   if (!map) return null
 
   return (
-    <APIProvider
-      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY || ''}
-      language="uk"
+    <Box
+      sx={{
+        width: 300,
+        borderRadius: '8px',
+        background: '#fff',
+        p: '8px 4px 4px 4px',
+        mt: '4px',
+        boxShadow: '1px 1px 4px #6e6d6d',
+      }}
     >
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 8,
-          left: 0,
-          right: 0,
-          margin: 'auto',
-          width: 300,
-          zIndex: 1,
-          borderRadius: '8px',
-          background: '#fff',
-          p: 1,
-          boxShadow: '1px 1px 5px #6e6d6d',
-        }}
-      >
+      <Box>
         <Autocomplete
           value={value}
           noOptionsText="Нет вариантов"
@@ -201,7 +193,9 @@ export default function PlacesSearchBar() {
                 name={'search'}
                 size={'small'}
                 sx={{
-                  '& .MuiInputLabel-root.Mui-focused': { color: darkBlueGreen },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: darkBlueGreen,
+                  },
 
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused fieldset': {
@@ -275,6 +269,6 @@ export default function PlacesSearchBar() {
           }}
         />
       </Box>
-    </APIProvider>
+    </Box>
   )
 }

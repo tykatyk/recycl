@@ -1,7 +1,6 @@
 import Supercluster from 'supercluster'
 import type {
-  CollectionPointFeatureProperties,
-  // ClusterProperties,
+  CollectionPointFeature,
   BBox,
 } from '@recycl/shared/dist/server/types'
 import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
@@ -29,10 +28,7 @@ type AggregatedCollectionPoint = {
   wasteType: string
 }
 
-const indexMap = new Map<
-  string,
-  Supercluster<CollectionPointFeatureProperties>
->()
+const indexMap = new Map<string, Supercluster<CollectionPointFeature>>()
 let refreshPromise: Promise<any> | null = null
 let lastRebuild: Date | null = null
 
@@ -59,7 +55,7 @@ export const getCollectionPointClusters = async (
 }
 
 const getPopulatedIndex = (ads: AggregatedCollectionPoint[]) => {
-  const index = new Supercluster<CollectionPointFeatureProperties>({
+  const index = new Supercluster<CollectionPointFeature>({
     radius: 40,
     maxZoom: 16,
   })

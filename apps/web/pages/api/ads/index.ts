@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import * as yup from 'yup'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
-import { getClusters } from '../../../lib/helpers/clusterMaker'
+import { getClusters } from '../../../lib/helpers/adsClusterMaker'
 import type { BBox } from '@recycl/shared/dist/server/types'
 
 const minZoom = 0

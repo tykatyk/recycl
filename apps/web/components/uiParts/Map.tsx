@@ -1,23 +1,30 @@
-import { APIProvider, ControlPosition, Map } from '@vis.gl/react-google-maps'
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  APIProvider,
+  ControlPosition,
+  Map,
+  MapControl,
+} from '@vis.gl/react-google-maps'
+import {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import type { BBox, MapCenter } from '@recycl/shared/dist/server/types'
-
-//Ukraine
-const countryBounds = {
-  north: 52.38,
-  south: 44.38,
-  west: 22.13,
-  east: 40.22,
-}
+import PlacesSearchBar from './PlacesSearchBar'
 
 const googleMapId = 'd80f8976374eb93b825a20cf'
-const initialZoom = 13
+export const initialZoom = 11
 
 type MapComponentProps = {
   children: ReactElement
   setVisibleRect: (bbox: BBox) => void
   setZoom: (zoom: number) => void
   center: MapCenter
+  setSelectedMarker: Dispatch<SetStateAction<string>>
 }
 
 export default function MapComponent(props: MapComponentProps) {
@@ -25,7 +32,7 @@ export default function MapComponent(props: MapComponentProps) {
   const mapRef = useRef<google.maps.Map | null>(null)
   const isResizing = useRef(false)
   const resizeTimeout = useRef<NodeJS.Timeout | null>(null)
-  const { setVisibleRect, setZoom, center, children } = props
+  const { setVisibleRect, setZoom, center, children, setSelectedMarker } = props
 
   const updateMapState = useCallback((map: google.maps.Map) => {
     const bounds = map.getBounds()
@@ -90,9 +97,9 @@ export default function MapComponent(props: MapComponentProps) {
         }}
         mapId={googleMapId}
         mapTypeId="roadmap"
-        restriction={{
-          latLngBounds: countryBounds,
-        }}
+        // restriction={{
+        //   latLngBounds: countryBounds,
+        // }}
         onIdle={(event) => {
           mapRef.current = event.map
 
@@ -100,7 +107,11 @@ export default function MapComponent(props: MapComponentProps) {
             updateMapState(event.map)
           }
         }}
+        onClick={() => setSelectedMarker('')}
       >
+        <MapControl position={ControlPosition.TOP_CENTER}>
+          <PlacesSearchBar />
+        </MapControl>
         {children}
       </Map>
     </APIProvider>

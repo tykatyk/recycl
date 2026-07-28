@@ -7,10 +7,9 @@ import UserLocation from '../uiParts/UserLocation'
 import Supercluster, { ClusterProperties } from 'supercluster'
 import type {
   BBox,
-  CollectionPointFeatureProperties,
+  CollectionPointFeature,
   MapCenter,
 } from '@recycl/shared/dist/server/types'
-import PlacesSearchBar from '../uiParts/PlacesSearchBar'
 import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import AdSidebar from '../uiParts/AdSidebar'
@@ -18,7 +17,7 @@ import AdSidebarItemsMap from '../uiParts/AdSidebarItemsMap'
 import Head from '../uiParts/Head'
 import { AdWrapper, drawerWidth } from '../uiParts/AdPageComponents'
 import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
-import { CollectionPointMarkers } from '../uiParts/Marker'
+import { AdMarkers } from '../uiParts/Marker'
 
 const errorMessage = 'Что-то пошло не так'
 
@@ -28,7 +27,7 @@ export default function CollectionPointsOnMap() {
   const [clusters, setClusters] = useState<
     (
       | Supercluster.ClusterFeature<ClusterProperties>
-      | Supercluster.PointFeature<CollectionPointFeatureProperties>
+      | Supercluster.PointFeature<CollectionPointFeature>
     )[]
   >([])
   const { enqueueSnackbar } = useSnackbar()
@@ -36,7 +35,7 @@ export default function CollectionPointsOnMap() {
   const [locationError, setLocationError] = useState(false)
   const [center, setCenter] = useState<MapCenter | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(true)
-
+  const [selectedMarker, setSelectedMarker] = useState('')
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen)
   }
@@ -75,7 +74,7 @@ export default function CollectionPointsOnMap() {
         }
 
         const data: {
-          clusters: Supercluster.PointFeature<CollectionPointFeatureProperties>[]
+          clusters: Supercluster.PointFeature<CollectionPointFeature>[]
         } = await response.json()
 
         if (data && data.clusters && data.clusters.length > 0) {
@@ -167,13 +166,15 @@ export default function CollectionPointsOnMap() {
                 <Map
                   center={center}
                   setVisibleRect={setVisibleRect}
-                  // data={clusters}
                   setZoom={setZoom}
+                  setSelectedMarker={setSelectedMarker}
                 >
-                  <>
-                    <PlacesSearchBar />
-                    <CollectionPointMarkers data={clusters} />
-                  </>
+                  <AdMarkers
+                    data={clusters}
+                    selectedMarker={selectedMarker}
+                    setSelectedMarker={setSelectedMarker}
+                    contentVariant="collectionPoints"
+                  />
                 </Map>
               </Box>
             </AdWrapper>

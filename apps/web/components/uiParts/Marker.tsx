@@ -8,10 +8,10 @@ import {
 } from '@vis.gl/react-google-maps'
 import Link from './Link'
 import {
-  CollectionPointFeatureProperties,
-  FeatureProperties,
+  CollectionPointFeature,
+  AdFeature,
 } from '@recycl/shared/dist/server/types'
-import { useState } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 import Supercluster, { ClusterProperties } from 'supercluster'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import dayjs from 'dayjs'
@@ -26,12 +26,8 @@ const aggregatedMarkerStyles = {
   },
 }
 
-export const IndividualAdContent = ({
-  adId,
-  placeDescription,
-  title,
-  weight,
-}) => {
+export const IndividualAdContent = ({ data }) => {
+  const { adId, placeDescription, title, weight } = data
   return (
     <Box sx={{ color: 'grey.800' }}>
       <Box sx={{ mb: 2 }}>
@@ -61,12 +57,8 @@ export const IndividualAdContent = ({
   )
 }
 
-export const AggregatedAdContent = ({
-  placeDescription,
-  weight,
-  wasteType,
-  placeId,
-}) => {
+export const AggregatedAdContent = ({ data }) => {
+  const { placeDescription, weight, wasteType, placeId } = data
   return (
     <Box sx={{ color: 'grey.800' }}>
       <Box sx={{ mb: 2 }}>
@@ -102,10 +94,10 @@ export const IndividualCollectionPointContent = ({ data }) => {
   const { adId, placeDescription, wasteTypes, phone, variant, date } = data
   return (
     <Box sx={{ color: 'grey.800' }}>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 1 }}>
         <Typography variant="h6">{placeDescription}</Typography>
       </Box>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 1 }}>
         <Typography
           variant="body2"
           gutterBottom
@@ -119,19 +111,19 @@ export const IndividualCollectionPointContent = ({ data }) => {
       </Box>
 
       {date && (
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 1 }}>
           <Typography
             variant="body2"
             gutterBottom
             sx={{ fontWeight: 'fontWeightLight' }}
           >
-            Дата и время начала приема вторсырья
+            Дата и время приема вторсырья
           </Typography>
           <Typography>{dayjs(date).format('DD.MM.YYYY HH:mm')}</Typography>
         </Box>
       )}
 
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 1 }}>
         <Typography
           variant="body2"
           gutterBottom
@@ -139,7 +131,7 @@ export const IndividualCollectionPointContent = ({ data }) => {
         >
           Виды вторсырья, которые принимаются
         </Typography>
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 1 }}>
           <Stack direction="row" spacing={1}>
             {wasteTypes.map((wasteType: string, idx: number) => {
               return (
@@ -157,7 +149,7 @@ export const IndividualCollectionPointContent = ({ data }) => {
           </Stack>
         </Box>
       </Box>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 1 }}>
         <Typography
           variant="body2"
           gutterBottom
@@ -189,11 +181,8 @@ export const IndividualCollectionPointContent = ({ data }) => {
   )
 }
 
-export const AggregatedCollectionPointContent = ({
-  placeDescription,
-  wasteType,
-  placeId,
-}) => {
+export const AggregatedCollectionPointContent = ({ data }) => {
+  const { placeDescription, wasteType, placeId } = data
   return (
     <Box sx={{ color: 'grey.800' }}>
       <Box sx={{ mb: 2 }}>
@@ -288,105 +277,58 @@ export function ClusterMarker({ totalPoints, position }) {
         if (!map) return
 
         const currZoom = map.getZoom()
-        if (!currZoom) return
+
+        if (typeof currZoom === 'undefined') return
+
         map.setZoom(currZoom + 2)
         map.panTo(position)
       }}
     >
-      <>
-        <Box
-          sx={{
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            bgcolor: '#1a2b34',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 700,
-            border: `3px solid #FF7518`,
-          }}
-        >
-          {totalPoints}
-        </Box>
-      </>
+      <Box
+        sx={{
+          width: 32,
+          height: 32,
+          borderRadius: '50%',
+          bgcolor: '#1a2b34',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 700,
+          border: `3px solid #FF7518`,
+        }}
+      >
+        {totalPoints}
+      </Box>
     </AdvancedMarker>
   )
 }
 
-export function AdMarkers(props: {
-  data: (
-    | Supercluster.ClusterFeature<ClusterProperties>
-    | Supercluster.PointFeature<FeatureProperties>
-  )[]
-}) {
-  const [selectedMarker, setSelectedMarker] = useState('')
-  const { data } = props
-  return data && data.length > 0
-    ? data.map((element, index: number) => {
-        const coords = {
-          lat: element.geometry.coordinates[1],
-          lng: element.geometry.coordinates[0],
-        }
-
-        if ('cluster' in element.properties) {
-          return (
-            <ClusterMarker
-              key={index}
-              position={coords}
-              totalPoints={element.properties.point_count}
-            ></ClusterMarker>
-          )
-        }
-
-        if ('adId' in element.properties) {
-          return (
-            <IndividualPointMarker
-              key={index}
-              position={coords}
-              placeId={element.properties.placeId}
-              selectedMarker={selectedMarker}
-              setSelectedMarker={setSelectedMarker}
-            >
-              <IndividualAdContent
-                title={element.properties.title}
-                placeDescription={element.properties.placeDescription}
-                weight={element.properties.weight}
-                adId={element.properties.adId}
-              />
-            </IndividualPointMarker>
-          )
-        }
-
-        return (
-          <AggregatedPointMarker
-            key={index}
-            position={coords}
-            placeId={element.properties.placeId}
-            selectedMarker={selectedMarker}
-            setSelectedMarker={setSelectedMarker}
-          >
-            <AggregatedAdContent
-              placeId={element.properties.placeId}
-              placeDescription={element.properties.placeDescription}
-              wasteType={element.properties.wasteType}
-              weight={element.properties.weight}
-            />
-          </AggregatedPointMarker>
-        )
-      })
-    : null
+type BaseMarkersProps = {
+  selectedMarker: string
+  setSelectedMarker: Dispatch<SetStateAction<string>>
 }
 
-export function CollectionPointMarkers(props: {
+type AdMarkersProps = {
   data: (
     | Supercluster.ClusterFeature<ClusterProperties>
-    | Supercluster.PointFeature<CollectionPointFeatureProperties>
+    | Supercluster.PointFeature<AdFeature>
   )[]
-}) {
-  const [selectedMarker, setSelectedMarker] = useState('')
-  const { data } = props
+  contentVariant: 'wasteAvailableAds'
+} & BaseMarkersProps
+
+type CollectionPointMarkersProps = {
+  data: (
+    | Supercluster.ClusterFeature<ClusterProperties>
+    | Supercluster.PointFeature<CollectionPointFeature>
+  )[]
+  contentVariant: 'collectionPoints'
+} & BaseMarkersProps
+
+type MarkersProps = AdMarkersProps | CollectionPointMarkersProps
+
+export function AdMarkers(props: MarkersProps) {
+  const { data, contentVariant, selectedMarker, setSelectedMarker } = props
   return data && data.length > 0
     ? data.map((element, index: number) => {
         const coords = {
@@ -413,7 +355,11 @@ export function CollectionPointMarkers(props: {
               selectedMarker={selectedMarker}
               setSelectedMarker={setSelectedMarker}
             >
-              <IndividualCollectionPointContent data={element.properties} />
+              {contentVariant === 'wasteAvailableAds' ? (
+                <IndividualAdContent data={element.properties} />
+              ) : (
+                <IndividualCollectionPointContent data={element.properties} />
+              )}
             </IndividualPointMarker>
           )
         }
@@ -426,11 +372,11 @@ export function CollectionPointMarkers(props: {
             selectedMarker={selectedMarker}
             setSelectedMarker={setSelectedMarker}
           >
-            <AggregatedCollectionPointContent
-              placeId={element.properties.placeId}
-              placeDescription={element.properties.placeDescription}
-              wasteType={element.properties.wasteType}
-            />
+            {contentVariant === 'wasteAvailableAds' ? (
+              <AggregatedAdContent data={element.properties} />
+            ) : (
+              <AggregatedCollectionPointContent data={element.properties} />
+            )}
           </AggregatedPointMarker>
         )
       })
