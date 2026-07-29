@@ -7,23 +7,20 @@ import GppMaybeIcon from '@mui/icons-material/GppMaybe'
 import { useCallback, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
+import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import ComplainDialog from '../uiParts/ComplainDialog'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
 const phoneLoadingErrorMessage = 'Что то пошло не так'
 
-export default function SingleWasteAvailableAd(props) {
+export default function SingleCollectionPoint(props) {
   const { data } = props
   const [showPhone, setShowPhone] = useState(false)
   const [phone, setPhone] = useState(defaultPhone)
   const [loading, setLoading] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
+  const [complainDialogOpen, setComplainDialogOpen] = useState(false)
   const creationDate = new Date(data.createdAt)
-
-  const formattedDate = new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(creationDate)
 
   const buttonHandler = useCallback(async () => {
     if (phone !== defaultPhone) return
@@ -33,7 +30,7 @@ export default function SingleWasteAvailableAd(props) {
 
     try {
       setLoading(true)
-      const result = await fetch('/api/ads/phone', {
+      const result = await fetch('/api/collection-points/phone', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adId }),
@@ -54,10 +51,9 @@ export default function SingleWasteAvailableAd(props) {
       <Box sx={{ mb: 3 }}>
         <Box sx={{ mb: 1 }}>
           <Typography component="h1" variant="h4">
-            {data.title}
+            Пункт приема вторсырья
           </Typography>
         </Box>
-
         <Box sx={{ mb: 2 }}>
           <Typography
             variant="body2"
@@ -69,7 +65,7 @@ export default function SingleWasteAvailableAd(props) {
             }}
           >
             <LocationPinIcon />
-            {`Местоположение: ${data.wasteLocation.description}`}
+            {`Местоположение: ${data.location.description}`}
           </Typography>
         </Box>
       </Box>
@@ -86,9 +82,10 @@ export default function SingleWasteAvailableAd(props) {
       >
         <Box>
           <Grid container spacing={2}>
-            <Chip label={`Тип вторсырья: ${data.wasteType}`} size="small" />
-
-            <Chip label={`Объявление создано: ${formattedDate}`} size="small" />
+            <Chip
+              label={`Тип пункта приема: ${collectionPointTypes[data.variant].toLowerCase()}`}
+              size="small"
+            />
             <Chip label={`Добавил: ${data.user.name}`} size="small" />
           </Grid>
         </Box>
@@ -98,8 +95,13 @@ export default function SingleWasteAvailableAd(props) {
             component={'h2'}
             variant="h5"
             gutterBottom
-          >{`Вес вторсырья`}</Typography>
-          <Typography>{`${data.quantity} кг`}</Typography>
+          >{`Виды вторсырья, которые принимаются`}</Typography>
+
+          <Grid container spacing={2}>
+            {data.wasteTypes.map((item, idx) => {
+              return <Chip key={idx} label={item} size="small" />
+            })}
+          </Grid>
         </Box>
         <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
           <Typography component={'h2'} variant="h5" gutterBottom>
@@ -132,7 +134,7 @@ export default function SingleWasteAvailableAd(props) {
         </Box>
 
         {data.comment && (
-          <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
+          <Box>
             <Typography component={'h2'} variant="h5" gutterBottom>
               Опиcание
             </Typography>
@@ -142,22 +144,22 @@ export default function SingleWasteAvailableAd(props) {
 
         <Box sx={{ p: 2 }}>
           <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-            <Typography
-              variant="body2"
+            <Button
+              variant="text"
               color="error"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
+              size="small"
+              onClick={() => {
+                setComplainDialogOpen(true)
               }}
-              align="right"
+              startIcon={<GppMaybeIcon />}
             >
-              <GppMaybeIcon />
-              <Link href={'#'} sx={{ color: 'inherit' }}>
-                Пожаловаться
-              </Link>
-            </Typography>
+              Пожаловаться
+            </Button>
           </Box>
+          <ComplainDialog
+            open={complainDialogOpen}
+            setOpen={setComplainDialogOpen}
+          />
         </Box>
       </Box>
     </Box>

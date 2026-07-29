@@ -1,9 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
-import {
-  dbConnect,
-  RemovalApplicationModel,
-} from '@recycl/shared/dist/server/db'
+import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 
 async function adsPhoneViewHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -15,10 +12,10 @@ async function adsPhoneViewHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!adId) return res.status(400).end()
 
   await dbConnect()
-  const data = await RemovalApplicationModel.findById(adId)
+  const data = await CollectionPointModel.findById(adId)
   if (!data || data.status !== 'active') return res.status(404)
 
-  res.json(data.contactPhone)
+  res.json(data.phone)
 }
 
 export default apiHandler(adsPhoneViewHandler)

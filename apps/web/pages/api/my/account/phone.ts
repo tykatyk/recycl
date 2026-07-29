@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
+import { METHOD_NOT_ALLOWED } from '../../../../lib/errors'
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../auth/[...nextauth]'
+import { authOptions } from '../../auth/[...nextauth]'
 
 async function userPhoneViewHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
