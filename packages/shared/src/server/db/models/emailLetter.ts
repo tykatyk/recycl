@@ -8,7 +8,12 @@ import {
 } from 'mongoose'
 import { checkEmail } from '../dbModelCommons'
 
-const emailLetterVariants = ['proposeWasteType', 'contact', 'other'] as const
+const emailLetterVariants = [
+  'proposeWasteType',
+  'contact',
+  'complaint',
+  'other',
+] as const
 export type EmailLetterVariant = (typeof emailLetterVariants)[number]
 
 const emailLetterSchema = new Schema(

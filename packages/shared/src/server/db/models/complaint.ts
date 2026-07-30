@@ -1,4 +1,6 @@
 import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
+import { checkEmail } from '../dbModelCommons'
+import type { ValidatorProps } from 'mongoose'
 
 const complaintSchema = new Schema(
   {
@@ -18,6 +20,19 @@ const complaintSchema = new Schema(
     userIp: {
       type: String,
       required: true,
+    },
+    userName: {
+      type: String,
+    },
+    userEmail: {
+      type: String,
+      validate: {
+        validator: checkEmail,
+        message: (props: ValidatorProps) =>
+          `${props.value} invalidEmailAddress`,
+      },
+      lowercase: true,
+      trim: true,
     },
   },
   { timestamps: true },

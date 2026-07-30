@@ -10,6 +10,7 @@ import { useFormik } from 'formik'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
 import { complaintFormSchema } from '../../lib/validation/complaintForm'
+import { useState } from 'react'
 
 const errorMessage = 'Что то пошло не так'
 const successMessage = 'Сообщение отправлено администратору'
@@ -23,6 +24,7 @@ export default function ComplainDialog(props: FormDialogProps) {
   const { open, setOpen } = props
   const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
+  const [loading, setLoading] = useState(false)
 
   const handleClose = () => {
     setOpen(false)
@@ -38,6 +40,7 @@ export default function ComplainDialog(props: FormDialogProps) {
     validationSchema: complaintFormSchema,
     onSubmit: async (values) => {
       try {
+        setLoading(true)
         const response = await fetch(`/api/complaint`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -55,6 +58,8 @@ export default function ComplainDialog(props: FormDialogProps) {
         enqueueSnackbar(errorMessage, {
           variant: 'error',
         })
+      } finally {
+        setLoading(false)
       }
     },
   })
@@ -94,7 +99,9 @@ export default function ComplainDialog(props: FormDialogProps) {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Отменить</Button>
-            <Button type="submit">Отправить</Button>
+            <Button type="submit" disabled={loading}>
+              Отправить
+            </Button>
           </DialogActions>
         </form>
       </Dialog>

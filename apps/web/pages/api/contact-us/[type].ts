@@ -5,87 +5,21 @@ import {
   contactUsSchema,
 } from '../../../lib/validation'
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
-import { sendEmail } from '../../../lib/helpers/email/mailer'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import {
   validationErrorResponse,
   captchaNotPassedResponse,
 } from '../../../lib/helpers/responses'
 import type { NextApiRequest, NextApiResponse } from 'next/types'
-import { INTERNAL_SERVER_ERROR } from '../../../lib/errors'
 import * as yup from 'yup'
-import { EmailLetterModel } from '@recycl/shared/dist/server/db'
-import type { EmailLetterVariant } from '@recycl/shared/dist/server/db/models/emailLetter'
+import {
+  handleEmailSending,
+  getEmailText,
+  getHtml,
+} from '../../../lib/helpers/email/mailer'
+import { email as emailValidator } from '@recycl/shared/dist/validation'
 
 const getEmailFrom = (email: string) => email.toLowerCase().replace(/\s/g, '')
-
-const getEmailText = (obj: Record<string, string>) =>
-  Object.values(obj).join('\r\n')
-
-const getHtml = (obj: Record<string, string>) => {
-  const { header, ...rest } = obj
-  return `
-        <html>
-            <head>
-              <meta charset="utf-8" />
-              <title>${header}</title>
-            </head>
-            <body style="font-family: Arial, Helvetica, sans-serif;">
-              <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
-              <tr>
-                <td>
-                  <h1 style="font-weight:500; font-size:1.25rem; lineHeight:1.6; letter-spacing:0.0075em">${header}</h1>
-                </td>
-              </tr>
-                <tr>
-                  <td>
-                    <p>
-                      ${Object.values(rest).join('</p><p>')}
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </body>
-          </html>
-        `
-}
-
-const validateEmailTo = (email: string) => {
-  try {
-    yup.string().email().validateSync(email)
-  } catch (err) {
-    console.log(err)
-    throw new Error(INTERNAL_SERVER_ERROR)
-  }
-}
-type HandleEmailSendingParams = {
-  to: string
-  from: string
-  subject: string
-  messageType: EmailLetterVariant
-  html: string
-  text: string
-}
-const handleEmailSending = async (params: HandleEmailSendingParams) => {
-  const { to, from, subject, html, text } = params
-  const emailLetterParams = { to, from, subject, message: text }
-
-  try {
-    await sendEmail({ to, subject, html, text })
-  } catch (err) {
-    console.log(err)
-    await EmailLetterModel.create({
-      ...emailLetterParams,
-      status: 'failed',
-      lastError: err instanceof Error ? err.message : 'Unknown error',
-    })
-    throw new Error(`Could not send an email to the admin`)
-  }
-  await EmailLetterModel.create({
-    ...emailLetterParams,
-    status: 'sent',
-  })
-}
 
 const generalContactHandler = async (
   req: NextApiRequest,
@@ -111,8 +45,8 @@ const generalContactHandler = async (
 
   const emailFrom = getEmailFrom(email)
   const emailTo = process.env.SMTP_USER || ''
-  validateEmailTo(emailTo)
-  const subject = `Новове сообщение с сайта ${process.env.BRAND}`
+  await emailValidator.validate(emailTo)
+  const subject = `Поступило новове сообщение с сайта ${process.env.BRAND}`
 
   const emailText = {
     header: subject,
@@ -161,7 +95,7 @@ const proposeWasteTypeContactHandler = async (
 
   const emailTo = process.env.SMTP_USER || ''
 
-  validateEmailTo(emailTo)
+  await emailValidator.validate(emailTo)
 
   const emailFrom = getEmailFrom(email)
 
@@ -177,7 +111,7 @@ const proposeWasteTypeContactHandler = async (
   const emailParams = {
     to: emailTo,
     from: emailFrom,
-    subject: 'Предложение о добавлении нового типа вторсырья',
+    subject: 'Поступило предложение о добавлении нового типа вторсырья',
     messageType: 'proposeWasteType' as const,
     html: getHtml(emailText),
     text: getEmailText(emailText),
