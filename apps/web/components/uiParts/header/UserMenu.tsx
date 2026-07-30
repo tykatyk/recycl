@@ -1,14 +1,11 @@
 import { useTheme } from '@mui/material/styles'
 import {
   MenuItem,
-  ClickAwayListener,
-  Grow,
-  Paper,
   ListItem,
   MenuList,
   ListItemText,
   ListItemIcon,
-  Popper,
+  Menu,
 } from '@mui/material'
 import Link from '../Link'
 import { useSession } from 'next-auth/react'
@@ -21,9 +18,38 @@ import InventoryIcon from '@mui/icons-material/Inventory'
 import PlaceIcon from '@mui/icons-material/Place'
 import EmailIcon from '@mui/icons-material/Email'
 import { useRouter } from 'next/router'
+import { useId } from 'react'
 
 const authenticated = 'authenticated'
 const apolloClient = initializeApollo()
+
+const menuItems = [
+  {
+    text: 'Мои',
+    items: [
+      {
+        text: 'Обьявления о наличии вторсырья',
+        href: '/my/ads',
+        icon: InventoryIcon,
+      },
+      {
+        text: 'Пункты приема вторсырья',
+        href: '/my/collection-points',
+        icon: PlaceIcon,
+      },
+      {
+        text: 'Подписки на уведомления',
+        href: '/my/subscriptions',
+        icon: EmailIcon,
+      },
+    ],
+  },
+  {
+    text: 'Настройки',
+    href: '/my/account',
+    icon: SettingsIcon,
+  },
+]
 
 export default function UserMenu(props) {
   const theme = useTheme()
@@ -31,35 +57,10 @@ export default function UserMenu(props) {
 
   const { data: session, status } = useSession()
   const preventDefault = () => false
-  const { open, anchorEl, handleClose, handleListKeyDown } = props
+  const { open, anchorEl, handleClose } = props
 
-  const menuItems = [
-    {
-      text: 'Мои',
-      items: [
-        {
-          text: 'Обьявления о наличии вторсырья',
-          href: '/my/ads',
-          icon: InventoryIcon,
-        },
-        {
-          text: 'Пункты приема вторсырья',
-          href: '/my/collection-points',
-          icon: PlaceIcon,
-        },
-        {
-          text: 'Подписки на уведомления',
-          href: '/my/subscriptions',
-          icon: EmailIcon,
-        },
-      ],
-    },
-    {
-      text: 'Настройки',
-      href: '/my/account',
-      icon: SettingsIcon,
-    },
-  ]
+  const id = useId()
+  const menuId = `${id}-menu`
 
   const showSubmenu = (item, index) => {
     const Icon = item.icon
@@ -149,45 +150,33 @@ export default function UserMenu(props) {
   }
 
   return (
-    <Popper
+    <Menu
       open={open}
+      id={menuId}
+      onClose={handleClose}
       anchorEl={anchorEl}
-      role={undefined}
-      transition
-      disablePortal
+      slotProps={{
+        list: {
+          'aria-label': 'Меню пользователя',
+        },
+      }}
     >
-      {({ TransitionProps, placement }) => (
-        <Grow
-          {...TransitionProps}
-          style={{
-            transformOrigin:
-              placement === 'bottom' ? 'center top' : 'center bottom',
-          }}
-        >
-          <Paper>
-            <ClickAwayListener onClickAway={handleClose}>
-              <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                {status === authenticated && (
-                  <MenuItem divider>
-                    <ListItemText
-                      style={{
-                        textAlign: 'center',
-                        color: theme.palette.secondary.main,
-                      }}
-                      secondary={session ? session.user?.name : ''}
-                    />
-                  </MenuItem>
-                )}
-                {status === authenticated &&
-                  menuItems.map((item, index) => {
-                    return showSubmenu(item, index)
-                  })}
-                <MenuItem onClick={handleClose}>{logIn}</MenuItem>
-              </MenuList>
-            </ClickAwayListener>
-          </Paper>
-        </Grow>
+      {status === authenticated && (
+        <MenuItem divider>
+          <ListItemText
+            style={{
+              textAlign: 'center',
+              color: theme.palette.secondary.main,
+            }}
+            secondary={session ? session.user?.name : ''}
+          />
+        </MenuItem>
       )}
-    </Popper>
+      {status === authenticated &&
+        menuItems.map((item, index) => {
+          return showSubmenu(item, index)
+        })}
+      <MenuItem onClick={handleClose}>{logIn}</MenuItem>
+    </Menu>
   )
 }

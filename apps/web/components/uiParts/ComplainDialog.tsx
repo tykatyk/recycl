@@ -6,26 +6,23 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import * as yup from 'yup'
 import { useFormik } from 'formik'
-import { validationMessages } from '@recycl/shared/dist/validation'
+import { useRouter } from 'next/router'
+import { useSnackbar } from 'notistack'
+import { complaintFormSchema } from '../../lib/validation/complaintForm'
 
-const { required, maxLength, minLength } = validationMessages
-
-const validationSchema = yup.object({
-  complaint: yup
-    .string()
-    .min(25, minLength)
-    .max(50, maxLength)
-    .required(required),
-})
+const errorMessage = 'Что то пошло не так'
+const successMessage = 'Сообщение отправлено администратору'
 
 type FormDialogProps = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
+
 export default function ComplainDialog(props: FormDialogProps) {
   const { open, setOpen } = props
+  const router = useRouter()
+  const { enqueueSnackbar } = useSnackbar()
 
   const handleClose = () => {
     setOpen(false)
@@ -33,14 +30,32 @@ export default function ComplainDialog(props: FormDialogProps) {
   }
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       complaint: '',
+      complaintUrl: router.asPath,
     },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log('here')
-      //   alert(JSON.stringify(values, null, 2))
-      //   handleClose()
+    validationSchema: complaintFormSchema,
+    onSubmit: async (values) => {
+      try {
+        const response = await fetch(`/api/complaint`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...values }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Response is not OK')
+        }
+        enqueueSnackbar(successMessage, {
+          variant: 'success',
+        })
+        handleClose()
+      } catch (error) {
+        enqueueSnackbar(errorMessage, {
+          variant: 'error',
+        })
+      }
     },
   })
 
@@ -60,12 +75,14 @@ export default function ComplainDialog(props: FormDialogProps) {
           <DialogContent>
             <DialogContentText>Опишите причину жалобы</DialogContentText>
             <TextField
+              multiline
+              rows={3}
+              variant="outlined"
               margin="dense"
               id="complaint"
               name="complaint"
               label="Текст жалобы"
               fullWidth
-              variant="standard"
               value={formik.values.complaint}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}

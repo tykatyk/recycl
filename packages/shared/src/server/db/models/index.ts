@@ -18,6 +18,7 @@ import UserModel from './user'
 import SubscriptionRunModel from './subscriptionRun'
 import SubscriptionBatchModel from './subscriptionBatch'
 import EmailLetterModel from './emailLetter'
+import ComplaintModel from './complaint'
 
 export {
   Message,
@@ -39,4 +40,5 @@ export {
   SubscriptionRunModel,
   SubscriptionBatchModel,
   EmailLetterModel,
+  ComplaintModel,
 }
