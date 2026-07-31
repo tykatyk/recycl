@@ -16,9 +16,9 @@ import { useQuery, useMutation } from '@apollo/client'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import {
-  GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT,
-  DELETE_REMOVAL_APPLICATIONS,
-} from '../../lib/graphql/queries/removalApplication'
+  GET_ADS_WITH_MESSAGE_COUNT,
+  DELETE_ADS,
+} from '../../lib/graphql/queries/ad'
 import Router from 'next/router'
 
 const PREFIX = 'IndexOwner'
@@ -99,23 +99,21 @@ const columns = [
   },
 ]
 
-export default function RemovalApplications(props) {
+export default function Ads(props) {
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(1)
   const [backendError, setBackendError] = useState(null)
   const { status } = useSession()
   const { asPath } = useRouter()
-  const { loading, error, data } = useQuery(
-    GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT,
-  )
+  const { loading, error, data } = useQuery(GET_ADS_WITH_MESSAGE_COUNT)
   const [deleteMutation, { loading: deleting, error: deletionError }] =
-    useMutation(DELETE_REMOVAL_APPLICATIONS)
+    useMutation(DELETE_ADS)
   const deleteHandler = (event) => {
     if (selected.length < 1) return
     deleteMutation({
       variables: { ids: selected },
-      refetchQueries: [{ query: GET_REMOVAL_APPLICATIONS_WITH_MESSAGE_COUNT }],
+      refetchQueries: [{ query: GET_ADS_WITH_MESSAGE_COUNT }],
     })
   }
   const handlePageChange = (_, newPage) => setPage(newPage)
@@ -137,10 +135,10 @@ export default function RemovalApplications(props) {
   }
 
   if (status === 'authenticated') {
-    if (!error && data && data.getRemovalApplicationsWithMessageCount) {
+    if (!error && data && data.getAdsWithMessageCount) {
       //ToDo: Refactor returned data, so that data contain objects in needed form
       //to avoid mapping
-      rows = data.getRemovalApplicationsWithMessageCount.map((item) => {
+      rows = data.getAdsWithMessageCount.map((item) => {
         const newItem = {}
         newItem.id = item.document['_id']
         newItem.wasteType = item.document.wasteType

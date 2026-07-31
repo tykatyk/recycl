@@ -1,5 +1,4 @@
-import dbConnect from '../../lib/db/connection'
-import removalApplicationModel from '../../lib/db/models/removalApplication'
+import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
 import lockfile from 'proper-lockfile'
 import { writeFile } from 'node:fs'
 
@@ -8,7 +7,7 @@ const fileName = 'public/locks/lock'
 export default async function disablePublications(req, res) {
   return dbConnect()
     .then(() => {
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         writeFile(fileName, '', { flag: 'wx' }, (err) => {
           if (!err || err.code === 'EEXIST') {
             resolve()
@@ -28,14 +27,12 @@ export default async function disablePublications(req, res) {
       console.log('Starting to disable expired ads')
 
       let date = new Date()
-      removalApplicationModel
-        .updateMany(
-          {
-            updatedAt: { $lte: new Date(date.setMonth(date.getMonth() - 6)) },
-          },
-          { isActive: false }
-        )
-        .exec()
+      AdModel.updateMany(
+        {
+          updatedAt: { $lte: new Date(date.setMonth(date.getMonth() - 6)) },
+        },
+        { isActive: false },
+      ).exec()
     })
     .then(() => {
       console.log('Finished disabling expired publications')

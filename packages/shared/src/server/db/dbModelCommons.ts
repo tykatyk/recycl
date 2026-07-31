@@ -6,7 +6,7 @@ import {
 
 const NUM_DAYS_TO_EXPIRE = 30
 
-//ToDo: використати цю схему також в removalApplication
+//ToDo: використати цю схему також в ad
 export const userSchema = new Schema({
   _id: {
     type: Schema.Types.ObjectId,

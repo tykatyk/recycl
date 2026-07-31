@@ -1,5 +1,5 @@
 import message from './message'
-import removalApplication from './removalApplication'
+import ad from './ad'
 import user from './user'
 import userRole from './userRole'
 import wasteType from './wasteType'
@@ -27,12 +27,5 @@ const dateResolver = {
   Date: dateScalar,
 }
 
-const resolvers = [
-  message,
-  removalApplication,
-  user,
-  userRole,
-  wasteType,
-  dateResolver,
-]
+const resolvers = [message, ad, user, userRole, wasteType, dateResolver]
 export default resolvers

@@ -2,35 +2,30 @@ import gql from 'graphql-tag'
 
 export default gql`
   type Query {
-    getRemovalApplications(queryParams: QueryParams): [RemovalApplicationOutput]
-    getRemovalApplicationsWithMessageCount: [RemovalApplicationsWithMessageCountOutput]
+    getAds(queryParams: QueryParams): [AdOutput]
+    getAdsWithMessageCount: [AdsWithMessageCountOutput]
   }
 
   type Mutation {
-    createRemovalApplication(
-      application: RemovalApplication!
-    ): RemovalApplicationOutput
-    updateRemovalApplication(
-      id: String!
-      newValues: RemovalApplication!
-    ): RemovalApplicationOutput
-    deleteRemovalApplication(id: String!): RemovalApplicationOutput
-    deleteRemovalApplications(ids: [String!]!): DeleteManyOutput
+    createAd(ad: Ad!): AdOutput
+    updateAd(id: String!, newValues: Ad!): AdOutput
+    deleteAd(id: String!): AdOutput
+    deleteAds(ids: [String!]!): DeleteManyOutput
   }
 
-  type UserOutputForRemovalApplication {
+  type UserOutputForAd {
     _id: String!
     name: String!
   }
 
-  type RemovalApplicationOutput {
+  type AdOutput {
     _id: String!
     title: String!
     wasteLocation: LocationOutput!
     wasteType: String!
     contactPhone: String
     quantity: Int!
-    user: UserOutputForRemovalApplication!
+    user: UserOutputForAd!
     comment: String
     passDocumet: Boolean
     notificationCitiesCheckbox: Boolean
@@ -41,12 +36,12 @@ export default gql`
     createdAt: Date!
   }
 
-  type RemovalApplicationsWithMessageCountOutput {
-    document: RemovalApplicationOutput!
+  type AdsWithMessageCountOutput {
+    document: AdOutput!
     messageCount: Int
   }
 
-  input RemovalApplication {
+  input Ad {
     title: String!
     wasteLocation: Location!
     wasteType: String!

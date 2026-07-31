@@ -2,7 +2,7 @@ import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
 import { contactPhone, locationSchema, expires } from '../dbModelCommons'
 import { documentActivityStatus } from '../../../constants'
 
-const removalApplicationSchema = new Schema(
+const adSchema = new Schema(
   {
     //ToDo: refactor user schema. Use one from dbModelCommons
     title: {
@@ -43,17 +43,10 @@ const removalApplicationSchema = new Schema(
   },
   { timestamps: true },
 )
-export type RemovalApplication = InferSchemaType<
-  typeof removalApplicationSchema
->
+export type Ad = InferSchemaType<typeof adSchema>
 
-type RemovalApplicationModel = Model<RemovalApplication>
+type AdModel = Model<Ad>
 
-const RemovalApplicationModel =
-  (models.RemovalApplication as RemovalApplicationModel) ||
-  model<RemovalApplication, RemovalApplicationModel>(
-    'RemovalApplication',
-    removalApplicationSchema,
-  )
+const AdModel = (models.Ad as AdModel) || model<Ad, AdModel>('Ad', adSchema)
 
-export default RemovalApplicationModel
+export default AdModel

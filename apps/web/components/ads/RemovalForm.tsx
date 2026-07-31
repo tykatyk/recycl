@@ -9,14 +9,11 @@ import { Formik, Form, Field } from 'formik'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { useMutation, useQuery } from '@apollo/client'
-import {
-  CREATE_REMOVAL_APPLICATION,
-  UPDATE_REMOVAL_APPLICATION,
-} from '../../lib/graphql/queries/removalApplication'
+import { CREATE_AD, UPDATE_AD } from '../../lib/graphql/queries/ad'
 import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
 import { GET_PHONE } from '../../lib/graphql/queries/user'
 import { initialValues, getNormalizedValues } from './removalFormConfig'
-import { removalApplicationSchema } from '../../lib/validation'
+import { adSchema } from '../../lib/validation'
 import { useSnackbar } from 'notistack'
 
 const errorMessage = 'Возникла ошибка при создании заявки'
@@ -48,8 +45,8 @@ export default function RemovalForm() {
   const [gettingApplication, setGettingApplication] = useState(false)
   const [gettingError, setGettingError] = useState(false)
 
-  const [createMutation] = useMutation(CREATE_REMOVAL_APPLICATION)
-  const [updateMutation] = useMutation(UPDATE_REMOVAL_APPLICATION)
+  const [createMutation] = useMutation(CREATE_AD)
+  const [updateMutation] = useMutation(UPDATE_AD)
 
   const createHandler = (values, setSubmitting) => {
     setSubmitting(true)
@@ -78,7 +75,7 @@ export default function RemovalForm() {
       variables: { id: applicationId, newValues: normalizedValues },
     })
       .then((data) => {
-        router.push('/my/applications')
+        router.push('/my/ads')
       })
       .catch((err) => {
         enqueueSnackbar('Возникла ошибка при сохранении заявки', {
@@ -102,7 +99,7 @@ export default function RemovalForm() {
       <Formik
         enableReinitialize
         initialValues={initialValues}
-        validationSchema={removalApplicationSchema}
+        validationSchema={adSchema}
         onSubmit={(values, { setSubmitting }) => {
           if (applicationId) {
             updateHandler(values, setSubmitting)

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
-const messageSchema = Schema(
+const messageSchema = new Schema(
   {
     text: {
       type: String,
@@ -9,7 +9,7 @@ const messageSchema = Schema(
     },
     ad: {
       type: Schema.Types.ObjectId,
-      ref: 'RemovalApplication',
+      ref: 'Ad',
       required: true,
     },
     senderId: {
@@ -43,7 +43,7 @@ const messageSchema = Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
 export default mongoose.models.Message ||

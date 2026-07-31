@@ -7,10 +7,7 @@ import type {
   WasteAdClusterProperties,
   BBox,
 } from '@recycl/shared/dist/server/types'
-import {
-  dbConnect,
-  RemovalApplicationModel,
-} from '@recycl/shared/dist/server/db'
+import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
 import WasteTypeModel from '@recycl/shared/dist/server/db/models/wasteType'
 import mongoose from 'mongoose'
 import type { Lng, Lat } from '@recycl/shared/dist/server/types'
@@ -108,8 +105,6 @@ const rebuildIndexOnServer = async () => {
   try {
     if (refreshPromise) return
 
-    // const allAds: RemovalApplication[] = []
-
     await dbConnect()
     const wasteTypes = await WasteTypeModel.find().lean()
 
@@ -117,38 +112,37 @@ const rebuildIndexOnServer = async () => {
       //Build indexes per each waste type
       for (const wasteType of wasteTypes) {
         try {
-          const adsByWasteType =
-            await RemovalApplicationModel.aggregate<AggregatedAd>([
-              {
-                $match: {
-                  wasteType: { $eq: wasteType.name },
-                  expires: { $gt: new Date() },
-                  status: {
-                    $eq: 'active',
-                  },
+          const adsByWasteType = await AdModel.aggregate<AggregatedAd>([
+            {
+              $match: {
+                wasteType: { $eq: wasteType.name },
+                expires: { $gt: new Date() },
+                status: {
+                  $eq: 'active',
                 },
               },
-              {
-                $group: {
-                  _id: '$wasteLocation.place_id',
-                  weight: { $sum: '$quantity' },
-                  totalAds: { $sum: 1 },
-                  // wasteTypeId: { $first: '$wasteType' },
-                  wasteType: { $first: wasteType.name },
-                  firstAdId: { $first: '$_id' },
-                  firstAdTitle: { $first: '$title' },
-                  wasteLocation: {
-                    $first: {
-                      position: {
-                        coordinates: '$wasteLocation.position.coordinates',
-                      },
-                      description: '$wasteLocation.description',
-                      placeId: '$wasteLocation.place_id',
+            },
+            {
+              $group: {
+                _id: '$wasteLocation.place_id',
+                weight: { $sum: '$quantity' },
+                totalAds: { $sum: 1 },
+                // wasteTypeId: { $first: '$wasteType' },
+                wasteType: { $first: wasteType.name },
+                firstAdId: { $first: '$_id' },
+                firstAdTitle: { $first: '$title' },
+                wasteLocation: {
+                  $first: {
+                    position: {
+                      coordinates: '$wasteLocation.position.coordinates',
                     },
+                    description: '$wasteLocation.description',
+                    placeId: '$wasteLocation.place_id',
                   },
                 },
               },
-            ])
+            },
+          ])
           const indexByWasteType = getPopulatedIndex(adsByWasteType)
 
           indexMap.set(wasteType.name, indexByWasteType)

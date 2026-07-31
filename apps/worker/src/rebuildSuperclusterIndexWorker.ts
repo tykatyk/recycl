@@ -3,20 +3,20 @@ import Supercluster from 'supercluster'
 
 import {
   dbConnect,
-  RemovalApplicationModel,
+  AdModel,
   WasteType as WasteTypeModel,
 } from '@recycl/shared/dist/server/db'
 import { redisConnection as redis } from '@recycl/shared/dist/server/redis'
 import { QUEUE_REBUILD_SUPERCLUSTER_INDEX } from '@recycl/shared/dist/server/worker'
-import type { SuperclusterFeatureParams } from '@recycl/shared/dist/server/types'
-import type { RemovalApplication } from '@recycl/shared/dist/server/db/models/removalApplication'
+import type { AdFeature } from '@recycl/shared/dist/server/types'
+import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 
 type RebuildSuperclusterJobData = {
-  indexMap: Map<string, Supercluster<SuperclusterFeatureParams>>
+  indexMap: Map<string, Supercluster<AdFeature>>
 }
 
 const getPopulatedIndex = (ads) => {
-  const index = new Supercluster<SuperclusterFeatureParams>({
+  const index = new Supercluster<AdFeature>({
     radius: 40,
     maxZoom: 16,
   })
@@ -49,7 +49,7 @@ export const rebuildSuperclusterIndexWorker =
         const { indexMap } = job.data
         console.log(indexMap)
         return
-        const allAds: RemovalApplication[] = []
+        const allAds: Ad[] = []
 
         await dbConnect()
         const wasteTypes = await WasteTypeModel.find().lean()
@@ -57,11 +57,11 @@ export const rebuildSuperclusterIndexWorker =
         //Build indexes per each waste type
         for (const wasteType of wasteTypes) {
           try {
-            const adsByWasteType = await RemovalApplicationModel.find({
+            const adsByWasteType = await AdModel.find({
               wasteType: wasteType.name,
               expires: { $gt: new Date() },
               status: 'active',
-            }).lean<RemovalApplication[]>()
+            }).lean<Ad[]>()
 
             const indexByWasteType = getPopulatedIndex(adsByWasteType)
 

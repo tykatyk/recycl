@@ -1,8 +1,5 @@
-import SingleWasteAvailableAd from '../../components/applications/SingleWasteAvailableAd'
-import {
-  dbConnect,
-  RemovalApplicationModel,
-} from '@recycl/shared/dist/server/db'
+import SingleWasteAvailableAd from '../../components/ads/SingleWasteAvailableAd'
+import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
 import { constants } from '@recycl/shared/dist'
 import Layout from '../../components/layouts/Layout'
 import { FORBIDDEN } from '../../lib/errors'
@@ -86,7 +83,7 @@ export async function getServerSideProps(context) {
 
   await dbConnect()
 
-  const data = await RemovalApplicationModel.findById(id)
+  const data = await AdModel.findById(id)
     .select(
       'status title user wasteLocation.description wasteLocation.structured_formatting.main_text wasteType quantity comment createdAt',
     )

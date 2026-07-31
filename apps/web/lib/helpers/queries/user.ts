@@ -1,8 +1,5 @@
-import {
-  UserModel as User,
-  RemovalApplicationModel,
-} from '@recycl/shared/dist/server/db'
-import { mapErrors } from '../../helpers/errorHelpers'
+import { UserModel as User, AdModel } from '@recycl/shared/dist/server/db'
+import { mapErrors } from '../errorHelpers'
 import {
   contactsSchema,
   phoneSchema,
@@ -75,7 +72,7 @@ const userQueries = {
     const id = user.id
     try {
       Promise.all([
-        RemovalApplicationModel.deleteMany({ user: id }).exec(),
+        AdModel.deleteMany({ user: id }).exec(),
         User.findByIdAndRemove(id).exec(),
       ])
         .then((result) => {

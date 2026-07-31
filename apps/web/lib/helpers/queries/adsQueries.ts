@@ -1,8 +1,8 @@
 import getCoords from '../getCoords'
-import { RemovalApplicationModel } from '@recycl/shared/dist/server/db'
+import { AdModel } from '@recycl/shared/dist/server/db'
 import { INTERNAL_SERVER_ERROR } from '../../errors'
 
-const removalApplicationQueries = {
+const adsQueries = {
   create: async (data, user) => {
     if (!user) return null
 
@@ -21,7 +21,7 @@ const removalApplicationQueries = {
       locationCoords.type = 'Point'
       locationCoords.coordinates = coords
 
-      const removalAppliaction = new RemovalApplicationModel(data)
+      const removalAppliaction = new AdModel(data)
       return await removalAppliaction.save()
     } catch (error) {
       console.log(error)
@@ -32,9 +32,7 @@ const removalApplicationQueries = {
   get: async (id: string) => {
     //ToDo: check if id is of type ObjectId
     try {
-      const result = await RemovalApplicationModel.findById(id)
-        .populate('user', 'name')
-        .lean()
+      const result = await AdModel.findById(id).populate('user', 'name').lean()
 
       return result
     } catch (error) {
@@ -50,19 +48,19 @@ const removalApplicationQueries = {
 
       if (queryParams.city) query['wasteLocation.place_id'] = queryParams.city
 
-      return await RemovalApplicationModel.find(query)
+      return await AdModel.find(query)
     } catch (error) {
       console.log(error)
       throw new Error(INTERNAL_SERVER_ERROR)
     }
   },
 
-  //get removal applications
+  //get removal ads
   //and counts number of unread messages per application
   getWithMessageCount: async (user) => {
     if (!user) return null
     try {
-      const result = await RemovalApplicationModel.aggregate([
+      const result = await AdModel.aggregate([
         {
           $match: { user: user['_id'] },
         },
@@ -114,7 +112,7 @@ const removalApplicationQueries = {
 
   update: async (id, newValue) => {
     try {
-      return await RemovalApplicationModel.findByIdAndUpdate(id, newValue, {
+      return await AdModel.findByIdAndUpdate(id, newValue, {
         new: true,
       }).exec()
     } catch (error) {
@@ -125,7 +123,7 @@ const removalApplicationQueries = {
 
   delete: async (id) => {
     try {
-      return await RemovalApplicationModel.findByIdAndRemove(id).exec()
+      return await AdModel.findByIdAndRemove(id).exec()
     } catch (error) {
       console.log(error)
       throw new Error(INTERNAL_SERVER_ERROR)
@@ -134,7 +132,7 @@ const removalApplicationQueries = {
 
   deleteMany: async (ids) => {
     try {
-      return await RemovalApplicationModel.deleteMany({
+      return await AdModel.deleteMany({
         _id: { $in: ids },
       }).exec()
     } catch (error) {
@@ -143,4 +141,4 @@ const removalApplicationQueries = {
     }
   },
 }
-export default removalApplicationQueries
+export default adsQueries

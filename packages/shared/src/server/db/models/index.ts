@@ -1,5 +1,5 @@
 import Message from './message'
-import RemovalApplicationModel from './removalApplication'
+import AdModel from './ad'
 import Account from './account'
 import UserRole from './userRole'
 import WasteType from './wasteType'
@@ -22,7 +22,7 @@ import ComplaintModel from './complaint'
 
 export {
   Message,
-  RemovalApplicationModel,
+  AdModel,
   UserRole,
   WasteType,
   Account,

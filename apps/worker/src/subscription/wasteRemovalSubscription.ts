@@ -1,6 +1,6 @@
 import {
-  WasteRemovalEventModel,
-  RemovalApplicationModel,
+  CollectionPointModel,
+  AdModel,
   WasteRemovalSubscriptionModel,
 } from '@recycl/shared/dist/server/db'
 import { constants } from '@recycl/shared/dist'
@@ -15,43 +15,42 @@ import mongoose from 'mongoose'
 import { EARTH_RADIUS } from './constants'
 
 const getUserAds = async (userId: string) => {
-  const removalApplications =
-    await RemovalApplicationModel.aggregate<AggregatedSubscriptionData>([
-      {
-        $match: {
-          user: new mongoose.Types.ObjectId(userId),
-          status: documentActivityStatus.active,
-          expires: { $gte: new Date() },
+  const ads = await AdModel.aggregate<AggregatedSubscriptionData>([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+        status: documentActivityStatus.active,
+        expires: { $gte: new Date() },
+      },
+    },
+    {
+      $group: {
+        _id: '$wasteLocation.place_id',
+        locationName: {
+          $first: '$wasteLocation.structured_formatting.main_text',
+        },
+        coords: {
+          $first: '$wasteLocation.position.coordinates',
+        },
+        allWasteTypes: {
+          $push: '$wasteType',
         },
       },
-      {
-        $group: {
-          _id: '$wasteLocation.place_id',
-          locationName: {
-            $first: '$wasteLocation.structured_formatting.main_text',
-          },
-          coords: {
-            $first: '$wasteLocation.position.coordinates',
-          },
-          allWasteTypes: {
-            $push: '$wasteType',
-          },
+    },
+    {
+      $project: {
+        _id: 0,
+        locationId: '$_id',
+        locationName: '$locationName',
+        coordinates: '$coords',
+        wasteTypes: {
+          $setUnion: ['$allWasteTypes'],
         },
       },
-      {
-        $project: {
-          _id: 0,
-          locationId: '$_id',
-          locationName: '$locationName',
-          coordinates: '$coords',
-          wasteTypes: {
-            $setUnion: ['$allWasteTypes'],
-          },
-        },
-      },
-    ])
+    },
+  ])
 
-  return removalApplications
+  return ads
 }
 
 export const getWasteRemovalData = async (params: {
@@ -79,32 +78,33 @@ export const getWasteRemovalData = async (params: {
     const eventCounters: WasteTypeCounter[] = []
 
     for (const wasteName of wasteTypes) {
-      const newAdsCount = await WasteRemovalEventModel.countDocuments({
-        waste: wasteName,
+      const newCollectionPointsCount =
+        await CollectionPointModel.countDocuments({
+          waste: wasteName,
 
-        'location.position': {
-          $geoWithin: {
-            $centerSphere: [
-              ad.coordinates,
-              collectionPointSearchRadius / EARTH_RADIUS,
-            ],
+          'location.position': {
+            $geoWithin: {
+              $centerSphere: [
+                ad.coordinates,
+                collectionPointSearchRadius / EARTH_RADIUS,
+              ],
+            },
           },
-        },
-        isActive: true,
-        user: {
-          $ne: new mongoose.Types.ObjectId(userId),
-        },
-        createdAt: {
-          $gt: lastRunDate,
-        },
-        //date exists only in mobile collection points
-        date: {
-          $gt: new Date(Date.now() + 12 * 60 * 60 * 1000), //12hours ahead
-        },
-      })
+          isActive: true,
+          user: {
+            $ne: new mongoose.Types.ObjectId(userId),
+          },
+          createdAt: {
+            $gt: lastRunDate,
+          },
+          //date exists only in mobile collection points
+          date: {
+            $gt: new Date(Date.now() + 12 * 60 * 60 * 1000), //12hours ahead
+          },
+        })
 
-      if (newAdsCount === 0) continue
-      eventCounters.push({ wasteName, newAdsCount })
+      if (newCollectionPointsCount === 0) continue
+      eventCounters.push({ wasteName, newAdsCount: newCollectionPointsCount })
     }
     if (eventCounters.length === 0) continue
 

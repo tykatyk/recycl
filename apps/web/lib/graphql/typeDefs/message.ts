@@ -17,7 +17,7 @@ export default gql`
   type MessageOutput {
     _id: ID!
     text: String!
-    ad: RemovalApplicationOutput!
+    ad: AdOutput!
     senderId: ID
     senderName: String!
     receiverId: ID!

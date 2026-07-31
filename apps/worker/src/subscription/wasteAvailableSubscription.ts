@@ -5,7 +5,7 @@ import type {
 } from './types'
 import {
   WasteAvailableSubscriptionModel,
-  RemovalApplicationModel,
+  AdModel,
 } from '@recycl/shared/dist/server/db'
 import { redisConnection as redis } from '@recycl/shared/dist/server/redis'
 import { Types } from 'mongoose'
@@ -115,7 +115,7 @@ export const getWasteAvailableData = async (params: {
 
       const cachedCounter = await redis.get(key)
       if (cachedCounter === null) {
-        counter = await RemovalApplicationModel.countDocuments({
+        counter = await AdModel.countDocuments({
           wasteType: wasteType,
           'wasteLocation.position': {
             $geoWithin: {

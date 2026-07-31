@@ -101,8 +101,6 @@ const rebuildIndexOnServer = async () => {
   try {
     if (refreshPromise) return
 
-    // const allAds: RemovalApplication[] = []
-
     await dbConnect()
     const wasteTypes = await WasteTypeModel.find().lean()
 

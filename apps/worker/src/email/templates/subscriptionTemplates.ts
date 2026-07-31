@@ -7,7 +7,7 @@ import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscriptio
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
 const removalEventsRoute = 'events'
-const removalApplicationsRoute = 'applications'
+const removalAdsRoute = 'ads'
 
 const white = ' #ffffff'
 
@@ -33,7 +33,7 @@ const getUrl = (params: {
 
   switch (subscriptionName) {
     case wasteAvailable:
-      return new URL(`${host}/${removalApplicationsRoute}/?${query}`).toString()
+      return new URL(`${host}/${removalAdsRoute}/?${query}`).toString()
 
     case wasteRemoval:
       return new URL(`${host}/${removalEventsRoute}/?${query}`).toString()

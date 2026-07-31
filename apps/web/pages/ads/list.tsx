@@ -1,8 +1,5 @@
-import {
-  dbConnect,
-  RemovalApplicationModel,
-} from '@recycl/shared/dist/server/db'
-import AdsOnList from '../../components/applications/AdsOnList'
+import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
+import AdsOnList from '../../components/ads/AdsOnList'
 import { INTERNAL_SERVER_ERROR } from '../../lib/errors'
 import {
   adSearchFormSchema,
@@ -12,11 +9,11 @@ import {
 import getCoords from '../../lib/helpers/getCoords'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
 import * as yup from 'yup'
-import type { RemovalApplication } from '@recycl/shared/dist/server/db/models/removalApplication'
+import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 
 async function getPlaceCoordinates(placeId: string) {
   await dbConnect()
-  const existing = await RemovalApplicationModel.findOne({
+  const existing = await AdModel.findOne({
     'wasteLocation.place_id': placeId,
   })
 
@@ -108,11 +105,11 @@ export async function getServerSideProps(context) {
 
   await dbConnect()
   const skip = Math.max(validPage - 1, 0) * validPageSize
-  const total = await RemovalApplicationModel.countDocuments(filter)
-  let ads: RemovalApplication[] = []
+  const total = await AdModel.countDocuments(filter)
+  let ads: Ad[] = []
 
   if (skip < total) {
-    ads = await RemovalApplicationModel.find(filter)
+    ads = await AdModel.find(filter)
       .skip(skip)
       .limit(validPageSize)
       .sort({ updatedAt: -1 })

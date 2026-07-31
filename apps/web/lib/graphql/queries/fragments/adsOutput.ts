@@ -1,9 +1,9 @@
 import gql from 'graphql-tag'
 import { STRUCTURED_FORMATTING_FRAGMENT } from './structuredFormatting'
 
-export const REMOVAL_APPLICATION_OUTPUT_FRAGMENT = gql`
+export const ADS_OUTPUT_FRAGMENT = gql`
   ${STRUCTURED_FORMATTING_FRAGMENT}
-  fragment RemovalApplicationOutputFragment on RemovalApplicationOutput {
+  fragment AdsOutputFragment on AdsOutput {
     _id
     title
     wasteLocation {

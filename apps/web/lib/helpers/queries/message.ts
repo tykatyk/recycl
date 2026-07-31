@@ -79,7 +79,7 @@ const messageQueries = {
               { $limit: limit },
               {
                 $lookup: {
-                  from: 'removalapplications',
+                  from: 'ads',
                   localField: 'ad',
                   foreignField: '_id',
                   as: 'ad',

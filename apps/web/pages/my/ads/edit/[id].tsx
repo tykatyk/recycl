@@ -1,4 +1,4 @@
-import CreateUpdate from '../../../../components/applications/CreateUpdate'
+import CreateUpdate from '../../../../components/ads/CreateUpdate'
 
 export default function MyApplicationsCreateUpdate() {
   return <CreateUpdate />

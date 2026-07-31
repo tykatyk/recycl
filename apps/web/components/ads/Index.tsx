@@ -10,7 +10,7 @@ import Error from '../uiParts/Error'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery } from '@apollo/client'
-import { GET_REMOVAL_APPLICATIONS } from '../../lib/graphql/queries/removalApplication'
+import { GET_ADS } from '../../lib/graphql/queries/ad'
 import Router from 'next/router'
 
 const PREFIX = 'Index'
@@ -61,7 +61,7 @@ export default function Index(props) {
   const [pageSize, setPageSize] = useState(10)
   const [backendError, setBackendError] = useState(null)
   const { city, wasteType } = props
-  const { loading, error, data } = useQuery(GET_REMOVAL_APPLICATIONS, {
+  const { loading, error, data } = useQuery(GET_ADS, {
     variables: {
       queryParams: {
         city,
@@ -83,27 +83,23 @@ export default function Index(props) {
   if (loading) return <PageLoadingCircle />
 
   //ToDo: Add no data overlay
-  if (
-    data &&
-    data.getRemovalApplications &&
-    data.getRemovalApplications.length > 0
-  ) {
-    titleCity = data.getRemovalApplications[0].wasteLocation.description
+  if (data && data.getAds && data.getAds.length > 0) {
+    titleCity = data.getAds[0].wasteLocation.description
     const parts = titleCity.split(',')
     titleCity = parts[0] || titleCity
 
-    titleWasteType = data.getRemovalApplications[0].wasteType.name
+    titleWasteType = data.getAds[0].wasteType.name
 
     if (titleCity && titleWasteType) {
       title = `${titleWasteType} в городе ${titleCity}`
       header = title
     }
 
-    titleWasteType = data.getRemovalApplications[0].wasteType
+    titleWasteType = data.getAds[0].wasteType
 
     //ToDo: Refactor returned data, so that data contain objects in needed form
     //to avoid mapping
-    rows = data.getRemovalApplications.map((item) => {
+    rows = data.getAds.map((item) => {
       const newItem = {}
       newItem.id = item['_id']
       newItem.wasteType = item.wasteType
@@ -141,7 +137,7 @@ export default function Index(props) {
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               onCellClick={(params, event) => {
-                Router.push(`/applications/${params.id}`)
+                Router.push(`/ads/${params.id}`)
               }}
               slots={{
                 footer: function Footer(props) {

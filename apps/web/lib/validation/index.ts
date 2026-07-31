@@ -1,6 +1,6 @@
 import loginSchema from './login'
 import registerSchema from './register'
-import removalApplicationSchema from './removalApplication'
+import adSchema from './ad'
 import {
   email,
   password,
@@ -25,7 +25,7 @@ import {
 export {
   loginSchema,
   registerSchema,
-  removalApplicationSchema,
+  adSchema,
   email as emailSchema,
   password as passwordSchema,
   phone as phoneSchema,

@@ -1,6 +1,6 @@
 import message from './message'
 import location from './location'
-import removalApplication from './removalApplication'
+import ad from './ad'
 import user from './user'
 import userRole from './userRole'
 import wasteType from './wasteType'
@@ -28,13 +28,5 @@ const baseSchema = gql`
     deletedCount: Int
   }
 `
-const typeDefs = [
-  baseSchema,
-  message,
-  location,
-  removalApplication,
-  wasteType,
-  user,
-  userRole,
-]
+const typeDefs = [baseSchema, message, location, ad, wasteType, user, userRole]
 export default typeDefs
