@@ -89,23 +89,9 @@ export default function HeaderActions() {
         {menuItems.map((item, index) => {
           const Icon = item.icon
           return (
-            <MenuItem onClick={handleClose} key={index}>
+            <MenuItem onClick={handleClose} key={index} component={Link}>
               <ListItemIcon>{Icon ? <Icon /> : null}</ListItemIcon>
-              <ListItemText>
-                <Link
-                  href={item.href}
-                  onClick={() => false}
-                  color="inherit"
-                  underline="none"
-                  sx={{
-                    whiteSpace: 'pre-line',
-                    display: 'inline-block',
-                    width: '100%',
-                  }}
-                >
-                  {item.text}
-                </Link>
-              </ListItemText>
+              <ListItemText>{item.text}</ListItemText>
             </MenuItem>
           )
         })}
