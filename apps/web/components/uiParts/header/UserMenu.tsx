@@ -56,7 +56,6 @@ export default function UserMenu(props) {
   const { asPath } = useRouter()
 
   const { data: session, status } = useSession()
-  const preventDefault = () => false
   const { open, anchorEl, handleClose } = props
 
   const id = useId()
@@ -86,67 +85,17 @@ export default function UserMenu(props) {
       )
     } else {
       return (
-        <MenuItem onClick={handleClose} key={index}>
+        <MenuItem
+          onClick={handleClose}
+          key={index}
+          component={Link}
+          href={item.href}
+        >
           <ListItemIcon>{Icon ? <Icon /> : null}</ListItemIcon>
-          <ListItemText>
-            <Link
-              href={item.href}
-              onClick={preventDefault}
-              color="inherit"
-              underline="none"
-              sx={{ display: 'inline-block', width: '100%' }}
-            >
-              {item.text}
-            </Link>
-          </ListItemText>
+          <ListItemText>{item.text}</ListItemText>
         </MenuItem>
       )
     }
-  }
-
-  let logIn = (
-    <>
-      <ListItemIcon>
-        <LoginIcon fontSize="small" />
-      </ListItemIcon>
-      <ListItemText>
-        <Link
-          href={`/auth/login/?from=${asPath}`}
-          color="inherit"
-          underline="none"
-          sx={{ display: 'inline-block', width: '100%' }}
-        >
-          Войти
-        </Link>
-      </ListItemText>
-    </>
-  )
-
-  if (status === authenticated) {
-    logIn = (
-      <>
-        <ListItemIcon>
-          <LogoutIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>
-          <Link
-            href="/"
-            onClick={async () => {
-              ;(preventDefault(),
-                await signOut({
-                  callbackUrl: `${window.location.origin}`,
-                }))
-              await apolloClient.resetStore()
-            }}
-            color="inherit"
-            underline="none"
-            sx={{ display: 'inline-block', width: '100%' }}
-          >
-            Выйти
-          </Link>
-        </ListItemText>
-      </>
-    )
   }
 
   return (
@@ -176,7 +125,29 @@ export default function UserMenu(props) {
         menuItems.map((item, index) => {
           return showSubmenu(item, index)
         })}
-      <MenuItem onClick={handleClose}>{logIn}</MenuItem>
+      <MenuItem
+        onClick={async () => {
+          if (status === 'authenticated') {
+            await signOut({
+              callbackUrl: `${window.location.origin}`,
+            })
+            await apolloClient.resetStore()
+          }
+        }}
+        component={Link}
+        href={status === 'authenticated' ? '/' : `/auth/login/?from=${asPath}`}
+      >
+        <ListItemIcon>
+          {status === 'authenticated' ? (
+            <LogoutIcon fontSize="small" />
+          ) : (
+            <LoginIcon fontSize="small" />
+          )}
+        </ListItemIcon>
+        <ListItemText>
+          {status === 'authenticated' ? 'Выйти' : 'Войти'}
+        </ListItemText>
+      </MenuItem>
     </Menu>
   )
 }
