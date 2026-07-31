@@ -12,14 +12,21 @@ import { getServerSession } from 'next-auth/next'
 import { getEmailText } from '../../lib/helpers/email/mailer'
 import { handleEmailSending, getHtml } from '../../lib/helpers/email/mailer'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
+import { checkCaptcha } from '../../lib/helpers/checkCaptcha'
+import { captchaNotPassedResponse } from '../../lib/helpers/responses'
 
 async function complaintHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 
+  const { recaptchaToken } = req.body
+  const captchaPassed = await checkCaptcha(recaptchaToken)
+  if (!captchaPassed) return captchaNotPassedResponse(res)
+
   const validated = await complaintFormSchema.validate(req.body, {
     abortEarly: false,
+    stripUnknown: true,
   })
 
   const { complaint, complaintUrl } = validated

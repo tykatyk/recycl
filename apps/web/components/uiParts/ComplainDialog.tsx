@@ -10,7 +10,10 @@ import { useFormik } from 'formik'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
 import { complaintFormSchema } from '../../lib/validation/complaintForm'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import ButtonSubmittingCircle from './ButtonSubmittingCircle'
+import { Box } from '@mui/material'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 const errorMessage = 'Что то пошло не так'
 const successMessage = 'Сообщение отправлено администратору'
@@ -24,11 +27,16 @@ export default function ComplainDialog(props: FormDialogProps) {
   const { open, setOpen } = props
   const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
-  const [loading, setLoading] = useState(false)
+  const [recaptchaToken, setRecaptchaToken] = useState(null)
+  const recaptchaRef = useRef<ReCAPTCHA>(null)
 
   const handleClose = () => {
     setOpen(false)
     formik.resetForm()
+  }
+
+  const handleChange = (token) => {
+    setRecaptchaToken(token)
   }
 
   const formik = useFormik({
@@ -39,12 +47,13 @@ export default function ComplainDialog(props: FormDialogProps) {
     },
     validationSchema: complaintFormSchema,
     onSubmit: async (values) => {
+      if (!recaptchaToken) return
+
       try {
-        setLoading(true)
         const response = await fetch(`/api/complaint`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...values }),
+          body: JSON.stringify({ ...values, recaptchaToken }),
         })
 
         if (!response.ok) {
@@ -59,7 +68,7 @@ export default function ComplainDialog(props: FormDialogProps) {
           variant: 'error',
         })
       } finally {
-        setLoading(false)
+        recaptchaRef.current?.reset()
       }
     },
   })
@@ -79,28 +88,45 @@ export default function ComplainDialog(props: FormDialogProps) {
           <DialogTitle>Пожаловаться на контент</DialogTitle>
           <DialogContent>
             <DialogContentText>Опишите причину жалобы</DialogContentText>
-            <TextField
-              multiline
-              rows={3}
-              variant="outlined"
-              margin="dense"
-              id="complaint"
-              name="complaint"
-              label="Текст жалобы"
-              fullWidth
-              value={formik.values.complaint}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.complaint && Boolean(formik.errors.complaint)
-              }
-              helperText={formik.touched.complaint && formik.errors.complaint}
-            />
+            <Box mb={3}>
+              <TextField
+                multiline
+                rows={3}
+                variant="outlined"
+                margin="dense"
+                id="complaint"
+                name="complaint"
+                label="Текст жалобы"
+                fullWidth
+                value={formik.values.complaint}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.complaint && Boolean(formik.errors.complaint)
+                }
+                helperText={formik.touched.complaint && formik.errors.complaint}
+              />
+            </Box>
+            <Box mb={3}>
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                onChange={handleChange}
+              />
+            </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Отменить</Button>
-            <Button type="submit" disabled={loading}>
+            <Button onClick={handleClose} variant="contained" size="small">
+              Отменить
+            </Button>
+            <Button
+              type="submit"
+              disabled={formik.isSubmitting}
+              variant="contained"
+              size="small"
+            >
               Отправить
+              {formik.isSubmitting && <ButtonSubmittingCircle />}
             </Button>
           </DialogActions>
         </form>

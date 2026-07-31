@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import { useTheme } from '@mui/material/styles'
 import { Typography, Box, Button, Container } from '@mui/material'
 import Layout from './layouts/Layout'
 import { contactUsSchema } from '../lib/validation'
@@ -16,7 +15,6 @@ const errorMessage = 'Ошибка при отправкве формы'
 const limit = 1000
 
 export default function SupportUsPage() {
-  const theme = useTheme()
   const [recaptchaToken, setRecaptchaToken] = useState(null)
   const recaptchaRef = useRef<ReCAPTCHA>(null)
 
