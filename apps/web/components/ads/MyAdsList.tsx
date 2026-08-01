@@ -16,30 +16,32 @@ import { useSnackbar } from 'notistack'
 import router, { useRouter } from 'next/router'
 import { useEffect, useState, useRef, RefObject, useLayoutEffect } from 'react'
 import Cookies from 'js-cookie'
-import NoRows from '../../components/uiParts/NoRows'
-import HeadingWithDescription from '../../components/uiParts/HeadingWithDescription'
-import DataGridFooter from '../../components/uiParts/DataGridFooter'
-import PageLoadingCircle from '../../components/uiParts/PageLoadingCircle'
-import ErrorComponet from '../../components/uiParts/Error'
+import NoRows from '../uiParts/NoRows'
+import HeadingWithDescription from '../uiParts/HeadingWithDescription'
+import DataGridFooter from '../uiParts/DataGridFooter'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle'
+import ErrorComponet from '../uiParts/Error'
 import {
   getValidPageNumber,
   getValidPageSize,
 } from '../../lib/helpers/pagination'
 import type { HrefOptions } from '../../lib/types/pagination'
 import type { PaginatedData } from '../../lib/types/pagination'
-import type { CollectionPoint } from '../../lib/types/collectionPoint'
+import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
-import CollectionPointTabs from '../uiParts/CollectionPointTabs'
-import { CollectionPointsDescription } from '../../components/uiParts/CollectionPointComponents'
+import {
+  collectionPointTypes,
+  documentActivityStatus,
+} from '@recycl/shared/dist/constants'
+import AdTabs from '../uiParts/AdTabs'
+import { CollectionPointsDescription } from '../uiParts/CollectionPointComponents' //ToDo: implement for ads
 import dayjs from 'dayjs'
 
-const apiUrl = '/api/my/collection-points'
-const baseUrl = '/my/collection-points'
+const apiUrl = '/api/my/ads'
+const baseUrl = '/my/ads'
 
-const stationeryCollectionPointsRoute = `${baseUrl}/stationery`
-const mobileCollectionPointsRoute = `${baseUrl}/mobile`
+const inactiveAdsRoute = `${baseUrl}?variant=disabled`
 
 const editButtonText = 'Редактировать'
 const deleteButtonText = 'Удалить'
@@ -54,14 +56,12 @@ const getHref = (options: HrefOptions) => {
 
 const handleVariantChange = (
   _: React.SyntheticEvent,
-  newVariant: keyof typeof collectionPointTypes,
+  newVariant: keyof typeof documentActivityStatus,
 ) => {
-  if (newVariant === 'container') {
+  if (newVariant === 'active') {
     router.push(baseUrl)
-  } else if (newVariant === 'mobile') {
-    router.push(mobileCollectionPointsRoute)
-  } else if (newVariant === 'stationery') {
-    router.push(stationeryCollectionPointsRoute)
+  } else if (newVariant === 'disabled') {
+    router.push(inactiveAdsRoute)
   }
 }
 
@@ -193,25 +193,26 @@ const ActionsBar = (props: ActionsBarProps) => {
   )
 }
 
-type MyCollectionPointsListProps = {
-  variant?: keyof typeof collectionPointTypes
+type MyAdsProps = {
+  // variant?: keyof typeof documentActivityStatus
   h1: string
 }
-export default function MyCollectionPointsList(
-  props: MyCollectionPointsListProps,
-) {
-  const { variant = 'container', h1 } = props
+export default function MyAdsList(props: MyAdsProps) {
+  const { h1 } = props
   const [status, setStatus] = useState('')
-  const [data, setData] = useState<PaginatedData<
-    CollectionPoint & { _id: string }
-  > | null>(null)
+  const [data, setData] = useState<PaginatedData<Ad & { _id: string }> | null>(
+    null,
+  )
   const router = useRouter()
   const query = router.query
   const [selected, setSelected] = useState<string[]>([])
   const [isSticky, setIsSticky] = useState(false)
+  const [variant, setVariant] =
+    useState<keyof typeof documentActivityStatus>('active')
   const actionsBarRef = useRef<HTMLDivElement>(null)
   const firstItemRef = useRef<HTMLDivElement>(null)
   const scrollPosRef = useRef<number>(0)
+
   const { enqueueSnackbar } = useSnackbar()
 
   const selectRowLabel = {
@@ -317,7 +318,28 @@ export default function MyCollectionPointsList(
 
   useEffect(() => {
     fetchData()
-  }, [query.page, query.pageSize])
+  }, [query.page, query.pageSize, variant])
+
+  useEffect(() => {
+    const variant = query.variant
+
+    if (typeof variant === 'string') {
+      function isDocumentActivityStatusKey(
+        value: string,
+      ): value is keyof typeof documentActivityStatus {
+        return value in documentActivityStatus
+      }
+
+      if (!isDocumentActivityStatusKey(variant)) {
+        router.push('/404')
+        return
+      }
+
+      setVariant(variant)
+    } else {
+      setVariant('active')
+    }
+  }, [query.variant])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -390,8 +412,8 @@ export default function MyCollectionPointsList(
         {status === 'deleting' ? <DeletingModal open={true} /> : null}
         <Header title={h1} />
 
-        <CollectionPointTabs
-          value={variant ? variant : 'container'}
+        <AdTabs
+          value={variant ? variant : 'active'}
           handleChange={handleVariantChange}
         >
           {data.items.length === 0 ? (
@@ -453,7 +475,7 @@ export default function MyCollectionPointsList(
                           sx={{
                             flexGrow: 1,
                             '& > *': {
-                              mb: 2,
+                              mb: 1,
                             },
                             '& > :last-child': {
                               mb: 0,
@@ -461,45 +483,33 @@ export default function MyCollectionPointsList(
                           }}
                         >
                           <Box>
-                            <Typography variant="h6">
-                              {item.location.description}
-                            </Typography>
+                            <Typography variant="h6">{item.title}</Typography>
                           </Box>
-                          {item.variant === 'mobile' && (
-                            <Box>
-                              <Typography
-                                component={'span'}
-                                sx={{ color: 'grey.400', fontWeight: 'light' }}
-                                variant="body2"
-                              >
-                                {'Дата и время события: '}
-                              </Typography>
-                              <Typography component={'span'} variant="body2">
-                                {dayjs(item.date).format('DD.MM.YYYY HH:mm')}
-                              </Typography>
-                            </Box>
-                          )}
 
                           <Box>
                             <Typography
+                              component={'span'}
+                              sx={{ color: 'grey.400', fontWeight: 'light' }}
                               variant="body2"
-                              sx={{
-                                pb: 1,
-                                color: 'grey.400',
-                                fontWeight: 'light',
-                              }}
                             >
-                              Виды вторсырья, которые принимаются:
+                              {'Местоположение вторсырья: '}
                             </Typography>
-                            <Stack direction="row" spacing={1}>
-                              {item.wasteTypes.map(
-                                (wasteType: string, idx: number) => {
-                                  return (
-                                    <Chip label={`${wasteType}`} key={idx} />
-                                  )
-                                },
-                              )}
-                            </Stack>
+                            <Typography component={'span'} variant="body2">
+                              {item.wasteLocation.description}
+                            </Typography>
+                          </Box>
+
+                          <Box>
+                            <Typography
+                              component={'span'}
+                              sx={{ color: 'grey.400', fontWeight: 'light' }}
+                              variant="body2"
+                            >
+                              {'Вид вторсырья: '}
+                            </Typography>
+                            <Typography component={'span'} variant="body2">
+                              {`${item.wasteType}`}
+                            </Typography>
                           </Box>
                           <Box>
                             <Typography
@@ -507,17 +517,30 @@ export default function MyCollectionPointsList(
                               sx={{ color: 'grey.400', fontWeight: 'light' }}
                               variant="body2"
                             >
-                              {'Тип пункта приема вторсырья: '}
+                              {'Вес вторсырья: '}
                             </Typography>
                             <Typography component={'span'} variant="body2">
-                              {collectionPointTypes[item.variant].toLowerCase()}
+                              {`${item.quantity} кг`}
+                            </Typography>
+                          </Box>
+
+                          <Box>
+                            <Typography
+                              component={'span'}
+                              sx={{ color: 'grey.400', fontWeight: 'light' }}
+                              variant="body2"
+                            >
+                              {'Объявление активно до: '}
+                            </Typography>
+                            <Typography component={'span'} variant="body2">
+                              {dayjs(item.expires).format('DD.MM.YYYY')}
                             </Typography>
                           </Box>
 
                           <Box>
                             <Stack direction="row" spacing={2}>
                               <Button
-                                href={`${baseUrl}/edit/${item.variant}/${item._id}`}
+                                href={`${baseUrl}/edit/${item._id}`}
                                 size="small"
                                 color="secondary"
                                 startIcon={<EditIcon />}
@@ -544,7 +567,7 @@ export default function MyCollectionPointsList(
               </Stack>
             </>
           )}
-        </CollectionPointTabs>
+        </AdTabs>
 
         {data.items.length > 0 && (
           <DataGridFooter

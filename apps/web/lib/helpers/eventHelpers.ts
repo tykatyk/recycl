@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import type { AdActions } from '../types/collectionPoint'
-import type { OrderBy, SortOrder, Variant } from '../types/pagination'
+import type { OrderBy, SortOrder } from '../types/pagination'
 import type { PlaceType } from '../types/placeAutocomplete'
 
 //ToDo привести цю функцію у відповідність з аналогічною функцією в removalFormConfig

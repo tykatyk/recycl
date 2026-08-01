@@ -1,6 +1,6 @@
 import Events from '../../../components/collectionPoints/MyEvents'
-import type { Variant } from '../../../lib/types/pagination'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
 
 export default function InactiveEvents({
   variant,
@@ -10,6 +10,8 @@ export default function InactiveEvents({
 
 export const getServerSideProps = (async () => {
   return {
-    props: { variant: 'inactive' },
+    props: { variant: 'disabled' },
   }
-}) satisfies GetServerSideProps<{ variant: Variant }>
+}) satisfies GetServerSideProps<{
+  variant: keyof typeof documentActivityStatus
+}>

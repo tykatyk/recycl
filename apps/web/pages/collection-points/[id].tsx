@@ -6,6 +6,7 @@ import { FORBIDDEN } from '../../lib/errors'
 import { Box, Button, Typography } from '@mui/material'
 import BlockIcon from '@mui/icons-material/Block'
 import { useRouter } from 'next/router'
+import { isValidObjectId } from 'mongoose'
 
 const { documentActivityStatus } = constants
 const { active } = documentActivityStatus
@@ -80,6 +81,12 @@ export default function CollectionPoint(props) {
 export async function getServerSideProps(context) {
   const { res } = context
   const { id } = context.query
+
+  if (!isValidObjectId(id)) {
+    return {
+      notFound: true,
+    }
+  }
 
   await dbConnect()
 

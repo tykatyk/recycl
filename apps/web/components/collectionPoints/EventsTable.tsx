@@ -31,13 +31,12 @@ import type {
   IsInactive,
   AdActions,
 } from '../../lib/types/collectionPoint'
-import type { Variant, SortOrder, OrderBy } from '../../lib/types/pagination'
+import type { SortOrder, OrderBy } from '../../lib/types/pagination'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 import {
   columns,
   eventActions,
-  eventVariants,
   adjustOverlay,
   overlayResizeHandler,
   validSortOrder,
@@ -52,6 +51,7 @@ import {
 } from '../uiParts/EventTableParts'
 
 import { visuallyHidden } from '@mui/utils'
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
 
 const { date } = validation
 
@@ -60,7 +60,7 @@ const isInactive: IsInactive = {
 }
 
 type TableProps<T> = {
-  variant: Variant
+  variant: keyof typeof documentActivityStatus
   rows: T[]
   selectedRows: string[]
   handleSelect: (row: T) => void

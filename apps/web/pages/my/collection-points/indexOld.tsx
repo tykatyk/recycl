@@ -1,7 +1,7 @@
 import { getSession } from 'next-auth/react'
 import MyEvents from '../../../components/collectionPoints/MyEvents'
-import { Variant } from '../../../lib/types/pagination'
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
 
 export default function MyEventsIndexPage({
   variant,
@@ -24,12 +24,14 @@ export const getServerSideProps = (async (context) => {
 
   const { variant } = query
 
-  const validatedVariant: Variant =
-    variant === 'inactive' ? 'inactive' : 'active'
+  const validatedVariant: keyof typeof documentActivityStatus =
+    variant === 'disabled' ? 'disabled' : 'active'
 
   return {
     props: {
       variant: validatedVariant,
     },
   }
-}) satisfies GetServerSideProps<{ variant: Variant }>
+}) satisfies GetServerSideProps<{
+  variant: keyof typeof documentActivityStatus
+}>

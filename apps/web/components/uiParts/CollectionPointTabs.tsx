@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { Tab, Tabs, Box } from '@mui/material'
+import { collectionPointTypes } from '@recycl/shared/dist/constants'
 
 interface TabPanelProps {
   children?: React.ReactNode
   index: string
-  value: string
+  value: keyof typeof collectionPointTypes
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -32,11 +33,14 @@ function a11yProps(index: number) {
 
 interface AdTabProps {
   children: React.ReactNode
-  value: string
-  handleChange: (event: React.SyntheticEvent, newValue: string) => void
+  value: keyof typeof collectionPointTypes
+  handleChange: (
+    event: React.SyntheticEvent,
+    newValue: keyof typeof collectionPointTypes,
+  ) => void
 }
 
-export default function AdTabs(props: AdTabProps) {
+export default function CollectionPointTabs(props: AdTabProps) {
   const { children, value, handleChange } = props
 
   return (
@@ -57,7 +61,7 @@ export default function AdTabs(props: AdTabProps) {
           indicatorColor="secondary"
           value={value}
           onChange={handleChange}
-          aria-label="Предложения о вывозе отходов"
+          aria-label="Мои пункты приема вторсырья"
         >
           <Tab value="container" label="Контейнеры" {...a11yProps(0)} />
           <Tab value="mobile" label="Передвижные" {...a11yProps(1)} />

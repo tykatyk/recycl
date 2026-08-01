@@ -8,7 +8,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material'
 import Layout from '../layouts/Layout'
-import Tabs from '../uiParts/Tabs'
+import Tabs from '../uiParts/CollectionPointTabs'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import NoRows from '../uiParts/NoRows'
 import ErrorComponet from '../uiParts/Error'
@@ -18,13 +18,11 @@ import {
   validOrderBy,
   validSortOrder,
   eventActions,
-  eventVariants,
 } from '../../lib/helpers/eventHelpers'
 
 import EventsTable from './EventsTable'
 import type {
   CollectionPoint,
-  Variant,
   AdActions,
   SortOrder,
   OrderBy,
@@ -38,6 +36,7 @@ import {
   getValidPageSize,
   defaultPageSize,
 } from '../../lib/helpers/pagination'
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
 
 const { activate, deactivate, remove } = eventActions
 
@@ -49,12 +48,14 @@ const apiPrefix = '/api/events/'
 const apiGetTotal = `${apiPrefix}total/`
 const activeEventsRoute = '/my/events'
 const deletionRoute = 'delete'
-const inactiveEventsRoute = '/my/events/inactive'
+const inactiveEventsRoute = '/my/events/disbled'
 const createdAt: OrderBy = 'createdAt'
 const { asc, desc } = validSortOrder
-const { active, inactive } = eventVariants
+const { active, disabled } = documentActivityStatus
 
-export default function MyEvents(props: { variant: Variant }) {
+export default function MyEvents(props: {
+  variant: keyof typeof documentActivityStatus
+}) {
   const router = useRouter()
   const query = router.query
   const { variant } = props
@@ -87,7 +88,7 @@ export default function MyEvents(props: { variant: Variant }) {
       sortOrder: qSortOrder = sortOrder,
     } = options
 
-    const activity = variant === active ? '' : `/${inactive}`
+    const activity = variant === active ? '' : `/${disabled}`
     let hrefQuery = ''
     if (qPage !== 1 || qPageSize !== rowsPerPageOptions[0]) {
       hrefQuery = `${hrefQuery}&page=${qPage}&pageSize=${qPageSize}`
@@ -132,7 +133,7 @@ export default function MyEvents(props: { variant: Variant }) {
 
   const handleVariantChange = (
     _: React.SyntheticEvent,
-    newVariant: Variant,
+    newVariant: keyof typeof documentActivityStatus,
   ) => {
     if (newVariant === active) {
       router.push(activeEventsRoute)
@@ -273,7 +274,9 @@ export default function MyEvents(props: { variant: Variant }) {
   }
 
   const fetchEvents = async (
-    options: Required<PaginationOptions> & { variant: Variant },
+    options: Required<PaginationOptions> & {
+      variant: keyof typeof documentActivityStatus
+    },
   ) => {
     return await fetch(`${apiPrefix}?${new URLSearchParams(options)}`, {
       headers: {

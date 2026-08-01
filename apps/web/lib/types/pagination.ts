@@ -1,6 +1,3 @@
-import { documentActivityStatus } from '@recycl/shared/dist/constants'
-// export type Variant = 'inactive' | 'active'
-export type Variant = keyof typeof documentActivityStatus
 export type SortOrder = 'asc' | 'desc'
 export type OrderBy = 'date' | 'waste' | 'location' | 'createdAt'
 

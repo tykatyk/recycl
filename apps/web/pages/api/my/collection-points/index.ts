@@ -93,7 +93,7 @@ async function collectionPointsHanlder(
       res.status(200).json({ message: 'Документ успешно создан' })
       break
     case 'GET':
-      let validatedQuery = await queryValidationSchema.validate(req.query, {
+      const validatedQuery = await queryValidationSchema.validate(req.query, {
         stripUnknown: true,
       })
 

@@ -29,7 +29,7 @@ const aggregatedMarkerStyles = {
 export const IndividualAdContent = ({ data }) => {
   const { adId, placeDescription, title, weight } = data
   return (
-    <Box sx={{ color: 'grey.800' }}>
+    <Box sx={{ color: 'grey.800', maxWidth: 350 }}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6">{title}</Typography>
         <Typography>{placeDescription}</Typography>
@@ -93,7 +93,7 @@ export const AggregatedAdContent = ({ data }) => {
 export const IndividualCollectionPointContent = ({ data }) => {
   const { adId, placeDescription, wasteTypes, phone, variant, date } = data
   return (
-    <Box sx={{ color: 'grey.800' }}>
+    <Box sx={{ color: 'grey.800', maxWidth: 350 }}>
       <Box sx={{ mb: 1 }}>
         <Typography variant="h6">{placeDescription}</Typography>
       </Box>
