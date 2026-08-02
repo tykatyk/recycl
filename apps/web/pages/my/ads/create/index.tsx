@@ -2,7 +2,7 @@ import Layout from '../../../../components/layouts/Layout'
 import RemovalForm from '../../../../components/ads/RemovalForm'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 
-const title = 'Редактировать объявление о наличии вторсырья'
+const title = 'Добавить объявление о наличии вторсырья'
 export default function CreateUpdate() {
   return (
     <RedirectUnathenticatedUser>

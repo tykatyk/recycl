@@ -20,11 +20,12 @@ const wasteTypeQueries = {
   },
 
   delete: async (id) => {
-    return await this.model.findByIdAndRemove(id).exec()
+    return await WasteType.findByIdAndRemove(id).exec()
   },
 
   deleteMany: async (ids) => {
     return await WasteType.deleteMany({ _id: { $in: ids } }).exec()
   },
 }
+
 export default wasteTypeQueries

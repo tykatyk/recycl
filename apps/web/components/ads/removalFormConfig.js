@@ -5,11 +5,6 @@ export const initialValues = {
   quantity: '',
   contactPhone: '',
   comment: '',
-  passDocumet: false,
-  notificationCities: [],
-  notificationCitiesCheckbox: false,
-  notificationRadius: '',
-  notificationRadiusCheckbox: false,
 }
 
 export function getNormalizedValues(values) {
@@ -29,15 +24,6 @@ export function getNormalizedValues(values) {
   }
 
   normalizedValues.wasteLocation = wasteLocation
-
-  const notificationCities = values.notificationCities.map((item) => {
-    const normalizedItem = {}
-    normalizedItem.description = item.description
-    normalizedItem.place_id = item.place_id
-    normalizedItem.structured_formatting = item.structured_formatting
-    return normalizedItem
-  })
-  normalizedValues.notificationCities = notificationCities
 
   return normalizedValues
 }

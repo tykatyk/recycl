@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import gql from 'graphql-tag'
 import { STRUCTURED_FORMATTING_FRAGMENT } from './fragments/structuredFormatting'
 
 export const CREATE_USER = gql`

@@ -22,7 +22,7 @@ export default function HeaderActions() {
   const menuItems = [
     {
       text: 'Объявление о наличии вторсырья',
-      href: '/ads/create',
+      href: '/my/ads/create',
       icon: InventoryIcon,
     },
     {

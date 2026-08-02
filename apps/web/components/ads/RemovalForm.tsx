@@ -7,43 +7,30 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { CREATE_AD, UPDATE_AD } from '../../lib/graphql/queries/ad'
-import { GET_WASTE_TYPES } from '../../lib/graphql/queries/wasteType'
-import { GET_PHONE } from '../../lib/graphql/queries/user'
-import { initialValues, getNormalizedValues } from './removalFormConfig'
+import {
+  initialValues as initVal,
+  getNormalizedValues,
+} from './removalFormConfig'
 import { adSchema } from '../../lib/validation'
 import { useSnackbar } from 'notistack'
+import {
+  userPhoneFetcher,
+  wasteTypeFetcher,
+} from '../../lib/helpers/dataFetcher'
 
-const errorMessage = 'Возникла ошибка при создании заявки'
+const errorMessage = 'Что то пошло не так'
 
-const fields = Object.keys(initialValues)
-
-export default function RemovalForm() {
+export default function RemovalForm(props) {
+  const { h1 } = props
   const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
-
-  const { data: session } = useSession()
-  if (!session) {
-    enqueueSnackbar(errorMessage, {
-      variant: 'error',
-    })
-    return null
-  }
-  const { id: userId } = session
-  const { id: applicationId } = router.query
-
-  const {
-    loading: gettingWasteTypes,
-    data: wasteTypesData,
-    error: wasteTypesError,
-  } = useQuery(GET_WASTE_TYPES)
-
-  const { data: phoneData } = useQuery(GET_PHONE, { variables: { id: userId } })
-
-  const [gettingApplication, setGettingApplication] = useState(false)
-  const [gettingError, setGettingError] = useState(false)
+  const [initialValues, setInitialValues] = useState(initVal)
+  const [wasteTypesData, setWasteTypesData] = useState([])
+  const { id } = router.query
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
 
   const [createMutation] = useMutation(CREATE_AD)
   const [updateMutation] = useMutation(UPDATE_AD)
@@ -71,28 +58,91 @@ export default function RemovalForm() {
   const updateHandler = (values, setSubmitting) => {
     setSubmitting(true)
     const normalizedValues = getNormalizedValues(values)
-    updateMutation({
-      variables: { id: applicationId, newValues: normalizedValues },
+
+    fetch(`/api/my/ads/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        //  id,
+        ...normalizedValues,
+      }),
     })
-      .then((data) => {
-        router.push('/my/ads')
+      .then((response) => {
+        return response.json()
       })
-      .catch((err) => {
-        enqueueSnackbar('Возникла ошибка при сохранении заявки', {
-          variant: 'error',
-        })
+      .then((data) => {
+        if (data.error) {
+          enqueueSnackbar(errorMessage, { variant: 'error' })
+        } else if (data.message) {
+          router.back()
+        }
+      })
+      .catch((error) => {
+        enqueueSnackbar(errorMessage, { variant: 'error' })
       })
       .finally(() => {
         setSubmitting(false)
       })
   }
 
-  if (gettingError)
-    return <Typography>Возникла ошибка при загрузке данных</Typography>
+  useEffect(() => {
+    if (id) {
+      const dataFether = async () => {
+        try {
+          setLoading(true)
 
-  if (gettingApplication || gettingWasteTypes) {
-    return <PageLoadingCircle />
-  }
+          const response = await fetch(`/api/my/ads/${id}`)
+          const data = await response.json()
+          if (!data) return router.push('/404')
+
+          setInitialValues(data)
+        } catch (error) {
+          setError(true)
+        } finally {
+          setLoading(false)
+        }
+      }
+      dataFether()
+    } else {
+      const phoneFetcher = async () => {
+        try {
+          setLoading(true)
+
+          const phoneData = await userPhoneFetcher()
+          setInitialValues({
+            ...initialValues,
+            contactPhone: phoneData ? phoneData.phone : '',
+          })
+        } catch (error) {
+          enqueueSnackbar(errorMessage, { variant: 'error' })
+        } finally {
+          setLoading(false)
+        }
+      }
+      phoneFetcher()
+    }
+  }, [id])
+
+  useEffect(() => {
+    const dataFetcher = async () => {
+      try {
+        setLoading(true)
+
+        const wasteTypesData = await wasteTypeFetcher()
+
+        setWasteTypesData(wasteTypesData)
+      } catch (error) {
+        enqueueSnackbar(errorMessage, { variant: 'error' })
+      } finally {
+        setLoading(false)
+      }
+    }
+    dataFetcher()
+  }, [])
+
+  if (error) return <Typography>Возникла ошибка при загрузке данных</Typography>
+
+  if (loading) return <PageLoadingCircle />
 
   return (
     <Box>
@@ -101,144 +151,112 @@ export default function RemovalForm() {
         initialValues={initialValues}
         validationSchema={adSchema}
         onSubmit={(values, { setSubmitting }) => {
-          if (applicationId) {
+          if (id) {
             updateHandler(values, setSubmitting)
           } else {
             createHandler(values, setSubmitting)
           }
         }}
       >
-        {({ setFieldValue, isSubmitting, values }) => {
-          const shouldDisable =
-            gettingApplication || gettingWasteTypes || isSubmitting
-
-          useEffect(() => {
-            if (!applicationId) return
-
-            const fetcher = async () => {
-              try {
-                setGettingApplication(true)
-                const response = await fetch(`/api/ads/${applicationId}`)
-                const data = await response.json()
-                if (!data) router.push('/404')
-                fields.forEach((field) => {
-                  setFieldValue(field, data[field], false)
-                })
-              } catch (error) {
-                setGettingError(true)
-              } finally {
-                setGettingApplication(false)
-              }
-            }
-            fetcher()
-          }, [applicationId])
-
-          useEffect(() => {
-            if (
-              !applicationId &&
-              phoneData &&
-              phoneData.getPhone &&
-              phoneData.getPhone.phone
-            ) {
-              setFieldValue('contactPhone', phoneData.getPhone.phone, false)
-            }
-          }, [setFieldValue])
+        {({ isSubmitting }) => {
+          const shouldDisable = loading || isSubmitting
 
           return (
-            <Form>
-              <Grid
-                container
-                sx={{
-                  mb: 2,
-                  '& > div': {
-                    pb: 2,
-                  },
-                  '& > div:last-child': {
-                    pb: 0,
-                  },
-                }}
-              >
-                <Grid size={{ xs: 12 }}>
-                  <Field
-                    id="title"
-                    name="title"
-                    variant="outlined"
-                    fullWidth
-                    component={TextFieldFormik}
-                    label="Заголовок объявления"
-                    helperText="*Обязательное поле"
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <Field
-                    id="wasteLocation"
-                    name="wasteLocation"
-                    variant="outlined"
-                    fullWidth
-                    component={PlacesAutocomplete}
-                    label="Местоположение вторсырья"
-                    helperText="*Обязательное поле"
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <SelectFormik
-                    error={wasteTypesError}
-                    loading={gettingWasteTypes}
-                    data={
-                      wasteTypesData ? wasteTypesData.getWasteTypes : undefined
-                    }
-                    name={'wasteType'}
-                    label={'Тип вторсырья'}
-                    helperText={'*Обязательное поле'}
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <Field
-                    component={TextFieldFormik}
-                    label="Количество"
-                    color="secondary"
-                    type="number"
-                    fullWidth
-                    name="quantity"
-                    variant="outlined"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">Кг</InputAdornment>
-                      ),
-                    }}
-                    helperText="*Обязательное поле"
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <Field
-                    component={TextFieldFormik}
-                    label="Контактный телефон"
-                    color="secondary"
-                    type="tel"
-                    fullWidth
-                    name="contactPhone"
-                    variant="outlined"
-                    helperText="*Обязательное поле"
-                    disabled={shouldDisable}
-                  />
-                </Grid>
-              </Grid>
+            <Box>
+              <Box sx={{ mb: 4 }}>
+                <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
+                  {h1}
+                </Typography>
+              </Box>
 
-              <Grid size={{ xs: 12 }}>
-                <Button
-                  variant="contained"
-                  type="submit"
-                  disabled={shouldDisable}
+              <Form>
+                <Grid
+                  container
+                  maxWidth={'md'}
+                  sx={{
+                    '& > *': {
+                      mb: 3,
+                    },
+                  }}
                 >
-                  Сохранить
-                  {isSubmitting && <ButtonSubmittingCircle />}
-                </Button>
-              </Grid>
-            </Form>
+                  <Grid size={{ xs: 12 }}>
+                    <Field
+                      id="title"
+                      name="title"
+                      variant="outlined"
+                      fullWidth
+                      component={TextFieldFormik}
+                      label="Заголовок объявления"
+                      helperText="*Обязательное поле"
+                      disabled={shouldDisable}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Field
+                      id="wasteLocation"
+                      name="wasteLocation"
+                      variant="outlined"
+                      fullWidth
+                      component={PlacesAutocomplete}
+                      label="Местоположение вторсырья"
+                      helperText="*Обязательное поле"
+                      disabled={shouldDisable}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <SelectFormik
+                      data={wasteTypesData}
+                      name={'wasteType'}
+                      label={'Тип вторсырья'}
+                      helperText={'*Обязательное поле'}
+                      disabled={shouldDisable}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Field
+                      component={TextFieldFormik}
+                      label="Количество"
+                      color="secondary"
+                      type="number"
+                      fullWidth
+                      name="quantity"
+                      variant="outlined"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">Кг</InputAdornment>
+                        ),
+                      }}
+                      helperText="*Обязательное поле"
+                      disabled={shouldDisable}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Field
+                      component={TextFieldFormik}
+                      label="Контактный телефон"
+                      color="secondary"
+                      type="tel"
+                      fullWidth
+                      name="contactPhone"
+                      variant="outlined"
+                      helperText="*Обязательное поле"
+                      disabled={shouldDisable}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    disabled={shouldDisable}
+                  >
+                    Сохранить
+                    {isSubmitting && <ButtonSubmittingCircle />}
+                  </Button>
+                </Grid>
+              </Form>
+            </Box>
           )
         }}
       </Formik>

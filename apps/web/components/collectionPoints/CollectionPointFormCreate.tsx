@@ -17,6 +17,10 @@ import {
 import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import {
+  wasteTypeFetcher,
+  userPhoneFetcher,
+} from '../../lib/helpers/dataFetcher'
 
 const errorMessage = 'Ошибка при сохранении документа'
 const api = '/api/my/collection-points'
@@ -111,21 +115,30 @@ export default function CollectionPointFormCreate(
   })
 
   useEffect(() => {
-    const wasteTypeFetcher = async () => {
-      const result = await fetch(`/api/waste-types`)
-      const data = await result.json()
-      setWasteTypes(data)
-    }
-    const userPhoneFetcher = async () => {
-      const result = await fetch(`/api/my/account/phone`)
-      const data = await result.json()
-      setUserPhone(data ? data.phone : '')
-    }
+    // const wasteTypeFetcher = async () => {
+    //   const result = await fetch(`/api/waste-types`)
+    //   const data = await result.json()
+    //   setWasteTypes(data)
+    // }
+    // const userPhoneFetcher = async () => {
+    //   const result = await fetch(`/api/my/account/phone`)
+    //   const data = await result.json()
+    //   setUserPhone(data ? data.phone : '')
+    // }
+
     const dataFetcher = async () => {
       try {
         setLoading(true)
-        await wasteTypeFetcher()
-        await userPhoneFetcher()
+        const [wasteTypeData, phoneData] = await Promise.all([
+          wasteTypeFetcher(),
+          userPhoneFetcher(),
+        ])
+
+        setWasteTypes(wasteTypeData)
+        setUserPhone(phoneData ? phoneData.phone : '')
+
+        // await wasteTypeFetcher()
+        // await userPhoneFetcher()
       } catch (error) {
         enqueueSnackbar(errorMessage, { variant: 'error' })
       } finally {

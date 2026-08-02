@@ -17,6 +17,7 @@ import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import dayjs from 'dayjs'
+import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 const api = '/api/my/collection-points'
@@ -61,12 +62,6 @@ export default function CollectionPointFormUpdate(
   useEffect(() => {
     if (!id) return
 
-    const wasteTypeFetcher = async () => {
-      const result = await fetch(`/api/waste-types`)
-      const data = await result.json()
-      setWasteTypes(data)
-    }
-
     const collectionPointFetcher = async () => {
       const result = await fetch(`/api/my/collection-points/${id}`)
       const collectionPoint = await result.json()
@@ -101,8 +96,11 @@ export default function CollectionPointFormUpdate(
     const dataFetcher = async () => {
       try {
         setLoading(true)
-        await wasteTypeFetcher()
-        await collectionPointFetcher()
+        const [wasteTypeData] = await Promise.all([
+          wasteTypeFetcher(),
+          collectionPointFetcher(),
+        ])
+        setWasteTypes(wasteTypeData)
       } catch (error) {
         enqueueSnackbar(errorMessage, { variant: 'error' })
       } finally {
@@ -153,13 +151,7 @@ export default function CollectionPointFormUpdate(
         if (data.error) {
           enqueueSnackbar(errorMessage, { variant: 'error' })
         } else if (data.message) {
-          const route =
-            variant === 'mobile'
-              ? `${indexRoute}/mobile`
-              : variant === 'stationery'
-                ? `${indexRoute}/stationery`
-                : indexRoute
-          router.push(route)
+          router.back()
         }
       })
       .catch((error) => {
@@ -173,7 +165,6 @@ export default function CollectionPointFormUpdate(
   return (
     <Box>
       <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
-        {/* Редактировать контейнер приема вторсырья */}
         {h1}
       </Typography>
 
@@ -182,11 +173,9 @@ export default function CollectionPointFormUpdate(
           container
           maxWidth={'md'}
           sx={{
-            '& > div': {
-              pb: 3,
+            '& > *': {
+              mb: 3,
             },
-
-            border: 'none',
           }}
         >
           <PlaceAutocompleteField
