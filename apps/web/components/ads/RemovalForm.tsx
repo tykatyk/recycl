@@ -87,11 +87,15 @@ export default function RemovalForm(props) {
 
   useEffect(() => {
     if (id) {
-      const dataFether = async () => {
+      const adFether = async () => {
         try {
           setLoading(true)
 
           const response = await fetch(`/api/my/ads/${id}`)
+          if (response.status === 404) {
+            router.push('/404')
+          }
+
           const data = await response.json()
           if (!data) return router.push('/404')
 
@@ -102,7 +106,7 @@ export default function RemovalForm(props) {
           setLoading(false)
         }
       }
-      dataFether()
+      adFether()
     } else {
       const phoneFetcher = async () => {
         try {

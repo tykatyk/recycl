@@ -57,11 +57,30 @@ async function adsHanlder(req: NextApiRequest, res: NextApiResponse) {
         validatedQuery
 
       await dbConnect()
+      const now = Date.now()
 
-      const total = await AdModel.countDocuments({
-        status: variant,
+      const query = {
         user,
-      })
+        ...(variant === 'active'
+          ? {
+              status: 'active',
+              expires: {
+                $gte: now,
+              },
+            }
+          : {
+              $or: [
+                { status: 'disabled' },
+                {
+                  expires: {
+                    $lt: now,
+                  },
+                },
+              ],
+            }),
+      }
+
+      const total = await AdModel.countDocuments(query)
 
       const skip = Math.max(page - 1, 0) * pageSize
 
@@ -78,10 +97,10 @@ async function adsHanlder(req: NextApiRequest, res: NextApiResponse) {
 
       //   const ads = await collectionPointsQueries.getAll(validatedQuery, userId)
 
-      const data = await AdModel.find({ user })
+      const data = await AdModel.find(query)
         .skip(skip)
         .limit(pageSize)
-        .sort({ _id: -1 })
+        .sort({ updatedAt: -1 })
         .lean()
 
       res.json({

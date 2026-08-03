@@ -21,7 +21,6 @@ import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 const api = '/api/my/collection-points'
-const indexRoute = '/my/collection-points'
 
 type CollectionPointFormProps = {
   variant: keyof typeof collectionPointTypes
@@ -63,8 +62,11 @@ export default function CollectionPointFormUpdate(
     if (!id) return
 
     const collectionPointFetcher = async () => {
-      const result = await fetch(`/api/my/collection-points/${id}`)
-      const collectionPoint = await result.json()
+      const response = await fetch(`/api/my/collection-points/${id}`)
+      if (response.status === 404) {
+        router.push('/404')
+      }
+      const collectionPoint = await response.json()
 
       const {
         user,

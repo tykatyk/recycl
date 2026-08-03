@@ -41,15 +41,20 @@ import dayjs from 'dayjs'
 const apiUrl = '/api/my/ads'
 const baseUrl = '/my/ads'
 
-const inactiveAdsRoute = `${baseUrl}?variant=disabled`
+const inactiveAdsRoute = `${baseUrl}/disabled`
 
 const editButtonText = 'Редактировать'
+const deactivateButtonText = 'Деактивировать'
+const activateButtonText = 'Активировать'
 const deleteButtonText = 'Удалить'
 const fetchDataErrorText = 'Не удалось загрузить данные'
 
-const getHref = (options: HrefOptions) => {
-  const { page, pageSize } = options
-  const href = `${baseUrl}?page=${page}&pageSize=${pageSize}`
+const getHref = (
+  options: HrefOptions & { variant: keyof typeof documentActivityStatus },
+) => {
+  const { page, pageSize, variant } = options
+  const url = variant === 'disabled' ? `${baseUrl}/disabled` : `${baseUrl}`
+  const href = `${url}?page=${page}&pageSize=${pageSize}`
 
   return href
 }
@@ -194,11 +199,11 @@ const ActionsBar = (props: ActionsBarProps) => {
 }
 
 type MyAdsProps = {
-  // variant?: keyof typeof documentActivityStatus
+  variant: keyof typeof documentActivityStatus
   h1: string
 }
 export default function MyAdsList(props: MyAdsProps) {
-  const { h1 } = props
+  const { h1, variant } = props
   const [status, setStatus] = useState('')
   const [data, setData] = useState<PaginatedData<Ad & { _id: string }> | null>(
     null,
@@ -207,8 +212,6 @@ export default function MyAdsList(props: MyAdsProps) {
   const query = router.query
   const [selected, setSelected] = useState<string[]>([])
   const [isSticky, setIsSticky] = useState(false)
-  const [variant, setVariant] =
-    useState<keyof typeof documentActivityStatus>('active')
   const actionsBarRef = useRef<HTMLDivElement>(null)
   const firstItemRef = useRef<HTMLDivElement>(null)
   const scrollPosRef = useRef<number>(0)
@@ -232,11 +235,40 @@ export default function MyAdsList(props: MyAdsProps) {
     })
     if (!response.ok) {
       enqueueSnackbar('Ошибка при удалении элемента', { variant: 'error' })
-      return
+    } else {
+      enqueueSnackbar('Элемент удален', { variant: 'success' })
+      await fetchData()
     }
     setStatus('')
-    enqueueSnackbar('Элемент удален', { variant: 'success' })
-    await fetchData()
+  }
+
+  const handleActivation = async (id: string) => {
+    setStatus('deleting') //ToDo: rename status
+    const action = variant === 'active' ? 'deactivate' : 'activate'
+    const response = await fetch(`${apiUrl}/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ id, action }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      enqueueSnackbar(
+        variant === 'active'
+          ? 'Не могу деактивировать объявление'
+          : 'Не могу активировать объявление',
+        { variant: 'error' },
+      )
+    } else {
+      enqueueSnackbar(
+        variant === 'active'
+          ? 'Объявление деактивировано'
+          : 'Объявление активировано',
+        { variant: 'success' },
+      )
+      await fetchData()
+    }
+    setStatus('')
   }
 
   const deleteMany = async () => {
@@ -304,7 +336,7 @@ export default function MyAdsList(props: MyAdsProps) {
 
       if (skip && skip >= total) {
         const lastPage = Math.ceil(total / pageSize)
-        const href = getHref({ page: lastPage, pageSize })
+        const href = getHref({ variant, page: lastPage, pageSize })
 
         return router.push(href)
       }
@@ -318,28 +350,7 @@ export default function MyAdsList(props: MyAdsProps) {
 
   useEffect(() => {
     fetchData()
-  }, [query.page, query.pageSize, variant])
-
-  useEffect(() => {
-    const variant = query.variant
-
-    if (typeof variant === 'string') {
-      function isDocumentActivityStatusKey(
-        value: string,
-      ): value is keyof typeof documentActivityStatus {
-        return value in documentActivityStatus
-      }
-
-      if (!isDocumentActivityStatusKey(variant)) {
-        router.push('/404')
-        return
-      }
-
-      setVariant(variant)
-    } else {
-      setVariant('active')
-    }
-  }, [query.variant])
+  }, [query.page, query.pageSize])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -412,10 +423,7 @@ export default function MyAdsList(props: MyAdsProps) {
         {status === 'deleting' ? <DeletingModal open={true} /> : null}
         <Header title={h1} />
 
-        <AdTabs
-          value={variant ? variant : 'active'}
-          handleChange={handleVariantChange}
-        >
+        <AdTabs value={variant} handleChange={handleVariantChange}>
           {data.items.length === 0 ? (
             <Box
               sx={{
@@ -523,19 +531,20 @@ export default function MyAdsList(props: MyAdsProps) {
                               {`${item.quantity} кг`}
                             </Typography>
                           </Box>
-
-                          <Box>
-                            <Typography
-                              component={'span'}
-                              sx={{ color: 'grey.400', fontWeight: 'light' }}
-                              variant="body2"
-                            >
-                              {'Объявление активно до: '}
-                            </Typography>
-                            <Typography component={'span'} variant="body2">
-                              {dayjs(item.expires).format('DD.MM.YYYY')}
-                            </Typography>
-                          </Box>
+                          {variant === 'active' && (
+                            <Box>
+                              <Typography
+                                component={'span'}
+                                sx={{ color: 'grey.400', fontWeight: 'light' }}
+                                variant="body2"
+                              >
+                                {'Объявление активно до: '}
+                              </Typography>
+                              <Typography component={'span'} variant="body2">
+                                {dayjs(item.expires).format('DD.MM.YYYY HH:MM')}
+                              </Typography>
+                            </Box>
+                          )}
 
                           <Box>
                             <Stack direction="row" spacing={2}>
@@ -546,6 +555,18 @@ export default function MyAdsList(props: MyAdsProps) {
                                 startIcon={<EditIcon />}
                               >
                                 {editButtonText}
+                              </Button>
+                              <Button
+                                size="small"
+                                color="secondary"
+                                startIcon={<DeleteIcon />}
+                                onClick={async (_) => {
+                                  await handleActivation(item._id)
+                                }}
+                              >
+                                {variant === 'active'
+                                  ? deactivateButtonText
+                                  : activateButtonText}
                               </Button>
                               <Button
                                 size="small"
@@ -580,6 +601,7 @@ export default function MyAdsList(props: MyAdsProps) {
             ) => {
               setSelected([])
               const href = getHref({
+                variant,
                 page: newPage,
                 pageSize: data.pagination.pageSize,
               })
@@ -592,6 +614,7 @@ export default function MyAdsList(props: MyAdsProps) {
               const newPageSize = event.target.value
 
               const href = getHref({
+                variant,
                 page: 1,
                 pageSize: parseInt(newPageSize, 10),
               })

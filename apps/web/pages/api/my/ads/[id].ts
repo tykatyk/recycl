@@ -2,14 +2,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { adSchema } from '../../../../lib/validation'
-import {
-  dbConnect,
-  CollectionPointContainerModel,
-  CollectionPointMobileModel,
-  CollectionPointStationeryModel,
-  CollectionPointModel,
-  AdModel,
-} from '@recycl/shared/dist/server/db'
+import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
 import { METHOD_NOT_ALLOWED } from '../../../../lib/errors'
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import { isValidObjectId } from 'mongoose'
@@ -29,33 +22,19 @@ async function adHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const user = session.id
   await dbConnect()
+  const existing = await AdModel.findOne({ _id: id, user }).lean()
+  if (!existing) {
+    return res.status(404).end()
+  }
 
   switch (req.method) {
     case 'GET':
-      const ad = await AdModel.findOne({
-        _id: id,
-        user,
-      }).lean()
-      if (!ad) {
-        res.status(404).end()
-        return
-      }
-
-      res.json(ad)
+      res.json(existing)
       break
     case 'PUT':
       const validated = await adSchema.validate(req.body, {
         abortEarly: false,
       })
-
-      const existing = await AdModel.findOne({
-        _id: id,
-        user,
-      })
-
-      if (!existing) {
-        return res.status(404).end()
-      }
 
       if (
         existing.wasteLocation.place_id !== validated.wasteLocation.place_id
@@ -81,7 +60,21 @@ async function adHandler(req: NextApiRequest, res: NextApiResponse) {
 
       res.status(200).json({ message: 'Документ обновлен' })
       break
+    case 'PATCH':
+      const { action } = req.body
 
+      if (action !== 'activate' && action !== 'deactivate') {
+        return res.status(400).end()
+      }
+
+      if (existing.status === 'blocked') {
+        return res.status(403).end()
+      }
+      const updatedStatus = action === 'activate' ? 'active' : 'disabled'
+
+      await AdModel.updateOne(existing, { status: updatedStatus })
+      res.status(200).end()
+      break
     default:
       res.status(405).json({ error: METHOD_NOT_ALLOWED })
       break

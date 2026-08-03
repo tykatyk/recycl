@@ -67,6 +67,7 @@ export const validOrderBy: Record<OrderBy, OrderBy> = {
   location: 'location',
   date: 'date',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
 }
 
 export const getEventTableStyles = (theme) => ({

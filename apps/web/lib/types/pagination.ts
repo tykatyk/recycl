@@ -1,5 +1,5 @@
 export type SortOrder = 'asc' | 'desc'
-export type OrderBy = 'date' | 'waste' | 'location' | 'createdAt'
+export type OrderBy = 'date' | 'waste' | 'location' | 'createdAt' | 'updatedAt'
 
 export type PaginatedData<T> = {
   items: T[]
