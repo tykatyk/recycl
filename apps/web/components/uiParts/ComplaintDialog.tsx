@@ -14,6 +14,7 @@ import { useRef, useState } from 'react'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import { Box } from '@mui/material'
 import ReCAPTCHA from 'react-google-recaptcha'
+import { complaintContentVariants } from '@recycl/shared/dist/constants'
 
 const errorMessage = 'Что то пошло не так'
 const successMessage = 'Сообщение отправлено администратору'
@@ -21,13 +22,14 @@ const successMessage = 'Сообщение отправлено админист
 type FormDialogProps = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  contentType: (typeof complaintContentVariants)[number]
 }
 
-export default function ComplainDialog(props: FormDialogProps) {
-  const { open, setOpen } = props
+export default function ComplaintDialog(props: FormDialogProps) {
+  const { open, setOpen, contentType } = props
   const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
-  const [recaptchaToken, setRecaptchaToken] = useState(null)
+  const [recaptchaToken, setRecaptchaToken] = useState('')
   const recaptchaRef = useRef<ReCAPTCHA>(null)
 
   const handleClose = () => {
@@ -35,7 +37,7 @@ export default function ComplainDialog(props: FormDialogProps) {
     formik.resetForm()
   }
 
-  const handleChange = (token) => {
+  const handleChange = (token: string) => {
     setRecaptchaToken(token)
   }
 
@@ -53,7 +55,7 @@ export default function ComplainDialog(props: FormDialogProps) {
         const response = await fetch(`/api/complaint`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...values, recaptchaToken }),
+          body: JSON.stringify({ ...values, recaptchaToken, contentType }),
         })
 
         if (!response.ok) {

@@ -113,7 +113,35 @@ async function adsHanlder(req: NextApiRequest, res: NextApiResponse) {
       })
 
       break
+    case 'DELETE':
+      await dbConnect()
 
+      const { documentIds }: { documentIds: string[] } = req.body
+
+      if (!Array.isArray(documentIds) || !(documentIds.length > 0)) {
+        res
+          .status(400)
+          .json({ error: `Expected an array of ids but got ${documentIds}` })
+        return
+      }
+      let deletedCount = 0
+      try {
+        const result = await AdModel.deleteMany({
+          user: session.id,
+          _id: { $in: documentIds },
+        })
+        deletedCount = result.deletedCount
+        console.log(`${deletedCount} ads successfully deleted`)
+      } catch (e) {
+        console.log(e)
+        res.status(500).json({ error: 'An error occurred while deleting ads' })
+        return
+      }
+
+      res
+        .status(200)
+        .json({ message: `${deletedCount} ads successfully deleted` })
+      break
     default:
       return res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }

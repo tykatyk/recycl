@@ -1,5 +1,6 @@
 import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
 import { checkEmail } from '../dbModelCommons'
+import { complaintContentVariants } from '../../../constants'
 import type { ValidatorProps } from 'mongoose'
 
 const complaintSchema = new Schema(
@@ -12,6 +13,10 @@ const complaintSchema = new Schema(
     complaintUrl: {
       type: String,
       required: true,
+    },
+    contentType: {
+      type: String,
+      Enum: complaintContentVariants,
     },
     userId: {
       type: Schema.Types.ObjectId,

@@ -9,3 +9,5 @@ export const collectionPointTypes = {
   mobile: 'Передвижной',
   container: 'Сортировочный контейнер',
 } as const
+
+export const complaintContentVariants = ['ad', 'collectionPoint'] as const

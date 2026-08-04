@@ -8,7 +8,7 @@ import { useCallback, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
-import ComplainDialog from '../uiParts/ComplainDialog'
+import ComplaintDialog from '../uiParts/ComplaintDialog'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
 const phoneLoadingErrorMessage = 'Что то пошло не так'
@@ -19,8 +19,7 @@ export default function SingleCollectionPoint(props) {
   const [phone, setPhone] = useState(defaultPhone)
   const [loading, setLoading] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
-  const [complainDialogOpen, setComplainDialogOpen] = useState(false)
-  const creationDate = new Date(data.createdAt)
+  const [complaintDialogOpen, setComplaintDialogOpen] = useState(false)
 
   const buttonHandler = useCallback(async () => {
     if (phone !== defaultPhone) return
@@ -149,16 +148,17 @@ export default function SingleCollectionPoint(props) {
               color="error"
               size="small"
               onClick={() => {
-                setComplainDialogOpen(true)
+                setComplaintDialogOpen(true)
               }}
               startIcon={<GppMaybeIcon />}
             >
               Пожаловаться
             </Button>
           </Box>
-          <ComplainDialog
-            open={complainDialogOpen}
-            setOpen={setComplainDialogOpen}
+          <ComplaintDialog
+            open={complaintDialogOpen}
+            setOpen={setComplaintDialogOpen}
+            contentType="collectionPoint"
           />
         </Box>
       </Box>

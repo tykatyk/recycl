@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Chip,
   Paper,
   Stack,
   Typography,
@@ -14,7 +13,7 @@ import {
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import router, { useRouter } from 'next/router'
-import { useEffect, useState, useRef, RefObject, useLayoutEffect } from 'react'
+import { useEffect, useState, useRef, useLayoutEffect } from 'react'
 import Cookies from 'js-cookie'
 import NoRows from '../uiParts/NoRows'
 import HeadingWithDescription from '../uiParts/HeadingWithDescription'
@@ -30,17 +29,15 @@ import type { PaginatedData } from '../../lib/types/pagination'
 import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import {
-  collectionPointTypes,
-  documentActivityStatus,
-} from '@recycl/shared/dist/constants'
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
 import AdTabs from '../uiParts/AdTabs'
-import { CollectionPointsDescription } from '../uiParts/CollectionPointComponents' //ToDo: implement for ads
+import { AdsDescription } from '../uiParts/AdPageComponents'
 import dayjs from 'dayjs'
+import ToggleOnIcon from '@mui/icons-material/ToggleOn'
+import ActionsBar from '../uiParts/ActionsBar'
 
 const apiUrl = '/api/my/ads'
 const baseUrl = '/my/ads'
-
 const inactiveAdsRoute = `${baseUrl}/disabled`
 
 const editButtonText = 'Редактировать'
@@ -70,134 +67,6 @@ const handleVariantChange = (
   }
 }
 
-const DeletingModal = (params: { open: boolean }) => {
-  const { open } = params
-
-  return (
-    <Modal open={open}>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
-        <CircularProgress size={40} color="warning" />
-      </Box>
-    </Modal>
-  )
-}
-
-const Header = (props) => {
-  return (
-    <HeadingWithDescription
-      detailedDescription={<CollectionPointsDescription />}
-    >
-      <Typography
-        component="h1"
-        variant="h4"
-        sx={{ mt: 2, mb: 3, width: '100%' }}
-      >
-        {props.title}
-      </Typography>
-    </HeadingWithDescription>
-  )
-}
-type ActionsBarProps = {
-  actionsBarRef: RefObject<HTMLDivElement | null>
-  isSticky: boolean
-  handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
-  handleDeleteMany: () => Promise<void>
-  selectedCount: number
-  total: number
-}
-
-const ActionsBar = (props: ActionsBarProps) => {
-  const {
-    actionsBarRef,
-    isSticky,
-    handleSelectAll,
-    handleDeleteMany,
-    selectedCount,
-    total,
-  } = props
-  const selectAllRowsLabel = {
-    slotProps: {
-      input: { 'aria-label': 'Выбрать все строки' },
-    },
-  }
-
-  return (
-    <Box>
-      <Box
-        ref={actionsBarRef}
-        sx={{
-          position: isSticky ? 'fixed' : 'sticky',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          backgroundColor: isSticky ? '#1a2b34' : 'background.default',
-          boxShadow: isSticky ? '0 2px 4px #3c4b53' : 'none',
-          transition: isSticky ? 'background 0.3s' : 'none',
-        }}
-      >
-        <Box
-          sx={{
-            maxWidth: 900,
-            margin: 'auto',
-            pl: isSticky ? 5 : 2,
-            pr: isSticky ? 5 : 2,
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Box sx={{ p: 2, pl: 0 }}>
-                <Checkbox
-                  checked={selectedCount > 0}
-                  color="secondary"
-                  {...selectAllRowsLabel}
-                  onChange={(e) => {
-                    handleSelectAll(e)
-                  }}
-                />
-              </Box>
-
-              <Box sx={{ pr: 2 }}>
-                <Typography variant="body2" sx={{ color: 'grey.400' }}>
-                  {`Выбрано ${selectedCount} из ${total}`}
-                </Typography>
-              </Box>
-              <Box>
-                <Button
-                  size="small"
-                  disabled={selectedCount === 0}
-                  color="secondary"
-                  onClick={handleDeleteMany}
-                >
-                  Удалить выбранные
-                </Button>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
-  )
-}
-
 type MyAdsProps = {
   variant: keyof typeof documentActivityStatus
   h1: string
@@ -218,14 +87,8 @@ export default function MyAdsList(props: MyAdsProps) {
 
   const { enqueueSnackbar } = useSnackbar()
 
-  const selectRowLabel = {
-    slotProps: {
-      input: { 'aria-label': 'Выбрать строку' },
-    },
-  }
-
   const handleDelete = async (documentIds: string[]) => {
-    setStatus('deleting')
+    setStatus('actionPerforming')
     const response = await fetch(apiUrl, {
       method: 'DELETE',
       body: JSON.stringify({ documentIds }),
@@ -234,16 +97,16 @@ export default function MyAdsList(props: MyAdsProps) {
       },
     })
     if (!response.ok) {
-      enqueueSnackbar('Ошибка при удалении элемента', { variant: 'error' })
+      enqueueSnackbar('Ошибка при удалении объявления', { variant: 'error' })
     } else {
-      enqueueSnackbar('Элемент удален', { variant: 'success' })
+      enqueueSnackbar('Объявление удалено', { variant: 'success' })
       await fetchData()
     }
     setStatus('')
   }
 
   const handleActivation = async (id: string) => {
-    setStatus('deleting') //ToDo: rename status
+    setStatus('actionPerforming')
     const action = variant === 'active' ? 'deactivate' : 'activate'
     const response = await fetch(`${apiUrl}/${id}`, {
       method: 'PATCH',
@@ -405,8 +268,6 @@ export default function MyAdsList(props: MyAdsProps) {
 
   if (!data && status === 'loading') return <PageLoadingCircle />
 
-  // if (data && data.pagination && data.pagination.total === 0) return <NoData />
-
   if (data && data.items) {
     return (
       <Box
@@ -420,8 +281,29 @@ export default function MyAdsList(props: MyAdsProps) {
         {status === 'loading' ? (
           <PageLoadingCircle sx={[{ position: 'fixed' }]} />
         ) : null}
-        {status === 'deleting' ? <DeletingModal open={true} /> : null}
-        <Header title={h1} />
+        {status === 'actionPerforming' && (
+          <Modal open={true}>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <CircularProgress size={40} color="warning" />
+            </Box>
+          </Modal>
+        )}
+        <HeadingWithDescription detailedDescription={<AdsDescription />}>
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{ mt: 2, mb: 3, width: '100%' }}
+          >
+            {h1}
+          </Typography>
+        </HeadingWithDescription>
 
         <AdTabs value={variant} handleChange={handleVariantChange}>
           {data.items.length === 0 ? (
@@ -467,9 +349,11 @@ export default function MyAdsList(props: MyAdsProps) {
                         <Box sx={{ p: 2, pl: 0 }}>
                           <Checkbox
                             color="secondary"
-                            {...selectRowLabel}
                             slotProps={{
-                              input: { 'data-id': `${item._id}` } as any,
+                              input: {
+                                'data-id': `${item._id}`,
+                                'aria-label': 'Выбрать строку',
+                              } as any,
                             }}
                             onChange={(e) => {
                               const id = e.target.dataset.id
@@ -559,7 +443,7 @@ export default function MyAdsList(props: MyAdsProps) {
                               <Button
                                 size="small"
                                 color="secondary"
-                                startIcon={<DeleteIcon />}
+                                startIcon={<ToggleOnIcon />}
                                 onClick={async (_) => {
                                   await handleActivation(item._id)
                                 }}

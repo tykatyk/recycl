@@ -70,9 +70,15 @@ async function adHandler(req: NextApiRequest, res: NextApiResponse) {
       if (existing.status === 'blocked') {
         return res.status(403).end()
       }
-      const updatedStatus = action === 'activate' ? 'active' : 'disabled'
+      const updated =
+        action === 'activate'
+          ? {
+              status: 'active',
+              expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            }
+          : { status: 'disabled' }
 
-      await AdModel.updateOne(existing, { status: updatedStatus })
+      await AdModel.updateOne(existing, updated)
       res.status(200).end()
       break
     default:

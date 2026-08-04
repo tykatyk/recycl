@@ -34,6 +34,7 @@ import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import CollectionPointTabs from '../uiParts/CollectionPointTabs'
 import { CollectionPointsDescription } from '../../components/uiParts/CollectionPointComponents'
 import dayjs from 'dayjs'
+import ActionsBar from '../uiParts/ActionsBar'
 
 const apiUrl = '/api/my/collection-points'
 const baseUrl = '/my/collection-points'
@@ -65,134 +66,6 @@ const handleVariantChange = (
   }
 }
 
-const DeletingModal = (params: { open: boolean }) => {
-  const { open } = params
-
-  return (
-    <Modal open={open}>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
-        <CircularProgress size={40} color="warning" />
-      </Box>
-    </Modal>
-  )
-}
-
-const Header = (props) => {
-  return (
-    <HeadingWithDescription
-      detailedDescription={<CollectionPointsDescription />}
-    >
-      <Typography
-        component="h1"
-        variant="h4"
-        sx={{ mt: 2, mb: 3, width: '100%' }}
-      >
-        {props.title}
-      </Typography>
-    </HeadingWithDescription>
-  )
-}
-type ActionsBarProps = {
-  actionsBarRef: RefObject<HTMLDivElement | null>
-  isSticky: boolean
-  handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
-  handleDeleteMany: () => Promise<void>
-  selectedCount: number
-  total: number
-}
-
-const ActionsBar = (props: ActionsBarProps) => {
-  const {
-    actionsBarRef,
-    isSticky,
-    handleSelectAll,
-    handleDeleteMany,
-    selectedCount,
-    total,
-  } = props
-  const selectAllRowsLabel = {
-    slotProps: {
-      input: { 'aria-label': 'Выбрать все строки' },
-    },
-  }
-
-  return (
-    <Box>
-      <Box
-        ref={actionsBarRef}
-        sx={{
-          position: isSticky ? 'fixed' : 'sticky',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          backgroundColor: isSticky ? '#1a2b34' : 'background.default',
-          boxShadow: isSticky ? '0 2px 4px #3c4b53' : 'none',
-          transition: isSticky ? 'background 0.3s' : 'none',
-        }}
-      >
-        <Box
-          sx={{
-            maxWidth: 900,
-            margin: 'auto',
-            pl: isSticky ? 5 : 2,
-            pr: isSticky ? 5 : 2,
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Box sx={{ p: 2, pl: 0 }}>
-                <Checkbox
-                  checked={selectedCount > 0}
-                  color="secondary"
-                  {...selectAllRowsLabel}
-                  onChange={(e) => {
-                    handleSelectAll(e)
-                  }}
-                />
-              </Box>
-
-              <Box sx={{ pr: 2 }}>
-                <Typography variant="body2" sx={{ color: 'grey.400' }}>
-                  {`Выбрано ${selectedCount} из ${total}`}
-                </Typography>
-              </Box>
-              <Box>
-                <Button
-                  size="small"
-                  disabled={selectedCount === 0}
-                  color="secondary"
-                  onClick={handleDeleteMany}
-                >
-                  Удалить выбранные
-                </Button>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
-  )
-}
-
 type MyCollectionPointsListProps = {
   variant?: keyof typeof collectionPointTypes
   h1: string
@@ -214,14 +87,8 @@ export default function MyCollectionPointsList(
   const scrollPosRef = useRef<number>(0)
   const { enqueueSnackbar } = useSnackbar()
 
-  const selectRowLabel = {
-    slotProps: {
-      input: { 'aria-label': 'Выбрать строку' },
-    },
-  }
-
   const handleDelete = async (documentIds: string[]) => {
-    setStatus('deleting')
+    setStatus('actionPerforming')
     const response = await fetch(apiUrl, {
       method: 'DELETE',
       body: JSON.stringify({ documentIds }),
@@ -372,8 +239,6 @@ export default function MyCollectionPointsList(
 
   if (!data && status === 'loading') return <PageLoadingCircle />
 
-  // if (data && data.pagination && data.pagination.total === 0) return <NoData />
-
   if (data && data.items) {
     return (
       <Box
@@ -387,8 +252,31 @@ export default function MyCollectionPointsList(
         {status === 'loading' ? (
           <PageLoadingCircle sx={[{ position: 'fixed' }]} />
         ) : null}
-        {status === 'deleting' ? <DeletingModal open={true} /> : null}
-        <Header title={h1} />
+        {status === 'actionPerforming' && (
+          <Modal open={true}>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <CircularProgress size={40} color="warning" />
+            </Box>
+          </Modal>
+        )}
+        <HeadingWithDescription
+          detailedDescription={<CollectionPointsDescription />}
+        >
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{ mt: 2, mb: 3, width: '100%' }}
+          >
+            {h1}
+          </Typography>
+        </HeadingWithDescription>
 
         <CollectionPointTabs
           value={variant ? variant : 'container'}
@@ -437,9 +325,11 @@ export default function MyCollectionPointsList(
                         <Box sx={{ p: 2, pl: 0 }}>
                           <Checkbox
                             color="secondary"
-                            {...selectRowLabel}
                             slotProps={{
-                              input: { 'data-id': `${item._id}` } as any,
+                              input: {
+                                'data-id': `${item._id}`,
+                                'aria-label': 'Выбрать строку',
+                              } as any,
                             }}
                             onChange={(e) => {
                               const id = e.target.dataset.id

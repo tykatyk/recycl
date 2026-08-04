@@ -7,6 +7,7 @@ import GppMaybeIcon from '@mui/icons-material/GppMaybe'
 import { useCallback, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
+import ComplaintDialog from '../uiParts/ComplaintDialog'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
 const phoneLoadingErrorMessage = 'Что то пошло не так'
@@ -18,6 +19,7 @@ export default function SingleWasteAvailableAd(props) {
   const [loading, setLoading] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const creationDate = new Date(data.createdAt)
+  const [complaintDialogOpen, setComplaintDialogOpen] = useState(false)
 
   const formattedDate = new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
@@ -142,22 +144,23 @@ export default function SingleWasteAvailableAd(props) {
 
         <Box sx={{ p: 2 }}>
           <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-            <Typography
-              variant="body2"
+            <Button
+              variant="text"
               color="error"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
+              size="small"
+              onClick={() => {
+                setComplaintDialogOpen(true)
               }}
-              align="right"
+              startIcon={<GppMaybeIcon />}
             >
-              <GppMaybeIcon />
-              <Link href={'#'} sx={{ color: 'inherit' }}>
-                Пожаловаться
-              </Link>
-            </Typography>
+              Пожаловаться
+            </Button>
           </Box>
+          <ComplaintDialog
+            open={complaintDialogOpen}
+            setOpen={setComplaintDialogOpen}
+            contentType="ad"
+          />
         </Box>
       </Box>
     </Box>

@@ -14,13 +14,20 @@ import { handleEmailSending, getHtml } from '../../lib/helpers/email/mailer'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
 import { checkCaptcha } from '../../lib/helpers/checkCaptcha'
 import { captchaNotPassedResponse } from '../../lib/helpers/responses'
+import { complaintContentVariants } from '@recycl/shared/dist/constants'
 
 async function complaintHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: METHOD_NOT_ALLOWED })
   }
 
-  const { recaptchaToken } = req.body
+  const {
+    recaptchaToken,
+    contentType,
+  }: {
+    recaptchaToken: string
+    contentType: (typeof complaintContentVariants)[number]
+  } = req.body
   const captchaPassed = await checkCaptcha(recaptchaToken)
   if (!captchaPassed) return captchaNotPassedResponse(res)
 
@@ -56,6 +63,14 @@ async function complaintHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const subject = `Поступила жалоба с сайта ${process.env.BRAND}`
 
+  let contentTypeMessage = ''
+  if (contentType == 'ad') {
+    contentTypeMessage = 'объявление о наличии вторсырья'
+  }
+  if (contentType == 'collectionPoint') {
+    contentTypeMessage = 'объявление о наличии вторсырья'
+  }
+
   const emailText = {
     header: subject,
     userIp: `IP адрес пользователя, отправившего жалобу: ${userIp}` || '',
@@ -66,6 +81,8 @@ async function complaintHandler(req: NextApiRequest, res: NextApiResponse) {
         }
       : {}),
     message: `Текст сообщения: ${complaint}.`,
+    complaintUrl: `URL контента: ${complaintUrl}`,
+    contentTypeDescription: `Тип контента: ${contentTypeMessage}`,
   }
 
   const emailParams = {
