@@ -4,9 +4,9 @@ import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
-import { phone as phoneValidator } from '@recycl/shared/dist/validation'
+import { userName } from '@recycl/shared/dist/validation'
 
-async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
+async function userContactsHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session) {
     res.status(401).end()
@@ -19,7 +19,7 @@ async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
       const user = await UserModel.findById(session.id)
       if (!user) return res.status(404)
 
-      res.json({ phone: user.phone })
+      res.json({ username: user.name })
       break
     }
     case 'PATCH': {
@@ -27,8 +27,8 @@ async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
       const user = await UserModel.findById(session.id)
 
       if (!user) return res.status(404)
-      const { phone } = req.body
-      const validated = await phoneValidator.validate(phone, {
+      const { username } = req.body
+      const validated = await userName.validate(username, {
         stripUnknown: true,
       })
 
@@ -36,7 +36,7 @@ async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(400).end()
       }
 
-      user.phone = validated
+      user.name = validated
       await user.save()
       res.status(200).end()
       break
@@ -46,4 +46,4 @@ async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default apiHandler(userPhoneHandler)
+export default apiHandler(userContactsHandler)

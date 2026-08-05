@@ -5,11 +5,35 @@ import { phone as phoneValidator } from '../../../validation/atomicValidators'
 import { checkEmail } from '../dbModelCommons'
 import { documentActivityStatus } from '../../../constants'
 import { validationMessages } from '../../../validation'
+import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '../../../constants'
 
 const { email: invalidEmailAddress, phone: invalidPhoneNumber } =
   validationMessages
 
 const { active, blocked } = documentActivityStatus
+
+interface UserMethods {
+  generateEmailReset(length?: number): void
+  generateEmailConfirm(length?: number): void
+}
+
+const methods = {
+  generateEmailReset: function (length = 128) {
+    this.resetEmailToken = cryptoRandomString({ length, type: 'url-safe' })
+    this.resetEmailExpires = new Date(
+      Date.now() + CHANGE_EMAIL_EXPIRATION_PERIOD,
+    )
+  },
+  generateEmailConfirm: function (length = 128) {
+    this.confirmEmailToken = cryptoRandomString({
+      length,
+      type: 'url-safe',
+    })
+    this.confirmEmailExpires = new Date(
+      Date.now() + CHANGE_EMAIL_EXPIRATION_PERIOD,
+    )
+  },
+} satisfies UserMethods
 
 const locationSchema = new Schema({
   description: {
@@ -110,25 +134,16 @@ const userSchema = new Schema(
       },
     ],
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    methods,
+  },
 )
 
-userSchema.methods.generatePasswordReset = function (length = 32) {
-  this.resetPasswordToken = cryptoRandomString({ length, type: 'url-safe' })
-  this.resetPasswordExpires = Date.now() + 3600000 //expires in an hour
-}
-userSchema.methods.generateEmailReset = function (length = 128) {
-  this.resetEmailToken = cryptoRandomString({ length, type: 'url-safe' })
-  this.resetEmailExpires = Date.now() + 3600000
-}
-userSchema.methods.generateEmailConfirm = function (length = 128) {
-  this.confirmEmailToken = cryptoRandomString({ length, type: 'url-safe' })
-  this.confirmEmailExpires = Date.now() + 3600000
-}
 export type User = InferSchemaType<typeof userSchema>
 
-type UserModel = Model<User>
+type UserModel = Model<User, {}, UserMethods>
 const UserModel =
-  (models.User as Model<User>) || model<User, UserModel>('User', userSchema)
+  (models.User as UserModel) || model<User, UserModel>('User', userSchema)
 
 export default UserModel

@@ -1,9 +1,4 @@
 import { UserModel as User, AdModel } from '@recycl/shared/dist/server/db'
-import { mapErrors } from '../errorHelpers'
-import { contactsSchema, phoneSchema } from '../../validation'
-import { compare, hash } from 'bcrypt'
-// const { UserInputError } = require('apollo-server-micro')
-import { GraphQLError } from 'graphql'
 
 const userQueries = {
   create: async (data) => {
@@ -96,26 +91,6 @@ const userQueries = {
     } catch (error) {
       return error
     }
-  },
-
-  updateContacts: async (contacts, userInstance) => {
-    if (!userInstance) return null
-    try {
-      await contactsSchema.validate(contacts, { abortEarly: false })
-    } catch (error) {
-      const mappedErrors = mapErrors(error)
-      throw new GraphQLError('Invalid argument value', {
-        extenstions: {
-          detailedMessages: mappedErrors,
-        },
-      })
-    }
-
-    const user = await User.findById(userInstance.id)
-    user.name = contacts.username
-    user.location = contacts.location
-
-    return await user.save()
   },
 }
 export default userQueries

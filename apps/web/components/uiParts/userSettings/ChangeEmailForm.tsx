@@ -5,7 +5,8 @@ import { Formik, Form, Field } from 'formik'
 import Snackbar from '../Snackbars'
 import TextFieldFormik from '../formInputs/TextFieldFormik'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
-import { loginSchema as changeEmailSchema } from '../../../lib/validation'
+import { email as emailValidator } from '@recycl/shared/dist/validation'
+import * as yup from 'yup'
 
 const PREFIX = 'ChangeEmailForm'
 
@@ -62,13 +63,14 @@ export default function ChangeEmailForm() {
       <Formik
         initialValues={{
           email: '',
-          password: '',
         }}
-        validationSchema={changeEmailSchema}
+        validationSchema={yup.object({
+          email: emailValidator,
+        })}
         onSubmit={async (values, { setSubmitting, setErrors }) => {
           setSubmitting(true)
 
-          await fetch('/api/my/account/settings/change-email', {
+          await fetch('/api/my/account/email', {
             method: 'POST',
             body: JSON.stringify(values),
             headers: {
@@ -116,18 +118,6 @@ export default function ChangeEmailForm() {
                 id="email"
                 label="Новый email адрес"
                 name="email"
-                component={TextFieldFormik}
-                className={classes.field}
-              />
-              <Field
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="password"
-                label="Текущий пароль"
-                name="password"
-                type="password"
                 component={TextFieldFormik}
                 className={classes.field}
               />

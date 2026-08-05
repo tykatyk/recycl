@@ -4,7 +4,7 @@ import {
   email as emailValidator,
 } from '../../validation/atomicValidators'
 
-const NUM_DAYS_TO_EXPIRE = 30
+import { AD_EXPIRATION_PERIOD } from '../../constants'
 
 //ToDo: використати цю схему також в ad
 export const userSchema = new Schema({
@@ -97,7 +97,7 @@ export const expires = {
   required: true,
   default: () => {
     const date = new Date()
-    return date.setDate(date.getDate() + NUM_DAYS_TO_EXPIRE)
+    return date.setDate(date.getDate() + AD_EXPIRATION_PERIOD)
   },
 }
 

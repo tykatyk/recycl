@@ -1,7 +1,5 @@
-import React from 'react'
 import ChangeEmailPage from '../../../../components/uiParts/userSettings/ChangeEmailPage'
-import dbConnect from '../../../../lib/db/connection'
-import { User } from '../../../../lib/db/models'
+import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 
 export default function ChangeEmail(props) {
   const { urlIsValid } = props
@@ -10,7 +8,15 @@ export default function ChangeEmail(props) {
 
 export async function getServerSideProps(context) {
   await dbConnect()
-  const user = await User.findOne({ resetEmailToken: context.query.token })
+  const user = await UserModel.findOne({
+    resetEmailToken: context.query.token,
+    resetEmailExpires: { $gte: Date.now() },
+  })
+  if (!user) {
+    return {
+      notFound: true,
+    }
+  }
   const { newEmail } = user
 
   if (user) {

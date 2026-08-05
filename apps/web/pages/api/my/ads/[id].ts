@@ -7,6 +7,7 @@ import { METHOD_NOT_ALLOWED } from '../../../../lib/errors'
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import { isValidObjectId } from 'mongoose'
 import getCoords from '../../../../lib/helpers/getCoords'
+import { AD_EXPIRATION_PERIOD } from '@recycl/shared/dist/constants'
 
 async function adHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -74,7 +75,9 @@ async function adHandler(req: NextApiRequest, res: NextApiResponse) {
         action === 'activate'
           ? {
               status: 'active',
-              expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              expires: new Date(
+                Date.now() + AD_EXPIRATION_PERIOD * 24 * 60 * 60 * 1000,
+              ),
             }
           : { status: 'disabled' }
 

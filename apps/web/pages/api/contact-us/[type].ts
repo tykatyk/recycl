@@ -98,9 +98,10 @@ const proposeWasteTypeContactHandler = async (
   await emailValidator.validate(emailTo)
 
   const emailFrom = getEmailFrom(email)
+  const subject = 'Поступило предложение о добавлении нового типа вторсырья'
 
   const emailText = {
-    header: `Поступило предложение о добавлении нового типа вторсырья`,
+    header: subject,
     userName: `Имя пользователя, который внес предложение: ${userName}.`,
     userEmail: `Email пользователя: ${email}.`,
     userId: `ID пользователя: ${session?.id || 'недоступен'}.`,
@@ -111,7 +112,7 @@ const proposeWasteTypeContactHandler = async (
   const emailParams = {
     to: emailTo,
     from: emailFrom,
-    subject: 'Поступило предложение о добавлении нового типа вторсырья',
+    subject,
     messageType: 'proposeWasteType' as const,
     html: getHtml(emailText),
     text: getEmailText(emailText),

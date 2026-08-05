@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react'
 import { Avatar, Button, Box, Typography } from '@mui/material'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { Formik, Form, Field } from 'formik'
-// import Snackbar from '../Snackbars'
 import TextFieldFormik from '../formInputs/TextFieldFormik'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
 import PageLoadingCircle from '../PageLoadingCircle'
-import { phoneSchema } from '../../../lib/validation'
 import { userPhoneFetcher } from '../../../lib/helpers/dataFetcher'
 import { enqueueSnackbar } from 'notistack'
+import { validation } from '@recycl/shared'
+import * as yup from 'yup'
 
+const { phone: phoneValidator } = validation
 const errorMessage = 'Что то пошло не так'
-
+const api = '/api/my/account/user-name'
 export default function PhoneForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
@@ -71,10 +72,10 @@ export default function PhoneForm() {
         initialValues={{
           phone,
         }}
-        validationSchema={phoneSchema}
+        validationSchema={yup.object({ phone: phoneValidator })}
         onSubmit={async (values) => {
           try {
-            const response = await fetch('/api/my/account/phone', {
+            const response = await fetch(api, {
               method: 'PATCH',
               body: JSON.stringify(values),
               headers: {

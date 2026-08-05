@@ -33,7 +33,17 @@ const confirmPassword = yup
 
 const email = yup.string().required(required).email(emailMsg)
 
-const phone = yup.string().min(10, phoneMsg).matches(phoneRegex, phoneMsg)
+const phone = yup
+  .string()
+  .required(required)
+  .min(10, phoneMsg)
+  .matches(phoneRegex, phoneMsg)
+
+const userName = yup
+  .string()
+  .required(required)
+  .min(3, 'Минимум 3 символа')
+  .max(255, 'Максимум 255 символов')
 
 const notOnlySpaces = yup
   .string()
@@ -105,6 +115,7 @@ export {
   confirmPassword,
   email,
   phone,
+  userName,
   notOnlySpaces,
   message,
   comment,

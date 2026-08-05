@@ -1,15 +1,11 @@
-import loginSchema from './login'
 import registerSchema from './register'
 import adSchema from './ad'
 import {
-  email,
   password,
-  phone,
   userLocation,
   paginationPageNumberSchema,
   paginationPageSizeSchema,
 } from './atomicSchemas'
-import contactsSchema from './contacts'
 import quantitySchema from './quantity'
 import contactUsForm from './contactUsForm'
 import chatForm from './chatForm'
@@ -22,14 +18,10 @@ import {
 } from './subscription'
 
 export {
-  loginSchema,
   registerSchema,
   adSchema,
-  email as emailSchema,
   password as passwordSchema,
-  phone as phoneSchema,
   userLocation as userLocationSchema,
-  contactsSchema,
   quantitySchema,
   contactUsForm as contactUsSchema,
   chatForm as chatSchema,

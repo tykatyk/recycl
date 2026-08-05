@@ -11,3 +11,6 @@ export const collectionPointTypes = {
 } as const
 
 export const complaintContentVariants = ['ad', 'collectionPoint'] as const
+
+export const AD_EXPIRATION_PERIOD = 30
+export const CHANGE_EMAIL_EXPIRATION_PERIOD = 10
