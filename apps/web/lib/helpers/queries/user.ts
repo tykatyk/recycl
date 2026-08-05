@@ -1,10 +1,6 @@
 import { UserModel as User, AdModel } from '@recycl/shared/dist/server/db'
 import { mapErrors } from '../errorHelpers'
-import {
-  contactsSchema,
-  phoneSchema,
-  changePasswordSchema,
-} from '../../validation'
+import { contactsSchema, phoneSchema } from '../../validation'
 import { compare, hash } from 'bcrypt'
 // const { UserInputError } = require('apollo-server-micro')
 import { GraphQLError } from 'graphql'
@@ -120,60 +116,6 @@ const userQueries = {
     user.location = contacts.location
 
     return await user.save()
-  },
-
-  updatePhone: async (phone, userInstance) => {
-    if (!userInstance) return null
-    try {
-      await phoneSchema.validate({ phone }, { abortEarly: false })
-    } catch (error) {
-      console.log(error)
-      const mappedErrors = mapErrors(error)
-      throw new GraphQLError('Invalid argument value', {
-        extenstions: {
-          detailedMessages: mappedErrors,
-        },
-      })
-    }
-    const user = await User.findById(userInstance.id)
-    user.phone = phone
-    return (await user.save()).phone
-  },
-
-  updatePassword: async (oldPassword, newPassword, userInstance) => {
-    if (!userInstance) return null
-    try {
-      await changePasswordSchema.validate(
-        { oldPassword, newPassword },
-        { abortEarly: false },
-      )
-    } catch (error) {
-      console.log(error)
-      const mappedErrors = mapErrors(error)
-      throw new GraphQLError('Invalid argument value', {
-        extenstions: {
-          detailedMessages: mappedErrors,
-        },
-      })
-    }
-    const user = await User.findById(userInstance.id)
-    let oldPasswordCorrect = false
-    if (user && user.password) {
-      oldPasswordCorrect = await compare(oldPassword, user.password)
-    }
-
-    if (!oldPasswordCorrect) {
-      throw new GraphQLError('Invalid argument value', {
-        detailedMessages: {
-          oldPassword: 'Некорректный пароль',
-        },
-      })
-    }
-    user.password = await hash(
-      newPassword,
-      parseInt(process.env.HASHING_ROUNDS, 10),
-    )
-    return !!(await user.save())
   },
 }
 export default userQueries

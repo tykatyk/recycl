@@ -10,7 +10,6 @@ import {
   paginationPageSizeSchema,
 } from './atomicSchemas'
 import contactsSchema from './contacts'
-import changePasswordSchema from './changePassword'
 import quantitySchema from './quantity'
 import contactUsForm from './contactUsForm'
 import chatForm from './chatForm'
@@ -31,7 +30,6 @@ export {
   phone as phoneSchema,
   userLocation as userLocationSchema,
   contactsSchema,
-  changePasswordSchema,
   quantitySchema,
   contactUsForm as contactUsSchema,
   chatForm as chatSchema,

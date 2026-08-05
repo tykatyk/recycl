@@ -104,7 +104,6 @@ export default function DeleteAccountForm() {
                   }}
                   fullWidth
                   variant="contained"
-                  color="secondary"
                   className={classes.submit}
                   disabled={isSubmitting}
                   style={{ width: 'auto' }}

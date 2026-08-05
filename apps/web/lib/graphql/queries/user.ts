@@ -69,22 +69,3 @@ export const UPDATE_USER_CONTACTS = gql`
     }
   }
 `
-
-export const GET_PHONE = gql`
-  query GetPhone($id: String!) {
-    getPhone(id: $id) {
-      phone
-    }
-  }
-`
-
-export const UPDATE_PHONE = gql`
-  mutation UpdatePhone($phone: String!) {
-    updatePhone(phone: $phone)
-  }
-`
-export const UPDATE_PASSWORD = gql`
-  mutation UpdatePassword($oldPassword: String!, $newPassword: String!) {
-    updatePassword(oldPassword: $oldPassword, newPassword: $newPassword)
-  }
-`
