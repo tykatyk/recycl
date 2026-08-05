@@ -10,12 +10,6 @@ const adResolvers = {
     },
   },
   Mutation: {
-    createAd(parent, args, context) {
-      return dbQueries.ad.create(args.application, context.user)
-    },
-    updateAd(parent, args, context) {
-      return dbQueries.ad.update(args.id, args.newValues)
-    },
     deleteAd(parent, args, context) {
       return dbQueries.ad.delete(args.id)
     },

@@ -7,12 +7,7 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
 import { useRouter } from 'next/router'
-import { useMutation } from '@apollo/client'
-import { CREATE_AD, UPDATE_AD } from '../../lib/graphql/queries/ad'
-import {
-  initialValues as initVal,
-  getNormalizedValues,
-} from './removalFormConfig'
+import { getNormalizedValues } from './removalFormConfig'
 import { adSchema } from '../../lib/validation'
 import { useSnackbar } from 'notistack'
 import {
@@ -21,68 +16,82 @@ import {
 } from '../../lib/helpers/dataFetcher'
 
 const errorMessage = 'Что то пошло не так'
+const initVal = {
+  title: '',
+  wasteLocation: null as any,
+  wasteType: '',
+  quantity: '',
+  contactPhone: '',
+  comment: '',
+}
+
+type FormValues = typeof initVal
 
 export default function RemovalForm(props) {
   const { h1 } = props
   const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
-  const [initialValues, setInitialValues] = useState(initVal)
+  const [initialValues, setInitialValues] = useState<FormValues>(initVal)
   const [wasteTypesData, setWasteTypesData] = useState([])
   const { id } = router.query
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
 
-  const [createMutation] = useMutation(CREATE_AD)
-  const [updateMutation] = useMutation(UPDATE_AD)
+  const createHandler = async (values: FormValues, setSubmitting) => {
+    try {
+      setSubmitting(true)
+      const normalizedValues = getNormalizedValues(values)
 
-  const createHandler = (values, setSubmitting) => {
-    setSubmitting(true)
-    const normalizedValues = getNormalizedValues(values)
-    createMutation({
-      variables: { application: normalizedValues },
-      fetchPolicy: 'no-cache',
-    })
-      .then((data) => {
-        router.push('/my/ads')
+      const response = await fetch('/api/my/ads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          //  id,
+          ...normalizedValues,
+        }),
       })
-      .catch((error) => {
-        enqueueSnackbar(errorMessage, {
-          variant: 'error',
-        })
+      if (response.status !== 200) {
+        enqueueSnackbar(errorMessage, { variant: 'error' })
+        return
+      }
+
+      enqueueSnackbar('Документ создан', { variant: 'success' })
+      router.push('/my/ads')
+    } catch (err) {
+      enqueueSnackbar(errorMessage, {
+        variant: 'error',
       })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  const updateHandler = (values, setSubmitting) => {
-    setSubmitting(true)
-    const normalizedValues = getNormalizedValues(values)
+  const updateHandler = async (values: FormValues, setSubmitting) => {
+    try {
+      setSubmitting(true)
+      const normalizedValues = getNormalizedValues(values)
 
-    fetch(`/api/my/ads/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        //  id,
-        ...normalizedValues,
-      }),
-    })
-      .then((response) => {
-        return response.json()
+      const response = await fetch(`/api/my/ads/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          //  id,
+          ...normalizedValues,
+        }),
       })
-      .then((data) => {
-        if (data.error) {
-          enqueueSnackbar(errorMessage, { variant: 'error' })
-        } else if (data.message) {
-          router.back()
-        }
-      })
-      .catch((error) => {
+
+      if (response.status !== 200) {
         enqueueSnackbar(errorMessage, { variant: 'error' })
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+        return
+      }
+
+      enqueueSnackbar('Документ обновлен', { variant: 'success' })
+      router.back()
+    } catch (err) {
+      enqueueSnackbar(errorMessage, { variant: 'error' })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   useEffect(() => {
@@ -154,11 +163,11 @@ export default function RemovalForm(props) {
         enableReinitialize
         initialValues={initialValues}
         validationSchema={adSchema}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={async (values, { setSubmitting }) => {
           if (id) {
-            updateHandler(values, setSubmitting)
+            await updateHandler(values, setSubmitting)
           } else {
-            createHandler(values, setSubmitting)
+            await createHandler(values, setSubmitting)
           }
         }}
       >

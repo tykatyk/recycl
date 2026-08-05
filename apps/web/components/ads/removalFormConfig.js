@@ -1,12 +1,3 @@
-export const initialValues = {
-  title: '',
-  wasteLocation: null,
-  wasteType: '',
-  quantity: '',
-  contactPhone: '',
-  comment: '',
-}
-
 export function getNormalizedValues(values) {
   const normalizedValues = {}
   Object.assign(normalizedValues, values)

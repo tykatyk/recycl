@@ -1,14 +1,6 @@
 import gql from 'graphql-tag'
 import { ADS_OUTPUT_FRAGMENT } from './fragments/adsOutput'
 
-export const CREATE_AD = gql`
-  ${ADS_OUTPUT_FRAGMENT}
-  mutation CreateAd($ad: Ad!) {
-    createAd(ad: $ad) {
-      ...AdOutputFragment
-    }
-  }
-`
 export const GET_ADS = gql`
   query GetAds($queryParams: QueryParams) {
     getAds(queryParams: $queryParams) {
@@ -34,14 +26,6 @@ export const GET_ADS_WITH_MESSAGE_COUNT = gql`
         expires
       }
       messageCount
-    }
-  }
-`
-export const UPDATE_AD = gql`
-  ${ADS_OUTPUT_FRAGMENT}
-  mutation UpdateAd($id: String!, $newValues: Ad!) {
-    updateAd(id: $id, newValues: $newValues) {
-      ...AdOutputFragment
     }
   }
 `
