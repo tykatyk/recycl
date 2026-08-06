@@ -3,20 +3,12 @@ import type {
   SubscriptionVariantName,
 } from '../..//subscription/types'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
+import { getHost, getFullHtml, delimiter } from '@recycl/shared/dist/email'
 
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
 const removalEventsRoute = 'events'
 const removalAdsRoute = 'ads'
-
-const white = ' #ffffff'
-
-const getHost = () => {
-  if (!process.env.HOST) {
-    throw new Error('process.env.HOST is not defined')
-  }
-  return process.env.HOST
-}
 
 const getUrl = (params: {
   wasteName: string
@@ -93,7 +85,7 @@ export const getSubscriptionHtml = (params: {
                       <a href="${getUrl({ wasteName, locationId, subscriptionName })}" style="color:#adce5d;">Посмотреть</a>
                     </td>
                   </tr>
-                  ${wasteTypeIdx !== adCounters.length - 1 ? "<td height='16' style='line-height:16px; font-size:0;'></td>" : ''}
+                  ${wasteTypeIdx !== adCounters.length - 1 ? delimiter : ''}
                       `
         })
         .join('')
@@ -112,90 +104,4 @@ export const getSubscriptionHtml = (params: {
                 <td>${newAdsCountByLocation}</td>
               </tr>`
   return getFullHtml({ content, title, header })
-}
-
-type FullHtmlData = { content: string; title: string; header: string }
-
-const getFullHtml = (data: FullHtmlData) => {
-  const logoPath = '../public/images/logo.png'
-  const brandName = process.env.BRAND || '' //ToDo: refactor
-  const unsubscribeText =
-    'Если вы не хотите получать подобные уведомления, нажмите'
-  const unsubscribe = 'Oтписаться'
-
-  const { content, title, header } = data
-
-  const fullHtml = `
-   <html>
-    <head>
-      <meta charset="utf-8" />
-      <title>${title}</title>
-    </head>
-    <body style="font-family: Arial, Helvetica, sans-serif; color:${white}">
-      <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
-        <tr>
-          <td align="center">
-            <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="600" style="border-radius: 10px; background: #223c4a;">
-              <tr>
-                <td style="padding:16px;">
-                  <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
-                    <tr>
-                      <td align="center" style="color:#adce5d;"\>
-                        <a href="${getHost()}" title="${brandName}" style="display: inline-block; text-decoration: none; color: #adce5d;">
-                          <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
-                            <tr>
-                              <td>
-                                <img
-                                  src="${logoPath}"
-                                  alt="Logo"
-                                  width="30"
-                                  style="display: block; border: 0"
-                                />
-                              </td>
-                              <td
-                                style="
-                                  font-size: 24px;
-                                  font-weight: bold;
-                                  letter-spacing: 0;
-                                "
-                              >
-                                ${brandName}
-                              </td>
-                            </tr>
-                          </table>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td align="center" style="font-size: 24px; font-weight: bold; padding-bottom: 24px;">
-                        ${header}
-                      </td>
-                    </tr>
-                    ${content}
-                    <tr>
-                      <td align="center" style="padding: 0px 0px 10px 0px; font-size: 14px; color: #ccc">
-                        ${unsubscribeText}
-                        <br />
-                        <a href="{{unsubscribe_url}}" title="${unsubscribe}"
-                          style="
-                            display: inline-block;
-                            padding-top: 4px;
-                            color: #ccc;
-                            text-decoration: underline;
-                          ">
-                          ${unsubscribe.toLowerCase()}
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-  </html>
-  `
-  return fullHtml
 }

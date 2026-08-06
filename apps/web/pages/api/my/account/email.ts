@@ -3,14 +3,10 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
-import {
-  handleEmailSending,
-  getEmailText,
-  getHtml,
-  sendEmail,
-} from '../../../../lib/helpers/email/mailer'
+import { getEmailText, sendEmail } from '../../../../lib/helpers/email/mailer'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
 import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '@recycl/shared/dist/constants'
+import { getFullHtml } from '@recycl/shared/dist/email'
 
 const userNotFound = function (res) {
   return res.status(401).json({
@@ -67,28 +63,44 @@ async function emailHandler(req: NextApiRequest, res: NextApiResponse) {
   //Generate and set email reset token
   user.generateEmailReset()
   user.newEmail = newEmail
-
   await user.save()
 
   // send email
   const actionUrl = `${process.env.NEXT_PUBLIC_URL}/my/account/change-email/${user.resetEmailToken}`
 
   // const frontendMessage = `Для смены email перейдите по ссылке из письма, которое отпавлено на ${validated}`
-  const subject = `Смена адреса электронной почты на сайте ${process.env.BRAND}`
+  const title = `Смена адреса электронной почты на сайте ${process.env.BRAND}`
 
   const emailText = {
-    header: subject,
+    title,
     p1: `Для смены адреса электронной почты перейдите по ссылке ${actionUrl}`,
     p2: `Ссылка действительна на протяжении ${CHANGE_EMAIL_EXPIRATION_PERIOD} минут.`,
-    userId:
-      'Если вы не совершали это действие, просто проигнорируйте данное письмо',
+    p3: 'Если вы не совершали это действие, просто проигнорируйте данное письмо.',
   }
+
+  const content = `
+    <tr>
+      <td style="padding:0 0 4px 8px">
+        Для смены адреса электронной почты перейдите по <a href="${actionUrl}" style="color: #adce5d";>ссылке</a>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 0 4px 8px">
+        ${emailText.p2}
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 0 4px 8px">
+        ${emailText.p3}
+      </td>
+    </tr>
+  `
 
   const emailParams = {
     to: newEmail,
-    subject,
+    subject: title,
     messageType: 'proposeWasteType' as const,
-    html: getHtml(emailText),
+    html: getFullHtml({ content, title }),
     text: getEmailText(emailText),
   }
 

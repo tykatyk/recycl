@@ -8,13 +8,14 @@ import Link from '../uiParts/Link'
 import Snackbar from '../uiParts/Snackbars'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { signIn, useSession } from 'next-auth/react'
-import { loginSchema } from '../../lib/validation'
 import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import LayoutWithoutHeader from '../layouts/LayoutWithoutHeader'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import { email as emailValidator } from '@recycl/shared/dist/validation'
+import * as yup from 'yup'
 
 const USER_NOT_FOUND = 'Пользователь с таким email не найден'
 const LINK_SENT = 'На вашу электронную почту отправлена ссылка для входа'
@@ -92,7 +93,9 @@ export default function SignIn() {
               initialValues={{
                 email: '',
               }}
-              validationSchema={loginSchema}
+              validationSchema={yup.object({
+                email: emailValidator,
+              })}
               onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                 setSubmitting(true)
 
