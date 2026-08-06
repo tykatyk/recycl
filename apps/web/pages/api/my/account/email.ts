@@ -8,20 +8,12 @@ import { email as emailValidator } from '@recycl/shared/dist/validation'
 import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '@recycl/shared/dist/constants'
 import { getFullHtml } from '@recycl/shared/dist/email'
 
-const userNotFound = function (res) {
-  return res.status(401).json({
-    error: {
-      type: 'perForm',
-      message: 'Пользователь не найден',
-    },
-  })
-}
-
 async function emailHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') res.status(405).end()
 
   const session = await getServerSession(req, res, authOptions)
   if (!session) return res.status(401).end()
+
   const userId = session.id
   const { email } = req.body
   const newEmail = await emailValidator.validate(email, {
@@ -31,7 +23,7 @@ async function emailHandler(req: NextApiRequest, res: NextApiResponse) {
   await dbConnect()
   const result = await Promise.all([
     UserModel.findById(userId),
-    UserModel.find({ email: newEmail, _id: { $ne: userId } }),
+    UserModel.find({ email: newEmail }),
   ])
 
   const [user, otherUsers] = result

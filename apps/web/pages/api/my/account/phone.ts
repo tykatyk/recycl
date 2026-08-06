@@ -12,31 +12,49 @@ async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
     res.status(401).end()
     return
   }
+  const userId = session.id
 
   switch (req.method) {
     case 'GET': {
       await dbConnect()
-      const user = await UserModel.findById(session.id)
+      const user = await UserModel.findById(userId)
       if (!user) return res.status(404)
 
       res.json({ phone: user.phone })
       break
     }
     case 'PATCH': {
-      await dbConnect()
-      const user = await UserModel.findById(session.id)
-
-      if (!user) return res.status(404)
       const { phone } = req.body
-      const validated = await phoneValidator.validate(phone, {
+      const newPhone = await phoneValidator.validate(phone, {
         stripUnknown: true,
       })
 
-      if (!validated) {
+      if (!newPhone) {
         return res.status(400).end()
       }
 
-      user.phone = validated
+      await dbConnect()
+
+      const result = await Promise.all([
+        UserModel.findById(session.id),
+        UserModel.find({ phone: newPhone }),
+      ])
+
+      const [user, otherUsers] = result
+
+      if (!user) return res.status(404)
+      if (otherUsers && otherUsers.length > 0) {
+        return res.status(422).json({
+          error: {
+            type: 'perField',
+            message: {
+              phone: 'Этот номер уже используется',
+            },
+          },
+        })
+      }
+
+      user.phone = newPhone
       await user.save()
       res.status(200).end()
       break

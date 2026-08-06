@@ -1,65 +1,17 @@
-import React, { useState } from 'react'
-import { styled } from '@mui/material/styles'
 import { Button, Box } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
-import Snackbar from '../Snackbars'
 import TextFieldFormik from '../formInputs/TextFieldFormik'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
+import { enqueueSnackbar } from 'notistack'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
 
-const PREFIX = 'ChangeEmailForm'
+const errorMessage = 'Что то пошло не так'
+const api = '/api/my/account/email'
 
-const classes = {
-  avatar: `${PREFIX}-avatar`,
-  box: `${PREFIX}-box`,
-  alternativeBox: `${PREFIX}-alternativeBox`,
-  form: `${PREFIX}-form`,
-  field: `${PREFIX}-field`,
-  submit: `${PREFIX}-submit`,
-}
-
-const StyledBox = styled(Box)(({ theme }) => ({
-  [`& .${classes.avatar}`]: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-
-  [`&.${classes.box}`]: {
-    width: '100%',
-    maxWidth: '400px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-
-  [`& .${classes.alternativeBox}`]: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-
-  [`& .${classes.form}`]: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-
-  [`& .${classes.field}`]: {
-    marginBottom: theme.spacing(4),
-  },
-
-  [`& .${classes.submit}`]: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}))
-
-export default function ChangeEmailForm() {
-  const [severity, setSeverity] = useState('error')
-  const [notification, setNotification] = useState('')
-
+export default function PhoneForm() {
   return (
-    <StyledBox className={classes.box}>
+    <Box>
       <Formik
         initialValues={{
           email: '',
@@ -67,85 +19,80 @@ export default function ChangeEmailForm() {
         validationSchema={yup.object({
           email: emailValidator,
         })}
-        onSubmit={async (values, { setSubmitting, setErrors }) => {
-          setSubmitting(true)
+        onSubmit={async (values, { setErrors }) => {
+          try {
+            const response = await fetch(api, {
+              method: 'POST',
+              body: JSON.stringify(values),
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
 
-          await fetch('/api/my/account/email', {
-            method: 'POST',
-            body: JSON.stringify(values),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-            .then((response) => {
-              return response.json()
+            if (response.status === 200) {
+              enqueueSnackbar(
+                'Письмо подтверждения отправлено на новый адрес',
+                {
+                  variant: 'success',
+                },
+              )
+              return
+            }
+
+            const data = await response.json()
+            const { error } = data
+
+            if (error.type === 'perField') {
+              setErrors(error.message)
+              return
+            }
+            if (error.type === 'perForm') {
+              enqueueSnackbar(error.message, {
+                variant: 'error',
+              })
+              return
+            }
+            enqueueSnackbar(errorMessage, {
+              variant: 'error',
             })
-            .then((data) => {
-              if (data.error) {
-                const error = data.error
-                if (error.type === 'perField') {
-                  setErrors(error.message)
-                  return
-                }
-                setSeverity('error')
-                if (error.type === 'perForm') {
-                  setNotification(error.message)
-                  return
-                }
-                setNotification(
-                  'Неизвестная ошибка при обработке ответа сервера',
-                )
-                return
-              } else {
-                setSeverity('success')
-                setNotification(data.message)
-              }
+            return
+          } catch (error) {
+            enqueueSnackbar(errorMessage, {
+              variant: 'error',
             })
-            .catch((error) => {
-              setSeverity('error')
-              setNotification('Неизвестная ошибка')
-            })
-          setSubmitting(false)
+          }
         }}
       >
         {({ isSubmitting }) => {
           return (
-            <Form className={classes.form} noValidate autoComplete="off">
-              <Field
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                id="email"
-                label="Новый email адрес"
-                name="email"
-                component={TextFieldFormik}
-                className={classes.field}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="secondary"
-                className={classes.submit}
-                disabled={isSubmitting}
-                style={{ width: 'auto' }}
-              >
-                Сохранить
-                {isSubmitting && <ButtonSubmittingCircle />}
-              </Button>
+            <Form noValidate autoComplete="off">
+              <Box sx={{ mb: 2 }}>
+                <Field
+                  variant="outlined"
+                  margin="normal"
+                  fullWidth
+                  id="email"
+                  label="Новый email адрес"
+                  name="email"
+                  component={TextFieldFormik}
+                />
+              </Box>
+              <Box>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  disabled={isSubmitting}
+                  style={{ width: 'auto' }}
+                >
+                  Сохранить
+                  {isSubmitting && <ButtonSubmittingCircle />}
+                </Button>
+              </Box>
             </Form>
           )
         }}
       </Formik>
-
-      <Snackbar
-        severity={severity}
-        open={!!notification}
-        message={notification}
-        handleClose={() => {
-          setNotification('')
-        }}
-      />
-    </StyledBox>
+    </Box>
   )
 }

@@ -6,10 +6,9 @@ import TextFieldFormik from '../formInputs/TextFieldFormik'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
 import PageLoadingCircle from '../PageLoadingCircle'
 import { enqueueSnackbar } from 'notistack'
-import { validation } from '@recycl/shared'
+import { userName as userNameValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
 
-const { userName: userNameValidator } = validation
 const errorMessage = 'Что то пошло не так'
 const api = '/api/my/account/user-name'
 export default function PhoneForm() {

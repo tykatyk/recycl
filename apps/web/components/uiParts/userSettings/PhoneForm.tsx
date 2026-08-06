@@ -7,12 +7,11 @@ import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
 import PageLoadingCircle from '../PageLoadingCircle'
 import { userPhoneFetcher } from '../../../lib/helpers/dataFetcher'
 import { enqueueSnackbar } from 'notistack'
-import { validation } from '@recycl/shared'
+import { phone as phoneValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
 
-const { phone: phoneValidator } = validation
 const errorMessage = 'Что то пошло не так'
-const api = '/api/my/account/user-name'
+const api = '/api/my/account/phone'
 export default function PhoneForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
@@ -73,7 +72,7 @@ export default function PhoneForm() {
           phone,
         }}
         validationSchema={yup.object({ phone: phoneValidator })}
-        onSubmit={async (values) => {
+        onSubmit={async (values, { setErrors }) => {
           try {
             const response = await fetch(api, {
               method: 'PATCH',
@@ -83,13 +82,32 @@ export default function PhoneForm() {
               },
             })
 
-            if (response.status !== 200) {
-              throw new Error(errorMessage)
+            if (response.status === 200) {
+              enqueueSnackbar('Данные успешно обновлены', {
+                variant: 'success',
+              })
+              return
             }
 
-            enqueueSnackbar('Данные успешно обновлены', { variant: 'success' })
+            const data = await response.json()
+
+            const { error } = data
+
+            if (error.type === 'perField') {
+              setErrors(error.message)
+              return
+            }
+            if (error.type === 'perForm') {
+              enqueueSnackbar(error.message, {
+                variant: 'error',
+              })
+              return
+            }
+            enqueueSnackbar(errorMessage, {
+              variant: 'error',
+            })
           } catch (error) {
-            enqueueSnackbar('Возникла ошибка при сохранении данных', {
+            enqueueSnackbar(errorMessage, {
               variant: 'error',
             })
           }
