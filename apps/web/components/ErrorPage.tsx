@@ -13,44 +13,37 @@ type ErrorPageProps = {
 export default function ErrorPage(props: ErrorPageProps) {
   const { headerText, contentText, title } = props
   return (
-    <>
-      <LayoutWithoutHeader title={title}>
-        <Container maxWidth="sm" sx={{ p: 2 }}>
+    <LayoutWithoutHeader title={title}>
+      <Container maxWidth="sm" sx={{ p: 2 }}>
+        <Box
+          component="main"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
           <Box
-            component="main"
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              m: 1,
             }}
           >
-            <Box
-              sx={{
-                m: 1,
-              }}
-            >
-              <ErrorOutlineIcon color="error" fontSize="large" />
-            </Box>
-            <Typography component="h1" variant="h5" mb={3}>
-              {headerText}
-            </Typography>
-            <Typography component="div" align="center" mb={4}>
-              {contentText}
-            </Typography>
-
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Button
-                sx={{ mb: 1 }}
-                variant="contained"
-                href={HOME_URL}
-                color="secondary"
-              >
-                {GO_HOME_TEXT}
-              </Button>
-            </Box>
+            <ErrorOutlineIcon color="error" fontSize="large" />
           </Box>
-        </Container>
-      </LayoutWithoutHeader>
-    </>
+          <Typography component="h1" variant="h5" mb={3}>
+            {headerText}
+          </Typography>
+          <Typography component="div" align="center" mb={4}>
+            {contentText}
+          </Typography>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Button variant="contained" href={HOME_URL} color="secondary">
+              {GO_HOME_TEXT}
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    </LayoutWithoutHeader>
   )
 }

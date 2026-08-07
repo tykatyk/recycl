@@ -1,16 +1,34 @@
 import Wrapper from '../uiParts/Wrapper'
 import Footer from '../uiParts/Footer'
 import Head from '../uiParts/Head'
-import BackButton from '../uiParts/BackButton'
-import { Box } from '@mui/material'
+import { Container } from '@mui/material'
+import { ReactElement } from 'react'
 
-export default function LayoutWithoutHeader({ children, title }) {
+type LayoutWithoutHeaderProps = {
+  children: ReactElement
+  title: string
+}
+
+export default function LayoutWithoutHeader(props: LayoutWithoutHeaderProps) {
+  const { children, title } = props
   return (
     <>
       <Head title={title} />
       <Wrapper>
-        <BackButton />
-        <Box sx={{ width: '100%' }}>{children}</Box>
+        <Container
+          component="main"
+          maxWidth="md"
+          sx={{
+            position: 'relative',
+            paddingTop: 3,
+            paddingBottom: 3,
+            display: 'flex',
+            justifyContent: 'center',
+            flex: 1,
+          }}
+        >
+          {children}
+        </Container>
         <Footer />
       </Wrapper>
     </>

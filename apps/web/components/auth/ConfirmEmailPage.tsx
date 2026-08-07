@@ -1,20 +1,13 @@
-import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
-import LayoutWithoutHeader from '../../../../components/layouts/LayoutWithoutHeader'
 import { Box, Alert, Button } from '@mui/material'
+import LayoutWithoutHeader from '../layouts/LayoutWithoutHeader'
 import router from 'next/router'
 
-type ChangeEmailProps = {
-  urlIsValid: boolean
-}
-
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const title = `Смена email | ${brand}`
+const title = `Подтверждение email | ${brand}`
 
 const buttonText = 'На главную'
 
-export default function ChangeEmail(props: ChangeEmailProps) {
-  const { urlIsValid } = props
-
+export default function ConfirmEmailPage({ urlIsValid }) {
   return (
     <LayoutWithoutHeader title={title}>
       <Box
@@ -37,10 +30,10 @@ export default function ChangeEmail(props: ChangeEmailProps) {
             <Alert
               variant="filled"
               severity={urlIsValid ? 'success' : 'error'}
-              sx={{ color: '#fff' }}
+              sx={{ color: '#fff', mb: 2 }}
             >
               {urlIsValid
-                ? 'Адрес электронной почты успешно изменен'
+                ? 'Адрес электронной почты успешно подтвержден'
                 : 'Срок действия ссылки истек'}
             </Alert>
           </Box>
@@ -63,37 +56,4 @@ export default function ChangeEmail(props: ChangeEmailProps) {
       </Box>
     </LayoutWithoutHeader>
   )
-}
-
-export async function getServerSideProps(context) {
-  await dbConnect()
-  const user = await UserModel.findOne({
-    resetEmailToken: context.query.token,
-  })
-
-  if (!user) {
-    return {
-      notFound: true,
-    }
-  }
-
-  const { resetEmailExpires, newEmail } = user
-  const urlIsValid =
-    resetEmailExpires && new Date(resetEmailExpires) >= new Date()
-
-  user.resetEmailToken = undefined
-  user.resetEmailExpires = undefined
-  user.newEmail = undefined
-  if (newEmail && urlIsValid) {
-    user.email = newEmail
-    user.emailConfirmed = true
-  }
-
-  await user.save()
-
-  return {
-    props: {
-      urlIsValid: true,
-    },
-  }
 }

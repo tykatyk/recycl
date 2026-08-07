@@ -90,7 +90,7 @@ export const getFullHtml = (data: FullHtmlData) => {
       <title>${title}</title>
     </head>
     <body style="font-family: Arial, Helvetica, sans-serif; color:${white}">
-      <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" style="background: #223c4a;">
+      <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" style="font-size: 16px; background: #223c4a;">
         <tr>
           <td align="center">
             <table role="presentation" border="0" cellspacing="0" cellpadding="0" >

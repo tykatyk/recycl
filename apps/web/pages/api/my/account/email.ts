@@ -9,7 +9,7 @@ import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '@recycl/shared/dist/constants'
 import { getFullHtml } from '@recycl/shared/dist/email'
 
 async function emailHandler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') res.status(405).end()
+  if (req.method !== 'POST') res.status(405).end()
 
   const session = await getServerSession(req, res, authOptions)
   if (!session) return res.status(401).end()
@@ -51,7 +51,6 @@ async function emailHandler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
   }
-
   //Generate and set email reset token
   user.generateEmailReset()
   user.newEmail = newEmail

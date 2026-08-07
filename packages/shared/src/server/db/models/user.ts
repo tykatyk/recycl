@@ -21,7 +21,7 @@ const methods = {
   generateEmailReset: function (length = 128) {
     this.resetEmailToken = cryptoRandomString({ length, type: 'url-safe' })
     this.resetEmailExpires = new Date(
-      Date.now() + CHANGE_EMAIL_EXPIRATION_PERIOD,
+      Date.now() + CHANGE_EMAIL_EXPIRATION_PERIOD * 60 * 1000,
     )
   },
   generateEmailConfirm: function (length = 128) {
@@ -30,7 +30,7 @@ const methods = {
       type: 'url-safe',
     })
     this.confirmEmailExpires = new Date(
-      Date.now() + CHANGE_EMAIL_EXPIRATION_PERIOD,
+      Date.now() + CHANGE_EMAIL_EXPIRATION_PERIOD * 60 * 1000,
     )
   },
 } satisfies UserMethods

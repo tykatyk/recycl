@@ -97,7 +97,9 @@ export const expires = {
   required: true,
   default: () => {
     const date = new Date()
-    return date.setDate(date.getDate() + AD_EXPIRATION_PERIOD)
+    return date.setDate(
+      date.getDate() + AD_EXPIRATION_PERIOD * 24 * 60 * 60 * 1000,
+    )
   },
 }
 
