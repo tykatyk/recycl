@@ -19,6 +19,7 @@ import Head from '../uiParts/Head'
 import { AdWrapper, drawerWidth } from '../uiParts/AdPageComponents'
 import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 import { AdMarkers } from '../uiParts/Marker'
+import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 
 const errorMessage = 'Что-то пошло не так'
 
@@ -140,13 +141,8 @@ export default function AdsOnMap() {
                 handleChange={setSelectedValue}
                 h1={'Карта наличия вторсырья'}
               />
-              <AdSidebarItemsCommon
-                isMapView={true}
-                createElementText="Добавить объявление"
-                createElementUrl={'/ads/create'}
-                listViewUrl={'/ads/list'}
-                mapViewUrl={'/ads'}
-              />
+              <AdSidebarChangeView isMapView={true} />
+              <AdSidebarItemsCommon />
             </AdSidebar>
 
             <AdWrapper

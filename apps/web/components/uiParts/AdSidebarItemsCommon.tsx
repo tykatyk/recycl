@@ -1,11 +1,8 @@
-import AddIcon from '@mui/icons-material/Add'
-import ListIcon from '@mui/icons-material/List'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 import CreateIcon from '@mui/icons-material/Create'
 import ProposeWasteType from '../ProposeWasteType'
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot'
 import { useState } from 'react'
-import LocationPinIcon from '@mui/icons-material/LocationPin'
 import {
   ListItem,
   ListItemButton,
@@ -14,9 +11,6 @@ import {
   Modal,
   Box,
 } from '@mui/material'
-
-const viewOnList = 'Смотреть списком'
-const viewOnMap = 'Смотреть на карте'
 
 function ContactAdmin() {
   return (
@@ -112,52 +106,12 @@ function SupportProject() {
     </ListItem>
   )
 }
-type AdSidebarItemsCommonProps = {
-  isMapView: boolean
-  createElementText: string
-  createElementUrl: string
-  listViewUrl: string
-  mapViewUrl: string
-}
-export default function AdSidebarItemsCommon(props: AdSidebarItemsCommonProps) {
-  const {
-    isMapView,
-    createElementText = 'Добавить',
-    createElementUrl = '#',
-    listViewUrl,
-    mapViewUrl,
-  } = props
+
+export default function AdSidebarItemsCommon() {
   const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <>
-      <ListItem disableGutters dense divider>
-        <ListItemButton component="a" href={`${createElementUrl}`}>
-          <ListItemIcon>
-            <AddIcon color="secondary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={createElementText}
-            sx={{ whiteSpace: 'normal' }}
-          />
-        </ListItemButton>
-      </ListItem>
-      <ListItem disableGutters dense divider>
-        <ListItemButton
-          component="a"
-          href={isMapView ? listViewUrl : mapViewUrl}
-        >
-          <ListItemIcon>
-            {isMapView ? (
-              <ListIcon color="secondary" />
-            ) : (
-              <LocationPinIcon color="secondary" />
-            )}
-          </ListItemIcon>
-          <ListItemText primary={isMapView ? viewOnList : viewOnMap} />
-        </ListItemButton>
-      </ListItem>
-
       <NoWasteTypeRequest handleOpen={() => setModalOpen(true)} />
       <ContactAdmin />
       <SupportProject />

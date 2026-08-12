@@ -23,6 +23,7 @@ import DataGridFooter from '../uiParts/DataGridFooter'
 import Cookies from 'js-cookie'
 import type { HrefOptions } from '../../lib/types/pagination'
 import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
+import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 
 const errorMessage = 'Что-то пошло не так'
 const baseUrl = '/ads/list'
@@ -143,13 +144,8 @@ export default function AdsOnList(props) {
             handleSubmit={handleSubmit}
             initialFormValues={initialFormValues}
           />
-          <AdSidebarItemsCommon
-            isMapView={false}
-            createElementText="Добавить объявление"
-            createElementUrl={'/ads/create'}
-            listViewUrl={'/ads/list'}
-            mapViewUrl={'/ads'}
-          />
+          <AdSidebarChangeView isMapView={false} />
+          <AdSidebarItemsCommon />
         </AdSidebar>
 
         <AdWrapper drawerOpen={drawerOpen}>
