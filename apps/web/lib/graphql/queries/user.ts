@@ -10,20 +10,6 @@ export const CREATE_USER = gql`
     }
   }
 `
-export const DELETE_USER = gql`
-  mutation DeleteUser {
-    deleteUser {
-      _id
-    }
-  }
-`
-export const DELETE_NOT_CONFIRMED_USER = gql`
-  mutation DeleteNotConfirmedUser($id: String!) {
-    deleteNotConfirmedUser(id: $id) {
-      _id
-    }
-  }
-`
 export const GET_USER_BY_EMAIL = gql`
   query GetUser($email: String!) {
     getUserByEmail(email: $email) {

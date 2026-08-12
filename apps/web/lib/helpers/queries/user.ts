@@ -58,33 +58,6 @@ const userQueries = {
     }
   },
 
-  delete: async (user) => {
-    if (!user.id) return null
-    const id = user.id
-    try {
-      Promise.all([
-        AdModel.deleteMany({ user: id }).exec(),
-        User.findByIdAndRemove(id).exec(),
-      ])
-        .then((result) => {
-          const [user] = result
-          return user
-        })
-        .catch((error) => {
-          console.log(error)
-          return error
-        })
-    } catch (error) {}
-  },
-
-  deleteNotConfirmedUser: async (id) => {
-    try {
-      return await User.findByIdAndRemove(id).exec()
-    } catch (error) {
-      return error
-    }
-  },
-
   deleteMany: async (ids) => {
     try {
       return await User.deleteMany({ _id: { $in: ids } }).exec()

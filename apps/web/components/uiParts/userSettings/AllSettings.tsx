@@ -7,7 +7,7 @@ import Layout from '../../layouts/Layout'
 import ContactsForm from './ContactsForm'
 import PhoneForm from './PhoneForm'
 import ChangeEmailForm from './ChangeEmailForm'
-import DeleteAccountForm from './DeleteAccountForm'
+import DeleteAccountComponent from './DeleteAccountComponent'
 import { useId } from 'react'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
@@ -68,7 +68,7 @@ export default function AllSettings() {
               <Typography component="span">Удалить аккаунт</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <DeleteAccountForm />
+              <DeleteAccountComponent />
             </AccordionDetails>
           </Accordion>
         </Box>
