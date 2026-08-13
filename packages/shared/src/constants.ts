@@ -10,6 +10,8 @@ export const collectionPointTypes = {
   container: 'Сортировочный контейнер',
 } as const
 
+export const userRoles = { user: 'user', admin: 'admin' }
+
 export const complaintContentVariants = ['ad', 'collectionPoint'] as const
 
 export const AD_EXPIRATION_PERIOD = 30

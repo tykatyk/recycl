@@ -1,4 +1,2 @@
-export const phoneRegex =
-  /^((\+[0-9]{1,4}[ \-]*)|(\([0-9]{2,3}\)[ \-]*)|([0-9]{2,4})[ \-]*)*?[0-9]{3,4}?[ \-]*[0-9]{3,4}?$/
-
+export const phoneRegex = /^((\+380)|(380)|(0)){1}[0-9]{9}$/
 export const whitespaceRegex = /\s/g

@@ -1,18 +1,6 @@
-import { UserModel as User, AdModel } from '@recycl/shared/dist/server/db'
+import { UserModel as User } from '@recycl/shared/dist/server/db'
 
 const userQueries = {
-  create: async (data) => {
-    try {
-      let user = await new User(data)
-      user.withPassword = true
-      user.generateEmailConfirm()
-      return await user.save()
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-  },
-
   getById: async (id, userInstance) => {
     if (!userInstance) return null
     try {
@@ -22,13 +10,6 @@ const userQueries = {
     }
   },
 
-  getByEmail: async (email) => {
-    try {
-      return await User.findOne({ email }).exec()
-    } catch (error) {
-      return error
-    }
-  },
   getByToken: async (token) => {
     try {
       return await User.findOne({

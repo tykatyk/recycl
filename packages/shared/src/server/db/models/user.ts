@@ -6,30 +6,20 @@ import { checkEmail } from '../dbModelCommons'
 import { documentActivityStatus } from '../../../constants'
 import { validationMessages } from '../../../validation'
 import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '../../../constants'
+import { userRoles } from '../../../constants'
 
-const { email: invalidEmailAddress, phone: invalidPhoneNumber } =
-  validationMessages
+const { email: invalidEmailAddress } = validationMessages
 
 const { active, blocked } = documentActivityStatus
 
 interface UserMethods {
   generateEmailReset(length?: number): void
-  generateEmailConfirm(length?: number): void
 }
 
 const methods = {
   generateEmailReset: function (length = 128) {
     this.resetEmailToken = cryptoRandomString({ length, type: 'url-safe' })
     this.resetEmailExpires = new Date(
-      Date.now() + CHANGE_EMAIL_EXPIRATION_PERIOD * 60 * 1000,
-    )
-  },
-  generateEmailConfirm: function (length = 128) {
-    this.confirmEmailToken = cryptoRandomString({
-      length,
-      type: 'url-safe',
-    })
-    this.confirmEmailExpires = new Date(
       Date.now() + CHANGE_EMAIL_EXPIRATION_PERIOD * 60 * 1000,
     )
   },
@@ -129,8 +119,9 @@ const userSchema = new Schema(
     },
     roles: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'Role',
+        type: String,
+        Enum: Object.keys(userRoles),
+        default: [userRoles.user],
       },
     ],
   },

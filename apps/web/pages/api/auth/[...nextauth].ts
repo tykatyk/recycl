@@ -1,24 +1,17 @@
 import NextAuth from 'next-auth'
 import type { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-import CredentialsProvider from 'next-auth/providers/credentials'
 import EmailProvider from 'next-auth/providers/email'
-import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
-import { html, text } from '../../../lib/helpers/email/loginEmail'
 import {
-  dbConnect,
-  UserModel as userModel,
-} from '@recycl/shared/dist/server/db'
-import { GET_USER_BY_EMAIL } from '../../../lib/graphql/queries/user'
-import { loginSchema } from '../../../lib/validation/index'
-// import nextAuthDbAdapter from '../../../lib/helpers/nextAuthDbAdapter'
+  getLoginEmailContent,
+  text,
+} from '../../../lib/helpers/email/loginEmail'
+import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import clientPromise from '../../../lib/helpers/nextAuthClientPromise'
 import { URL } from 'url'
-import { colors as theme } from '../../../lib/helpers/themeStub'
 import { sendEmail } from '../../../lib/helpers/email/mailer'
-
-// const apolloClient = initializeApollo()
+import { getFullHtml } from '@recycl/shared/dist/email'
 
 declare global {
   namespace NodeJS {
@@ -29,7 +22,7 @@ declare global {
   }
 }
 
-const subjectText = 'Вход в учётную запись'
+const subject = `Вход в учётную запись ${process.env.BRAND}`
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -44,12 +37,20 @@ export const authOptions: NextAuthOptions = {
 
         const partialEmailParams = {
           to: identifier,
-          subject: `${subjectText} ${process.env.BRAND}`,
+          subject,
           text: text({ url, host }),
         }
+
+        const loginEmailContent = getLoginEmailContent(url)
+        const header = 'Для входа в учетную запись перейдите по ссылке'
+
         const emailParams = {
           ...partialEmailParams,
-          html: html({ url, host, theme }),
+          html: getFullHtml({
+            content: loginEmailContent,
+            title: subject,
+            header,
+          }),
         }
 
         try {
@@ -86,22 +87,24 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async signIn({ user, account, profile, email, credentials }) {
-      return await dbConnect()
-        .then(() => {
-          return userModel
-            .findOne({
-              email: user.email,
-            })
-            .exec()
+      try {
+        await dbConnect()
+        const existing = await UserModel.findOne({
+          email: user.email,
         })
-        .then((userFromDb) => {
-          if (userFromDb) return true
-          return false
-        })
-        .catch((err) => {
-          console.log(err)
-          return false
-        })
+        if (!existing) return false
+        if (
+          !existing.emailConfirmed &&
+          account &&
+          account.provider === 'email'
+        ) {
+          existing.emailConfirmed = true
+          await existing.save()
+        }
+        return true
+      } catch (error) {
+        return false
+      }
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

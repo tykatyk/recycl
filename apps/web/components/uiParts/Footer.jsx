@@ -89,20 +89,6 @@ export default function Footer(props) {
                 <Link
                   color="textSecondary"
                   underline="none"
-                  href="/about-us"
-                  sx={{
-                    '&:hover': {
-                      color: 'primary',
-                    },
-                  }}
-                >
-                  О нас
-                </Link>
-              </ListItem>
-              <ListItem dense>
-                <Link
-                  color="textSecondary"
-                  underline="none"
                   href="/contact-us"
                   sx={{
                     '&:hover': {
@@ -128,69 +114,6 @@ export default function Footer(props) {
                 </Link>
               </ListItem>
             </List>
-          </Grid>
-          <Grid container direction="column" size={sizes} sx={{ pb: 3 }}>
-            <Typography
-              variant="overline"
-              component="h5"
-              className={classes.title}
-            >
-              Пользователям
-            </Typography>
-            <List style={{ padding: 0 }}>
-              <ListItem dense>
-                <Link
-                  color="textSecondary"
-                  underline="none"
-                  href="/terms-of-service"
-                  sx={{
-                    '&:hover': {
-                      color: 'primary',
-                    },
-                  }}
-                >
-                  Условия использования
-                </Link>
-              </ListItem>
-              <ListItem dense>
-                <Link
-                  color="textSecondary"
-                  underline="none"
-                  href="/privacy-policy"
-                  sx={{
-                    '&:hover': {
-                      color: 'primary',
-                    },
-                  }}
-                >
-                  Политика приватности
-                </Link>
-              </ListItem>
-              <ListItem dense>
-                <Link
-                  color="textSecondary"
-                  underline="none"
-                  href="/cookie-policy"
-                  sx={{
-                    '&:hover': {
-                      color: 'primary',
-                    },
-                  }}
-                >
-                  Политика Cookie
-                </Link>
-              </ListItem>
-            </List>
-          </Grid>
-          <Grid container direction="column" size={sizes}>
-            <Typography
-              variant="caption"
-              color="textSecondary"
-              sx={{ pl: 2, pr: 2 }}
-            >
-              {`Использование материалов сайта возможно только с разрешения правообладателя Recycl World
-              Company © ${new Date().getFullYear()}`}
-            </Typography>
           </Grid>
         </Grid>
       </Container>

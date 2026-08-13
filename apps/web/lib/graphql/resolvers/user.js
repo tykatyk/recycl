@@ -2,9 +2,6 @@ import dbQueries from '../../helpers/queries'
 
 const userResolvers = {
   Mutation: {
-    createUser(parent, args, context) {
-      return dbQueries.user.create(args.user)
-    },
     deleteUser(parent, args, context) {
       return dbQueries.user.delete(context.user)
     },
@@ -16,9 +13,6 @@ const userResolvers = {
     },
   },
   Query: {
-    getUserByEmail(parent, args, context) {
-      return dbQueries.user.getByEmail(args.email)
-    },
     getByToken(parent, args, context) {
       return dbQueries.user.getByToken(args.token)
     },

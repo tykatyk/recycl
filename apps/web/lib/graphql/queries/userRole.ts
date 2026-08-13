@@ -5,9 +5,3 @@ export const CREATE_ROLE = gql`
     createRole(roleName: $roleName)
   }
 `
-
-export const GET_ROLE_ID = gql`
-  query GetRoleId($roleName: String) {
-    getRoleId(roleName: $roleName)
-  }
-`

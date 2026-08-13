@@ -16,16 +16,6 @@ const userRoleQueries = {
       return err
     }
   },
-  getByName: async (roleName) => {
-    try {
-      const id = (
-        await UserRole.findOne({ name: roleName }, { _id: 1 }).exec()
-      )['_id']
-      return id
-    } catch (err) {
-      return err
-    }
-  },
 
   getAll: async () => {
     try {

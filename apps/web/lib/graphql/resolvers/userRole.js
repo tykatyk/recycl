@@ -6,10 +6,5 @@ const userRoleResolvers = {
       return dbQueries.userRole.createRole(args.roleName)
     },
   },
-  Query: {
-    getRoleId(parent, args, context) {
-      return dbQueries.userRole.getByName(args.roleName)
-    },
-  },
 }
 export default userRoleResolvers

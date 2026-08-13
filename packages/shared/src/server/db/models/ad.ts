@@ -23,6 +23,10 @@ const adSchema = new Schema(
       type: String,
       required: true,
     },
+    wasteCreatedRegularly: {
+      type: Boolean,
+      default: false,
+    },
     quantity: {
       type: Number,
       required: true,
