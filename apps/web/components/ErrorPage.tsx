@@ -28,7 +28,7 @@ export default function ErrorPage(props: ErrorPageProps) {
               m: 1,
             }}
           >
-            <ErrorOutlineIcon color="error" fontSize="large" />
+            <ErrorOutlineIcon fontSize="large" />
           </Box>
           <Typography component="h1" variant="h5" mb={3}>
             {headerText}
@@ -38,7 +38,7 @@ export default function ErrorPage(props: ErrorPageProps) {
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Button variant="contained" href={HOME_URL} color="secondary">
+            <Button variant="contained" href={HOME_URL}>
               {GO_HOME_TEXT}
             </Button>
           </Box>
