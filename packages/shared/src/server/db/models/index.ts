@@ -1,7 +1,6 @@
 import Message from './message'
 import AdModel from './ad'
 import Account from './account'
-import UserRole from './userRole'
 import WasteType from './wasteType'
 import CollectionPointModel, {
   CollectionPointContainerModel,
@@ -23,7 +22,6 @@ import ComplaintModel from './complaint'
 export {
   Message,
   AdModel,
-  UserRole,
   WasteType,
   Account,
   CollectionPointModel,

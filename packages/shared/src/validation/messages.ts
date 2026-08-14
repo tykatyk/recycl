@@ -6,7 +6,7 @@ export const validationMessages = {
   onlyIntegers: 'Только целые числа',
   maxLength: ({ max }: { max: number }) => `Максимум ${max} симоволов`,
   minLength: ({ min }: { min: number }) => `Минимум ${min} симоволов`,
-  email: 'Недействительный адрес электронной почты',
+  email: 'Недействительная адрес',
   phone: 'Недействительный номер телефона',
   notOnlySpaces: 'Строка не может состоять только из пробелов',
   incorrectValue: 'Значение указано не верно',

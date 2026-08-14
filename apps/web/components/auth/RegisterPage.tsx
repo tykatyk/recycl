@@ -12,6 +12,7 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { enqueueSnackbar } from 'notistack'
 import { useRouter } from 'next/router'
 import { userRoles } from '@recycl/shared/dist/constants'
+import { useSession } from 'next-auth/react'
 
 const successMessage = 'Регистрация успешна. Теперь вы можете войти'
 const errorMessage = 'Что то пошло не так'
@@ -24,10 +25,15 @@ export default function SignUp() {
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
   const router = useRouter()
+  const { status } = useSession()
+
+  if (status === 'authenticated') {
+    router.push('/')
+  }
 
   return (
     <LayoutWithoutHeader title="Recycl | Регистрация">
-      <Box>
+      <Box sx={{ minWidth: 470 }}>
         <Box
           sx={{
             mb: 2,
@@ -140,7 +146,12 @@ export default function SignUp() {
                     Вход
                   </Link>
                 </Box>
-                <Box sx={{ display: showRecaptcha ? 'flex' : 'none' }}>
+                <Box
+                  sx={{
+                    display: showRecaptcha ? 'flex' : 'none',
+                    justifyContent: 'center',
+                  }}
+                >
                   <ReCAPTCHA
                     ref={recaptchaRef}
                     sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}

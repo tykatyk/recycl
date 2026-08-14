@@ -82,10 +82,9 @@ const userSchema = new Schema(
       },
       lowercase: true,
     },
-    emailConfirmed: {
-      type: Boolean,
-      required: true,
-      default: false,
+    emailVerified: {
+      type: Date,
+      default: null,
     },
     image: {
       type: String,

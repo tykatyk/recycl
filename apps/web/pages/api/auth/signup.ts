@@ -1,7 +1,5 @@
-import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 import { registerSchema } from '../../../lib/validation'
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
-// import { perFormErrorResponse } from '../../../lib/helpers/responses'
 import { captchaNotPassedResponse } from '../../../lib/helpers/responses'
 import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'

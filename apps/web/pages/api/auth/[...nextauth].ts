@@ -12,6 +12,10 @@ import clientPromise from '../../../lib/helpers/nextAuthClientPromise'
 import { URL } from 'url'
 import { sendEmail } from '../../../lib/helpers/email/mailer'
 import { getFullHtml } from '@recycl/shared/dist/email'
+import {
+  documentActivityStatus,
+  userRoles,
+} from '@recycl/shared/dist/constants'
 
 declare global {
   namespace NodeJS {
@@ -92,13 +96,15 @@ export const authOptions: NextAuthOptions = {
         const existing = await UserModel.findOne({
           email: user.email,
         })
-        if (!existing) return false
-        if (
-          !existing.emailConfirmed &&
-          account &&
-          account.provider === 'email'
-        ) {
-          existing.emailConfirmed = true
+        if (!existing) {
+          if (account?.provider == 'google') return true
+          return false
+        }
+
+        if (existing.status === documentActivityStatus.blocked) return false
+
+        if (!existing.roles || existing.roles.length === 0) {
+          existing.roles.push(userRoles.user)
           await existing.save()
         }
         return true
