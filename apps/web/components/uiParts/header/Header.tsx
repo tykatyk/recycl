@@ -28,7 +28,7 @@ export default function Header(props) {
 
   const {
     currentDialogId,
-    desktopBreakpoints = { xs: 'none', lg: 'flex' },
+    desktopBreakpoints = { xs: 'none', md: 'flex' },
     mobileViewport,
     ...rest
   } = props
