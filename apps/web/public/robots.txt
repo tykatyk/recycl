@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /api/
+Disallow: /my/
+Disallow: /auth/
+Disallow: /404
+Disallow: /500/
+
+Sitemap: https://example.com/sitemap.xml
