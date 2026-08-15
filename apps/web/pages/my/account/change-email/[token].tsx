@@ -86,7 +86,6 @@ export async function getServerSideProps(context) {
   user.newEmail = undefined
   if (newEmail && urlIsValid) {
     user.email = newEmail
-    user.emailConfirmed = true
   }
 
   await user.save()

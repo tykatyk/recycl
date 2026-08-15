@@ -98,15 +98,6 @@ const userSchema = new Schema(
       type: Date,
       required: false,
     },
-    confirmEmailToken: {
-      type: String,
-      required: false,
-      maxLength: 128,
-    },
-    confirmEmailExpires: {
-      type: Date,
-      required: false,
-    },
     status: {
       type: String,
       Enum: [active, blocked],
