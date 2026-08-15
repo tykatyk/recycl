@@ -6,7 +6,7 @@ const ethWallet = '2lkadg9xlkj#laclk98255xkjagsdf'
 const usdtWallet = 'aosudifhsadjkfhasdfmasdf'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const h1 = 'Настройки аккаунта'
+const h1 = 'Поддержать проект'
 const title = `${h1} | ${brand}`
 
 export default function SupportUsPage() {
@@ -18,7 +18,12 @@ export default function SupportUsPage() {
           flexDirection: 'column',
         }}
       >
-        <Typography component="h1" variant="h5" align="center" sx={{ mb: 5 }}>
+        <Typography
+          component="h1"
+          variant="h4"
+          align="center"
+          sx={{ mt: 2, mb: 3, width: '100%' }}
+        >
           Если вы хотите помочь проекту, то можете сделать это одним из
           перечисленных ниже способов
         </Typography>

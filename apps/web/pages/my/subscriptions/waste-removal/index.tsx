@@ -7,13 +7,17 @@ import * as yup from 'yup'
 import { useEffect, useState } from 'react'
 import ButtonSubmittingCircle from '../../../../components/uiParts/ButtonSubmittingCircle'
 import { useSnackbar } from 'notistack'
-import { useSession } from 'next-auth/react'
 import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
-import { useRouter } from 'next/router'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 import { default as ErrorComponent } from '../../../../components/uiParts/Error'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import NotSubscribed from '../../../../components/subscriptions/NotSubscribed'
+
+const api = '/api/my/subscriptions/waste-removal'
+const frontendUrl = '/my/subscriptions'
+
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
+const title = `Указать радиус поиска пунктов приема вторсырья | ${brand}`
 
 const errorMessage = 'Что то пошло не так'
 const successMessage = 'Значение сохранено'
@@ -25,7 +29,7 @@ const ErrorView = () => {
     <Stack spacing={3} sx={{ alignItems: 'center' }}>
       <ErrorComponent />
       <Box>
-        <Button variant="outlined" color="secondary" href="/my/subscriptions">
+        <Button variant="outlined" color="secondary" href={`${frontendUrl}`}>
           Вернуться
         </Button>
       </Box>
@@ -34,19 +38,15 @@ const ErrorView = () => {
 }
 
 const Content = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [initialValues, setInitialValues] = useState({ radius: '' } as any)
   const [viewStatus, setViewStatus] = useState('')
   const { enqueueSnackbar } = useSnackbar()
-  const session = useSession()
-  const { status } = session
-  const router = useRouter()
 
   useEffect(() => {}, [])
 
   useEffect(() => {
     const getUserSubscriptions = async () => {
-      const response = await fetch(`/api/my/subscriptions`)
+      const response = await fetch(`${api}`)
 
       if (!response.ok) {
         throw new Error('Response is not OK')
@@ -56,10 +56,10 @@ const Content = () => {
     }
 
     const dataFetcher = async () => {
-      const response = await fetch(`/api/my/subscriptions/waste-removal`)
+      const response = await fetch(`${api}`)
 
       if (!response.ok) {
-        throw new Error('Response is not OK')
+        throw new Error(errorMessage)
       }
       return await response.json()
     }
@@ -92,7 +92,7 @@ const Content = () => {
   }, [])
 
   const formHandler = async (values) => {
-    const response = await fetch(`/api/my/subscriptions/waste-removal`, {
+    const response = await fetch(`${api}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ radius: values.radius }),
@@ -104,7 +104,6 @@ const Content = () => {
     }
 
     enqueueSnackbar(successMessage, { variant: 'success' })
-    // router.push('/my/subscriptions')
   }
 
   const MainContent = () => {
@@ -122,55 +121,59 @@ const Content = () => {
               formHandler(values)
             }}
           >
-            <Form>
-              <Stack
-                spacing={3}
-                sx={{ justifyContent: 'center', alignItems: 'center' }}
-              >
-                <Field
-                  id="radius"
-                  name="radius"
-                  variant="outlined"
-                  fullWidth
-                  component={TextFieldFormik}
-                  label="Радиус поиска"
-                  helperText="*Обязательное поле"
-                  type="number"
-                  size="small"
-                  sx={{ width: '100%' }}
-                  inputProps={{ min: 1, max: 200 }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">Км</InputAdornment>
-                    ),
-                  }}
-                  disabled={false}
-                />
-                <Box
-                  sx={{
-                    display: 'flex',
-                    width: '100%',
-                    justifyContent: 'space-around',
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    disabled={isSubmitting}
+            {({ isSubmitting }) => {
+              return (
+                <Form>
+                  <Stack
+                    spacing={3}
+                    sx={{ justifyContent: 'center', alignItems: 'center' }}
                   >
-                    Сохранить
-                    {isSubmitting && <ButtonSubmittingCircle />}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    href="/my/subscriptions"
-                  >
-                    Вернуться
-                  </Button>
-                </Box>
-              </Stack>
-            </Form>
+                    <Field
+                      id="radius"
+                      name="radius"
+                      variant="outlined"
+                      fullWidth
+                      component={TextFieldFormik}
+                      label="Радиус поиска"
+                      helperText="*Обязательное поле"
+                      type="number"
+                      size="small"
+                      sx={{ width: '100%' }}
+                      inputProps={{ min: 1, max: 200 }}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">Км</InputAdornment>
+                        ),
+                      }}
+                      disabled={false}
+                    />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        width: '100%',
+                        justifyContent: 'space-around',
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        type="submit"
+                        disabled={isSubmitting}
+                      >
+                        Сохранить
+                        {isSubmitting && <ButtonSubmittingCircle />}
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        href={`${frontendUrl}`}
+                      >
+                        Вернуться
+                      </Button>
+                    </Box>
+                  </Stack>
+                </Form>
+              )
+            }}
           </Formik>
         </Box>
       </>
@@ -197,7 +200,7 @@ const Content = () => {
 
 export default function WasteRemovalSubscriptionConfig() {
   return (
-    <Layout title="Указать радиус поиска пунктов приема вторсырья">
+    <Layout title={title}>
       <RedirectUnathenticatedUser>
         <Box
           sx={{

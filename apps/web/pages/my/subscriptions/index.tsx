@@ -9,46 +9,38 @@ import {
 import Layout from '../../../components/layouts/Layout'
 import PageLoadingCircle from '../../../components/uiParts/PageLoadingCircle'
 import SettingsIcon from '@mui/icons-material/Settings'
-import Snackbars from '../../../components/uiParts/Snackbars'
 import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
 import { useEffect, useMemo, useState } from 'react'
 import type { SubscriptionVariant } from '@recycl/shared/dist/server/db/models/subscriptionVariant'
-import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import { subscriptionConfig } from '../../../lib/helpers/subscription'
 import HeadingWithDescription, {
   HeadingDetails,
 } from '../../../components/uiParts/HeadingWithDescription'
+import { enqueueSnackbar } from 'notistack'
 
-const loadingErrorText = 'Ошибка при загрузке данных'
-const updatingErrorMessage = 'Ошибка при обновлении данных'
-const titleHeadingText = 'Мои подписки на получение уведомлений'
+const errorMessage = 'Что то пошло не так'
 const enabledText = 'Включено'
 const disabledText = 'Выключено'
 const configText = 'Настроить'
 
-const subscriptionVariantsApi = '/api/my/subscriptions/variant'
-const subscriptionsApi = '/api/my/subscriptions'
+const api = '/api/my/subscriptions'
+
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
+const h1 = 'Мои подписки на получение уведомлений'
+const title = `${h1} | ${brand}`
 
 type SubscriptionName = string[]
 
-type SubsVarNameType = typeof subscriptionVariantNames
-
 export default function MySubscriptions() {
-  const [backendError, setBackendError] = useState('')
   const [allSubs, setAllSubs] = useState<
     ({ _id: string } & SubscriptionVariant)[]
   >([])
   const [userSubs, setUserSubs] = useState<SubscriptionName>([])
   const [loading, setLoading] = useState(false)
-  const [showDetails, setShowDetails] = useState<
-    SubsVarNameType[keyof SubsVarNameType][]
-  >([])
 
   const userSubsForSearch = useMemo(() => {
     return new Set(userSubs)
   }, [userSubs])
-
-  const handleClose = () => setBackendError('')
 
   const handleChange = async (name: string) => {
     let updatedUserSubs: SubscriptionName = []
@@ -67,40 +59,33 @@ export default function MySubscriptions() {
   }
 
   async function fetchAllSubscriptions() {
-    return await fetch(subscriptionVariantsApi)
-      .then((respone) => {
-        return respone.json()
-      })
-      .then((result) => {
-        //ToDo
-        return result
-      })
+    const response = await fetch(`${api}/variant`)
+    if (!response.ok) {
+      throw new Error(errorMessage)
+    }
+    return await response.json()
   }
 
   async function fetchUserSubscriptions() {
-    return await fetch('/api/my/subscriptions?subscribed=true')
-      .then((respone) => {
-        if (!respone.ok) {
-          throw new Error('Ошибка сервера')
-        }
-        return respone.json()
-      })
-      .then((result) => {
-        return result || []
-      })
-      .catch((err) => {
-        setBackendError(err.message)
-      })
+    const response = await fetch(`${api}?subscribed=true`)
+    if (!response.ok) {
+      throw new Error(errorMessage)
+    }
+    return (await response.json()) || []
   }
+
   async function updateUserSubscription(subscription: {
     variant: string
     subscribed: boolean
   }) {
-    await fetch(subscriptionsApi, {
+    const response = await fetch(api, {
       method: 'POST',
       body: JSON.stringify(subscription),
       headers: { 'Content-Type': 'application/json' },
-    }).catch((_) => setBackendError(updatingErrorMessage))
+    })
+    if (!response.ok) {
+      throw new Error(errorMessage)
+    }
   }
 
   useEffect(() => {
@@ -111,10 +96,9 @@ export default function MySubscriptions() {
         const userSubs = await fetchUserSubscriptions()
         setUserSubs(userSubs)
       } catch (e) {
-        setBackendError(loadingErrorText)
+        enqueueSnackbar(errorMessage, { variant: 'error' })
       }
     }
-
     setLoading(true)
     setSubs().finally(() => setLoading(false))
   }, [])
@@ -181,21 +165,18 @@ export default function MySubscriptions() {
   }
 
   return (
-    <Layout title={`${titleHeadingText} | Recycl`}>
+    <Layout title={title}>
       <RedirectUnathenticatedUser>
         <Box>
-          <Typography sx={{ mb: 4 }} variant="h4" component="h1">
-            {titleHeadingText}
+          <Typography
+            sx={{ mt: 2, mb: 3, width: '100%' }}
+            variant="h4"
+            component="h1"
+          >
+            {h1}
           </Typography>
           {content}
         </Box>
-
-        <Snackbars
-          severity="error"
-          message={backendError}
-          open={!!backendError}
-          handleClose={handleClose}
-        />
       </RedirectUnathenticatedUser>
     </Layout>
   )
