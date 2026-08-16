@@ -16,6 +16,7 @@ import Head from 'next/head'
 import Wrapper from '../components/uiParts/Wrapper'
 import Footer from '../components/uiParts/Footer'
 import Header from '../components/uiParts/header/Header'
+import Link from '../components/uiParts/Link'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const title = `Главная | ${brand}`
@@ -31,7 +32,7 @@ const classes = {
   cardContent: `${PREFIX}-cardContent`,
 }
 
-const StyledMain = styled(Box)(({ theme }) => ({
+const StyledMain = styled('main')(({ theme }) => ({
   [`& .${classes.splash}`]: {
     display: 'flex',
     flexDirection: 'column',
@@ -81,7 +82,7 @@ const StyledMain = styled(Box)(({ theme }) => ({
   [`& .${classes.splashHeader}`]: {
     margin: '0 auto',
     padding: '0 24px',
-    maxWidth: 700,
+    maxWidth: 900,
     boxSizing: 'border-box',
     fontWeight: 'bold',
     textShadow: '2px 1px #152229',
@@ -90,7 +91,7 @@ const StyledMain = styled(Box)(({ theme }) => ({
 
   [`& .${classes.cardContainer}`]: {
     maxWidth: `${theme.breakpoints.values.lg}px`,
-    padding: '20px',
+    padding: '40px 16px',
     margin: '0 auto',
   },
 
@@ -101,7 +102,7 @@ const StyledMain = styled(Box)(({ theme }) => ({
   },
 
   [`& .${classes.cardHeader}`]: {
-    backgroundColor: `${theme.palette.primary.main}`,
+    backgroundColor: `${theme.palette.primary.dark}`,
     borderBottom: '6px solid #fff',
   },
 
@@ -162,6 +163,7 @@ export default function HomePage() {
     <>
       <Head>
         <title>{title}</title>
+        <meta name="description" content="" />
       </Head>
       <Wrapper>
         <Header />
@@ -171,17 +173,25 @@ export default function HomePage() {
             style={{ minHeight: `${splashMinHeight}px` }}
           >
             <Typography
-              component="h2"
+              component="h1"
               variant={matches ? 'h3' : 'h2'}
               className={classes.splashHeader}
             >
-              Помогаем собирать и перерабатывать отходы
+              Помогаем находить и сдавать на переработку вторсырье и отходы
             </Typography>
           </section>
           <section className={classes.cardContainer}>
+            <Typography
+              component={'h2'}
+              variant={matches ? 'h4' : 'h3'}
+              align="center"
+              sx={{ mt: 1, mb: 6 }}
+            >
+              Что мы предлагаем
+            </Typography>
             <Grid container spacing={5}>
               {cardsContent.map((card) => (
-                <Grid key={card.title} size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid key={card.title} size={{ xs: 12, sm: 6 }}>
                   <Card className={classes.card}>
                     <CardHeader
                       title={card.title}
@@ -190,14 +200,20 @@ export default function HomePage() {
                     />
                     <CardContent className={classes.cardContent}>
                       <ul>
-                        {card.description.map((line) => (
-                          <Typography
-                            component="li"
-                            variant="subtitle1"
-                            align="left"
-                            key={line}
-                          >
-                            {line}
+                        {card.description.map((line, index) => (
+                          <Typography component="li" key={index}>
+                            <Link
+                              href={line.href}
+                              sx={{
+                                color: '#fff',
+                                textDecoration: 'none',
+                                '&:hover': {
+                                  textDecoration: 'underline',
+                                },
+                              }}
+                            >
+                              {line.text}
+                            </Link>
                           </Typography>
                         ))}
                       </ul>
