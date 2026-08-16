@@ -12,6 +12,7 @@ import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectU
 import { default as ErrorComponent } from '../../../../components/uiParts/Error'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import NotSubscribed from '../../../../components/subscriptions/NotSubscribed'
+import Head from 'next/head'
 
 const api = '/api/my/subscriptions/waste-removal'
 const frontendUrl = '/my/subscriptions'
@@ -200,8 +201,12 @@ const Content = () => {
 
 export default function WasteRemovalSubscriptionConfig() {
   return (
-    <Layout title={title}>
-      <RedirectUnathenticatedUser>
+    <RedirectUnathenticatedUser>
+      <Head>
+        <title>{title}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <Layout>
         <Box
           sx={{
             margin: 'auto',
@@ -212,7 +217,7 @@ export default function WasteRemovalSubscriptionConfig() {
         >
           <Content />
         </Box>
-      </RedirectUnathenticatedUser>
-    </Layout>
+      </Layout>
+    </RedirectUnathenticatedUser>
   )
 }

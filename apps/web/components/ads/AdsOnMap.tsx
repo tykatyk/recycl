@@ -15,13 +15,14 @@ import Header from '../uiParts/header/Header'
 import Footer from '../uiParts/Footer'
 import AdSidebar from '../uiParts/AdSidebar'
 import AdSidebarItemsMap from '../uiParts/AdSidebarItemsMap'
-import Head from '../uiParts/Head'
 import { AdWrapper, drawerWidth } from '../uiParts/AdPageComponents'
 import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 import { AdMarkers } from '../uiParts/Marker'
 import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
+import Head from 'next/head'
 
 const errorMessage = 'Что-то пошло не так'
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 export default function AdsOnMap() {
   const [selectedValue, setSelectedValue] = useState('')
@@ -98,9 +99,13 @@ export default function AdsOnMap() {
 
   return (
     <>
-      <Head
-        title={`Карта наличия вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
-      />
+      <Head>
+        <title>{`Карта наличия вторсырья | ${brand}`}</title>
+        <meta
+          name="description"
+          content="Карта наличия вторсырья, доступного для переработки или утилизации"
+        />
+      </Head>
       <Box
         sx={{
           display: 'flex',

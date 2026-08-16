@@ -15,6 +15,9 @@ import { wasteAvailableSubscriptionSchema } from '../../lib/validation'
 import NotSubscribed from './NotSubscribed'
 import * as yup from 'yup'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
+import Head from 'next/head'
+
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 const createTitle =
   'Создание подписки на получение уведомлений о наличии вторсырья'
@@ -30,8 +33,11 @@ const updateRoute = (id: string) =>
   `/api/my/subscriptions/waste-available/${id}`
 const indexRoute = '/my/subscriptions/waste-available'
 
-export default function CreateSubscription(params: { action: string }) {
+export default function CreateSubscription(params: {
+  action: 'create' | 'update'
+}) {
   const { action } = params
+  const title = action === 'create' ? createTitle : updateTitle
   const [severity, setSeverity] = useState<string>('success')
   const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
   const router = useRouter()
@@ -211,8 +217,12 @@ export default function CreateSubscription(params: { action: string }) {
   }
 
   return (
-    <Layout title={action === 'create' ? createTitle : updateTitle}>
-      <RedirectUnathenticatedUser>
+    <RedirectUnathenticatedUser>
+      <Head>
+        <title>{`${title} | ${brand}`}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <Layout>
         <Box
           sx={{
             display: 'flex',
@@ -232,7 +242,7 @@ export default function CreateSubscription(params: { action: string }) {
             }}
           />
         </Box>
-      </RedirectUnathenticatedUser>
-    </Layout>
+      </Layout>
+    </RedirectUnathenticatedUser>
   )
 }

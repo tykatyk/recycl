@@ -7,11 +7,14 @@ import { Box, Button, Typography } from '@mui/material'
 import BlockIcon from '@mui/icons-material/Block'
 import { useRouter } from 'next/router'
 import { isValidObjectId } from 'mongoose'
+import Head from 'next/head'
+import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 
 const { documentActivityStatus } = constants
 const { active } = documentActivityStatus
 const headerText = 'Это объявление не активно'
 const backButtonText = 'Назад'
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 function ContentNotAvailableView() {
   const router = useRouter()
@@ -58,23 +61,39 @@ function ContentNotAvailableView() {
     </Box>
   )
 }
-
-export default function wasteAvailableAd(props) {
+type WasteAvailableAdProps = {
+  data: Ad & { _id: string }
+  error: any
+}
+export default function wasteAvailableAd(props: WasteAvailableAdProps) {
   const { data, error } = props
 
   if (error) {
     return (
-      <Layout title={'Обьявление больше не доступно'}>
-        <ContentNotAvailableView />
-      </Layout>
+      <>
+        <Head>
+          <title>{`Обьявление больше не доступно | ${brand}`}</title>
+        </Head>
+        <Layout>
+          <ContentNotAvailableView />
+        </Layout>
+      </>
     )
   }
-  const titleDescription = `${data.title} | Вторсырьё на ${process.env.NEXT_PUBLIC_BRAND}`
 
   return (
-    <Layout title={titleDescription}>
-      <SingleWasteAvailableAd data={data} />
-    </Layout>
+    <>
+      <Head>
+        <title>{`${data.title} | Вторсырьё на ${brand}`}</title>
+        <meta
+          name="description"
+          content={`${data.title}. ${data.comment?.slice(0, 150)}`}
+        />
+      </Head>
+      <Layout>
+        <SingleWasteAvailableAd data={data} />
+      </Layout>
+    </>
   )
 }
 

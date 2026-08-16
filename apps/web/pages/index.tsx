@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { styled, useTheme } from '@mui/material/styles'
 import {
   Grid,
@@ -7,11 +7,18 @@ import {
   CardContent,
   Typography,
   useMediaQuery,
+  Box,
 } from '@mui/material'
-import HomeLayout from '../layouts/HomeLayout'
-import cardsContent from './cardsContent'
-import { handleResize } from './resizeHandlers'
-import images from './backgroundImages'
+import cardsContent from '../components/home/cardsContent'
+import { handleResize } from '../components/home/resizeHandlers'
+import images from '../components/home/backgroundImages'
+import Head from 'next/head'
+import Wrapper from '../components/uiParts/Wrapper'
+import Footer from '../components/uiParts/Footer'
+import Header from '../components/uiParts/header/Header'
+
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
+const title = `Главная | ${brand}`
 
 const PREFIX = 'Index'
 
@@ -24,7 +31,7 @@ const classes = {
   cardContent: `${PREFIX}-cardContent`,
 }
 
-const StyledHomeLayout = styled(HomeLayout)(({ theme }) => ({
+const StyledMain = styled(Box)(({ theme }) => ({
   [`& .${classes.splash}`]: {
     display: 'flex',
     flexDirection: 'column',
@@ -152,48 +159,57 @@ export default function HomePage() {
   }, [])
 
   return (
-    <StyledHomeLayout title="Recycl | Главная">
-      <section
-        className={classes.splash}
-        style={{ minHeight: `${splashMinHeight}px` }}
-      >
-        <Typography
-          component="h2"
-          variant={matches ? 'h3' : 'h2'}
-          className={classes.splashHeader}
-        >
-          Помогаем собирать и перерабатывать отходы
-        </Typography>
-      </section>
-      <section className={classes.cardContainer}>
-        <Grid container spacing={5}>
-          {cardsContent.map((card) => (
-            <Grid key={card.title} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Card className={classes.card}>
-                <CardHeader
-                  title={card.title}
-                  titleTypographyProps={{ align: 'center' }}
-                  className={classes.cardHeader}
-                />
-                <CardContent className={classes.cardContent}>
-                  <ul>
-                    {card.description.map((line) => (
-                      <Typography
-                        component="li"
-                        variant="subtitle1"
-                        align="left"
-                        key={line}
-                      >
-                        {line}
-                      </Typography>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+    <>
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <Wrapper>
+        <Header />
+        <StyledMain sx={{ width: '100%' }}>
+          <section
+            className={classes.splash}
+            style={{ minHeight: `${splashMinHeight}px` }}
+          >
+            <Typography
+              component="h2"
+              variant={matches ? 'h3' : 'h2'}
+              className={classes.splashHeader}
+            >
+              Помогаем собирать и перерабатывать отходы
+            </Typography>
+          </section>
+          <section className={classes.cardContainer}>
+            <Grid container spacing={5}>
+              {cardsContent.map((card) => (
+                <Grid key={card.title} size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Card className={classes.card}>
+                    <CardHeader
+                      title={card.title}
+                      titleTypographyProps={{ align: 'center' }}
+                      className={classes.cardHeader}
+                    />
+                    <CardContent className={classes.cardContent}>
+                      <ul>
+                        {card.description.map((line) => (
+                          <Typography
+                            component="li"
+                            variant="subtitle1"
+                            align="left"
+                            key={line}
+                          >
+                            {line}
+                          </Typography>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
-      </section>
-    </StyledHomeLayout>
+          </section>
+        </StyledMain>
+        <Footer />
+      </Wrapper>
+    </>
   )
 }

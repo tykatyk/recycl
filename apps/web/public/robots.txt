@@ -1,7 +1,6 @@
 User-agent: *
 Disallow: /api/
 Disallow: /my/
-Disallow: /auth/
 Disallow: /404
 Disallow: /500/
 

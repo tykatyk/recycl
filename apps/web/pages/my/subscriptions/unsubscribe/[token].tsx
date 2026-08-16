@@ -9,13 +9,14 @@ import TokenNotFound from '../../../../components/subscriptions/TokenNotFound'
 import TokenExpiredOrUsed from '../../../../components/subscriptions/TokenExpiredOrUsed'
 import { unsubscribeApiResponseCodes } from '../../../../lib/helpers/responses'
 import { UnsubscribeApiResponse } from '../../../../lib/types/subscription'
+import Head from 'next/head'
 
 const { SUCCESS, NOT_FOUND, TOKEN_USED, TOKEN_EXPIRED } =
   unsubscribeApiResponseCodes
-
 const titleHeading = 'Отписаться от рассылки'
 const errorMessge = 'Ошибка при загрузке данных'
 const unsubscribeRoute = '/api/my/subscriptions/unsubscribe'
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 const ShowUnsubscibe = ({
   data,
@@ -90,29 +91,35 @@ export default function Unsubscribe() {
   }
 
   return (
-    <Layout title={`${titleHeading} | ${process.env.NEXT_PUBLIC_BRAND}`}>
-      {/*--maybe use Box instead of Grid--*/}
-      <Grid
-        container
-        direction="column"
-        sx={{
-          margin: '0 auto',
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'relative',
-        }}
-      >
-        {content}
-
-        <CustomSnackbar
-          severity={'error'}
-          open={!!error}
-          message={error}
-          handleClose={() => {
-            setError('')
+    <>
+      <Head>
+        <title>{`${titleHeading} | ${brand}`}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <Layout>
+        {/*--maybe use Box instead of Grid--*/}
+        <Grid
+          container
+          direction="column"
+          sx={{
+            margin: '0 auto',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'relative',
           }}
-        />
-      </Grid>
-    </Layout>
+        >
+          {content}
+
+          <CustomSnackbar
+            severity={'error'}
+            open={!!error}
+            message={error}
+            handleClose={() => {
+              setError('')
+            }}
+          />
+        </Grid>
+      </Layout>
+    </>
   )
 }

@@ -17,6 +17,7 @@ import HeadingWithDescription, {
   HeadingDetails,
 } from '../../../components/uiParts/HeadingWithDescription'
 import { enqueueSnackbar } from 'notistack'
+import Head from 'next/head'
 
 const errorMessage = 'Что то пошло не так'
 const enabledText = 'Включено'
@@ -165,8 +166,12 @@ export default function MySubscriptions() {
   }
 
   return (
-    <Layout title={title}>
-      <RedirectUnathenticatedUser>
+    <RedirectUnathenticatedUser>
+      <Head>
+        <title>{title}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <Layout>
         <Box>
           <Typography
             sx={{ mt: 2, mb: 3, width: '100%' }}
@@ -177,7 +182,7 @@ export default function MySubscriptions() {
           </Typography>
           {content}
         </Box>
-      </RedirectUnathenticatedUser>
-    </Layout>
+      </Layout>
+    </RedirectUnathenticatedUser>
   )
 }

@@ -36,8 +36,11 @@ import { WasteAvailableSubscription } from '@recycl/shared/dist/server/db/models
 import type { PaginatedData } from '../../../../lib/types/pagination'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import Head from 'next/head'
 
-const title = 'Мои подписки на уведомления о появлении вторсырья '
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
+const title = 'Мои подписки на уведомления о появлении вторсырья'
+
 const apiUrl = '/api/my/subscriptions/waste-available'
 const baseUrl = '/my/subscriptions/waste-available'
 const createSubscriptionUrl = `${baseUrl}/create`
@@ -567,8 +570,12 @@ const SubscriptionList = () => {
 
 export default function WasteAvailableSubscriptions() {
   return (
-    <Layout title={title}>
-      <RedirectUnathenticatedUser>
+    <RedirectUnathenticatedUser>
+      <Head>
+        <title>{`${title} | ${brand}`}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <Layout>
         <Box
           sx={{
             width: '100%',
@@ -581,7 +588,7 @@ export default function WasteAvailableSubscriptions() {
           <SubscriptionList />
           <ScrollTopButton />
         </Box>
-      </RedirectUnathenticatedUser>
-    </Layout>
+      </Layout>
+    </RedirectUnathenticatedUser>
   )
 }

@@ -3,6 +3,7 @@ import Layout from '../../../components/layouts/Layout'
 import ScrollTopButton from '../../../components/uiParts/ScrollToTopButton'
 import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
 import MyCollectionPointsList from '../../../components/collectionPoints/MyCollectionPointsList'
+import Head from 'next/head'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const h1 = 'Мои контейнеры для приема вторсырья'
@@ -10,8 +11,12 @@ const title = `${h1} | ${brand}`
 
 export default function MyCollectionPoints() {
   return (
-    <Layout title={title}>
-      <RedirectUnathenticatedUser>
+    <RedirectUnathenticatedUser>
+      <Head>
+        <title>{title}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <Layout>
         <Box
           sx={{
             width: '100%',
@@ -24,7 +29,7 @@ export default function MyCollectionPoints() {
           <MyCollectionPointsList variant="container" h1={h1} />
           <ScrollTopButton />
         </Box>
-      </RedirectUnathenticatedUser>
-    </Layout>
+      </Layout>
+    </RedirectUnathenticatedUser>
   )
 }

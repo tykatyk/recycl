@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { styled } from '@mui/material/styles'
 import { Grid } from '@mui/material'
 import DialogsHeader from './DialogsHeader'
@@ -15,6 +15,8 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { GET_DIALOGS } from '../../lib/graphql/queries/message'
 import { DELETE_DIALOGS } from '../../lib/graphql/queries/message'
 import { useRouter } from 'next/router'
+import { DELETE_STALE_DIALOGS } from '../../lib/graphql/queries/message'
+import { initializeApollo } from '../../lib/apolloClient/apolloClient'
 
 const PREFIX = 'DialogsPage'
 
@@ -27,7 +29,7 @@ const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
     [`& .${classes.root}`]: {
       maxWidth: 1024,
     },
-  })
+  }),
 )
 
 const dataIsValid = (data) => {
@@ -52,7 +54,7 @@ export default function DialogsPage() {
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(
     // parseInt(process.env.NEXT_PUBLIC_DEFAULT_PAGINATION_SIZE, 10)
-    1
+    1,
   )
   const navigation = useRef('')
   const prevDialogId = useRef(null)
@@ -62,7 +64,7 @@ export default function DialogsPage() {
     {
       variables: { offset: 0, limit: pageSize },
       fetchPolicy: 'network-only',
-    }
+    },
   )
 
   const router = useRouter()
@@ -82,7 +84,7 @@ export default function DialogsPage() {
         variables: { offset, limit: pageSize },
       })
     },
-    [pageSize, loadDialogs]
+    [pageSize, loadDialogs],
   )
 
   const needLoadMore = () => {
@@ -148,7 +150,7 @@ export default function DialogsPage() {
     //if current row is not selected
     if (currentRowIndex === -1) {
       const currentRow = data.getDialogs.dialogs.filter(
-        (el) => el.dialogId === dialogId
+        (el) => el.dialogId === dialogId,
       )[0]
       //add it to selected rows
       newCheckedRows.push(currentRow)
@@ -283,4 +285,31 @@ export default function DialogsPage() {
       </StyledRedirectUnathenticatedUser>
     )
   }
+}
+
+export async function getServerSideProps(context) {
+  const res = { props: {} }
+
+  const apolloClient = initializeApollo()
+  await apolloClient
+    .mutate({
+      mutation: DELETE_STALE_DIALOGS,
+      context: {
+        headers: {
+          //manually pass cookies to request
+          //since mutate function doesn't include them automatically.
+          //With cookies grapql server can access session and get user instance from it
+          //otherwise session is null and user is undefined
+          cookie: context.req.headers.cookie,
+        },
+      },
+    })
+    .then((result) => {
+      res.props.deletedCount = result.data.deleteStaleDialogs.deletedCount
+    })
+    .catch((error) => {
+      console.log(error)
+      res.props.staleDialogsDeletionError = true
+    })
+  return res
 }

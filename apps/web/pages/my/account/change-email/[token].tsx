@@ -2,6 +2,7 @@ import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 import LayoutWithoutHeader from '../../../../components/layouts/LayoutWithoutHeader'
 import { Box, Alert, Button } from '@mui/material'
 import router from 'next/router'
+import Head from 'next/head'
 
 type ChangeEmailProps = {
   urlIsValid: boolean
@@ -16,52 +17,58 @@ export default function ChangeEmail(props: ChangeEmailProps) {
   const { urlIsValid } = props
 
   return (
-    <LayoutWithoutHeader title={title}>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
+    <>
+      <Head>
+        <title>{title}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <LayoutWithoutHeader>
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'column',
-            '&>*': {
-              mb: 3,
-            },
+            alignItems: 'center',
+            flexWrap: 'wrap',
           }}
         >
-          <Box>
-            <Alert
-              variant="filled"
-              severity={urlIsValid ? 'success' : 'error'}
-              sx={{ color: '#fff' }}
-            >
-              {urlIsValid
-                ? 'Адрес электронной почты успешно изменен'
-                : 'Срок действия ссылки истек'}
-            </Alert>
-          </Box>
-
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'center',
+              flexDirection: 'column',
+              '&>*': {
+                mb: 3,
+              },
             }}
           >
-            <Button
-              onClick={() => router.push('/')}
-              sx={{ color: '#fff' }}
-              variant={'outlined'}
+            <Box>
+              <Alert
+                variant="filled"
+                severity={urlIsValid ? 'success' : 'error'}
+                sx={{ color: '#fff' }}
+              >
+                {urlIsValid
+                  ? 'Адрес электронной почты успешно изменен'
+                  : 'Срок действия ссылки истек'}
+              </Alert>
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+              }}
             >
-              {buttonText}
-            </Button>
+              <Button
+                onClick={() => router.push('/')}
+                sx={{ color: '#fff' }}
+                variant={'outlined'}
+              >
+                {buttonText}
+              </Button>
+            </Box>
           </Box>
         </Box>
-      </Box>
-    </LayoutWithoutHeader>
+      </LayoutWithoutHeader>
+    </>
   )
 }
 

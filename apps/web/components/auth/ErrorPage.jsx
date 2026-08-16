@@ -6,44 +6,51 @@ const GO_HOME_TEXT = 'На главную'
 const CANT_ENTER_TEXT = 'Не удалось выполнить вход'
 const LINK_INVALID_TEXT = 'Возможно ссылка для входа больше не действительна'
 const HOME_URL = '/'
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
-export default function ErrorPage() {
+export default function AuthErrorPage() {
   return (
-    <LayoutWithoutHeader title="Recycl | Ошибка входа">
-      <Container component="div" maxWidth="sm" sx={{ p: 2 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar
+    <>
+      <Head>
+        <title>{`Ошибка входа | ${brand}`}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <LayoutWithoutHeader>
+        <Container component="div" maxWidth="sm" sx={{ p: 2 }}>
+          <Box
             sx={{
-              m: 1,
-              backgroundColor: 'secondary.main',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
             }}
           >
-            <ErrorOutlineIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5" mb={3}>
-            {CANT_ENTER_TEXT}
-          </Typography>
-          <Typography component="div" align="center" mb={10}>
-            {LINK_INVALID_TEXT}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button
-              sx={{ mb: 4 }}
-              variant="contained"
-              href={HOME_URL}
-              color="secondary"
+            <Avatar
+              sx={{
+                m: 1,
+                backgroundColor: 'secondary.main',
+              }}
             >
-              {GO_HOME_TEXT}
-            </Button>
+              <ErrorOutlineIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5" mb={3}>
+              {CANT_ENTER_TEXT}
+            </Typography>
+            <Typography component="div" align="center" mb={10}>
+              {LINK_INVALID_TEXT}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Button
+                sx={{ mb: 4 }}
+                variant="contained"
+                href={HOME_URL}
+                color="secondary"
+              >
+                {GO_HOME_TEXT}
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Container>
-    </LayoutWithoutHeader>
+        </Container>
+      </LayoutWithoutHeader>
+    </>
   )
 }

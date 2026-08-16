@@ -7,11 +7,13 @@ import { Box, Button, Typography } from '@mui/material'
 import BlockIcon from '@mui/icons-material/Block'
 import { useRouter } from 'next/router'
 import { isValidObjectId } from 'mongoose'
+import Head from 'next/head'
 
 const { documentActivityStatus } = constants
 const { active } = documentActivityStatus
 const headerText = 'Это объявление не активно'
 const backButtonText = 'Назад'
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 function ContentNotAvailableView() {
   const router = useRouter()
@@ -64,17 +66,30 @@ export default function CollectionPoint(props) {
 
   if (error) {
     return (
-      <Layout title={'Обьявление больше не доступно'}>
-        <ContentNotAvailableView />
-      </Layout>
+      <>
+        <Head>
+          <title>{`Обьявление больше не доступно | ${brand}`}</title>
+        </Head>
+        <Layout>
+          <ContentNotAvailableView />
+        </Layout>
+      </>
     )
   }
-  const titleDescription = `Пункт приема вторсырья ${data.location.description} | ${process.env.NEXT_PUBLIC_BRAND}`
 
   return (
-    <Layout title={titleDescription}>
-      <SingleCollectionPoint data={data} />
-    </Layout>
+    <>
+      <Head>
+        <title>{`Пункт приема вторсырья ${data.location.description} | ${brand}`}</title>
+        <meta
+          name="description"
+          content={`Пункт приема вторсырья. ${data.location.description}`}
+        />
+      </Head>
+      <Layout>
+        <SingleCollectionPoint data={data} />
+      </Layout>
+    </>
   )
 }
 

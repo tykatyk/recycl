@@ -1,6 +1,7 @@
 import Layout from '../../../../components/layouts/Layout'
 import CollectionPointFormCreate from '../../../../components/collectionPoints/CollectionPointFormCreate'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
+import Head from 'next/head'
 
 export default function CreateContainerCollectionPoint() {
   const brand = process.env.NEXT_PUBLIC_BRAND || ''
@@ -9,7 +10,11 @@ export default function CreateContainerCollectionPoint() {
 
   return (
     <RedirectUnathenticatedUser>
-      <Layout title={title}>
+      <Head>
+        <title>{title}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <Layout>
         <CollectionPointFormCreate variant={'container'} h1={h1} />
       </Layout>
     </RedirectUnathenticatedUser>

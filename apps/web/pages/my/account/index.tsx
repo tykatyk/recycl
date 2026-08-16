@@ -9,6 +9,7 @@ import PhoneForm from '../../../components/uiParts/userSettings/PhoneForm'
 import ChangeEmailForm from '../../../components/uiParts/userSettings/ChangeEmailForm'
 import DeleteAccountComponent from '.../../../components/uiParts/userSettings/DeleteAccountComponent'
 import { useId } from 'react'
+import Head from 'next/head'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const h1 = 'Настройки аккаунта'
@@ -18,7 +19,11 @@ export default function AllSettings() {
   const id = useId()
   return (
     <RedirectUnathenticatedUser>
-      <Layout title={title}>
+      <Head>
+        <title>{title}</title>
+        <meta name="robots" content="noindex, nofollow"></meta>
+      </Head>
+      <Layout>
         <Box sx={{ width: '100%' }}>
           <Accordion>
             <AccordionSummary

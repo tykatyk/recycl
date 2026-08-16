@@ -22,7 +22,6 @@ import {
 
 import EventsTable from './EventsTable'
 import type {
-  CollectionPoint,
   AdActions,
   SortOrder,
   OrderBy,
@@ -37,6 +36,7 @@ import {
   defaultPageSize,
 } from '../../lib/helpers/pagination'
 import { documentActivityStatus } from '@recycl/shared/dist/constants'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
 const { activate, deactivate, remove } = eventActions
 
@@ -54,7 +54,7 @@ const { asc, desc } = validSortOrder
 const { active, disabled } = documentActivityStatus
 
 export default function MyEvents(props: {
-  variant: keyof typeof documentActivityStatus
+  variant: InferGetServerSidePropsType<typeof getServerSideProps>
 }) {
   const router = useRouter()
   const query = router.query
@@ -426,3 +426,11 @@ export default function MyEvents(props: {
     </Layout>
   )
 }
+
+export const getServerSideProps = (async () => {
+  return {
+    props: { variant: 'disabled' },
+  }
+}) satisfies GetServerSideProps<{
+  variant: keyof typeof documentActivityStatus
+}>

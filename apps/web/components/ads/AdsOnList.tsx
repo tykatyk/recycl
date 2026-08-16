@@ -12,7 +12,6 @@ import {
 import { useSnackbar } from 'notistack'
 import AdSidebarItemsList from '../uiParts/AdSidebarItemsList'
 import AdSidebar from '../uiParts/AdSidebar'
-import Head from '../uiParts/Head'
 import { AdWrapper, drawerWidth } from '../uiParts/AdPageComponents'
 import Link from '../uiParts/Link'
 import NoRows from '../uiParts/NoRows'
@@ -24,9 +23,11 @@ import Cookies from 'js-cookie'
 import type { HrefOptions } from '../../lib/types/pagination'
 import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
+import Head from 'next/head'
 
 const errorMessage = 'Что-то пошло не так'
 const baseUrl = '/ads/list'
+const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 //ToDo: add ads type
 export default function AdsOnList(props) {
@@ -123,9 +124,13 @@ export default function AdsOnList(props) {
 
   return (
     <>
-      <Head
-        title={`Объявления о наличии вторсырья | ${process.env.NEXT_PUBLIC_BRAND}`}
-      />
+      <Head>
+        <title>{`Объявления о наличии вторсырья | ${brand}`}</title>
+        <meta
+          name="description"
+          content="Найти вторсырье для переработки или утилизации"
+        />
+      </Head>
       <Box
         sx={{
           display: 'flex',

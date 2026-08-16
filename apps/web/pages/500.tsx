@@ -1,11 +1,13 @@
 import ErrorPage from '../components/ErrorPage'
 
+const title = 'Ошибка сервера'
+
 export default function NotFound() {
   return (
     <ErrorPage
-      headerText="Ошибка сервера"
+      headerText={title}
       contentText="На сервере возникла неизвестная ошибка"
-      title="Ошибка сервера | Recycl"
+      title={title}
     />
   )
 }
