@@ -1,6 +1,6 @@
 interface StructuredFormatting {
   main_text: string
-  secondary_text: string
+  secondary_text?: string
 }
 
 interface MainTextMatchedSubstrings {

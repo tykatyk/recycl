@@ -78,7 +78,7 @@ const location = yup
     structured_formatting: yup
       .object({
         main_text: yup.string().typeError(incorrectValue).required(required),
-        secondary_text: yup.string().typeError(incorrectValue).notRequired(),
+        secondary_text: yup.string().typeError(incorrectValue),
       })
       .required(required)
       .typeError(incorrectValue),

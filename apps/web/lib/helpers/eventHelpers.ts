@@ -14,7 +14,12 @@ export function getNormalizedValues<T extends { location: PlaceType }>(
     place_id: values.location?.place_id,
     structured_formatting: {
       main_text: values.location?.structured_formatting.main_text,
-      secondary_text: values.location?.structured_formatting.secondary_text,
+      ...(values.location?.structured_formatting
+        ? {
+            secondaryText:
+              values.location?.structured_formatting.secondary_text,
+          }
+        : {}),
     },
   }
   const normalizedValues = { ...values, location: normalizedLocation }
