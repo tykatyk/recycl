@@ -1,23 +1,8 @@
-import { Schema, Types } from 'mongoose'
+import { Schema, Types, ValidatorProps } from 'mongoose'
 import {
   phone as phoneValidator,
   email as emailValidator,
 } from '../../validation/atomicValidators'
-
-import { AD_EXPIRATION_PERIOD } from '../../constants'
-
-//ToDo: використати цю схему також в ad
-export const userSchema = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-})
 
 export const contactPhone = {
   type: String,
@@ -29,8 +14,7 @@ export const contactPhone = {
         return false
       }
     },
-    message: (props: { value: string }) =>
-      `${props.value} Недействительный номер телефона!`,
+    message: (props: ValidatorProps) => `${props.value} invalidPhoneNumber`,
   },
 }
 
@@ -66,7 +50,6 @@ const structuredFormattingSchema = new Schema(
     },
     secondary_text: {
       type: String,
-      required: true,
     },
   },
   { _id: false },
@@ -91,17 +74,6 @@ export const locationSchema = new Schema(
   },
   { _id: false },
 )
-
-export const expires = {
-  type: Date,
-  required: true,
-  default: () => {
-    const date = new Date()
-    return date.setDate(
-      date.getDate() + AD_EXPIRATION_PERIOD * 24 * 60 * 60 * 1000,
-    )
-  },
-}
 
 //validates email in db schemas
 export const checkEmail = (v: string) => {

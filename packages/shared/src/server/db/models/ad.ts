@@ -1,6 +1,9 @@
 import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
-import { contactPhone, locationSchema, expires } from '../dbModelCommons'
-import { documentActivityStatus } from '../../../constants'
+import { contactPhone, locationSchema } from '../dbModelCommons'
+import {
+  documentActivityStatus,
+  AD_EXPIRATION_PERIOD,
+} from '../../../constants'
 
 const adSchema = new Schema(
   {
@@ -43,7 +46,16 @@ const adSchema = new Schema(
       type: String,
     },
     comment: String,
-    expires,
+    expires: {
+      type: Date,
+      required: true,
+      default: () => {
+        const date = new Date()
+        return date.setDate(
+          date.getDate() + AD_EXPIRATION_PERIOD * 24 * 60 * 60 * 1000,
+        )
+      },
+    },
   },
   { timestamps: true },
 )

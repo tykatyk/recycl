@@ -1,8 +1,7 @@
 import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
 import type { ValidatorProps } from 'mongoose'
 import cryptoRandomString from 'crypto-random-string'
-import { phone as phoneValidator } from '../../../validation/atomicValidators'
-import { checkEmail } from '../dbModelCommons'
+import { checkEmail, contactPhone } from '../dbModelCommons'
 import { documentActivityStatus } from '../../../constants'
 import { validationMessages } from '../../../validation'
 import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '../../../constants'
@@ -45,19 +44,7 @@ const userSchema = new Schema(
       maxLength: 255,
     },
     location: locationSchema,
-    phone: {
-      type: String,
-      validate: {
-        validator: (v: string) => {
-          try {
-            return !!phoneValidator.validateSync(v)
-          } catch (error) {
-            return false
-          }
-        },
-        message: (props: ValidatorProps) => `${props.value} invalidPhoneNumber`,
-      },
-    },
+    phone: contactPhone,
     email: {
       type: String,
       required: true, //ToDo: email can be undefined if user is authenticated with OAuth
