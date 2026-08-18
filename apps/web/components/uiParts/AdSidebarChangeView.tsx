@@ -4,32 +4,37 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material'
-
 import LocationPinIcon from '@mui/icons-material/LocationPin'
 import ListIcon from '@mui/icons-material/List'
+import { useRouter } from 'next/router'
 
 const viewOnList = 'Смотреть списком'
 const viewOnMap = 'Смотреть на карте'
-const listViewUrl = '/ads/list'
-const mapViewUrl = '/ads'
 
 type AdSidebarChangeViewProps = {
-  isMapView: boolean
+  listViewUrl: string
+  mapViewUrl: string
 }
 
 export default function AdSidebarChangeView(props: AdSidebarChangeViewProps) {
-  const { isMapView } = props
+  const router = useRouter()
+  const { listViewUrl = '#', mapViewUrl = '#' } = props
+  const isListView = router.asPath.includes('/list')
+
   return (
     <ListItem disableGutters dense divider>
-      <ListItemButton component="a" href={isMapView ? listViewUrl : mapViewUrl}>
+      <ListItemButton
+        component="a"
+        href={isListView ? mapViewUrl : listViewUrl}
+      >
         <ListItemIcon>
-          {isMapView ? (
-            <ListIcon color="secondary" />
-          ) : (
+          {isListView ? (
             <LocationPinIcon color="secondary" />
+          ) : (
+            <ListIcon color="secondary" />
           )}
         </ListItemIcon>
-        <ListItemText primary={isMapView ? viewOnList : viewOnMap} />
+        <ListItemText primary={isListView ? viewOnMap : viewOnList} />
       </ListItemButton>
     </ListItem>
   )

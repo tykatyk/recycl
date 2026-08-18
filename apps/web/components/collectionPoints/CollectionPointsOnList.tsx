@@ -3,6 +3,7 @@ import {
   Box,
   Chip,
   Container,
+  ListItem,
   PaginationItem,
   Paper,
   SelectChangeEvent,
@@ -24,17 +25,18 @@ import type { HrefOptions } from '../../lib/types/pagination'
 import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 import Head from 'next/head'
+import type { CollectionPoint } from '../../lib/types/collectionPoint'
+import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import AdSidebarHeader from '../uiParts/AdSidebarHeader'
-import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 
 const errorMessage = 'Что-то пошло не так'
-const listViewUrl = '/ads/list'
-const mapViewUrl = '/ads'
+const baseUrl = '/collection-points/list'
+const mapViewUrl = '/collection-points'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const howSearchWorksDescription =
-  'При поиске по местоположению объявления ищутся только в указанной точке. Например, при указанном местоположении "Винница", вы увидите объявления, в которых местоположение указано как "Винница", но не "ул. Пирогова, Винница", "ул. Келецакая, Винница" и т. д. Для поиска по региону, рекомендуем кроме местоположения также указывать радиус поиска.'
+  'При поиске по местоположению пункты приема вторсырья ищутся только в указанной точке. Например, при указанном местоположении "Винница", вы увидите пункты приема, для которых местоположение указано как "Винница", но не "ул. Пирогова, Винница", "ул. Келецакая, Винница" и т. д. Для поиска по региону, рекомендуем кроме местоположения также указывать радиус поиска.'
 
-export type AdsOnListProps =
+export type CollectionPointsOnListProps =
   | {
       status: 'error'
       message: string
@@ -42,7 +44,7 @@ export type AdsOnListProps =
   | {
       status: 'success'
       data: {
-        ads: (Ad & { _id: string })[]
+        ads: (CollectionPoint & { _id: string })[]
         wasteType: string
         wasteLocation: {
           description: string
@@ -56,7 +58,10 @@ export type AdsOnListProps =
         }
       }
     }
-export default function AdsOnList(props: AdsOnListProps) {
+
+export default function CollectionPointsOnList(
+  props: CollectionPointsOnListProps,
+) {
   const { enqueueSnackbar } = useSnackbar()
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [initialFormValues, setInitialFormValues] = useState<{
@@ -79,8 +84,7 @@ export default function AdsOnList(props: AdsOnListProps) {
       const { page, pageSize } = options
 
       const queryExists = Object.keys(router.query).length > 0
-      if (!queryExists)
-        return `${listViewUrl}?page=${page}&pageSize=${pageSize}`
+      if (!queryExists) return `${baseUrl}?page=${page}&pageSize=${pageSize}`
 
       const { wasteType, locationDescription, locationId, searchRadius } =
         router.query
@@ -102,9 +106,7 @@ export default function AdsOnList(props: AdsOnListProps) {
       query.set('pageSize', String(pageSize))
 
       const queryString = query.toString()
-      const pageRoute = queryString
-        ? `${listViewUrl}?${queryString}`
-        : listViewUrl
+      const pageRoute = queryString ? `${baseUrl}?${queryString}` : baseUrl
 
       return pageRoute
     },
@@ -158,9 +160,7 @@ export default function AdsOnList(props: AdsOnListProps) {
       }
 
       const queryString = query.toString()
-      const pageRoute = queryString
-        ? `${listViewUrl}?${queryString}`
-        : listViewUrl
+      const pageRoute = queryString ? `${baseUrl}?${queryString}` : baseUrl
 
       router.push(pageRoute)
     } catch (error) {
@@ -171,11 +171,8 @@ export default function AdsOnList(props: AdsOnListProps) {
   return (
     <>
       <Head>
-        <title>{`Объявления о наличии вторсырья | ${brand}`}</title>
-        <meta
-          name="description"
-          content="Найти вторсырье для переработки или утилизации"
-        />
+        <title>{`Список пунктов приема вторсырья | ${brand}`}</title>
+        <meta name="description" content="Найти пункт приема вторсырья" />
       </Head>
       <Box
         sx={{
@@ -191,16 +188,15 @@ export default function AdsOnList(props: AdsOnListProps) {
           drawerWidth={drawerWidth}
           handleDrawerToggle={handleDrawerToggle}
         >
-          <AdSidebarHeader headerText={'Объявления о наличии вторсырья'} />
+          <AdSidebarHeader headerText={'Пункты приема вторсырья'} />
           <AdSidebarItemsList
             handleSubmit={handleSubmit}
             initialFormValues={initialFormValues}
             howSearchWorksDescription={howSearchWorksDescription}
           />
-          <AdSidebarChangeView
-            listViewUrl={listViewUrl}
-            mapViewUrl={mapViewUrl}
-          />
+
+          <ListItem dense disableGutters divider />
+          <AdSidebarChangeView listViewUrl={baseUrl} mapViewUrl={mapViewUrl} />
           <AdSidebarItemsCommon />
         </AdSidebar>
 
@@ -236,15 +232,7 @@ export default function AdsOnList(props: AdsOnListProps) {
               {data && data.ads && data.ads.length > 0 ? (
                 <Container maxWidth="md" sx={{ pt: 2, pb: 2 }}>
                   <Stack spacing={2} sx={{ width: '100%' }}>
-                    {data.ads.map((item) => {
-                      const creationDate = new Date(item.updatedAt)
-
-                      const formattedDate = new Intl.DateTimeFormat('ru-RU', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      }).format(creationDate)
-
+                    {data.ads.map((item, index) => {
                       return (
                         <Box
                           sx={{ display: 'flex', width: '100%' }}
@@ -262,11 +250,6 @@ export default function AdsOnList(props: AdsOnListProps) {
                           >
                             <Box sx={{ flexGrow: 1 }}>
                               <Box sx={{ mb: 2 }}>
-                                <Typography variant="h6" gutterBottom>
-                                  {item.title}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ pb: 2 }}>
                                 <Typography
                                   variant="body2"
                                   sx={{
@@ -274,24 +257,31 @@ export default function AdsOnList(props: AdsOnListProps) {
                                     color: 'grey.400',
                                   }}
                                 >
-                                  Местоположение вторсырья
+                                  Местоположение пункта приема
                                 </Typography>
-                                <Typography>
-                                  {item.wasteLocation.description}
+                                <Typography variant="h6" component="div">
+                                  {item.location.description}
                                 </Typography>
                               </Box>
-                              <Box sx={{ pb: 2 }}>
+
+                              <Box sx={{ mb: 2 }}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontWeight: 'fontWeightLight',
+                                    color: 'grey.400',
+                                  }}
+                                  gutterBottom
+                                >
+                                  Вторсырье, которое принимается
+                                </Typography>
                                 <Stack spacing={2} direction={'row'}>
-                                  <Chip
-                                    size="small"
-                                    label={`${item.quantity} кг`}
-                                  />
-                                  <Chip
-                                    size="small"
-                                    label={`${item.wasteType}`}
-                                  />
+                                  {item.wasteTypes.map((waste) => {
+                                    return <Chip label={`${waste} кг`} />
+                                  })}
                                 </Stack>
                               </Box>
+
                               <Box sx={{ mb: 2 }}>
                                 <Typography
                                   variant="body2"
@@ -300,13 +290,19 @@ export default function AdsOnList(props: AdsOnListProps) {
                                     color: 'grey.400',
                                   }}
                                 >
-                                  {`Последее обновление: ${formattedDate}`}
+                                  Тип пункта приема
+                                </Typography>
+                                <Typography>
+                                  {collectionPointTypes[
+                                    item.variant
+                                  ].toLowerCase()}
                                 </Typography>
                               </Box>
+
                               <Box>
                                 <Typography gutterBottom>
                                   <Link
-                                    href={`/ads/${item._id}`}
+                                    href={`/collection-points/${item._id}`}
                                     sx={{
                                       color: 'secondary.dark',
                                       '&:visited': {

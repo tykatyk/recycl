@@ -1,5 +1,4 @@
-import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
-import AdsOnList, { AdsOnListProps } from '../../components/ads/AdsOnList'
+import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
 import { INTERNAL_SERVER_ERROR } from '../../lib/errors'
 import {
   adSearchFormSchema,
@@ -9,27 +8,33 @@ import {
 import getCoords from '../../lib/helpers/getCoords'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
 import * as yup from 'yup'
+import CollectionPointsOnList, {
+  type CollectionPointsOnListProps,
+} from '../../components/collectionPoints/CollectionPointsOnList'
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
 
 async function getPlaceCoordinates(placeId: string) {
   await dbConnect()
-  const existing = await AdModel.findOne({
+  const existing = await CollectionPointModel.findOne({
     'wasteLocation.place_id': placeId,
   })
 
   if (existing) {
-    return existing.wasteLocation.position.coordinates
+    return existing.location.position.coordinates
   }
 
   return getCoords(placeId)
 }
 
-export default function AdsListView(props: AdsOnListProps) {
-  return <AdsOnList {...props} />
+export default function CollectionPointsListView(
+  props: CollectionPointsOnListProps,
+) {
+  return <CollectionPointsOnList {...props} />
 }
 
 export async function getServerSideProps(context) {
+  //ToDo: add verification that locationDescription really belongs to locationId
   try {
-    //ToDo: add verification that locationDescription really belongs to locationId
     const {
       searchRadius = 0,
       locationDescription = '',
@@ -61,11 +66,11 @@ export async function getServerSideProps(context) {
     const { page: validPage, pageSize: validPageSize } = validatedQuery
 
     const filter: Record<string, unknown> = {
-      status: 'active',
+      status: documentActivityStatus.active,
     }
 
     if (wasteType) {
-      filter.wasteType = wasteType
+      filter.wasteTypes = wasteType
     }
 
     const wasteLocation =
@@ -84,7 +89,7 @@ export async function getServerSideProps(context) {
       }
 
       if (searchRadius) {
-        filter['wasteLocation.position'] = {
+        filter['location.position'] = {
           $near: {
             $geometry: {
               type: 'Point',
@@ -94,24 +99,24 @@ export async function getServerSideProps(context) {
           },
         }
       } else {
-        filter['wasteLocation.place_id'] = locationId
+        filter['location.place_id'] = locationId
       }
     }
 
     await dbConnect()
     const skip = Math.max(validPage - 1, 0) * validPageSize
-    const ads = await AdModel.find(filter)
+    const collectionPoints = await CollectionPointModel.find(filter)
       .skip(skip)
       .limit(validPageSize)
       .sort({ updatedAt: -1 })
-      .select('title user wasteLocation wasteType quantity updatedAt')
+      .select('user location wasteTypes variant')
       .lean()
 
     return {
       props: {
         status: 'success',
         data: {
-          ads: JSON.parse(JSON.stringify(ads)),
+          ads: JSON.parse(JSON.stringify(collectionPoints)),
           wasteType,
           wasteLocation:
             locationDescription && locationId
@@ -122,7 +127,7 @@ export async function getServerSideProps(context) {
               : null,
           searchRadius,
           pagination: {
-            total: ads.length,
+            total: collectionPoints.length,
             page: validPage,
             pageSize: validPageSize,
           },

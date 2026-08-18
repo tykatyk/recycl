@@ -1,4 +1,4 @@
-import { Box, Chip, Stack, Typography } from '@mui/material'
+import { Box, Chip, Grid, Typography } from '@mui/material'
 import {
   useAdvancedMarkerRef,
   AdvancedMarker,
@@ -60,7 +60,7 @@ export const IndividualAdContent = ({ data }) => {
 export const AggregatedAdContent = ({ data }) => {
   const { placeDescription, weight, wasteType, placeId } = data
   return (
-    <Box sx={{ color: 'grey.800' }}>
+    <Box sx={{ color: 'grey.800', maxWidth: 350 }}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6">
           {'В данной локации несколько объявлений'}
@@ -93,7 +93,7 @@ export const AggregatedAdContent = ({ data }) => {
 export const IndividualCollectionPointContent = ({ data }) => {
   const { adId, placeDescription, wasteTypes, phone, variant, date } = data
   return (
-    <Box sx={{ color: 'grey.800', maxWidth: 350 }}>
+    <Box id="24" sx={{ color: 'grey.800', maxWidth: 350 }}>
       <Box sx={{ mb: 1 }}>
         <Typography variant="h6">{placeDescription}</Typography>
       </Box>
@@ -132,7 +132,7 @@ export const IndividualCollectionPointContent = ({ data }) => {
           Виды вторсырья, которые принимаются
         </Typography>
         <Box sx={{ mb: 1 }}>
-          <Stack direction="row" spacing={1}>
+          <Grid spacing={1}>
             {wasteTypes.map((wasteType: string, idx: number) => {
               return (
                 <Chip
@@ -140,13 +140,14 @@ export const IndividualCollectionPointContent = ({ data }) => {
                   label={`${wasteType}`}
                   key={idx}
                   sx={(theme) => ({
+                    m: 0.5,
                     color: '#fff',
                     background: theme.palette.grey[600],
                   })}
                 />
               )
             })}
-          </Stack>
+          </Grid>
         </Box>
       </Box>
       <Box sx={{ mb: 1 }}>
@@ -184,7 +185,7 @@ export const IndividualCollectionPointContent = ({ data }) => {
 export const AggregatedCollectionPointContent = ({ data }) => {
   const { placeDescription, wasteType, placeId } = data
   return (
-    <Box sx={{ color: 'grey.800' }}>
+    <Box sx={{ color: 'grey.800', maxWidth: 350 }}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6">{placeDescription}</Typography>
         <Typography>{'В данной локации несколько пунктов приема'}</Typography>

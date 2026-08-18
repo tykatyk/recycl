@@ -23,7 +23,11 @@ import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutoco
 const errorMessage = 'Что-то пошло не так'
 
 export default function AdSidebarItemsList(props) {
-  const { handleSubmit, initialFormValues } = props
+  const {
+    handleSubmit,
+    initialFormValues,
+    howSearchWorksDescription = '',
+  } = props
   const {
     wasteType = null,
     searchRadius = null,
@@ -31,8 +35,8 @@ export default function AdSidebarItemsList(props) {
   } = initialFormValues
 
   const [wasteTypes, setWasteTypes] = useState<string[]>([])
-  const { enqueueSnackbar } = useSnackbar()
   const [modalOpen, setModalOpen] = useState(false)
+  const { enqueueSnackbar } = useSnackbar()
 
   type AdSearchForm = InferType<typeof adSearchFormSchema>
   const formik = useFormik<AdSearchForm>({
@@ -83,18 +87,6 @@ export default function AdSidebarItemsList(props) {
             alignItems: 'center',
           }}
         >
-          <Box sx={{ p: 1 }}>
-            <Typography
-              component="h1"
-              variant="body1"
-              sx={{ fontWeight: 'bold' }}
-              align="center"
-              color="#91d608"
-            >
-              Объявления о наличии вторсырья
-            </Typography>
-          </Box>
-
           <Box sx={{ width: '100%', p: 1 }}>
             <Box
               component="form"
@@ -177,11 +169,7 @@ export default function AdSidebarItemsList(props) {
                         p: 4,
                       }}
                     >
-                      <Typography>
-                        {
-                          'При поиске по местоположению объявления ищутся только в указанной точке. Например, при указанном местоположении "Винница", вы увидите объявления, в которых местоположение указано как "Винница", но не "ул. Пирогова, Винница", "ул. Келецакая, Винница" и т. д. Для поиска по региону, рекомендуем кроме местоположения также указывать радиус поиска.'
-                        }
-                      </Typography>
+                      <Typography>{howSearchWorksDescription}</Typography>
                     </Box>
                   </Modal>
                 </Box>

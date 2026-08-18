@@ -33,7 +33,10 @@ export default function DesktopNavigation({ links }: { links: LinkData[] }) {
                 underline="none"
                 sx={{
                   textDecoration:
-                    router.asPath === link.href ? 'underline' : 'none',
+                    router.asPath.includes(link.href) ||
+                    router.asPath.includes(`${link.href}/list`)
+                      ? 'underline'
+                      : 'none',
                 }}
               >
                 {link.text}
