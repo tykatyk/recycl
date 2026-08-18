@@ -159,7 +159,6 @@ export const sendSubscriptionEmailWorker =
 
           const subscriptionData = await getSubscriptionData({
             userId,
-            runId,
             lastRunDate,
             subscriptionName: subscriptionVariantName,
           })

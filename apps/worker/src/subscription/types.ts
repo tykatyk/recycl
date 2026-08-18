@@ -30,6 +30,7 @@ type WasteTypeCounter = { wasteName: string; newAdsCount: number }
 type WasteLocationCounter = {
   locationName: string
   locationId: string
+  searchRadius: number
   adCounters: WasteTypeCounter[]
 }
 

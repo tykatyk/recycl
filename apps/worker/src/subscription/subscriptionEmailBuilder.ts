@@ -10,25 +10,22 @@ import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscriptio
 
 export const getSubscriptionData = async (params: {
   userId: string
-  runId: string
   lastRunDate: Date
   subscriptionName: SubscriptionVariantName
 }) => {
-  const { userId, runId, lastRunDate, subscriptionName } = params
+  const { userId, lastRunDate, subscriptionName } = params
   const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
   switch (subscriptionName) {
     case wasteAvailable:
       return await getWasteAvailableData({
         userId,
-        runId,
         lastRunDate,
       })
 
     case wasteRemoval:
       return await getWasteRemovalData({
         userId,
-        runId,
         lastRunDate,
       })
 

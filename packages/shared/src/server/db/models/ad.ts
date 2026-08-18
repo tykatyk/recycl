@@ -40,7 +40,7 @@ const adSchema = new Schema(
       type: String,
       Enum: Object.keys(documentActivityStatus),
       required: true,
-      default: 'active',
+      default: documentActivityStatus.active,
     },
     statusChangeReason: {
       type: String,

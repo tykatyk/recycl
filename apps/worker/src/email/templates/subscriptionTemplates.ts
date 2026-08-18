@@ -8,19 +8,27 @@ import { getHost, getFullHtml, delimiter } from '@recycl/shared/dist/email'
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
 const removalEventsRoute = 'events'
-const removalAdsRoute = 'ads'
+const removalAdsRoute = 'ads/list'
 
 const getUrl = (params: {
   wasteName: string
+  locationName: string
   locationId: string
+  searchRadius: number
   subscriptionName: string
 }) => {
   const host = getHost()
 
-  const { wasteName, locationId, subscriptionName } = params
+  const {
+    wasteName,
+    locationName,
+    locationId,
+    subscriptionName,
+    searchRadius,
+  } = params
 
   const query = encodeURI(
-    `wasteType=${wasteName}$location=${locationId}&sortBy=createdAd&sortOrder=desc`,
+    `wasteType=${wasteName}&locationDescription=${locationName}&locationId=${locationId}&searchRadius=${searchRadius}`,
   )
 
   switch (subscriptionName) {
@@ -44,11 +52,11 @@ export const getSubscriptionTitleAndHeader = (
   switch (subscriptionName) {
     case wasteAvailable:
       title = 'Новые объявления о наличии вторсырья'
-      header = 'Информируем вас о новых объявлениях о появлении вторсырья'
+      header = 'Информируем вас о новых объявлениях о наличии вторсырья'
       return { title, header }
 
     case wasteRemoval:
-      title = 'Передвижные пункты приема отходов в вашем регионе'
+      title = 'Передвижные пункты приема вторсырья в вашем регионе'
       header = 'Информируем вас о передвижных пунктах приема вторсырья'
       return { title, header }
 
@@ -65,8 +73,8 @@ export const getSubscriptionHtml = (params: {
   const { title, header } = getSubscriptionTitleAndHeader(subscriptionName)
 
   const newAdsCountByLocation = locations
-    .map((location, locationIdx) => {
-      const { locationName, locationId, adCounters } = location
+    .map((location) => {
+      const { locationName, locationId, adCounters, searchRadius } = location
       const newAdsCountByWasteTypes = adCounters
         .map((wasteType, wasteTypeIdx) => {
           const { wasteName, newAdsCount } = wasteType
@@ -82,7 +90,7 @@ export const getSubscriptionHtml = (params: {
                   </tr>
                   <tr>
                     <td style="padding:0 0 4px 8px">
-                      <a href="${getUrl({ wasteName, locationId, subscriptionName })}" style="color:#adce5d;">Посмотреть</a>
+                      <a href="${getUrl({ wasteName, locationName, locationId, searchRadius, subscriptionName })}" style="color:#adce5d;">Посмотреть</a>
                     </td>
                   </tr>
                   ${wasteTypeIdx !== adCounters.length - 1 ? delimiter : ''}

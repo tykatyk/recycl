@@ -7,16 +7,15 @@ import {
   WasteAvailableSubscriptionModel,
   AdModel,
 } from '@recycl/shared/dist/server/db'
-import { redisConnection as redis } from '@recycl/shared/dist/server/redis'
 import { Types } from 'mongoose'
 import { EARTH_RADIUS } from './constants'
+import { documentActivityStatus } from '@recycl/shared/dist/constants'
 
 export const getWasteAvailableData = async (params: {
   userId: string
-  runId: string
   lastRunDate: Date
 }) => {
-  const { userId, runId, lastRunDate } = params
+  const { userId, lastRunDate } = params
 
   //ToDo: check if user is not banned
 
@@ -40,7 +39,7 @@ export const getWasteAvailableData = async (params: {
               $expr: {
                 $and: [
                   { $eq: ['$_id', new Types.ObjectId(userId)] },
-                  { $eq: ['$isBanned', false] },
+                  { $eq: ['$status', documentActivityStatus.active] },
                 ],
               },
             },
@@ -110,33 +109,22 @@ export const getWasteAvailableData = async (params: {
     const wasteTypeCounters: WasteTypeCounter[] = []
 
     for (const wasteType of wasteTypes) {
-      let counter = 0
-      const key = `WasteAvailableAdsCounter:${runId}:${wasteType}`
-
-      const cachedCounter = await redis.get(key)
-      if (cachedCounter === null) {
-        counter = await AdModel.countDocuments({
-          wasteType: wasteType,
-          'wasteLocation.position': {
-            $geoWithin: {
-              $centerSphere: [coordinates, radius / EARTH_RADIUS],
-            },
+      const counter = await AdModel.countDocuments({
+        wasteType: wasteType,
+        'wasteLocation.position': {
+          $geoWithin: {
+            $centerSphere: [coordinates, radius / EARTH_RADIUS],
           },
-
-          isActive: true,
-          user: {
-            $ne: new Types.ObjectId(userId),
-          },
-          createdAt: {
-            $gt: lastRunDate,
-          },
-          expires: { $gt: new Date(Date.now() + 12 * 60 * 60 * 1000) }, //12 hours ahead
-        })
-        await redis.set(key, counter)
-        await redis.expire(key, 30 * 60) //30 minutes
-      } else {
-        counter = Number(cachedCounter)
-      }
+        },
+        status: documentActivityStatus.active,
+        user: {
+          $ne: new Types.ObjectId(userId),
+        },
+        createdAt: {
+          $gt: lastRunDate,
+        },
+        expires: { $gt: new Date(Date.now() + 12 * 60 * 60 * 1000) }, //12 hours ahead
+      })
 
       if (!counter) continue
       wasteTypeCounters.push({ wasteName: wasteType, newAdsCount: counter })
@@ -147,6 +135,7 @@ export const getWasteAvailableData = async (params: {
     locations.push({
       locationName: item.locationName,
       locationId: item.locationId,
+      searchRadius: radius,
       adCounters: wasteTypeCounters,
     })
   }

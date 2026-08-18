@@ -4,8 +4,6 @@ import {
   WasteRemovalSubscriptionModel,
 } from '@recycl/shared/dist/server/db'
 import { constants } from '@recycl/shared/dist'
-const { documentActivityStatus } = constants
-
 import type {
   AggregatedSubscriptionData,
   WasteLocationCounter,
@@ -13,6 +11,8 @@ import type {
 } from './types'
 import mongoose from 'mongoose'
 import { EARTH_RADIUS } from './constants'
+
+const { documentActivityStatus } = constants
 
 const getUserAds = async (userId: string) => {
   const ads = await AdModel.aggregate<AggregatedSubscriptionData>([
@@ -55,10 +55,9 @@ const getUserAds = async (userId: string) => {
 
 export const getWasteRemovalData = async (params: {
   userId: string
-  runId: string
   lastRunDate: Date
 }) => {
-  const { userId, runId, lastRunDate } = params
+  const { userId, lastRunDate } = params
   const userAds = await getUserAds(userId)
 
   if (userAds.length == 0) return []
@@ -80,7 +79,7 @@ export const getWasteRemovalData = async (params: {
     for (const wasteName of wasteTypes) {
       const newCollectionPointsCount =
         await CollectionPointModel.countDocuments({
-          waste: wasteName,
+          wasteTypes: wasteName,
 
           'location.position': {
             $geoWithin: {
@@ -90,17 +89,26 @@ export const getWasteRemovalData = async (params: {
               ],
             },
           },
-          isActive: true,
+          status: documentActivityStatus.active,
           user: {
             $ne: new mongoose.Types.ObjectId(userId),
           },
           createdAt: {
             $gt: lastRunDate,
           },
-          //date exists only in mobile collection points
-          date: {
-            $gt: new Date(Date.now() + 12 * 60 * 60 * 1000), //12hours ahead
-          },
+          $or: [
+            {
+              $and: [
+                { variant: 'mobile' },
+                { date: { $gt: new Date(Date.now() + 12 * 60 * 60 * 1000) } }, //12 hours
+              ],
+            },
+            {
+              variant: {
+                $or: ['stationery', 'container'],
+              },
+            },
+          ],
         })
 
       if (newCollectionPointsCount === 0) continue
@@ -108,7 +116,12 @@ export const getWasteRemovalData = async (params: {
     }
     if (eventCounters.length === 0) continue
 
-    data.push({ locationId, locationName, adCounters: eventCounters })
+    data.push({
+      locationId,
+      locationName,
+      searchRadius: collectionPointSearchRadius,
+      adCounters: eventCounters,
+    })
   }
 
   return data
