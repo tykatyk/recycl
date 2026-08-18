@@ -1,10 +1,13 @@
 import { Box, Link, List, ListItem, ListItemText } from '@mui/material'
+import { useRouter } from 'next/router'
 
 type LinkData = {
   text: string
   href: string
 }
 export default function DesktopNavigation({ links }: { links: LinkData[] }) {
+  const router = useRouter()
+
   return (
     <Box
       component="nav"
@@ -29,9 +32,8 @@ export default function DesktopNavigation({ links }: { links: LinkData[] }) {
                 color="inherit"
                 underline="none"
                 sx={{
-                  '&:hover': {
-                    textDecoration: 'underline',
-                  },
+                  textDecoration:
+                    router.asPath === link.href ? 'underline' : 'none',
                 }}
               >
                 {link.text}

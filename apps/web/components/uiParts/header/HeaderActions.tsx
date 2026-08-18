@@ -13,7 +13,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import PlaceIcon from '@mui/icons-material/Place'
-import EmailIcon from '@mui/icons-material/Email'
 
 export default function HeaderActions() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -29,11 +28,6 @@ export default function HeaderActions() {
       text: 'Пункт приема вторсырья',
       href: '/my/collection-points/create',
       icon: PlaceIcon,
-    },
-    {
-      text: 'Подписку на уведомления\n о появлении вторсырья',
-      href: '/my/subscriptions/waste-available/create',
-      icon: EmailIcon,
     },
   ]
 

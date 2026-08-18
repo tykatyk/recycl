@@ -39,7 +39,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import Head from 'next/head'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const title = 'Мои подписки на уведомления о появлении вторсырья'
+const title = 'Мои подписки на получение уведомлений о появлении вторсырья'
 
 const apiUrl = '/api/my/subscriptions/waste-available'
 const baseUrl = '/my/subscriptions/waste-available'
@@ -121,9 +121,9 @@ const Header = () => {
     >
       <Typography
         component="h1"
-        variant="h5"
+        variant="h4"
         align="center"
-        sx={{ mt: 2, mb: 3 }}
+        sx={{ mt: 2, mb: 3, width: '100%' }}
       >
         {title}
       </Typography>
@@ -480,11 +480,30 @@ const SubscriptionList = () => {
                       </Box>
                       <Box sx={{ flexGrow: 1 }}>
                         <Box sx={{ pb: 2 }}>
+                          <Typography
+                            sx={{
+                              color: 'grey.400',
+                              fontWeight: 'light',
+                            }}
+                            variant="body2"
+                          >
+                            Где искать:
+                          </Typography>
                           <Typography variant="h6">
                             {item.location.description}
                           </Typography>
                         </Box>
                         <Box sx={{ pb: 2 }}>
+                          <Typography
+                            sx={{
+                              color: 'grey.400',
+                              fontWeight: 'light',
+                              mb: 1,
+                            }}
+                            variant="body2"
+                          >
+                            Что искать:
+                          </Typography>
                           <Stack direction="row" spacing={1}>
                             {item.wasteTypes.map(
                               (wasteType: string, idx: number) => {

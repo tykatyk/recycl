@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
-import Snackbar from '../uiParts/Snackbars'
 import SubscriptionForm from './SubscriptionForm'
 import { Formik, FormikHelpers } from 'formik'
 import { getNormalizedValues } from '../../lib/helpers/eventHelpers'
-import { showErrorMessages } from '../../lib/helpers/errorHelpers'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { useRouter } from 'next/router'
 import { Box, Button, Stack, Typography } from '@mui/material'
@@ -16,13 +14,14 @@ import NotSubscribed from './NotSubscribed'
 import * as yup from 'yup'
 import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import Head from 'next/head'
+import { enqueueSnackbar } from 'notistack'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 const createTitle =
-  'Создание подписки на получение уведомлений о наличии вторсырья'
+  'Создать подписку на получение уведомлений о наличии вторсырья'
 const updateTitle =
-  'Редактирование подписки на получение уведомлений о наличии вторсырья'
+  'Редактировать подписку на получение уведомлений о наличии вторсырья'
 
 const errorMessage = 'Возникла ошибка при сохранении заявки'
 const notSubscribedMessage =
@@ -38,10 +37,8 @@ export default function CreateSubscription(params: {
 }) {
   const { action } = params
   const title = action === 'create' ? createTitle : updateTitle
-  const [severity, setSeverity] = useState<string>('success')
   const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
   const router = useRouter()
-  const [notification, setNotification] = useState<string>('')
   const [viewStatus, setViewStatus] = useState('')
   const [initialValues, setInitialValues] = useState({
     location: null,
@@ -149,8 +146,7 @@ export default function CreateSubscription(params: {
       if (!response.ok) {
         if (response.status === 422) {
           const data = await response.json()
-          setSeverity('error')
-          showErrorMessages(data.error, setErrors, setNotification)
+          enqueueSnackbar(data.error, { variant: 'error' })
           return
         }
         throw new Error(errorMessage)
@@ -158,8 +154,7 @@ export default function CreateSubscription(params: {
 
       action === 'create' ? router.push(indexRoute) : router.back()
     } catch (error) {
-      setSeverity('error')
-      setNotification(errorMessage)
+      enqueueSnackbar(errorMessage, { variant: 'error' })
     } finally {
       setSubmitting(false)
     }
@@ -168,8 +163,8 @@ export default function CreateSubscription(params: {
   const CreateUpdateForm = () => {
     return (
       <>
-        <Box sx={{ mb: 2 }}>
-          <Typography component={'h1'} variant="h6" align="center">
+        <Box sx={{ mt: 2, mb: 3 }}>
+          <Typography component={'h1'} variant="h4" align="center">
             {action === 'create' ? createTitle : updateTitle}
           </Typography>
         </Box>
@@ -233,14 +228,6 @@ export default function CreateSubscription(params: {
           }}
         >
           {renderContent()}
-          <Snackbar
-            severity={severity}
-            open={!!notification}
-            message={notification}
-            handleClose={() => {
-              setNotification('')
-            }}
-          />
         </Box>
       </Layout>
     </RedirectUnathenticatedUser>

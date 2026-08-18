@@ -176,8 +176,8 @@ export default function RemovalForm(props) {
 
           return (
             <Box>
-              <Box sx={{ mb: 4 }}>
-                <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
+              <Box sx={{ mt: 2, mb: 3 }}>
+                <Typography component="h1" variant="h4">
                   {h1}
                 </Typography>
               </Box>

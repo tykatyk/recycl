@@ -14,7 +14,8 @@ import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscriptio
 import NotSubscribed from '../../../../components/subscriptions/NotSubscribed'
 import Head from 'next/head'
 
-const api = '/api/my/subscriptions/waste-removal'
+const api = '/api/my/subscriptions'
+const wasteRemovalApi = `${api}/waste-removal`
 const frontendUrl = '/my/subscriptions'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
@@ -43,8 +44,6 @@ const Content = () => {
   const [viewStatus, setViewStatus] = useState('')
   const { enqueueSnackbar } = useSnackbar()
 
-  useEffect(() => {}, [])
-
   useEffect(() => {
     const getUserSubscriptions = async () => {
       const response = await fetch(`${api}`)
@@ -57,7 +56,7 @@ const Content = () => {
     }
 
     const dataFetcher = async () => {
-      const response = await fetch(`${api}`)
+      const response = await fetch(`${wasteRemovalApi}`)
 
       if (!response.ok) {
         throw new Error(errorMessage)
@@ -84,7 +83,6 @@ const Content = () => {
         setInitialValues({ radius: data.radius })
       } catch (error) {
         enqueueSnackbar(errorMessage, { variant: 'error' })
-
         setViewStatus('error')
       }
     }
@@ -110,10 +108,13 @@ const Content = () => {
   const MainContent = () => {
     return (
       <>
-        <Typography component={'h1'} variant="h6" sx={{ pb: 3 }} align="center">
-          Укажите радиус поиска пунктов приема вторсырья из ваших обьявлений
-        </Typography>
-        <Box sx={{ pb: 3, minWidth: 300 }}>
+        <Box sx={{ mt: 2, mb: 3 }}>
+          <Typography component={'h1'} variant="h4" align="center">
+            Укажите радиус поиска пунктов приема вторсырья из ваших обьявлений
+          </Typography>
+        </Box>
+
+        <Box sx={{ mb: 3, minWidth: 300 }}>
           <Formik<yup.InferType<typeof wasteRemovalSubscriptionSchema>>
             enableReinitialize
             initialValues={initialValues as any}
@@ -133,13 +134,12 @@ const Content = () => {
                       id="radius"
                       name="radius"
                       variant="outlined"
-                      fullWidth
                       component={TextFieldFormik}
                       label="Радиус поиска"
                       helperText="*Обязательное поле"
                       type="number"
                       size="small"
-                      sx={{ width: '100%' }}
+                      sx={{ minWidth: 250 }}
                       inputProps={{ min: 1, max: 200 }}
                       InputProps={{
                         endAdornment: (
@@ -152,13 +152,14 @@ const Content = () => {
                       sx={{
                         display: 'flex',
                         width: '100%',
-                        justifyContent: 'space-around',
+                        justifyContent: 'center',
                       }}
                     >
                       <Button
                         variant="contained"
                         type="submit"
                         disabled={isSubmitting}
+                        sx={{ ml: 1, mr: 1 }}
                       >
                         Сохранить
                         {isSubmitting && <ButtonSubmittingCircle />}
@@ -167,6 +168,7 @@ const Content = () => {
                         variant="outlined"
                         color="secondary"
                         href={`${frontendUrl}`}
+                        sx={{ ml: 1, mr: 1 }}
                       >
                         Вернуться
                       </Button>
@@ -209,10 +211,9 @@ export default function WasteRemovalSubscriptionConfig() {
       <Layout>
         <Box
           sx={{
-            margin: 'auto',
+            margin: '0 auto',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
           }}
         >
           <Content />
