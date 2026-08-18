@@ -9,7 +9,6 @@ import {
 import getCoords from '../../lib/helpers/getCoords'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
 import * as yup from 'yup'
-import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 
 async function getPlaceCoordinates(placeId: string) {
   await dbConnect()
@@ -29,6 +28,7 @@ export default function AdsListView(props) {
 }
 
 export async function getServerSideProps(context) {
+  //ToDo: handle if an error is thrown here
   //ToDo: add verification that locationDescription really belongs to locationId
   const {
     searchRadius = 0,
@@ -105,17 +105,12 @@ export async function getServerSideProps(context) {
 
   await dbConnect()
   const skip = Math.max(validPage - 1, 0) * validPageSize
-  const total = await AdModel.countDocuments(filter)
-  let ads: Ad[] = []
-
-  if (skip < total) {
-    ads = await AdModel.find(filter)
-      .skip(skip)
-      .limit(validPageSize)
-      .sort({ updatedAt: -1 })
-      .select('title user wasteLocation wasteType quantity updatedAt')
-      .lean()
-  }
+  const ads = await AdModel.find(filter)
+    .skip(skip)
+    .limit(validPageSize)
+    .sort({ updatedAt: -1 })
+    .select('title user wasteLocation wasteType quantity updatedAt')
+    .lean()
 
   return {
     props: {
@@ -132,7 +127,7 @@ export async function getServerSideProps(context) {
             : null,
         searchRadius,
         pagination: {
-          total,
+          total: ads.length,
           page: validPage,
           pageSize: validPageSize,
         },
