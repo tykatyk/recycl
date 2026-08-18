@@ -382,7 +382,7 @@ const SubscriptionList = () => {
     }
   }, [])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!actionsBarRef.current) return
 
     const node = actionsBarRef.current
@@ -400,7 +400,7 @@ const SubscriptionList = () => {
     observer.observe(node)
 
     return () => observer.disconnect()
-  }, [])
+  }, [actionsBarRef.current])
 
   if (status === 'error') return <ErrorComponet />
 

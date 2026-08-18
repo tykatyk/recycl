@@ -243,7 +243,7 @@ export default function MyAdsList(props: MyAdsProps) {
     }
   }, [])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     //ToDo: get rid of the actionsBarRef in the dependency array
     if (!actionsBarRef.current) return
 

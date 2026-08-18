@@ -214,7 +214,7 @@ export default function MyCollectionPointsList(
     }
   }, [])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     //ToDo: get rid of the actionsBarRef in the dependency array
     if (!actionsBarRef.current) return
 
