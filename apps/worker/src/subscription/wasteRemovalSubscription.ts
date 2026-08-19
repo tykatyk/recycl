@@ -105,7 +105,7 @@ export const getWasteRemovalData = async (params: {
             },
             {
               variant: {
-                $or: ['stationery', 'container'],
+                $in: ['stationery', 'container'],
               },
             },
           ],

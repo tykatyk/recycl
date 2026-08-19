@@ -7,7 +7,7 @@ import { getHost, getFullHtml, delimiter } from '@recycl/shared/dist/email'
 
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
-const removalEventsRoute = 'events'
+const removalEventsRoute = 'collection-points/list'
 const removalAdsRoute = 'ads/list'
 
 const getUrl = (params: {
@@ -33,10 +33,10 @@ const getUrl = (params: {
 
   switch (subscriptionName) {
     case wasteAvailable:
-      return new URL(`${host}/${removalAdsRoute}/?${query}`).toString()
+      return new URL(`${host}/${removalAdsRoute}?${query}`).toString()
 
     case wasteRemoval:
-      return new URL(`${host}/${removalEventsRoute}/?${query}`).toString()
+      return new URL(`${host}/${removalEventsRoute}?${query}`).toString()
 
     default:
       throw new Error('Unknown subscription name')
