@@ -52,7 +52,16 @@ const CollectionPointModel =
 
 const collectionPointContainerSchema = new Schema({}, options)
 
-const collectionPointStationerySchema = new Schema({}, options)
+const collectionPointStationerySchema = new Schema(
+  {
+    receiveParcels: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+  },
+  options,
+)
 
 const collectionPointMobileSchema = new Schema(
   {
