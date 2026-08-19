@@ -3,6 +3,14 @@ import Link from './Link'
 import Logo from './header/Logo'
 
 const sizes = { xs: 12, md: 3 }
+const css = {
+  '&:hover': {
+    color: 'primary',
+    textDecoration: 'underline',
+  },
+  fontSize: 14,
+  fontWeight: 'fontWeightLight',
+}
 
 export default function Footer(props) {
   return (
@@ -45,13 +53,7 @@ export default function Footer(props) {
                 color="textSecondary"
                 underline="none"
                 href="/contact-us"
-                sx={{
-                  '&:hover': {
-                    color: 'primary',
-                  },
-                  fontSize: 14,
-                  fontWeight: 'fontWeightLight',
-                }}
+                sx={css}
               >
                 Связаться с нами
               </Link>
@@ -61,13 +63,7 @@ export default function Footer(props) {
                 color="textSecondary"
                 underline="none"
                 href="/support-us"
-                sx={{
-                  '&:hover': {
-                    color: 'primary',
-                  },
-                  fontSize: 14,
-                  fontWeight: 'fontWeightLight',
-                }}
+                sx={css}
               >
                 Поддержать проект
               </Link>

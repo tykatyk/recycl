@@ -37,6 +37,9 @@ export default function DesktopNavigation({ links }: { links: LinkData[] }) {
                     router.asPath.includes(`${link.href}/list`)
                       ? 'underline'
                       : 'none',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                  },
                 }}
               >
                 {link.text}
