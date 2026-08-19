@@ -5,7 +5,7 @@ import Head from 'next/head'
 
 export default function CreateContainerCollectionPoint() {
   const brand = process.env.NEXT_PUBLIC_BRAND || ''
-  const h1 = 'Редактировать информацию о передвижном пункте сбора вторсырья'
+  const h1 = 'Редактировать информацию о передвижном пункте приема вторсырья'
   const title = `${h1} | ${brand}`
 
   return (

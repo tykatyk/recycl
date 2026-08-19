@@ -52,12 +52,14 @@ export const getSubscriptionTitleAndHeader = (
   switch (subscriptionName) {
     case wasteAvailable:
       title = 'Новые объявления о наличии вторсырья'
-      header = 'Информируем вас о новых объявлениях о наличии вторсырья'
+      header =
+        'Информируем вас о новых объявлениях о наличии у пользователей вторсырья для переработки'
       return { title, header }
 
     case wasteRemoval:
-      title = 'Передвижные пункты приема вторсырья в вашем регионе'
-      header = 'Информируем вас о передвижных пунктах приема вторсырья'
+      title = 'Пункты приема вторсырья в вашем регионе'
+      header =
+        'Информируем вас о появлении в вашем регионе пунктов приема вторсырья'
       return { title, header }
 
     default:
