@@ -18,9 +18,12 @@ import { AdWrapper, drawerWidth } from '../uiParts/AdPageComponents'
 import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 import { AdMarkers } from '../uiParts/Marker'
 import Head from 'next/head'
+import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 
 const errorMessage = 'Что-то пошло не так'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
+const baseUrl = '/collection-points/list'
+const mapViewUrl = '/collection-points'
 
 export default function CollectionPointsOnMap() {
   const [selectedValue, setSelectedValue] = useState('')
@@ -138,6 +141,10 @@ export default function CollectionPointsOnMap() {
               <AdSidebarItemsMap
                 handleChange={setSelectedValue}
                 h1={'Карта пунктов приема вторсырья'}
+              />
+              <AdSidebarChangeView
+                listViewUrl={baseUrl}
+                mapViewUrl={mapViewUrl}
               />
               <AdSidebarItemsCommon />
             </AdSidebar>
