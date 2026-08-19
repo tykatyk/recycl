@@ -109,7 +109,7 @@ export async function getServerSideProps(context) {
       .skip(skip)
       .limit(validPageSize)
       .sort({ updatedAt: -1 })
-      .select('user location wasteTypes variant')
+      .select('user location wasteTypes date variant')
       .lean()
 
     return {

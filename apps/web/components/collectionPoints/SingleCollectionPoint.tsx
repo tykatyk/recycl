@@ -9,6 +9,7 @@ import { useSnackbar } from 'notistack'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import ComplaintDialog from '../uiParts/ComplaintDialog'
+import dayjs from 'dayjs'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
 const phoneLoadingErrorMessage = 'Что то пошло не так'
@@ -88,6 +89,19 @@ export default function SingleCollectionPoint(props) {
             <Chip label={`Добавил: ${data.user.name}`} size="small" />
           </Grid>
         </Box>
+
+        {data.variant === 'mobile' && (
+          <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
+            <Typography
+              component={'h2'}
+              variant="h5"
+              gutterBottom
+            >{`Дата и время начала`}</Typography>
+            <Typography>
+              {dayjs(data.date).format('DD.MM.YYYY HH:MM')}
+            </Typography>
+          </Box>
+        )}
 
         <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
           <Typography

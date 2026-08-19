@@ -299,6 +299,27 @@ export default function CollectionPointsOnList(
                                 </Typography>
                               </Box>
 
+                              {item.variant === 'mobile' && (
+                                <Box sx={{ mb: 2 }}>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontWeight: 'fontWeightLight',
+                                      color: 'grey.400',
+                                    }}
+                                  >
+                                    Дата события
+                                  </Typography>
+                                  <Typography>
+                                    {new Intl.DateTimeFormat('ru-RU', {
+                                      day: 'numeric',
+                                      month: 'long',
+                                      year: 'numeric',
+                                    }).format(new Date(item.date))}
+                                  </Typography>
+                                </Box>
+                              )}
+
                               <Box>
                                 <Typography gutterBottom>
                                   <Link
