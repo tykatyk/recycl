@@ -36,7 +36,7 @@ async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
       await dbConnect()
 
       const result = await Promise.all([
-        UserModel.findById(session.id),
+        UserModel.findById(userId),
         UserModel.find({ phone: newPhone }),
       ])
 

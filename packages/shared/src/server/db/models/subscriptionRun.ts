@@ -7,6 +7,7 @@ const subscriptionJobRunSchema = new Schema(
       type: String,
       enum: Object.values(subscriptionVariantNames),
       required: true,
+      index: true,
     },
     status: {
       type: String,

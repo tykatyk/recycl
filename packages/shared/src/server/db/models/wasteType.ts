@@ -5,12 +5,9 @@ const wasteTypeSchema = new Schema(
     name: {
       type: String,
       required: true,
+      index: true,
+      unique: true,
     },
-    genitive: {
-      type: String,
-      required: true,
-    },
-    //ToDo: Add name and genitive in russian
   },
   { timestamps: true },
 )

@@ -71,7 +71,6 @@ const emailLetterSchema = new Schema(
       enum: ['queued', 'sent', 'skipped', 'failed'],
       required: true,
       default: 'queued',
-      //   index: true,
     },
     lastError: {
       type: String,

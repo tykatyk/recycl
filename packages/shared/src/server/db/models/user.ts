@@ -56,7 +56,6 @@ const userSchema = new Schema(
       },
       lowercase: true,
       trim: true,
-      index: true,
     },
     newEmail: {
       type: String,
@@ -107,6 +106,16 @@ const userSchema = new Schema(
     methods,
   },
 )
+
+userSchema.index({
+  email: 1,
+})
+userSchema.index({
+  phone: 1,
+})
+userSchema.index({
+  status: 1,
+})
 
 export type User = InferSchemaType<typeof userSchema>
 

@@ -17,7 +17,6 @@ const collectionPointSchema = new Schema(
       required: true,
     },
     phone: { ...contactPhone, required: true },
-
     viewCount: {
       type: Number,
       default: 0,
@@ -38,6 +37,25 @@ const collectionPointSchema = new Schema(
   },
   { timestamps: true, ...options },
 )
+
+collectionPointSchema.index({
+  wasteTypes: 1,
+})
+
+collectionPointSchema.index({
+  wasteTypes: 1,
+  'location.description': 1,
+  'location.place_id': 1,
+})
+
+collectionPointSchema.index({
+  user: 1,
+  status: 1,
+})
+
+collectionPointSchema.index({
+  status: 1,
+})
 
 export type CollectionPoint = InferSchemaType<typeof collectionPointSchema>
 

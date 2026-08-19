@@ -21,7 +21,6 @@ const adSchema = new Schema(
       type: locationSchema,
       required: true,
     },
-
     wasteType: {
       type: String,
       required: true,
@@ -59,6 +58,26 @@ const adSchema = new Schema(
   },
   { timestamps: true },
 )
+
+adSchema.index({
+  wasteType: 1,
+})
+
+adSchema.index({
+  wasteType: 1,
+  'wasteLocation.description': 1,
+  'wasteLocation.place_id': 1,
+})
+
+adSchema.index({
+  user: 1,
+  status: 1,
+})
+
+adSchema.index({
+  status: 1,
+})
+
 export type Ad = InferSchemaType<typeof adSchema>
 
 type AdModel = Model<Ad>

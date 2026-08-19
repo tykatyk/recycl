@@ -5,7 +5,6 @@ import type { ValidatorProps } from 'mongoose'
 
 const complaintSchema = new Schema(
   {
-    //ToDo: refactor user schema. Use one from dbModelCommons
     complaint: {
       type: String,
       required: true,
@@ -21,6 +20,7 @@ const complaintSchema = new Schema(
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      index: true,
     },
     userIp: {
       type: String,
@@ -38,6 +38,7 @@ const complaintSchema = new Schema(
       },
       lowercase: true,
       trim: true,
+      index: true,
     },
   },
   { timestamps: true },

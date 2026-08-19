@@ -1,6 +1,6 @@
 import Message from './message'
 import AdModel from './ad'
-import Account from './account'
+// import Account from './account'
 import WasteType from './wasteType'
 import CollectionPointModel, {
   CollectionPointContainerModel,
@@ -23,7 +23,7 @@ export {
   Message,
   AdModel,
   WasteType,
-  Account,
+  // Account,
   CollectionPointModel,
   CollectionPointContainerModel,
   CollectionPointStationeryModel,

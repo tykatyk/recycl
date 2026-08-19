@@ -20,6 +20,12 @@ const subscriptionSchema = new Schema(
   { timestamps: true },
 )
 
+subscriptionSchema.index({
+  user: 1,
+  subscribed: 1,
+  variant: 1,
+})
+
 export type Subscription = InferSchemaType<typeof subscriptionSchema>
 
 type SubscriptionModel = Model<Subscription>

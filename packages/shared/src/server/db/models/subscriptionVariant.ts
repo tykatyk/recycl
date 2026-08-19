@@ -6,6 +6,7 @@ const subscriptionVariantSchema = new Schema({
     type: String,
     required: true,
     enum: Object.values(subscriptionVariantNames),
+    index: true,
   },
 })
 
