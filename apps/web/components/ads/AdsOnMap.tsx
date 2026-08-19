@@ -23,6 +23,8 @@ import Head from 'next/head'
 
 const errorMessage = 'Что-то пошло не так'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
+const listViewUrl = '/ads/list'
+const mapViewUrl = '/ads'
 
 export default function AdsOnMap() {
   const [selectedValue, setSelectedValue] = useState('')
@@ -146,7 +148,10 @@ export default function AdsOnMap() {
                 handleChange={setSelectedValue}
                 h1={'Карта наличия вторсырья'}
               />
-              <AdSidebarChangeView isMapView={true} />
+              <AdSidebarChangeView
+                listViewUrl={listViewUrl}
+                mapViewUrl={mapViewUrl}
+              />
               <AdSidebarItemsCommon />
             </AdSidebar>
 

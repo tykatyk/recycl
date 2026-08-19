@@ -8,6 +8,7 @@ import {
   Typography,
   useMediaQuery,
   Box,
+  Container,
 } from '@mui/material'
 import cardsContent from '../components/home/cardsContent'
 import { handleResize } from '../components/home/resizeHandlers'
@@ -17,6 +18,7 @@ import Wrapper from '../components/uiParts/Wrapper'
 import Footer from '../components/uiParts/Footer'
 import Header from '../components/uiParts/header/Header'
 import Link from '../components/uiParts/Link'
+import HowItWorks from '../components/home/HowItWorks'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const title = `Главная | ${brand}`
@@ -166,65 +168,90 @@ export default function HomePage() {
         <meta name="description" content="" />
       </Head>
       <Wrapper>
-        <Header />
-        <StyledMain sx={{ width: '100%' }}>
-          <section
-            className={classes.splash}
-            style={{ minHeight: `${splashMinHeight}px` }}
-          >
-            <Typography
-              component="h1"
-              variant={matches ? 'h3' : 'h2'}
-              className={classes.splashHeader}
+        <Box
+          className="container"
+          sx={{ width: '100%', ml: 'auto', mr: 'auto', maxWidth: 1920 }}
+        >
+          <Header />
+          <StyledMain sx={{ width: '100%' }}>
+            <section
+              className={classes.splash}
+              style={{ minHeight: `${splashMinHeight}px` }}
             >
-              Помогаем находить и сдавать на переработку вторсырье и отходы
-            </Typography>
-          </section>
-          <section className={classes.cardContainer}>
-            <Typography
-              component={'h2'}
-              variant={matches ? 'h4' : 'h3'}
-              align="center"
-              sx={{ mt: 1, mb: 6 }}
+              <Typography
+                component="h1"
+                variant={matches ? 'h3' : 'h2'}
+                className={classes.splashHeader}
+              >
+                Помогаем находить и сдавать на переработку вторсырье и отходы
+              </Typography>
+            </section>
+            <section className={classes.cardContainer}>
+              <Typography
+                component={'h2'}
+                variant={matches ? 'h4' : 'h3'}
+                align="center"
+                sx={{ mt: 1, mb: 6 }}
+              >
+                Что мы предлагаем
+              </Typography>
+              <Grid container spacing={5}>
+                {cardsContent.map((card) => (
+                  <Grid key={card.title} size={{ xs: 12, sm: 6 }}>
+                    <Card className={classes.card}>
+                      <CardHeader
+                        title={card.title}
+                        titleTypographyProps={{ align: 'center' }}
+                        className={classes.cardHeader}
+                      />
+                      <CardContent className={classes.cardContent}>
+                        <ul>
+                          {card.description.map((line, index) => (
+                            <Typography component="li" key={index}>
+                              <Link
+                                href={line.href}
+                                sx={{
+                                  color: '#fff',
+                                  textDecoration: 'none',
+                                  '&:hover': {
+                                    textDecoration: 'underline',
+                                  },
+                                }}
+                              >
+                                {line.text}
+                              </Link>
+                            </Typography>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </section>
+            <Box
+              component="section"
+              sx={{
+                backgroundColor: '#21275c',
+                width: '100%',
+                padding: '40px 16px',
+              }}
             >
-              Что мы предлагаем
-            </Typography>
-            <Grid container spacing={5}>
-              {cardsContent.map((card) => (
-                <Grid key={card.title} size={{ xs: 12, sm: 6 }}>
-                  <Card className={classes.card}>
-                    <CardHeader
-                      title={card.title}
-                      titleTypographyProps={{ align: 'center' }}
-                      className={classes.cardHeader}
-                    />
-                    <CardContent className={classes.cardContent}>
-                      <ul>
-                        {card.description.map((line, index) => (
-                          <Typography component="li" key={index}>
-                            <Link
-                              href={line.href}
-                              sx={{
-                                color: '#fff',
-                                textDecoration: 'none',
-                                '&:hover': {
-                                  textDecoration: 'underline',
-                                },
-                              }}
-                            >
-                              {line.text}
-                            </Link>
-                          </Typography>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </section>
-        </StyledMain>
-        <Footer />
+              <Typography
+                component={'h2'}
+                variant={matches ? 'h4' : 'h3'}
+                align="center"
+                sx={{ mt: 1, mb: 6 }}
+              >
+                Как это работает
+              </Typography>
+              <Container maxWidth="md">
+                <HowItWorks />
+              </Container>
+            </Box>
+          </StyledMain>
+          <Footer />
+        </Box>
       </Wrapper>
     </>
   )
