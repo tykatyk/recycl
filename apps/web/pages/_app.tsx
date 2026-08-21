@@ -13,8 +13,13 @@ import '@fontsource/roboto/700.css'
 import CookieConsentPopup from '../components/uiParts/CookieConsentPopup'
 import { SnackbarProvider } from 'notistack'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { NextIntlClientProvider } from 'next-intl'
+import { AppProps } from 'next/app'
 
-export default function App(props) {
+export default function App(props: AppProps) {
+  const router = useRouter()
+
   const {
     Component,
     pageProps: { session, ...pageProps },
@@ -42,7 +47,13 @@ export default function App(props) {
                 horizontal: 'right',
               }}
             >
-              <Component {...pageProps} />
+              <NextIntlClientProvider
+                locale={router.locale}
+                messages={pageProps.messages}
+                timeZone="Europe/Kiev"
+              >
+                <Component {...pageProps} />
+              </NextIntlClientProvider>
             </SnackbarProvider>
             <CookieConsentPopup />
           </ApolloProvider>

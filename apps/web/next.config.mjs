@@ -16,4 +16,8 @@ export default {
     },
   },
   transpilePackages: ['@recycle/shared', 'formik-mui'],
+  i18n: {
+    locales: ['ru', 'uk'],
+    defaultLocale: 'uk',
+  },
 }

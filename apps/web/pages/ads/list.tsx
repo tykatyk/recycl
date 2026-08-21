@@ -28,7 +28,13 @@ export default function AdsListView(props: AdsOnListProps) {
 }
 
 export async function getServerSideProps(context) {
+  const { locale } = context
+  const messages = {
+    messages: (await import(`../../messages/${locale}.json`)).default,
+  }
+
   try {
+    const { query } = context
     //ToDo: add verification that locationDescription really belongs to locationId
     const {
       searchRadius = 0,
@@ -37,7 +43,7 @@ export async function getServerSideProps(context) {
       wasteType = '',
       page = 1,
       pageSize = rowsPerPageOptions[0],
-    } = context.query
+    } = query
 
     await adSearchFormSchema.validate(
       { searchRadius, wasteLocation: locationDescription, wasteType },
@@ -127,6 +133,7 @@ export async function getServerSideProps(context) {
             pageSize: validPageSize,
           },
         },
+        ...messages,
       },
     }
   } catch (error) {
@@ -134,6 +141,7 @@ export async function getServerSideProps(context) {
       props: {
         status: 'error',
         message: INTERNAL_SERVER_ERROR,
+        ...messages,
       },
     }
   }

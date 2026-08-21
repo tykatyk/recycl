@@ -1,5 +1,6 @@
-import { Box, Link, List, ListItem, ListItemText } from '@mui/material'
+import { Box, List, ListItem, ListItemText } from '@mui/material'
 import { useRouter } from 'next/router'
+import Link from '../Link'
 
 type LinkData = {
   text: string
@@ -7,6 +8,7 @@ type LinkData = {
 }
 export default function DesktopNavigation({ links }: { links: LinkData[] }) {
   const router = useRouter()
+  const { locale } = router
 
   return (
     <Box
@@ -27,6 +29,7 @@ export default function DesktopNavigation({ links }: { links: LinkData[] }) {
           >
             <ListItemText>
               <Link
+                locale={locale}
                 href={link.href}
                 onClick={() => false}
                 color="inherit"

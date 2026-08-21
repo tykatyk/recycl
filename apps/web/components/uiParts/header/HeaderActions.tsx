@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   IconButton,
-  Link,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -13,19 +12,25 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import PlaceIcon from '@mui/icons-material/Place'
+import Link from '../Link'
+import { useRouter } from 'next/router'
+import { useTranslations } from 'next-intl'
 
 export default function HeaderActions() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
+  const router = useRouter()
+  const { locale } = router
+  const t = useTranslations('Header.actions')
 
   const menuItems = [
     {
-      text: 'Объявление о наличии вторсырья',
+      text: t('createAd'),
       href: '/my/ads/create',
       icon: InventoryIcon,
     },
     {
-      text: 'Пункт приема вторсырья',
+      text: t('createCollectionPoint'),
       href: '/my/collection-points/create',
       icon: PlaceIcon,
     },
@@ -57,7 +62,7 @@ export default function HeaderActions() {
           onClick={handleClick}
           endIcon={<KeyboardArrowDownIcon />}
         >
-          Добавить
+          {t('add')}
         </Button>
       </Box>
       <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
@@ -88,6 +93,7 @@ export default function HeaderActions() {
               key={index}
               component={Link}
               href={item.href}
+              locale={locale}
             >
               <ListItemIcon>{Icon ? <Icon /> : null}</ListItemIcon>
               <ListItemText>{item.text}</ListItemText>

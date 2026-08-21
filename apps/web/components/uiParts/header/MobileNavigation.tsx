@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import {
-  IconButton,
-  Menu,
-  Box,
-  Link,
-  MenuItem,
-  useMediaQuery,
-} from '@mui/material'
+import { IconButton, Menu, Box, MenuItem, useMediaQuery } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import theme from '../../../lib/helpers/themeStub'
+import { useRouter } from 'next/router'
+import Link from '../Link'
 
 type LinkData = {
   text: string
@@ -24,6 +19,8 @@ export default function MobileNavigation({
   mobileViewport: any
 }) {
   const [anchorNavMenu, setAnchorNavMenu] = useState<null | HTMLElement>(null)
+  const router = useRouter()
+  const { locale } = router
   const { show, hide } = mobileViewport
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -75,16 +72,10 @@ export default function MobileNavigation({
         sx={{ display: { [show]: 'block', [hide]: 'none' } }}
       >
         {links.map((link, index: number) => (
-          <MenuItem
-            key={index}
-            onClick={handleCloseNavMenu}
-            // sx={{
-            //   display: isDesktop ? 'inline-block' : 'block',
-            //   width: isDesktop ? 'auto' : 'unset',
-            // }}
-          >
+          <MenuItem key={index} onClick={handleCloseNavMenu}>
             <Link
               href={link.href}
+              locale={locale}
               onClick={() => false}
               color="inherit"
               underline="none"

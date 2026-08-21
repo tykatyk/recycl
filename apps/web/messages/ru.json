@@ -1,0 +1,35 @@
+{
+  "HomePage": {
+    "h1": "Помогаем находить и сдавать на переработку вторсырье и отходы",
+    "title": "Home"
+  },
+  "Header": {
+    "navigation": {
+      "collectionPoints": "Пункты приема вторсырья",
+      "ads": "Объявления о наличии вторсырья"
+    },
+    "actions": {
+      "add": "Добавить",
+      "createAd": "Объявление о наличии вторсырья",
+      "createCollectionPoint": "Пункт приема вторсырья"
+    },
+    "userMenu": {
+      "header": "Мои",
+      "myAds": "Обьявления о наличии вторсырья",
+      "myCollectionPoints": "Пункты приема вторсырья",
+      "mySubscriptions": "Подписки на уведомления",
+      "mySettings": "Настройки",
+      "logIn": "Войти",
+      "logOut": "Выйти"
+    }
+  },
+  "LocaleSwitcher": {
+    "switchLocale": "{locale, select, uk {УКР} ru {РУС} other {Unknown}}"
+  },
+  "NotFound": {
+    "title": "Not found (404)"
+  },
+  "PageLayout": {
+    "pageTitle": "next-intl"
+  }
+}

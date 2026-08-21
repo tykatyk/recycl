@@ -19,47 +19,49 @@ import PlaceIcon from '@mui/icons-material/Place'
 import EmailIcon from '@mui/icons-material/Email'
 import { useRouter } from 'next/router'
 import { useId } from 'react'
+import { useTranslations } from 'next-intl'
 
 const authenticated = 'authenticated'
 const apolloClient = initializeApollo()
 
-const menuItems = [
-  {
-    text: 'Мои',
-    items: [
-      {
-        text: 'Обьявления о наличии вторсырья',
-        href: '/my/ads',
-        icon: InventoryIcon,
-      },
-      {
-        text: 'Пункты приема вторсырья',
-        href: '/my/collection-points',
-        icon: PlaceIcon,
-      },
-      {
-        text: 'Подписки на уведомления',
-        href: '/my/subscriptions',
-        icon: EmailIcon,
-      },
-    ],
-  },
-  {
-    text: 'Настройки',
-    href: '/my/account',
-    icon: SettingsIcon,
-  },
-]
-
 export default function UserMenu(props) {
   const theme = useTheme()
-  const { asPath } = useRouter()
+  const { locale, asPath } = useRouter()
 
   const { data: session, status } = useSession()
   const { open, anchorEl, handleClose } = props
 
   const id = useId()
   const menuId = `${id}-menu`
+
+  const t = useTranslations('Header.userMenu')
+  const menuItems = [
+    {
+      text: t('header'),
+      items: [
+        {
+          text: t('myAds'),
+          href: '/my/ads',
+          icon: InventoryIcon,
+        },
+        {
+          text: t('myCollectionPoints'),
+          href: '/my/collection-points',
+          icon: PlaceIcon,
+        },
+        {
+          text: t('mySubscriptions'),
+          href: '/my/subscriptions',
+          icon: EmailIcon,
+        },
+      ],
+    },
+    {
+      text: t('mySettings'),
+      href: '/my/account',
+      icon: SettingsIcon,
+    },
+  ]
 
   const showSubmenu = (item, index) => {
     const Icon = item.icon
@@ -90,6 +92,7 @@ export default function UserMenu(props) {
           key={index}
           component={Link}
           href={item.href}
+          locale={locale}
         >
           <ListItemIcon>{Icon ? <Icon /> : null}</ListItemIcon>
           <ListItemText>{item.text}</ListItemText>
@@ -145,7 +148,7 @@ export default function UserMenu(props) {
           )}
         </ListItemIcon>
         <ListItemText>
-          {status === 'authenticated' ? 'Выйти' : 'Войти'}
+          {status === 'authenticated' ? t('logIn') : t('logOut')}
         </ListItemText>
       </MenuItem>
     </Menu>

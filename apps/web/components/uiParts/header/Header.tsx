@@ -9,22 +9,25 @@ import MobileNavigation from './MobileNavigation'
 import HeaderActions from './HeaderActions'
 import Logo from './Logo'
 import { colors } from '../../../lib/helpers/themeStub'
-
-const links = [
-  {
-    text: 'Пункты приема вторсырья',
-    href: '/collection-points',
-  },
-  {
-    text: 'Объявления о наличии вторсырья',
-    href: '/ads',
-  },
-]
+import LocaleSwitcher from '../LocaleSwitcher'
+import { useTranslations } from 'next-intl'
 
 export default function Header(props) {
   const theme = useTheme()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'))
+  const t = useTranslations('Header')
+
+  const links = [
+    {
+      text: t('navigation.collectionPoints'),
+      href: '/collection-points',
+    },
+    {
+      text: t('navigation.ads'),
+      href: '/ads',
+    },
+  ]
 
   const {
     currentDialogId,
@@ -83,6 +86,9 @@ export default function Header(props) {
             {/* <UnreadDialogsCounter currentDialogId={currentDialogId} /> */}
             <Box sx={{ pl: 2 }}>
               <UserAvatar handleMenu={handleMenu} />
+            </Box>
+            <Box sx={{ pl: 1 }}>
+              <LocaleSwitcher />
             </Box>
           </Box>
           <UserMenu

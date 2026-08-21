@@ -55,6 +55,7 @@
     "mongoose": "^7.5.2",
     "next": "^15.5.19",
     "next-auth": "^4.24.14",
+    "next-intl": "^4.13.7",
     "nodemailer": "^7.0.7",
     "notistack": "^3.0.2",
     "proper-lockfile": "^4.1.2",
