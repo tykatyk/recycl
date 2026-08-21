@@ -19,15 +19,10 @@ import {
 import { useSnackbar } from 'notistack'
 import { InferType } from 'yup'
 import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutocomplete'
-
-const errorMessage = 'Что-то пошло не так'
+import { useTranslations } from 'use-intl'
 
 export default function AdSidebarItemsList(props) {
-  const {
-    handleSubmit,
-    initialFormValues,
-    howSearchWorksDescription = '',
-  } = props
+  const { handleSubmit, initialFormValues, howSearchWorks = '' } = props
   const {
     wasteType = null,
     searchRadius = null,
@@ -37,6 +32,7 @@ export default function AdSidebarItemsList(props) {
   const [wasteTypes, setWasteTypes] = useState<string[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('AdSidebarItemsList')
 
   type AdSearchForm = InferType<typeof adSearchFormSchema>
   const formik = useFormik<AdSearchForm>({
@@ -71,7 +67,7 @@ export default function AdSidebarItemsList(props) {
         const mapped = data.map((item) => item.name)
         setWasteTypes(mapped)
       } catch (error) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       }
     }
     fetcher()
@@ -88,11 +84,7 @@ export default function AdSidebarItemsList(props) {
           }}
         >
           <Box sx={{ width: '100%', p: 1 }}>
-            <Box
-              component="form"
-              onSubmit={formik.handleSubmit}
-              sx={{ width: '100%' }}
-            >
+            <form onSubmit={formik.handleSubmit} style={{ width: '100%' }}>
               <Box sx={{ mb: 2 }}>
                 <Autocomplete
                   disablePortal
@@ -107,7 +99,7 @@ export default function AdSidebarItemsList(props) {
                       {...params}
                       id="wasteType"
                       name="wasteType"
-                      label="Тип вторсырья"
+                      label={t('form.wasteTypeLabel')}
                       onBlur={formik.handleBlur}
                       error={
                         formik.touched.wasteType &&
@@ -124,7 +116,7 @@ export default function AdSidebarItemsList(props) {
                 <Box>
                   <PlacesAutocompleteNew
                     name="wasteLocation"
-                    label="Местоположение"
+                    label={t('form.wasteLocationLabel')}
                     value={formik.values.wasteLocation}
                     onChange={(
                       event,
@@ -151,7 +143,7 @@ export default function AdSidebarItemsList(props) {
                     onClick={() => setModalOpen(!modalOpen)}
                     sx={{ fontWeight: 'fontWeightLight', fontSize: '10px' }}
                   >
-                    Как работает поиск
+                    {t('form.howSearchWorksBtn')}
                   </Button>
                 </Box>
                 <Box>
@@ -169,7 +161,7 @@ export default function AdSidebarItemsList(props) {
                         p: 4,
                       }}
                     >
-                      <Typography>{howSearchWorksDescription}</Typography>
+                      <Typography>{howSearchWorks}</Typography>
                     </Box>
                   </Modal>
                 </Box>
@@ -181,7 +173,7 @@ export default function AdSidebarItemsList(props) {
                   max={maxRadius}
                   size="small"
                   disabled={numberFieldDisabled}
-                  label="Радиус поиска, км"
+                  label={t('form.searchRadiusLabel')}
                   id="searchRadius"
                   name="searchRadius"
                   value={formik.values.searchRadius}
@@ -209,10 +201,10 @@ export default function AdSidebarItemsList(props) {
                   disabled={formik.isSubmitting}
                   size="small"
                 >
-                  Поиск
+                  {t('form.submitBtn')}
                 </Button>
               </Box>
-            </Box>
+            </form>
           </Box>
         </Box>
       </ListItem>

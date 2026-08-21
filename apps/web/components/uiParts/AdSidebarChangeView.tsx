@@ -6,10 +6,9 @@ import {
 } from '@mui/material'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
 import ListIcon from '@mui/icons-material/List'
+import Link from './Link'
 import { useRouter } from 'next/router'
-
-const viewOnList = 'Смотреть списком'
-const viewOnMap = 'Смотреть на карте'
+import { useTranslations } from 'next-intl'
 
 type AdSidebarChangeViewProps = {
   listViewUrl: string
@@ -18,14 +17,17 @@ type AdSidebarChangeViewProps = {
 
 export default function AdSidebarChangeView(props: AdSidebarChangeViewProps) {
   const router = useRouter()
+  const { locale } = router
   const { listViewUrl = '#', mapViewUrl = '#' } = props
   const isListView = router.asPath.includes('/list')
+  const t = useTranslations('AdSidebarChangeView')
 
   return (
     <ListItem disableGutters dense divider>
       <ListItemButton
-        component="a"
+        component={Link}
         href={isListView ? mapViewUrl : listViewUrl}
+        locale={locale}
       >
         <ListItemIcon>
           {isListView ? (
@@ -34,7 +36,7 @@ export default function AdSidebarChangeView(props: AdSidebarChangeViewProps) {
             <ListIcon color="secondary" />
           )}
         </ListItemIcon>
-        <ListItemText primary={isListView ? viewOnMap : viewOnList} />
+        <ListItemText primary={isListView ? t('viewOnMap') : t('viewOnList')} />
       </ListItemButton>
     </ListItem>
   )

@@ -1,10 +1,11 @@
 import { Fab, Tooltip } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import { useTranslations } from 'next-intl'
 
 export default function MapActionButton(props) {
   const { onClick = () => {}, open } = props
-
+  const t = useTranslations('MapActionButton')
   return (
     <Fab
       aria-label="show panel"
@@ -24,7 +25,7 @@ export default function MapActionButton(props) {
       onClick={onClick}
       size="small"
     >
-      <Tooltip title={open ? 'Скрыть панель' : 'Показать панель'}>
+      <Tooltip title={open ? t('hidePanel') : t('showPanel')}>
         {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
       </Tooltip>
     </Fab>

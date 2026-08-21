@@ -8,18 +8,8 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { useSnackbar } from 'notistack'
 import * as yup from 'yup'
 import { showErrorMessages } from '../lib/helpers/errorHelpers'
-
-const errorMessage = 'Ошибка при отправкве формы'
-const successMessage = 'Сообщение успешно отправлено'
-const submitButtonText = 'Отправить'
-const headerText =
-  ' Если вы не нашли нужного вам типа вторсырья в списке, вы можете отправить запрос на его добавление'
-const headerDetailsText =
-  'О результате рассмотрения запроса, мы известим вас на электронную почту'
-const addititonalNotesHeadingText = 'Примечание'
-const wasteTypeToAddHeadingText = '  Тип вторсырья, который вы хотите добавить'
-const emailHeadingText = 'Email для обратной связи'
-const remainedSymbolsText = 'Осталось'
+import { useRouter } from 'next/router'
+import { useTranslations } from 'use-intl'
 
 const apiRoute = '/api/contact-us/propose-waste-type'
 
@@ -28,6 +18,7 @@ export default function ProposeWasteType({ setOpen }) {
   const [recaptchaToken, setRecaptchaToken] = useState(null)
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('ProposeWasteType')
 
   const formHandler = async (
     values: yup.InferType<typeof proposeWasteTypeSchema>,
@@ -55,9 +46,9 @@ export default function ProposeWasteType({ setOpen }) {
         return
       }
       setOpen(false)
-      enqueueSnackbar(successMessage, { variant: 'success' })
+      enqueueSnackbar(t('successMessage'), { variant: 'success' })
     } catch (error) {
-      enqueueSnackbar(errorMessage, { variant: 'error' })
+      enqueueSnackbar(t('errorMessage'), { variant: 'error' })
     } finally {
       recaptchaRef.current?.reset()
       setSubmitting(false)
@@ -67,10 +58,10 @@ export default function ProposeWasteType({ setOpen }) {
   return (
     <Container>
       <Typography component="h2" variant="h6" align="center" gutterBottom>
-        {headerText}
+        {t('header')}
       </Typography>
       <Typography align="center" sx={{ mb: 1 }} variant="body2">
-        {headerDetailsText}
+        {t('headerDetails')}
       </Typography>
       <Formik
         enableReinitialize
@@ -103,7 +94,7 @@ export default function ProposeWasteType({ setOpen }) {
                   color="textSecondary"
                   sx={{ fontWeight: 'bold' }}
                 >
-                  Ваше имя
+                  {t('form.yourName')}
                 </Typography>
                 <Field
                   component={TextFieldFormik}
@@ -119,7 +110,7 @@ export default function ProposeWasteType({ setOpen }) {
                   color="textSecondary"
                   sx={{ fontWeight: 'bold' }}
                 >
-                  {emailHeadingText}
+                  {t('form.yourEmail')}
                 </Typography>
                 <Field
                   component={TextFieldFormik}
@@ -135,7 +126,7 @@ export default function ProposeWasteType({ setOpen }) {
                   color="textSecondary"
                   sx={{ fontWeight: 'bold' }}
                 >
-                  {wasteTypeToAddHeadingText}
+                  {t('form.wasteTypeToAdd')}
                 </Typography>
                 <Field
                   component={TextFieldFormik}
@@ -151,7 +142,7 @@ export default function ProposeWasteType({ setOpen }) {
                   color="textSecondary"
                   sx={{ fontWeight: 'bold' }}
                 >
-                  {addititonalNotesHeadingText}
+                  {t('form.additionalNotes')}
                 </Typography>
                 <Field
                   component={TextFieldFormik}
@@ -167,7 +158,7 @@ export default function ProposeWasteType({ setOpen }) {
                   color="textSecondary"
                   sx={{ fontWeight: 'fontWeightLight' }}
                 >
-                  {remainedSymbolsText}: {availableSymbols}
+                  {t('remainedSymbols')}: {availableSymbols}
                 </Typography>
               </Box>
 
@@ -185,7 +176,7 @@ export default function ProposeWasteType({ setOpen }) {
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  {submitButtonText}
+                  {t('form.submit')}
                   {isSubmitting && <ButtonSubmittingCircle />}
                 </Button>
               </Box>

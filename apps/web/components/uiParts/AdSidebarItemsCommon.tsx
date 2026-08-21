@@ -11,115 +11,91 @@ import {
   Modal,
   Box,
 } from '@mui/material'
-
-function ContactAdmin() {
-  return (
-    <ListItem disableGutters dense divider>
-      <ListItemButton
-        key={'Написать администратору'}
-        component="a"
-        href="/contact-us"
-        target="_blank"
-        rel="noopener"
-      >
-        <ListItemIcon>
-          <CreateIcon color="secondary" />
-        </ListItemIcon>
-        <ListItemText
-          primary={'Написать администратору'}
-          primaryTypographyProps={{ variant: 'body2' }}
-          sx={{ whiteSpace: 'normal' }}
-        />
-      </ListItemButton>
-    </ListItem>
-  )
-}
-
-function AddWasteTypeModal({ open, setOpen, handleClose }) {
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    maxWidth: 600,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    maxHeight: '100vh',
-    overflowY: 'auto',
-  }
-
-  return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={style}>
-        <ProposeWasteType setOpen={setOpen} />
-      </Box>
-    </Modal>
-  )
-}
-
-function NoWasteTypeRequest({ handleOpen }) {
-  return (
-    <ListItem disableGutters dense divider>
-      <ListItemButton
-        onClick={handleOpen}
-        key={'Нет нужного типа вторсырья в списке'}
-      >
-        <ListItemIcon>
-          <TroubleshootIcon color="secondary" />
-        </ListItemIcon>
-        <ListItemText
-          primary={'Нет нужного типа вторсырья в списке'}
-          primaryTypographyProps={{ variant: 'body2' }}
-          sx={{ whiteSpace: 'normal' }}
-        />
-      </ListItemButton>
-    </ListItem>
-  )
-}
-
-function SupportProject() {
-  return (
-    <ListItem disableGutters dense divider>
-      <ListItemButton
-        key={'Поддержать проект'}
-        component="a"
-        href="/support-us"
-        target="_blank"
-        rel="noopener"
-      >
-        <ListItemIcon>
-          <AttachMoneyIcon color="secondary" />
-        </ListItemIcon>
-        <ListItemText
-          primary={'Поддержать проект'}
-          primaryTypographyProps={{ variant: 'body2' }}
-          sx={{ whiteSpace: 'normal' }}
-        />
-      </ListItemButton>
-    </ListItem>
-  )
-}
+import Link from './Link'
+import { useRouter } from 'next/router'
+import { useTranslations } from 'next-intl'
 
 export default function AdSidebarItemsCommon() {
   const [modalOpen, setModalOpen] = useState(false)
+  const router = useRouter()
+  const { locale } = router
+  const t = useTranslations('AdSidebarItemsCommon')
 
   return (
     <>
-      <NoWasteTypeRequest handleOpen={() => setModalOpen(true)} />
-      <ContactAdmin />
-      <SupportProject />
-      <AddWasteTypeModal
+      <ListItem disableGutters dense divider>
+        <ListItemButton onClick={() => setModalOpen(true)}>
+          <ListItemIcon>
+            <TroubleshootIcon color="secondary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('noWasteType')}
+            primaryTypographyProps={{ variant: 'body2' }}
+            sx={{ whiteSpace: 'normal' }}
+          />
+        </ListItemButton>
+      </ListItem>
+      <ListItem disableGutters dense divider>
+        <ListItemButton
+          component={Link}
+          href="/contact-us"
+          locale={locale}
+          target="_blank"
+          rel="noopener"
+        >
+          <ListItemIcon>
+            <CreateIcon color="secondary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('writeToAdmin')}
+            primaryTypographyProps={{ variant: 'body2' }}
+            sx={{ whiteSpace: 'normal' }}
+          />
+        </ListItemButton>
+      </ListItem>
+      <ListItem disableGutters dense divider>
+        <ListItemButton
+          component={Link}
+          href="/support-us"
+          locale={locale}
+          target="_blank"
+          rel="noopener"
+        >
+          <ListItemIcon>
+            <AttachMoneyIcon color="secondary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('supportProject')}
+            primaryTypographyProps={{ variant: 'body2' }}
+            sx={{ whiteSpace: 'normal' }}
+          />
+        </ListItemButton>
+      </ListItem>
+
+      <Modal
         open={modalOpen}
-        setOpen={setModalOpen}
-        handleClose={() => setModalOpen(false)}
-      />
+        onClose={() => setModalOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            maxWidth: 600,
+            bgcolor: 'background.paper',
+            border: '2px solid #000',
+            boxShadow: 24,
+            p: 4,
+            maxHeight: '100vh',
+            overflowY: 'auto',
+          }}
+        >
+          <ProposeWasteType setOpen={setModalOpen} />
+        </Box>
+      </Modal>
     </>
   )
 }

@@ -26,13 +26,11 @@ import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 import Head from 'next/head'
 import AdSidebarHeader from '../uiParts/AdSidebarHeader'
 import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Что-то пошло не так'
 const listViewUrl = '/ads/list'
 const mapViewUrl = '/ads'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const howSearchWorksDescription =
-  'При поиске по местоположению объявления ищутся только в указанной точке. Например, при указанном местоположении "Винница", вы увидите объявления, в которых местоположение указано как "Винница", но не "ул. Пирогова, Винница", "ул. Келецакая, Винница" и т. д. Для поиска по региону, рекомендуем кроме местоположения также указывать радиус поиска.'
 
 export type AdsOnListProps =
   | {
@@ -71,8 +69,9 @@ export default function AdsOnList(props: AdsOnListProps) {
     wasteLocation: null,
     searchRadius: null,
   })
-
   const router = useRouter()
+  const { locale } = router
+  const t = useTranslations('AdsOnListPage')
 
   const getHref = useCallback(
     (options: HrefOptions) => {
@@ -115,7 +114,7 @@ export default function AdsOnList(props: AdsOnListProps) {
 
   if (status !== 'success') {
     //ToDo: show err message
-    enqueueSnackbar(errorMessage, { variant: 'error' })
+    enqueueSnackbar(t('errorMessage'), { variant: 'error' })
     return null
   }
 
@@ -123,7 +122,7 @@ export default function AdsOnList(props: AdsOnListProps) {
 
   useEffect(() => {
     if (!data) {
-      enqueueSnackbar(errorMessage, { variant: 'error' })
+      enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       return
     }
 
@@ -164,18 +163,15 @@ export default function AdsOnList(props: AdsOnListProps) {
 
       router.push(pageRoute)
     } catch (error) {
-      enqueueSnackbar(errorMessage, { variant: 'error' })
+      enqueueSnackbar(t('errorMessage'), { variant: 'error' })
     }
   }, [])
 
   return (
     <>
       <Head>
-        <title>{`Объявления о наличии вторсырья | ${brand}`}</title>
-        <meta
-          name="description"
-          content="Найти вторсырье для переработки или утилизации"
-        />
+        <title>{`${t('title')} | ${brand}`}</title>
+        <meta name="description" content={t('metaDescription')} />
       </Head>
       <Box
         sx={{
@@ -191,11 +187,11 @@ export default function AdsOnList(props: AdsOnListProps) {
           drawerWidth={drawerWidth}
           handleDrawerToggle={handleDrawerToggle}
         >
-          <AdSidebarHeader headerText={'Объявления о наличии вторсырья'} />
+          <AdSidebarHeader headerText={t('sidebarHeader')} />
           <AdSidebarItemsList
             handleSubmit={handleSubmit}
             initialFormValues={initialFormValues}
-            howSearchWorksDescription={howSearchWorksDescription}
+            howSearchWorks={t('howSearchWorks')}
           />
           <AdSidebarChangeView
             listViewUrl={listViewUrl}
@@ -274,7 +270,7 @@ export default function AdsOnList(props: AdsOnListProps) {
                                     color: 'grey.400',
                                   }}
                                 >
-                                  Местоположение вторсырья
+                                  {t('wasteLocation')}
                                 </Typography>
                                 <Typography>
                                   {item.wasteLocation.description}
@@ -300,13 +296,14 @@ export default function AdsOnList(props: AdsOnListProps) {
                                     color: 'grey.400',
                                   }}
                                 >
-                                  {`Последее обновление: ${formattedDate}`}
+                                  {`${t('lastUpdate')}: ${formattedDate}`}
                                 </Typography>
                               </Box>
                               <Box>
                                 <Typography gutterBottom>
                                   <Link
                                     href={`/ads/${item._id}`}
+                                    locale={locale}
                                     sx={{
                                       color: 'secondary.dark',
                                       '&:visited': {
@@ -314,7 +311,7 @@ export default function AdsOnList(props: AdsOnListProps) {
                                       },
                                     }}
                                   >
-                                    Посмотреть
+                                    {t('viewItem')}
                                   </Link>
                                 </Typography>
                               </Box>
