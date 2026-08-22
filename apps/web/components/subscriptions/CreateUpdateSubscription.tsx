@@ -39,6 +39,7 @@ export default function CreateSubscription(params: {
   const title = action === 'create' ? createTitle : updateTitle
   const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
   const router = useRouter()
+  const { locale } = router
   const [viewStatus, setViewStatus] = useState('')
   const [initialValues, setInitialValues] = useState({
     location: null,
@@ -152,7 +153,9 @@ export default function CreateSubscription(params: {
         throw new Error(errorMessage)
       }
 
-      action === 'create' ? router.push(indexRoute) : router.back()
+      action === 'create'
+        ? router.push(indexRoute, undefined, { locale })
+        : router.back()
     } catch (error) {
       enqueueSnackbar(errorMessage, { variant: 'error' })
     } finally {

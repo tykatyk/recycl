@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import router, { useRouter } from 'next/router'
-import { useEffect, useState, useRef, useLayoutEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Cookies from 'js-cookie'
 import NoRows from '../uiParts/NoRows'
 import HeadingWithDescription from '../uiParts/HeadingWithDescription'
@@ -57,13 +57,13 @@ const getHref = (
 }
 
 const handleVariantChange = (
-  _: React.SyntheticEvent,
   newVariant: keyof typeof documentActivityStatus,
+  locale: string,
 ) => {
   if (newVariant === 'active') {
-    router.push(baseUrl)
+    router.push(baseUrl, undefined, { locale })
   } else if (newVariant === 'disabled') {
-    router.push(inactiveAdsRoute)
+    router.push(inactiveAdsRoute, undefined, { locale })
   }
 }
 
@@ -78,6 +78,7 @@ export default function MyAdsList(props: MyAdsProps) {
     null,
   )
   const router = useRouter()
+  const { locale } = router
   const query = router.query
   const [selected, setSelected] = useState<string[]>([])
   const [isSticky, setIsSticky] = useState(false)
@@ -201,7 +202,7 @@ export default function MyAdsList(props: MyAdsProps) {
         const lastPage = Math.ceil(total / pageSize)
         const href = getHref({ variant, page: lastPage, pageSize })
 
-        return router.push(href)
+        return router.push(href, undefined, { locale })
       }
 
       setData(data)
@@ -305,7 +306,12 @@ export default function MyAdsList(props: MyAdsProps) {
           </Typography>
         </HeadingWithDescription>
 
-        <AdTabs value={variant} handleChange={handleVariantChange}>
+        <AdTabs
+          value={variant}
+          handleChange={(_, newVariant) => {
+            handleVariantChange(newVariant, locale as string)
+          }}
+        >
           {data.items.length === 0 ? (
             <Box
               sx={{
@@ -489,7 +495,7 @@ export default function MyAdsList(props: MyAdsProps) {
                 page: newPage,
                 pageSize: data.pagination.pageSize,
               })
-              router.push(href)
+              router.push(href, undefined, { locale })
             }}
             handlePageSizeChange={(event: SelectChangeEvent) => {
               setSelected([])
@@ -503,7 +509,7 @@ export default function MyAdsList(props: MyAdsProps) {
                 pageSize: parseInt(newPageSize, 10),
               })
 
-              router.push(href)
+              router.push(href, undefined, { locale })
             }}
             renderItem={(item: PaginationRenderItemParams) => {
               return <PaginationItem {...item} />

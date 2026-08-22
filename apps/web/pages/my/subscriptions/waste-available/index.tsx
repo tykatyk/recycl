@@ -240,6 +240,7 @@ const SubscriptionList = () => {
     WasteAvailableSubscription & { _id: string }
   > | null>(null)
   const router = useRouter()
+  const { locale } = router
   const query = router.query
   const [selected, setSelected] = useState<string[]>([])
   const [isSticky, setIsSticky] = useState(false)
@@ -340,7 +341,7 @@ const SubscriptionList = () => {
         const lastPage = Math.ceil(total / pageSize)
         const href = getHref({ page: lastPage, pageSize })
 
-        return router.push(href)
+        return router.push(href, undefined, { locale })
       }
 
       setData(data)
@@ -564,7 +565,7 @@ const SubscriptionList = () => {
               page: newPage,
               pageSize: data.pagination.pageSize,
             })
-            router.push(href)
+            router.push(href, undefined, { locale })
           }}
           handlePageSizeChange={(event: SelectChangeEvent) => {
             setSelected([])
@@ -577,7 +578,7 @@ const SubscriptionList = () => {
               pageSize: parseInt(newPageSize, 10),
             })
 
-            router.push(href)
+            router.push(href, undefined, { locale })
           }}
           renderItem={renderItem}
         />

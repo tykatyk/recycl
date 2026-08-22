@@ -161,7 +161,7 @@ export default function AdsOnList(props: AdsOnListProps) {
         ? `${listViewUrl}?${queryString}`
         : listViewUrl
 
-      router.push(pageRoute)
+      router.push(pageRoute, undefined, { locale })
     } catch (error) {
       enqueueSnackbar(t('errorMessage'), { variant: 'error' })
     }
@@ -333,7 +333,7 @@ export default function AdsOnList(props: AdsOnListProps) {
                         page: newPage,
                         pageSize: data.pagination.pageSize,
                       })
-                      router.push(href)
+                      router.push(href, undefined, { locale })
                     }}
                     handlePageSizeChange={(event: SelectChangeEvent) => {
                       Cookies.set('pageSize', event.target.value.toString())
@@ -345,7 +345,7 @@ export default function AdsOnList(props: AdsOnListProps) {
                         pageSize: parseInt(newPageSize, 10),
                       })
 
-                      router.push(href)
+                      router.push(href, undefined, { locale })
                     }}
                     renderItem={(item) => <PaginationItem {...item} />}
                   />

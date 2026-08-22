@@ -1,8 +1,8 @@
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 import LayoutWithoutHeader from '../../../../components/layouts/LayoutWithoutHeader'
 import { Box, Alert, Button } from '@mui/material'
-import router from 'next/router'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
 type ChangeEmailProps = {
   urlIsValid: boolean
@@ -15,6 +15,8 @@ const buttonText = 'На главную'
 
 export default function ChangeEmail(props: ChangeEmailProps) {
   const { urlIsValid } = props
+  const router = useRouter()
+  const { locale } = router
 
   return (
     <>
@@ -58,7 +60,7 @@ export default function ChangeEmail(props: ChangeEmailProps) {
               }}
             >
               <Button
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/', undefined, { locale })}
                 sx={{ color: '#fff' }}
                 variant={'outlined'}
               >

@@ -1,5 +1,4 @@
 import Wrapper from '../uiParts/Wrapper'
-import Footer from '../uiParts/Footer'
 import { Container } from '@mui/material'
 import { ReactElement } from 'react'
 
@@ -25,7 +24,6 @@ export default function LayoutWithoutHeader(props: LayoutWithoutHeaderProps) {
       >
         {children}
       </Container>
-      <Footer />
     </Wrapper>
   )
 }

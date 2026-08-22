@@ -148,7 +148,7 @@ export default function UserMenu(props) {
           )}
         </ListItemIcon>
         <ListItemText>
-          {status === 'authenticated' ? t('logIn') : t('logOut')}
+          {status === 'authenticated' ? t('logOut') : t('logIn')}
         </ListItemText>
       </MenuItem>
     </Menu>

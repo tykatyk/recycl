@@ -31,6 +31,7 @@ export default function CollectionPointFormUpdate(
 ) {
   const { variant = 'container', h1 } = props
   const router = useRouter()
+  const { locale } = router
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [wasteTypes, setWasteTypes] = useState<any>([]) //ToDo: add type
@@ -62,9 +63,9 @@ export default function CollectionPointFormUpdate(
     if (!id) return
 
     const collectionPointFetcher = async () => {
-      const response = await fetch(`/api/my/collection-points/${id}`)
+      const response = await fetch(`${api}/${id}`)
       if (response.status === 404) {
-        router.push('/404')
+        router.push('/404', undefined, { locale })
       }
       const collectionPoint = await response.json()
 

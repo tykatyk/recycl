@@ -20,6 +20,7 @@ const title = `Выберите тип пункта приема вторсыр�
 
 export default function CollectionPointCreateSelector() {
   const router = useRouter()
+  const { locale } = router
   const [selected, setSelected] = useState<string>('')
 
   return (
@@ -79,7 +80,7 @@ export default function CollectionPointCreateSelector() {
                   variant="contained"
                   onClick={() => {
                     if (!selected) return
-                    router.push(`${baseUrl}/${selected}`)
+                    router.push(`${baseUrl}/${selected}`, undefined, { locale })
                   }}
                 >
                   Выбрать

@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import PageLoadingCircle from './PageLoadingCircle'
 
 export default function RedirectUnathenticatedUser(props) {
-  const { children = null } = props
   const { status } = useSession()
   const router = useRouter()
 
@@ -12,7 +11,7 @@ export default function RedirectUnathenticatedUser(props) {
     router.push({
       pathname: '/auth/login',
       query: {
-        from: `${router.asPath}`,
+        from: router.asPath,
       },
     })
     return null

@@ -2,18 +2,19 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { Box, Button, Typography, Container } from '@mui/material'
 import LayoutWithoutHeader from './layouts/LayoutWithoutHeader'
 import Head from 'next/head'
+import { useTranslations } from 'use-intl'
 
-const GO_HOME_TEXT = 'На главную'
-const HOME_URL = '/'
+const homeUrl = '/'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
-type ErrorPageProps = {
+type ErrorComponentProps = {
   headerText: string
   contentText: string
   title: string
 }
-export default function ErrorPage(props: ErrorPageProps) {
+export default function ErrorComponent(props: ErrorComponentProps) {
   const { headerText, contentText, title } = props
+  const t = useTranslations('ErrorComponent')
   return (
     <>
       <Head>
@@ -37,7 +38,12 @@ export default function ErrorPage(props: ErrorPageProps) {
             >
               <ErrorOutlineIcon fontSize="large" />
             </Box>
-            <Typography component="h1" variant="h5" mb={3}>
+            <Typography
+              component="h1"
+              variant="h4"
+              align="center"
+              sx={{ mt: 2, mb: 3 }}
+            >
               {headerText}
             </Typography>
             <Typography component="div" align="center" mb={4}>
@@ -45,8 +51,8 @@ export default function ErrorPage(props: ErrorPageProps) {
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <Button variant="contained" href={HOME_URL}>
-                {GO_HOME_TEXT}
+              <Button variant="contained" href={homeUrl}>
+                {t('homeBtn')}
               </Button>
             </Box>
           </Box>

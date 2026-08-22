@@ -9,16 +9,16 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { useSnackbar } from 'notistack'
 import { showErrorMessages } from '../lib/helpers/errorHelpers'
 import Head from 'next/head'
+import { useTranslations } from 'next-intl'
 
 const apiRoute = 'api/contact-us/general'
-const successMessage = 'Сообщение успешно отправлено'
-const errorMessage = 'Ошибка при отправкве формы'
 const limit = 1000
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
-export default function SupportUsPage() {
+export default function ContactUsPage() {
   const [recaptchaToken, setRecaptchaToken] = useState(null)
   const recaptchaRef = useRef<ReCAPTCHA>(null)
+  const t = useTranslations('ContactUsPage')
 
   const { enqueueSnackbar } = useSnackbar()
 
@@ -29,14 +29,17 @@ export default function SupportUsPage() {
   return (
     <>
       <Head>
-        <title>{`Связаться с нами | ${brand}`}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
       </Head>
       <Layout>
         <Container maxWidth="md">
-          <Typography component="h1" variant="h6" align="center" gutterBottom>
-            Если у вас есть вопросы, предложения или замечания относительно
-            работы сайта, заполните, пожалуйста, приведенную ниже форму и мы
-            свяжемся с вами в ближайшее время
+          <Typography
+            component="h1"
+            variant="h4"
+            align="center"
+            sx={{ mt: 2, mb: 3, width: '100%' }}
+          >
+            {t('h1')}
           </Typography>
           <Formik
             enableReinitialize
@@ -73,10 +76,10 @@ export default function SupportUsPage() {
                   )
                   return
                 }
-                enqueueSnackbar(successMessage, { variant: 'success' })
+                enqueueSnackbar(t('successMessage'), { variant: 'success' })
                 resetForm()
               } catch (error) {
-                enqueueSnackbar(errorMessage, { variant: 'error' })
+                enqueueSnackbar(t('errorMessage'), { variant: 'error' })
               } finally {
                 recaptchaRef.current?.reset()
                 setSubmitting(false)
@@ -103,7 +106,7 @@ export default function SupportUsPage() {
                       color="textSecondary"
                       sx={{ fontWeight: 'bold' }}
                     >
-                      Тема письма
+                      {t('form.subject')}
                     </Typography>
                     <Field
                       component={TextFieldFormik}
@@ -118,7 +121,7 @@ export default function SupportUsPage() {
                       color="textSecondary"
                       sx={{ fontWeight: 'bold' }}
                     >
-                      Ваше имя
+                      {t('form.yourName')}
                     </Typography>
                     <Field
                       component={TextFieldFormik}
@@ -134,7 +137,7 @@ export default function SupportUsPage() {
                       color="textSecondary"
                       sx={{ fontWeight: 'bold' }}
                     >
-                      Email для обратной связи
+                      {t('form.yourEmail')}
                     </Typography>
                     <Field
                       component={TextFieldFormik}
@@ -150,7 +153,7 @@ export default function SupportUsPage() {
                       color="textSecondary"
                       sx={{ fontWeight: 'bold' }}
                     >
-                      Текст сообщения
+                      {t('form.message')}
                     </Typography>
                     <Field
                       component={TextFieldFormik}
@@ -166,7 +169,7 @@ export default function SupportUsPage() {
                       color="textSecondary"
                       sx={{ fontWeight: 'fontWeightLight' }}
                     >
-                      Осталось: {availableSymbols}
+                      {`${t('remainedSymbols')}: ${availableSymbols}`}
                     </Typography>
                   </Box>
                   <Box mb={3}>
@@ -182,7 +185,7 @@ export default function SupportUsPage() {
                       type="submit"
                       disabled={isSubmitting}
                     >
-                      Отправить
+                      {t('form.submit')}
                       {isSubmitting && <ButtonSubmittingCircle />}
                     </Button>
                   </Box>
@@ -194,4 +197,12 @@ export default function SupportUsPage() {
       </Layout>
     </>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../messages/${locale}.json`)).default,
+    },
+  }
 }

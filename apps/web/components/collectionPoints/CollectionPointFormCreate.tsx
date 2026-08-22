@@ -35,6 +35,7 @@ export default function CollectionPointFormCreate(
 ) {
   const { variant = 'container', h1 } = props
   const router = useRouter()
+  const { locale } = router
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [wasteTypes, setWasteTypes] = useState<any>([]) //ToDo: add type
@@ -69,7 +70,7 @@ export default function CollectionPointFormCreate(
                 : variant === 'stationery'
                   ? `${indexRoute}/stationery`
                   : indexRoute
-            router.push(route)
+            router.push(route, undefined, { locale })
           }
         })
         .catch((error) => {
@@ -115,17 +116,6 @@ export default function CollectionPointFormCreate(
   })
 
   useEffect(() => {
-    // const wasteTypeFetcher = async () => {
-    //   const result = await fetch(`/api/waste-types`)
-    //   const data = await result.json()
-    //   setWasteTypes(data)
-    // }
-    // const userPhoneFetcher = async () => {
-    //   const result = await fetch(`/api/my/account/phone`)
-    //   const data = await result.json()
-    //   setUserPhone(data ? data.phone : '')
-    // }
-
     const dataFetcher = async () => {
       try {
         setLoading(true)
@@ -136,9 +126,6 @@ export default function CollectionPointFormCreate(
 
         setWasteTypes(wasteTypeData)
         setUserPhone(phoneData ? phoneData.phone : '')
-
-        // await wasteTypeFetcher()
-        // await userPhoneFetcher()
       } catch (error) {
         enqueueSnackbar(errorMessage, { variant: 'error' })
       } finally {

@@ -1,13 +1,21 @@
-import ErrorPage from '../components/ErrorPage'
+import ErrorComponent from '../components/ErrorComponent'
+import { useTranslations } from 'use-intl'
 
-const title = 'Ошибка сервера'
-
-export default function NotFound() {
+export default function ServerErrorPage() {
+  const t = useTranslations('ServerErrorPage')
   return (
-    <ErrorPage
-      headerText={title}
-      contentText="На сервере возникла неизвестная ошибка"
-      title={title}
+    <ErrorComponent
+      headerText={t('title')}
+      contentText={t('content')}
+      title={t('title')}
     />
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../messages/${locale}.json`)).default,
+    },
+  }
 }

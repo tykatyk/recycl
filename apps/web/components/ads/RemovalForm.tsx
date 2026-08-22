@@ -16,6 +16,10 @@ import {
 } from '../../lib/helpers/dataFetcher'
 
 const errorMessage = 'Что то пошло не так'
+
+const api = '/api/my/ads'
+const myAds = '/my/ads'
+
 const initVal = {
   title: '',
   wasteLocation: null as any,
@@ -30,6 +34,7 @@ type FormValues = typeof initVal
 export default function RemovalForm(props) {
   const { h1 } = props
   const router = useRouter()
+  const { locale } = router
   const { enqueueSnackbar } = useSnackbar()
   const [initialValues, setInitialValues] = useState<FormValues>(initVal)
   const [wasteTypesData, setWasteTypesData] = useState([])
@@ -42,7 +47,7 @@ export default function RemovalForm(props) {
       setSubmitting(true)
       const normalizedValues = getNormalizedValues(values)
 
-      const response = await fetch('/api/my/ads', {
+      const response = await fetch(api, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -56,7 +61,7 @@ export default function RemovalForm(props) {
       }
 
       enqueueSnackbar('Документ создан', { variant: 'success' })
-      router.push('/my/ads')
+      router.push(myAds, undefined, { locale })
     } catch (err) {
       enqueueSnackbar(errorMessage, {
         variant: 'error',
@@ -71,7 +76,7 @@ export default function RemovalForm(props) {
       setSubmitting(true)
       const normalizedValues = getNormalizedValues(values)
 
-      const response = await fetch(`/api/my/ads/${id}`, {
+      const response = await fetch(`${api}/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -100,13 +105,13 @@ export default function RemovalForm(props) {
         try {
           setLoading(true)
 
-          const response = await fetch(`/api/my/ads/${id}`)
+          const response = await fetch(`${api}/${id}`)
           if (response.status === 404) {
-            router.push('/404')
+            router.push('/404', undefined, { locale })
           }
 
           const data = await response.json()
-          if (!data) return router.push('/404')
+          if (!data) return router.push('/404', undefined, { locale })
 
           setInitialValues(data)
         } catch (error) {

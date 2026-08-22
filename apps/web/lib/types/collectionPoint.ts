@@ -25,5 +25,5 @@ export type CollectionPoint =
     > & { variant: 'mobile' })
   | (Omit<
       CollectionPointStationery,
-      'createdAt' | 'updatedAt' | 'viewedBy' | 'status'
+      'createdAt' | 'updatedAt' | 'viewedBy' | 'status' | 'receiveParcels'
     > & { variant: 'stationery' })

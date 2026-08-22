@@ -48,21 +48,19 @@ const fetchDataErrorText = 'Не удалось загрузить данные'
 
 const getHref = (options: HrefOptions) => {
   const { page, pageSize } = options
-  const href = `${baseUrl}?page=${page}&pageSize=${pageSize}`
-
-  return href
+  return `${baseUrl}?page=${page}&pageSize=${pageSize}`
 }
 
 const handleVariantChange = (
-  _: React.SyntheticEvent,
   newVariant: keyof typeof collectionPointTypes,
+  locale: string,
 ) => {
   if (newVariant === 'container') {
-    router.push(baseUrl)
+    router.push(baseUrl, undefined, { locale })
   } else if (newVariant === 'mobile') {
-    router.push(mobileCollectionPointsRoute)
+    router.push(mobileCollectionPointsRoute, undefined, { locale })
   } else if (newVariant === 'stationery') {
-    router.push(stationeryCollectionPointsRoute)
+    router.push(stationeryCollectionPointsRoute, undefined, { locale })
   }
 }
 
@@ -79,6 +77,7 @@ export default function MyCollectionPointsList(
     CollectionPoint & { _id: string }
   > | null>(null)
   const router = useRouter()
+  const { locale } = router
   const query = router.query
   const [selected, setSelected] = useState<string[]>([])
   const [isSticky, setIsSticky] = useState(false)
@@ -172,7 +171,7 @@ export default function MyCollectionPointsList(
         const lastPage = Math.ceil(total / pageSize)
         const href = getHref({ page: lastPage, pageSize })
 
-        return router.push(href)
+        return router.push(href, undefined, { locale })
       }
 
       setData(data)
@@ -280,7 +279,9 @@ export default function MyCollectionPointsList(
 
         <CollectionPointTabs
           value={variant ? variant : 'container'}
-          handleChange={handleVariantChange}
+          handleChange={(_, newVariant) => {
+            handleVariantChange(newVariant, locale as string)
+          }}
         >
           {data.items.length === 0 ? (
             <Box
@@ -450,7 +451,7 @@ export default function MyCollectionPointsList(
                 page: newPage,
                 pageSize: data.pagination.pageSize,
               })
-              router.push(href)
+              router.push(href, undefined, { locale })
             }}
             handlePageSizeChange={(event: SelectChangeEvent) => {
               setSelected([])
@@ -463,7 +464,7 @@ export default function MyCollectionPointsList(
                 pageSize: parseInt(newPageSize, 10),
               })
 
-              router.push(href)
+              router.push(href, undefined, { locale })
             }}
             renderItem={(item: PaginationRenderItemParams) => {
               return <PaginationItem {...item} />

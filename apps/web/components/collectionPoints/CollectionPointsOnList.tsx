@@ -33,7 +33,7 @@ const errorMessage = 'Что-то пошло не так'
 const baseUrl = '/collection-points/list'
 const mapViewUrl = '/collection-points'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const howSearchWorksDescription =
+const howSearchWorks =
   'При поиске по местоположению пункты приема вторсырья ищутся только в указанной точке. Например, при указанном местоположении "Винница", вы увидите пункты приема, для которых местоположение указано как "Винница", но не "ул. Пирогова, Винница", "ул. Келецакая, Винница" и т. д. Для поиска по региону, рекомендуем кроме местоположения также указывать радиус поиска.'
 
 export type CollectionPointsOnListProps =
@@ -78,6 +78,7 @@ export default function CollectionPointsOnList(
   })
 
   const router = useRouter()
+  const { locale } = router
 
   const getHref = useCallback(
     (options: HrefOptions) => {
@@ -162,7 +163,7 @@ export default function CollectionPointsOnList(
       const queryString = query.toString()
       const pageRoute = queryString ? `${baseUrl}?${queryString}` : baseUrl
 
-      router.push(pageRoute)
+      router.push(pageRoute, undefined, { locale })
     } catch (error) {
       enqueueSnackbar(errorMessage, { variant: 'error' })
     }
@@ -192,7 +193,7 @@ export default function CollectionPointsOnList(
           <AdSidebarItemsList
             handleSubmit={handleSubmit}
             initialFormValues={initialFormValues}
-            howSearchWorksDescription={howSearchWorksDescription}
+            howSearchWorks={howSearchWorks}
           />
 
           <ListItem dense disableGutters divider />
@@ -353,7 +354,7 @@ export default function CollectionPointsOnList(
                         page: newPage,
                         pageSize: data.pagination.pageSize,
                       })
-                      router.push(href)
+                      router.push(href, undefined, { locale })
                     }}
                     handlePageSizeChange={(event: SelectChangeEvent) => {
                       Cookies.set('pageSize', event.target.value.toString())
@@ -365,7 +366,7 @@ export default function CollectionPointsOnList(
                         pageSize: parseInt(newPageSize, 10),
                       })
 
-                      router.push(href)
+                      router.push(href, undefined, { locale })
                     }}
                     renderItem={(item) => <PaginationItem {...item} />}
                   />
