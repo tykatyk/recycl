@@ -65,7 +65,7 @@ export default function AdSidebarItemsCommon() {
             <AttachMoneyIcon color="secondary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('supportProject')}
+            primary={t('supportUs')}
             primaryTypographyProps={{ variant: 'body2' }}
             sx={{ whiteSpace: 'normal' }}
           />

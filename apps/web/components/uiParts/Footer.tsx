@@ -1,6 +1,8 @@
 import { Container, Grid, List, ListItem, Box } from '@mui/material'
 import Link from './Link'
 import Logo from './header/Logo'
+import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
 
 const sizes = { xs: 12, md: 3 }
 const css = {
@@ -13,6 +15,9 @@ const css = {
 }
 
 export default function Footer(props) {
+  const { locale } = useRouter()
+  const t = useTranslations('Footer')
+
   return (
     <Box
       component={'footer'}
@@ -53,9 +58,10 @@ export default function Footer(props) {
                 color="textSecondary"
                 underline="none"
                 href="/contact-us"
+                locale={locale}
                 sx={css}
               >
-                Связаться с нами
+                {t('contactUs')}
               </Link>
             </ListItem>
             <ListItem dense disableGutters>
@@ -65,7 +71,7 @@ export default function Footer(props) {
                 href="/support-us"
                 sx={css}
               >
-                Поддержать проект
+                {t('supportUs')}
               </Link>
             </ListItem>
           </List>

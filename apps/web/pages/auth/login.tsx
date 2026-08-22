@@ -137,7 +137,7 @@ export default function LoginPage() {
                           variant="contained"
                           disabled={isSubmitting}
                         >
-                          {t('signIn')}
+                          {t('submit')}
                           {isSubmitting && <ButtonSubmittingCircle />}
                         </Button>
                       </Box>

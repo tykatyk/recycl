@@ -19,10 +19,10 @@ import Footer from '../components/uiParts/Footer'
 import Header from '../components/uiParts/header/Header'
 import Link from '../components/uiParts/Link'
 import HowItWorks from '../components/home/HowItWorks'
+import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const title = `Главная | ${brand}`
-
 const PREFIX = 'Index'
 
 const classes = {
@@ -141,8 +141,9 @@ const options = {
 export default function HomePage() {
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.down('md'))
-
   const [splashMinHeight, setSplashMinHeight] = useState(0)
+  const t = useTranslations('HomePage')
+  const { locale } = useRouter()
 
   useEffect(() => {
     let isLoaded = true
@@ -164,7 +165,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>{title}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="description" content="" />
       </Head>
       <Wrapper>
@@ -183,7 +184,7 @@ export default function HomePage() {
                 variant={matches ? 'h3' : 'h2'}
                 className={classes.splashHeader}
               >
-                Помогаем находить и сдавать на переработку вторсырье и отходы
+                {t('h1')}
               </Typography>
             </section>
             <section className={classes.cardContainer}>
@@ -193,23 +194,24 @@ export default function HomePage() {
                 align="center"
                 sx={{ mt: 1, mb: 6 }}
               >
-                Что мы предлагаем
+                {t('whatWePropose.h2')}
               </Typography>
               <Grid container spacing={5}>
-                {cardsContent.map((card) => (
-                  <Grid key={card.title} size={{ xs: 12, sm: 6 }}>
+                {cardsContent.map((card, idx) => (
+                  <Grid key={idx} size={{ xs: 12, sm: 6 }}>
                     <Card className={classes.card}>
                       <CardHeader
-                        title={card.title}
+                        title={t(`whatWePropose.${card.id}.title`)}
                         titleTypographyProps={{ align: 'center' }}
                         className={classes.cardHeader}
                       />
                       <CardContent className={classes.cardContent}>
                         <ul>
-                          {card.description.map((line, index) => (
+                          {card.description.map((item, index) => (
                             <Typography component="li" key={index}>
                               <Link
-                                href={line.href}
+                                href={item.href}
+                                locale={locale}
                                 sx={{
                                   color: '#fff',
                                   textDecoration: 'none',
@@ -218,7 +220,10 @@ export default function HomePage() {
                                   },
                                 }}
                               >
-                                {line.text}
+                                {/* //ToDo: add types */}
+                                {t(
+                                  `whatWePropose.${card.id}.${item.id}` as any,
+                                )}
                               </Link>
                             </Typography>
                           ))}
@@ -229,30 +234,29 @@ export default function HomePage() {
                 ))}
               </Grid>
             </section>
-            <Box
-              component="section"
-              sx={{
+            <section
+              style={{
                 backgroundColor: '#21275c',
                 width: '100%',
                 padding: '40px 16px',
               }}
             >
-              <Typography
-                component={'h2'}
-                variant={matches ? 'h4' : 'h3'}
-                align="center"
-                sx={{ mt: 1, mb: 6 }}
-              >
-                Как это работает
-              </Typography>
               <Container maxWidth="md">
-                <HowItWorks />
+                <HowItWorks matches={matches} />
               </Container>
-            </Box>
+            </section>
           </StyledMain>
           <Footer />
         </Box>
       </Wrapper>
     </>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../messages/${locale}.json`)).default,
+    },
+  }
 }

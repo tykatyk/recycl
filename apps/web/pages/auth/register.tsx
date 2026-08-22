@@ -15,20 +15,19 @@ import { userRoles } from '@recycl/shared/dist/constants'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import LocaleSwitcher from '../../components/uiParts/LocaleSwitcher'
+import { useTranslations } from 'next-intl'
 
-const successMessage = 'Регистрация успешна. Теперь вы можете войти'
-const errorMessage = 'Что то пошло не так'
-const userExistsMessage = 'Пользователь с таким email уже зарегистрирован'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const api = '/api/auth/signup/'
 
-export default function SignUp() {
+export default function RegisterPage() {
   const theme = useTheme()
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
   const router = useRouter()
   const { locale } = router
   const { status } = useSession()
+  const t = useTranslations('RegisterPage')
 
   if (status === 'authenticated') {
     router.push('/', undefined, { locale })
@@ -37,7 +36,7 @@ export default function SignUp() {
   return (
     <>
       <Head>
-        <title>{`Регистрация | ${brand}`}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex"></meta>
       </Head>
       <LayoutWithoutHeader>
@@ -61,8 +60,8 @@ export default function SignUp() {
             >
               <LockOutlinedIcon />
             </Avatar>
-            <Typography component="h1" variant="h5" textAlign={'center'}>
-              Регистрация
+            <Typography component="h1" variant="h4" align={'center'}>
+              {t('h1')}
             </Typography>
           </Box>
 
@@ -91,17 +90,17 @@ export default function SignUp() {
                 })
 
                 if (response.status === 422) {
-                  enqueueSnackbar(userExistsMessage, { variant: 'error' })
+                  enqueueSnackbar(t('userExists'), { variant: 'error' })
                   return
                 }
 
-                if (!response.ok) throw new Error(errorMessage)
+                if (!response.ok) throw new Error(t('errorMessage'))
 
-                enqueueSnackbar(successMessage, { variant: 'success' })
+                enqueueSnackbar(t('successMessage'), { variant: 'success' })
                 router.push('/', undefined, { locale })
                 resetForm()
               } catch (error) {
-                enqueueSnackbar(errorMessage, { variant: 'error' })
+                enqueueSnackbar(t('errorMessage'), { variant: 'error' })
               } finally {
                 recaptchaRef.current?.reset()
               }
@@ -121,7 +120,7 @@ export default function SignUp() {
                         required
                         fullWidth
                         id="name"
-                        label="Имя или название организации"
+                        label={t('form.yourName')}
                         name="name"
                         component={TextFieldFormik}
                       />
@@ -131,7 +130,7 @@ export default function SignUp() {
                         required
                         fullWidth
                         id="email"
-                        label="Электронная почта"
+                        label={t('form.yourEmail')}
                         name="email"
                         component={TextFieldFormik}
                       />
@@ -143,7 +142,7 @@ export default function SignUp() {
                         disabled={isSubmitting}
                         fullWidth
                       >
-                        Зарегистрироваться
+                        {t('form.submit')}
                         {isSubmitting && <ButtonSubmittingCircle />}
                       </Button>
                     </Box>
@@ -156,7 +155,7 @@ export default function SignUp() {
                       variant="body2"
                       style={{ color: `${theme.palette.text.secondary}` }}
                     >
-                      Вход
+                      {t('form.submit')}
                     </Link>
                   </Box>
                   <Box
