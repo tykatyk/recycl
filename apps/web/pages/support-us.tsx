@@ -3,9 +3,9 @@ import Layout from '../components/layouts/Layout'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 
-const btcWallet = '6Le-cZ8dAAAAABgRwLZP_IVBeV8ZJueinte6rm5n'
-const ethWallet = '2lkadg9xlkj#laclk98255xkjagsdf'
-const usdtWallet = 'aosudifhsadjkfhasdfmasdf'
+const btcWallet = '16eboKokCzZaLgvA4WoVgV82pBG5jPNXbA'
+const ethWallet = '0xabba15ead95b371a3065b4194012ef345d294b35'
+const usdtWallet = '0xabba15ead95b371a3065b4194012ef345d294b35' //(BNB Smart Chain (BEP20))
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
@@ -57,7 +57,12 @@ export default function SupportUsPage() {
                 <Typography align="center" variant="h6">
                   USDT
                 </Typography>
-                <Typography align="center">{usdtWallet}</Typography>
+                <Typography align="center">
+                  <span>{usdtWallet}</span>
+                  <Box component="span" sx={{ color: 'grey.500' }}>
+                    {'(BNB Smart Chain (BEP20))'}
+                  </Box>
+                </Typography>
               </Box>
             </Box>
           </Paper>
