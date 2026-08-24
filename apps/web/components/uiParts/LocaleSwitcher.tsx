@@ -16,7 +16,7 @@ const css = {
 export default function LocaleSwitcher() {
   const t = useTranslations('LocaleSwitcher')
 
-  const { locale, locales, route } = useRouter()
+  const { locale, locales, asPath } = useRouter()
   const otherLocale = locales?.find((cur) => cur !== locale) as string
 
   if (!otherLocale) {
@@ -36,7 +36,7 @@ export default function LocaleSwitcher() {
         return (
           <Box key={idx}>
             <Link
-              href={route}
+              href={asPath}
               locale={localeItem}
               onClick={() => handleClick(localeItem)}
               sx={{

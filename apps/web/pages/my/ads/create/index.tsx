@@ -1,21 +1,31 @@
 import Layout from '../../../../components/layouts/Layout'
-import RemovalForm from '../../../../components/ads/RemovalForm'
+import WasteAvailableForm from '../../../../components/ads/WasteAvailableForm'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 import Head from 'next/head'
+import { useTranslations } from 'next-intl'
 
-const title = 'Добавить объявление о наличии вторсырья'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
-export default function CreateUpdate() {
+export default function CreateAdPage() {
+  const t = useTranslations('CreateAdPage')
+
   return (
     <RedirectUnathenticatedUser>
       <Head>
-        <title>{`${title} | ${brand}`}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
-        <RemovalForm h1={title} />
+        <WasteAvailableForm h1={t('h1')} />
       </Layout>
     </RedirectUnathenticatedUser>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../../../../messages/${locale}.json`)).default,
+    },
+  }
 }

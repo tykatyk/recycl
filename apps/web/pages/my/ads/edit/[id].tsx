@@ -1,21 +1,43 @@
 import Layout from '../../../../components/layouts/Layout'
-import RemovalForm from '../../../../components/ads/RemovalForm'
-import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
+import WasteAvailableForm from '../../../../components/ads/WasteAvailableForm'
 import Head from 'next/head'
+import { useTranslations } from 'next-intl'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../../../api/auth/[...nextauth]'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const title = 'Редактировать объявление о наличии вторсырья'
 
-export default function CreateUpdate() {
+export default function EditAd() {
+  const t = useTranslations('EditAdPage')
   return (
-    <RedirectUnathenticatedUser>
+    <>
       <Head>
-        <title>{`${title} | ${brand}`}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
-        <RemovalForm h1={title} />
+        <WasteAvailableForm h1={t('h1')} />
       </Layout>
-    </RedirectUnathenticatedUser>
+    </>
   )
+}
+
+export async function getServerSideProps({ req, res, locale, resolvedUrl }) {
+  //ToDo: add server side data fetching
+  const session = await getServerSession(req, res, authOptions)
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: `/auth/login?from=${encodeURIComponent(resolvedUrl)}`,
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      messages: (await import(`../../../../messages/${locale}.json`)).default,
+    },
+  }
 }

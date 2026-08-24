@@ -14,8 +14,7 @@ import {
   userPhoneFetcher,
   wasteTypeFetcher,
 } from '../../lib/helpers/dataFetcher'
-
-const errorMessage = 'Что то пошло не так'
+import { useTranslations } from 'next-intl'
 
 const api = '/api/my/ads'
 const myAds = '/my/ads'
@@ -31,7 +30,7 @@ const initVal = {
 
 type FormValues = typeof initVal
 
-export default function RemovalForm(props) {
+export default function WasteAvailableForm(props) {
   const { h1 } = props
   const router = useRouter()
   const { locale } = router
@@ -41,6 +40,7 @@ export default function RemovalForm(props) {
   const { id } = router.query
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
+  const t = useTranslations('WasteAvailableForm')
 
   const createHandler = async (values: FormValues, setSubmitting) => {
     try {
@@ -56,14 +56,14 @@ export default function RemovalForm(props) {
         }),
       })
       if (response.status !== 200) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('unknownError'), { variant: 'error' })
         return
       }
 
-      enqueueSnackbar('Документ создан', { variant: 'success' })
+      enqueueSnackbar(t('documentCreated'), { variant: 'success' })
       router.push(myAds, undefined, { locale })
     } catch (err) {
-      enqueueSnackbar(errorMessage, {
+      enqueueSnackbar(t('unknownError'), {
         variant: 'error',
       })
     } finally {
@@ -86,14 +86,14 @@ export default function RemovalForm(props) {
       })
 
       if (response.status !== 200) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('unknownError'), { variant: 'error' })
         return
       }
 
-      enqueueSnackbar('Документ обновлен', { variant: 'success' })
+      enqueueSnackbar(t('documentUpdated'), { variant: 'success' })
       router.back()
     } catch (err) {
-      enqueueSnackbar(errorMessage, { variant: 'error' })
+      enqueueSnackbar(t('unknownError'), { variant: 'error' })
     } finally {
       setSubmitting(false)
     }
@@ -132,7 +132,7 @@ export default function RemovalForm(props) {
             contactPhone: phoneData ? phoneData.phone : '',
           })
         } catch (error) {
-          enqueueSnackbar(errorMessage, { variant: 'error' })
+          enqueueSnackbar(t('unknownError'), { variant: 'error' })
         } finally {
           setLoading(false)
         }
@@ -150,7 +150,7 @@ export default function RemovalForm(props) {
 
         setWasteTypesData(wasteTypesData)
       } catch (error) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('unknownError'), { variant: 'error' })
       } finally {
         setLoading(false)
       }
@@ -158,7 +158,7 @@ export default function RemovalForm(props) {
     dataFetcher()
   }, [])
 
-  if (error) return <Typography>Возникла ошибка при загрузке данных</Typography>
+  if (error) return <Typography>{t('dataLoadingError')}</Typography>
 
   if (loading) return <PageLoadingCircle />
 
@@ -204,8 +204,8 @@ export default function RemovalForm(props) {
                       variant="outlined"
                       fullWidth
                       component={TextFieldFormik}
-                      label="Заголовок объявления"
-                      helperText="*Обязательное поле"
+                      label={t('form.adTitle')}
+                      helperText={t('form.adTitleHelperText')}
                       disabled={shouldDisable}
                     />
                   </Grid>
@@ -216,8 +216,8 @@ export default function RemovalForm(props) {
                       variant="outlined"
                       fullWidth
                       component={PlacesAutocomplete}
-                      label="Местоположение вторсырья"
-                      helperText="*Обязательное поле"
+                      label={t('form.wasteLocation')}
+                      helperText={t('form.wasteLocationHelperText')}
                       disabled={shouldDisable}
                     />
                   </Grid>
@@ -225,15 +225,15 @@ export default function RemovalForm(props) {
                     <SelectFormik
                       data={wasteTypesData}
                       name={'wasteType'}
-                      label={'Тип вторсырья'}
-                      helperText={'*Обязательное поле'}
+                      label={t('form.wasteType')}
+                      helperText={t('form.wasteTypeHelperText')}
                       disabled={shouldDisable}
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Field
                       component={TextFieldFormik}
-                      label="Количество"
+                      label={t('form.quantity')}
                       color="secondary"
                       type="number"
                       fullWidth
@@ -241,23 +241,25 @@ export default function RemovalForm(props) {
                       variant="outlined"
                       InputProps={{
                         endAdornment: (
-                          <InputAdornment position="end">Кг</InputAdornment>
+                          <InputAdornment position="end">
+                            {t('form.quantityEndAdornment')}
+                          </InputAdornment>
                         ),
                       }}
-                      helperText="*Обязательное поле"
+                      helperText={t('form.quantityHelperText')}
                       disabled={shouldDisable}
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Field
                       component={TextFieldFormik}
-                      label="Контактный телефон"
+                      label={t('form.phone')}
                       color="secondary"
                       type="tel"
                       fullWidth
                       name="contactPhone"
                       variant="outlined"
-                      helperText="*Обязательное поле"
+                      helperText={t('form.phoneHelperText')}
                       disabled={shouldDisable}
                     />
                   </Grid>
@@ -269,7 +271,7 @@ export default function RemovalForm(props) {
                     type="submit"
                     disabled={shouldDisable}
                   >
-                    Сохранить
+                    {t('form.submit')}
                     {isSubmitting && <ButtonSubmittingCircle />}
                   </Button>
                 </Grid>
