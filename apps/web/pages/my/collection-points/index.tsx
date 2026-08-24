@@ -4,16 +4,18 @@ import ScrollTopButton from '../../../components/uiParts/ScrollToTopButton'
 import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
 import MyCollectionPointsList from '../../../components/collectionPoints/MyCollectionPointsList'
 import Head from 'next/head'
+import { useTranslations } from 'next-intl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const h1 = 'Мои контейнеры для приема вторсырья'
-const title = `${h1} | ${brand}`
 
 export default function MyCollectionPoints() {
+  const t = useTranslations('MyCollectionPointsPage')
   return (
     <RedirectUnathenticatedUser>
       <Head>
-        <title>{title}</title>
+        <title>
+          `${t('title')} | ${brand}`
+        </title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
@@ -26,10 +28,18 @@ export default function MyCollectionPoints() {
             alignItems: 'center',
           }}
         >
-          <MyCollectionPointsList variant="container" h1={h1} />
+          <MyCollectionPointsList variant="container" h1={t('h1')} />
           <ScrollTopButton />
         </Box>
       </Layout>
     </RedirectUnathenticatedUser>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../../../messages/${locale}.json`)).default,
+    },
+  }
 }
