@@ -35,16 +35,11 @@ import { AdsDescription } from '../uiParts/AdPageComponents'
 import dayjs from 'dayjs'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ActionsBar from '../uiParts/ActionsBar'
+import { useTranslations } from 'next-intl'
 
 const apiUrl = '/api/my/ads'
 const baseUrl = '/my/ads'
 const inactiveAdsRoute = `${baseUrl}/disabled`
-
-const editButtonText = 'Редактировать'
-const deactivateButtonText = 'Деактивировать'
-const activateButtonText = 'Активировать'
-const deleteButtonText = 'Удалить'
-const fetchDataErrorText = 'Не удалось загрузить данные'
 
 const getHref = (
   options: HrefOptions & { variant: keyof typeof documentActivityStatus },
@@ -85,6 +80,7 @@ export default function MyAdsList(props: MyAdsProps) {
   const actionsBarRef = useRef<HTMLDivElement>(null)
   const firstItemRef = useRef<HTMLDivElement>(null)
   const scrollPosRef = useRef<number>(0)
+  const t = useTranslations('MyAdsList')
 
   const { enqueueSnackbar } = useSnackbar()
 
@@ -98,9 +94,9 @@ export default function MyAdsList(props: MyAdsProps) {
       },
     })
     if (!response.ok) {
-      enqueueSnackbar('Ошибка при удалении объявления', { variant: 'error' })
+      enqueueSnackbar(t('deletionError'), { variant: 'error' })
     } else {
-      enqueueSnackbar('Объявление удалено', { variant: 'success' })
+      enqueueSnackbar(t('deletionSuccess'), { variant: 'success' })
       await fetchData()
     }
     setStatus('')
@@ -118,16 +114,14 @@ export default function MyAdsList(props: MyAdsProps) {
     })
     if (!response.ok) {
       enqueueSnackbar(
-        variant === 'active'
-          ? 'Не могу деактивировать объявление'
-          : 'Не могу активировать объявление',
+        variant === 'active' ? t('deactivationError') : t('activationError'),
         { variant: 'error' },
       )
     } else {
       enqueueSnackbar(
         variant === 'active'
-          ? 'Объявление деактивировано'
-          : 'Объявление активировано',
+          ? t('deactivationSuccess')
+          : t('activationSuccess'),
         { variant: 'success' },
       )
       await fetchData()
@@ -190,7 +184,7 @@ export default function MyAdsList(props: MyAdsProps) {
       })
 
       if (!response.ok) {
-        throw new Error(fetchDataErrorText)
+        throw new Error(t('fetchDataError'))
       }
       const data = await response.json()
       const page = data.pagination.page
@@ -358,7 +352,7 @@ export default function MyAdsList(props: MyAdsProps) {
                             slotProps={{
                               input: {
                                 'data-id': `${item._id}`,
-                                'aria-label': 'Выбрать строку',
+                                'aria-label': t('selectRow'),
                               } as any,
                             }}
                             onChange={(e) => {
@@ -390,7 +384,7 @@ export default function MyAdsList(props: MyAdsProps) {
                               sx={{ color: 'grey.400', fontWeight: 'light' }}
                               variant="body2"
                             >
-                              {'Местоположение вторсырья: '}
+                              {`${t('data.wasteLocation')}: `}
                             </Typography>
                             <Typography component={'span'} variant="body2">
                               {item.wasteLocation.description}
@@ -403,7 +397,7 @@ export default function MyAdsList(props: MyAdsProps) {
                               sx={{ color: 'grey.400', fontWeight: 'light' }}
                               variant="body2"
                             >
-                              {'Вид вторсырья: '}
+                              {`${t('data.wasteType')}: `}
                             </Typography>
                             <Typography component={'span'} variant="body2">
                               {`${item.wasteType}`}
@@ -415,10 +409,10 @@ export default function MyAdsList(props: MyAdsProps) {
                               sx={{ color: 'grey.400', fontWeight: 'light' }}
                               variant="body2"
                             >
-                              {'Вес вторсырья: '}
+                              {`${t('data.wasteWeight')}: `}
                             </Typography>
                             <Typography component={'span'} variant="body2">
-                              {`${item.quantity} кг`}
+                              {t('data.quantity', { quantity: item.quantity })}
                             </Typography>
                           </Box>
                           {variant === 'active' && (
@@ -428,7 +422,7 @@ export default function MyAdsList(props: MyAdsProps) {
                                 sx={{ color: 'grey.400', fontWeight: 'light' }}
                                 variant="body2"
                               >
-                                {'Объявление активно до: '}
+                                {`${t('data.adActiveUpTo')}: `}
                               </Typography>
                               <Typography component={'span'} variant="body2">
                                 {dayjs(item.expires).format('DD.MM.YYYY HH:MM')}
@@ -444,7 +438,7 @@ export default function MyAdsList(props: MyAdsProps) {
                                 color="secondary"
                                 startIcon={<EditIcon />}
                               >
-                                {editButtonText}
+                                {t('editBtn')}
                               </Button>
                               <Button
                                 size="small"
@@ -455,8 +449,8 @@ export default function MyAdsList(props: MyAdsProps) {
                                 }}
                               >
                                 {variant === 'active'
-                                  ? deactivateButtonText
-                                  : activateButtonText}
+                                  ? t('deactivateBtn')
+                                  : t('activateBtn')}
                               </Button>
                               <Button
                                 size="small"
@@ -466,7 +460,7 @@ export default function MyAdsList(props: MyAdsProps) {
                                   await handleDelete([item._id])
                                 }}
                               >
-                                {deleteButtonText}
+                                {t('deleteBtn')}
                               </Button>
                             </Stack>
                           </Box>

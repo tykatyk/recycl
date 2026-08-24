@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Tab, Tabs, Box } from '@mui/material'
 import { documentActivityStatus } from '@recycl/shared/dist/constants'
+import { useTranslations } from 'next-intl'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -42,6 +43,7 @@ interface AdTabProps {
 
 export default function AdTabs(props: AdTabProps) {
   const { children, value, handleChange } = props
+  const t = useTranslations('AdTabs')
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -61,10 +63,10 @@ export default function AdTabs(props: AdTabProps) {
           indicatorColor="secondary"
           value={value}
           onChange={handleChange}
-          aria-label="Мои объявления о наличии вторсырья"
+          aria-label={t('myAds')}
         >
-          <Tab value="active" label="Активные" {...a11yProps(0)} />
-          <Tab value="disabled" label="Неактивные" {...a11yProps(1)} />
+          <Tab value="active" label={t('active')} {...a11yProps(0)} />
+          <Tab value="disabled" label={t('inactive')} {...a11yProps(1)} />
         </Tabs>
       </Box>
 

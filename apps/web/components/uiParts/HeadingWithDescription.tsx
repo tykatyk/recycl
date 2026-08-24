@@ -1,7 +1,7 @@
 import { Box, Typography, Tooltip, IconButton } from '@mui/material'
 import HelpIcon from '@mui/icons-material/Help'
-
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 export const HeadingDetails = (props: { details: string }) => {
   const { details } = props
@@ -30,6 +30,7 @@ export const HeadingDetails = (props: { details: string }) => {
 
 const HeadingWithDescription = ({ children, detailedDescription }) => {
   const [showDetails, setShowDetails] = useState(false)
+  const t = useTranslations('HeadingWithDescription')
 
   return (
     <Box
@@ -46,7 +47,7 @@ const HeadingWithDescription = ({ children, detailedDescription }) => {
       >
         {children}
 
-        <Tooltip title="Подробнее об этом">
+        <Tooltip title={t('title')}>
           <IconButton
             onClick={() => {
               setShowDetails(!showDetails)

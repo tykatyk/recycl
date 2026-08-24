@@ -1,5 +1,6 @@
 import { Box, Typography, Button, Checkbox } from '@mui/material'
 import { RefObject } from 'react'
+import { useTranslations } from 'next-intl'
 
 type ActionsBarProps = {
   actionsBarRef: RefObject<HTMLDivElement | null>
@@ -11,6 +12,7 @@ type ActionsBarProps = {
 }
 
 export default function ActionsBar(props: ActionsBarProps) {
+  const t = useTranslations('ActionsBar')
   const {
     actionsBarRef,
     isSticky,
@@ -21,7 +23,7 @@ export default function ActionsBar(props: ActionsBarProps) {
   } = props
   const selectAllRowsLabel = {
     slotProps: {
-      input: { 'aria-label': 'Выбрать все' },
+      input: { 'aria-label': `${t('selectAll')}` },
     },
   }
 
@@ -74,7 +76,7 @@ export default function ActionsBar(props: ActionsBarProps) {
 
               <Box sx={{ pr: 2 }}>
                 <Typography variant="body2" sx={{ color: 'grey.400' }}>
-                  {`Выбрано ${selectedCount} из ${total}`}
+                  {t('selected', { selectedCount, total })}
                 </Typography>
               </Box>
               <Box>
@@ -84,7 +86,7 @@ export default function ActionsBar(props: ActionsBarProps) {
                   color="secondary"
                   onClick={handleDeleteMany}
                 >
-                  Удалить выбранные
+                  {t('deleteSelected')}
                 </Button>
               </Box>
             </Box>

@@ -40,7 +40,6 @@ export default function DataGridFooter(props: DataGridFooterProps) {
         <FormControl fullWidth size="small">
           <InputLabel id="rowsPerPageLabel">{labelText}</InputLabel>
           <Select
-            // size="small"
             labelId="rowsPerPageLabel"
             id="rowsPerPage"
             label={labelText}

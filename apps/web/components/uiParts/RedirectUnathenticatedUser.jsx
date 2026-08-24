@@ -2,7 +2,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import PageLoadingCircle from './PageLoadingCircle'
 
-export default function RedirectUnathenticatedUser(props) {
+export default function RedirectUnathenticatedUser({ children }) {
   const { status } = useSession()
   const router = useRouter()
 
