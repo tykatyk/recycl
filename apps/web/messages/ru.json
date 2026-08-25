@@ -223,6 +223,49 @@
     "mobile": "Передвижной",
     "container": "Сортировочный контейнер"
   },
+  "CollectionPointsOnMap": {
+    "title": "Карта пунктов приема вторсырья",
+    "errorMessage": "Что-то пошло не так"
+  },
+  "UserLocationComponent": {
+    "intro": "Мы не смогли определить местоположение для отображения карты",
+    "selectLocation": "Выберите, пожалуйста, населенный пункт вручную",
+    "errorMessage": "Не удалось получить координаты населенного пункта",
+    "form": {
+      "userLocation": {
+        "label": "Населенный пункт",
+        "helperText": "Обязательное поле"
+      },
+      "submit": "Продолжить"
+    }
+  },
+  "Marker": {
+    "IndividualAdContent": {
+      "wasteWeight": "Вес вторсырья в объявлении: {weight} кг.",
+      "view": "Посмотреть"
+    },
+    "AggregatedAdContent": {
+      "title": "В данной локации несколько объявлений",
+      "wasteWeight": "Вес вторсырья в данной локации: {weight} кг.",
+      "view": "Посмотреть"
+    },
+    "IndividualCollectionPointContent": {
+      "collectionPointType": "Тип пункта приема вторсырья",
+      "date": " Дата и время приема вторсырья",
+      "collectedWasteTypes": "Виды вторсырья, которые принимаются",
+      "phone": "Телефон",
+      "view": "Посмотреть"
+    },
+    "AggregatedCollectionPointContent": {
+      "title": "В данной локации несколько пунктов приема",
+      "view": "Посмотреть"
+    }
+  },
+  "AdsOnMap": {
+    "title": "Карта наличия вторсырья",
+    "metaDescription": "Карта наличия вторсырья, доступного для переработки или утилизации",
+    "errorMessage": "Что-то пошло не так"
+  },
   "DataGridFooter": {
     "label": "Показывать по"
   },
@@ -317,6 +360,9 @@
   "MapActionButton": {
     "showPanel": "Скрыть панель",
     "hidePanel": "Показать панель"
+  },
+  "AdSidebarItemsMap": {
+    "wasteType": "Тип вторсырья"
   },
   "AdSidebarItemsList": {
     "errorMessage": "Что-то пошло не так",

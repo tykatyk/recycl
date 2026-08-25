@@ -13,8 +13,8 @@ import {
 } from '@recycl/shared/dist/server/types'
 import { Dispatch, SetStateAction } from 'react'
 import Supercluster, { ClusterProperties } from 'supercluster'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import dayjs from 'dayjs'
+import { useTranslations } from 'use-intl'
 
 const aggregatedMarkerStyles = {
   '&:link': { color: 'blue', textDecoration: 'none' },
@@ -27,6 +27,8 @@ const aggregatedMarkerStyles = {
 }
 
 export const IndividualAdContent = ({ data }) => {
+  const t = useTranslations('Marker.IndividualAdContent')
+
   const { adId, placeDescription, title, weight } = data
   return (
     <Box sx={{ color: 'grey.800', maxWidth: 350 }}>
@@ -36,10 +38,9 @@ export const IndividualAdContent = ({ data }) => {
       </Box>
 
       <Box mb={2}>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: 'light' }}
-        >{`Вес вторсырья в объявлении: ${weight} кг.`}</Typography>
+        <Typography variant="body2" sx={{ fontWeight: 'light' }}>
+          {t('wasteWeight', { weight })}
+        </Typography>
       </Box>
       <Box>
         <Typography variant="body2" sx={{ color: ' grey.800' }}>
@@ -49,7 +50,7 @@ export const IndividualAdContent = ({ data }) => {
             rel="noopener noreferrer"
             sx={aggregatedMarkerStyles}
           >
-            Посмотреть
+            {t('view')}
           </Link>
         </Typography>
       </Box>
@@ -59,20 +60,19 @@ export const IndividualAdContent = ({ data }) => {
 
 export const AggregatedAdContent = ({ data }) => {
   const { placeDescription, weight, wasteType, placeId } = data
+  const t = useTranslations('Marker.AggregatedAdContent')
+
   return (
     <Box sx={{ color: 'grey.800', maxWidth: 350 }}>
       <Box sx={{ mb: 2 }}>
-        <Typography variant="h6">
-          {'В данной локации несколько объявлений'}
-        </Typography>
+        <Typography variant="h6">{t('title')}</Typography>
         <Typography>{placeDescription}</Typography>
       </Box>
 
       <Box mb={2}>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: 'light' }}
-        >{`Вес вторсырья в данной локации: ${weight} кг.`}</Typography>
+        <Typography variant="body2" sx={{ fontWeight: 'light' }}>
+          {t('wasteWeight', { weight })}
+        </Typography>
       </Box>
       <Box>
         <Typography variant="body2" sx={{ color: 'blue' }}>
@@ -82,7 +82,7 @@ export const AggregatedAdContent = ({ data }) => {
             rel="noopener noreferrer"
             sx={aggregatedMarkerStyles}
           >
-            Посмотреть
+            {t('view')}
           </Link>
         </Typography>
       </Box>
@@ -92,6 +92,9 @@ export const AggregatedAdContent = ({ data }) => {
 
 export const IndividualCollectionPointContent = ({ data }) => {
   const { adId, placeDescription, wasteTypes, phone, variant, date } = data
+  const t = useTranslations('Marker.IndividualCollectionPointContent')
+  const tCollectionPointTypes = useTranslations('CollectionPointTypes')
+
   return (
     <Box id="24" sx={{ color: 'grey.800', maxWidth: 350 }}>
       <Box sx={{ mb: 1 }}>
@@ -103,10 +106,10 @@ export const IndividualCollectionPointContent = ({ data }) => {
           gutterBottom
           sx={{ fontWeight: 'fontWeightLight' }}
         >
-          Тип пункта приема вторсырья
+          {t('collectionPointType')}
         </Typography>
         <Box>
-          <Typography>{collectionPointTypes[variant]}</Typography>
+          <Typography>{tCollectionPointTypes(variant)}</Typography>
         </Box>
       </Box>
 
@@ -117,7 +120,7 @@ export const IndividualCollectionPointContent = ({ data }) => {
             gutterBottom
             sx={{ fontWeight: 'fontWeightLight' }}
           >
-            Дата и время приема вторсырья
+            {t('date')}
           </Typography>
           <Typography>{dayjs(date).format('DD.MM.YYYY HH:mm')}</Typography>
         </Box>
@@ -129,7 +132,7 @@ export const IndividualCollectionPointContent = ({ data }) => {
           gutterBottom
           sx={{ fontWeight: 'fontWeightLight' }}
         >
-          Виды вторсырья, которые принимаются
+          {t('collectedWasteTypes')}
         </Typography>
         <Box sx={{ mb: 1 }}>
           <Grid spacing={1}>
@@ -156,7 +159,7 @@ export const IndividualCollectionPointContent = ({ data }) => {
           gutterBottom
           sx={{ fontWeight: 'fontWeightLight' }}
         >
-          Телефон
+          {t('phone')}
         </Typography>
         <Box>
           <Typography>
@@ -174,7 +177,7 @@ export const IndividualCollectionPointContent = ({ data }) => {
             rel="noopener noreferrer"
             sx={aggregatedMarkerStyles}
           >
-            Посмотреть
+            {t('view')}
           </Link>
         </Typography>
       </Box>
@@ -184,11 +187,12 @@ export const IndividualCollectionPointContent = ({ data }) => {
 
 export const AggregatedCollectionPointContent = ({ data }) => {
   const { placeDescription, wasteType, placeId } = data
+  const t = useTranslations('Marker.AggregatedCollectionPointContent')
   return (
     <Box sx={{ color: 'grey.800', maxWidth: 350 }}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6">{placeDescription}</Typography>
-        <Typography>{'В данной локации несколько пунктов приема'}</Typography>
+        <Typography>{t('title')}</Typography>
       </Box>
 
       <Box>
@@ -199,7 +203,7 @@ export const AggregatedCollectionPointContent = ({ data }) => {
             rel="noopener noreferrer"
             sx={aggregatedMarkerStyles}
           >
-            Посмотреть
+            {t('view')}
           </Link>
         </Typography>
       </Box>

@@ -19,8 +19,8 @@ import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 import { AdMarkers } from '../uiParts/Marker'
 import Head from 'next/head'
 import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Что-то пошло не так'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const baseUrl = '/collection-points/list'
 const mapViewUrl = '/collection-points'
@@ -40,6 +40,9 @@ export default function CollectionPointsOnMap() {
   const [center, setCenter] = useState<MapCenter | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [selectedMarker, setSelectedMarker] = useState('')
+
+  const t = useTranslations('CollectionPointsOnMap')
+
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen)
   }
@@ -87,7 +90,7 @@ export default function CollectionPointsOnMap() {
           setClusters([])
         }
       } catch (error) {
-        enqueueSnackbar(errorMessage, {
+        enqueueSnackbar(t('errorMessage'), {
           variant: 'error',
         })
       }
@@ -99,8 +102,8 @@ export default function CollectionPointsOnMap() {
   return (
     <>
       <Head>
-        <title>{`Карта пунктов приема вторсырья | ${brand}`}</title>
-        <meta name="description" content="Карта пунктов приема вторсырья" />
+        <title>{`${t('title')} | ${brand}`}</title>
+        <meta name="description" content={t('title')} />
       </Head>
       <Box
         sx={{
@@ -140,7 +143,7 @@ export default function CollectionPointsOnMap() {
             >
               <AdSidebarItemsMap
                 handleChange={setSelectedValue}
-                h1={'Карта пунктов приема вторсырья'}
+                h1={t('title')}
               />
               <AdSidebarChangeView
                 listViewUrl={baseUrl}

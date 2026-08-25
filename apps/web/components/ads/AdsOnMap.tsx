@@ -20,8 +20,8 @@ import AdSidebarItemsCommon from '../uiParts/AdSidebarItemsCommon'
 import { AdMarkers } from '../uiParts/Marker'
 import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 import Head from 'next/head'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Что-то пошло не так'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const listViewUrl = '/ads/list'
 const mapViewUrl = '/ads'
@@ -41,6 +41,7 @@ export default function AdsOnMap() {
   const [center, setCenter] = useState<MapCenter | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [selectedMarker, setSelectedMarker] = useState('')
+  const t = useTranslations('AdsOnMap')
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen)
@@ -90,7 +91,7 @@ export default function AdsOnMap() {
           setClusters([])
         }
       } catch (error) {
-        enqueueSnackbar(errorMessage, {
+        enqueueSnackbar(t('errorMessage'), {
           variant: 'error',
         })
       }
@@ -102,11 +103,8 @@ export default function AdsOnMap() {
   return (
     <>
       <Head>
-        <title>{`Карта наличия вторсырья | ${brand}`}</title>
-        <meta
-          name="description"
-          content="Карта наличия вторсырья, доступного для переработки или утилизации"
-        />
+        <title>{`${t('title')} | ${brand}`}</title>
+        <meta name="description" content={t('metaDescription')} />
       </Head>
       <Box
         sx={{
@@ -146,7 +144,7 @@ export default function AdsOnMap() {
             >
               <AdSidebarItemsMap
                 handleChange={setSelectedValue}
-                h1={'Карта наличия вторсырья'}
+                h1={t('title')}
               />
               <AdSidebarChangeView
                 listViewUrl={listViewUrl}

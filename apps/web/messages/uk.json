@@ -223,6 +223,52 @@
     "mobile": "Пересуввний",
     "container": "Сортувальний контейнер"
   },
+  "CollectionPointsOnMap": {
+    "title": "Карта пунктів приймання вторсировини",
+    "errorMessage": "Щось пішло не так"
+  },
+  "UserLocationComponent": {
+    "intro": "Нам не вдалося визначити місцезнаходження для відображення карти",
+    "selectLocation": "Будь ласка, виберіть населений пункт вручну",
+    "errorMessage": "Не вдалося отримати координати населеного пункту",
+    "form": {
+      "userLocation": {
+        "label": "Населений пункт",
+        "helperText": "Обов’язкове поле"
+      },
+      "submit": "Продовжити"
+    }
+  },
+  "Marker": {
+    "IndividualAdContent": {
+      "wasteWeight": "Вага вторинної сировини в оголошенні: {weight} кг.",
+      "view": "Переглянути"
+    },
+
+    "AggregatedAdContent": {
+      "title": "У цій локації є декілька оголошень",
+      "wasteWeight": "Вага вторинної сировини у цій локації: {weight} кг.",
+      "view": "Переглянути"
+    },
+
+    "IndividualCollectionPointContent": {
+      "collectionPointType": "Тип пункту приймання вторинної сировини",
+      "date": "Дата та час приймання вторинної сировини",
+      "collectedWasteTypes": "Види вторинної сировини, які приймаються",
+      "phone": "Телефон",
+      "view": "Переглянути"
+    },
+
+    "AggregatedCollectionPointContent": {
+      "title": "У цій локації є декілька пунктів приймання",
+      "view": "Переглянути"
+    }
+  },
+  "AdsOnMap": {
+    "title": "Карта наявності вторсировини",
+    "metaDescription": "Карта наявності вторсировини, доступної для переробки або утилізації",
+    "errorMessage": "Щось пішло не так"
+  },
   "DataGridFooter": {
     "label": "Показувати по"
   },
@@ -317,6 +363,9 @@
   "MapActionButton": {
     "showPanel": "Сховати панель",
     "hidePanel": "Показати панель"
+  },
+  "AdSidebarItemsMap": {
+    "wasteType": "Тип вторсировини"
   },
   "AdSidebarItemsList": {
     "errorMessage": "Щось пішло не так",

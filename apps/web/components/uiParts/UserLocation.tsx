@@ -9,12 +9,14 @@ import { userLocationSchema } from '../../lib/validation'
 import * as yup from 'yup'
 import { useSnackbar } from 'notistack'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
+import { useTranslations } from 'use-intl'
 
 function UserLocationComponent(props) {
   const [recaptcha, setRecaptcha] = useState('')
   const recaptchaRef = useRef<ReCAPTCHA | null>(null)
   const { enqueueSnackbar } = useSnackbar()
   const geocodingLib = useMapsLibrary('geocoding')
+  const t = useTranslations('UserLocationComponent')
 
   const handleChange = (token) => {
     setRecaptcha(token)
@@ -40,10 +42,10 @@ function UserLocationComponent(props) {
     >
       <Box sx={{ mb: 2 }}>
         <Typography align="center" component={'h1'} variant="h6" gutterBottom>
-          Мы не смогли определить местоположение для отображения карты
+          {t('intro')}
         </Typography>
         <Typography align="center" gutterBottom>
-          Выберите, пожалуйста, населенный пункт вручную
+          {t('selectLocation')}
         </Typography>
       </Box>
 
@@ -75,10 +77,7 @@ function UserLocationComponent(props) {
                 setLocationError(false)
                 resetForm()
               } else {
-                enqueueSnackbar(
-                  'Не удалось получить координаты населенного пункта',
-                  { variant: 'error' },
-                )
+                enqueueSnackbar(t('errorMessage'), { variant: 'error' })
               }
             })
             .finally(() => {
@@ -107,8 +106,8 @@ function UserLocationComponent(props) {
                   variant="outlined"
                   fullWidth
                   component={PlacesAutocomplete}
-                  label="Населенный пункт"
-                  helperText="*Обязательное поле"
+                  label={t('form.userLocation.label')}
+                  helperText={`*${t('form.userLocation.helperText')}`}
                   disabled={isSubmitting}
                 />
               </Box>
@@ -139,7 +138,7 @@ function UserLocationComponent(props) {
                   variant="contained"
                   disabled={isSubmitting}
                 >
-                  Продолжить
+                  {t('form.submit')}
                   {isSubmitting && <ButtonSubmittingCircle />}
                 </Button>
               </Box>

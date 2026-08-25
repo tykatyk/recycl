@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 type WasteItem = {
   _id: string
@@ -18,6 +19,7 @@ export default function AdSidebarItemsMap(props: {
 }) {
   const [wasteTypes, setWasteTypes] = useState<WasteItem[]>([])
   const { handleChange, h1 } = props
+  const t = useTranslations('AdSidebarItemsMap')
 
   useEffect(() => {
     const fetcher = async () => {
@@ -75,7 +77,7 @@ export default function AdSidebarItemsMap(props: {
                   {...params}
                   id="wasteType"
                   name="wasteType"
-                  label="Тип вторсырья"
+                  label={t('wasteType')}
                 />
               )}
             />
