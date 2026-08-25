@@ -9,12 +9,14 @@ import { useTranslations } from 'next-intl'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 export default function MyMobileCollectionPoints() {
-  const t = useTranslations('MyCollectionPointsPage')
+  const t = useTranslations('MyMobileCollectionPointsPage')
 
   return (
     <RedirectUnathenticatedUser>
       <Head>
-        <title>{`${t('title')} | ${brand}`}</title>
+        <title>
+          {t('title')} | {brand}
+        </title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>

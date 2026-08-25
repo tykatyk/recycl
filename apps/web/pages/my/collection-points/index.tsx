@@ -14,7 +14,7 @@ export default function MyCollectionPoints() {
     <RedirectUnathenticatedUser>
       <Head>
         <title>
-          `${t('title')} | ${brand}`
+          {t('title')} | {brand}
         </title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>

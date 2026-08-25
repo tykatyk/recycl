@@ -2,21 +2,28 @@ import Layout from '../../../../components/layouts/Layout'
 import CollectionPointFormCreate from '../../../../components/collectionPoints/CollectionPointFormCreate'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 import Head from 'next/head'
+import { useTranslations } from 'next-intl'
 
-export default function CreateContainerCollectionPoint() {
+export default function CreateMobileCollectionPoint() {
   const brand = process.env.NEXT_PUBLIC_BRAND || ''
-  const h1 = 'Добавить передвижной пункт сбора вторсырья'
-  const title = `${h1} | ${brand}`
+  const t = useTranslations('CreateMobileCollectionPointPage')
 
   return (
     <RedirectUnathenticatedUser>
       <Head>
-        <title>{title}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
-        <CollectionPointFormCreate variant={'mobile'} h1={h1} />
+        <CollectionPointFormCreate variant={'mobile'} h1={t('h1')} />
       </Layout>
     </RedirectUnathenticatedUser>
   )
+}
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../../../../messages/${locale}.json`)).default,
+    },
+  }
 }

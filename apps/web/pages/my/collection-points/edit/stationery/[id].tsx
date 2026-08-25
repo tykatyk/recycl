@@ -1,22 +1,44 @@
 import Layout from '../../../../../components/layouts/Layout'
 import CollectionPointFormUpdate from '../../../../../components/collectionPoints/CollectionPointFormUpdate'
-import RedirectUnathenticatedUser from '../../../../../components/uiParts/RedirectUnathenticatedUser'
 import Head from 'next/head'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../../../../api/auth/[...nextauth]'
+import { useTranslations } from 'next-intl'
 
-export default function CreateContainerCollectionPoint() {
+export default function EditStationeryCollectionPoint() {
   const brand = process.env.NEXT_PUBLIC_BRAND || ''
-  const h1 = 'Редактировать информацию о стационарном пункте приема вторсырья'
-  const title = `${h1} | ${brand}`
+  const t = useTranslations('EditStationeryCollectionPointPage')
 
   return (
-    <RedirectUnathenticatedUser>
+    <>
       <Head>
-        <title>{title}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
-        <CollectionPointFormUpdate variant="stationery" h1={h1} />
+        <CollectionPointFormUpdate variant="stationery" h1={t('h1')} />
       </Layout>
-    </RedirectUnathenticatedUser>
+    </>
   )
+}
+
+export async function getServerSideProps({ req, res, locale, resolvedUrl }) {
+  //ToDo: add server side data fetching
+  const session = await getServerSession(req, res, authOptions)
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: `/auth/login?from=${encodeURIComponent(resolvedUrl)}`,
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      messages: (await import(`../../../../../messages/${locale}.json`))
+        .default,
+    },
+  }
 }

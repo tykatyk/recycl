@@ -6,8 +6,7 @@ import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import PaginationItem from '@mui/material/PaginationItem'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
-
-const labelText = 'Показывать по'
+import { useTranslations } from 'next-intl'
 
 interface DataGridFooterProps {
   numRows: number
@@ -19,6 +18,7 @@ interface DataGridFooterProps {
 }
 
 export default function DataGridFooter(props: DataGridFooterProps) {
+  const t = useTranslations('DataGridFooter')
   const {
     numRows,
     handlePageChange,
@@ -38,11 +38,11 @@ export default function DataGridFooter(props: DataGridFooterProps) {
     >
       <Box sx={{ minWidth: 120, mr: 1, pt: 2 }}>
         <FormControl fullWidth size="small">
-          <InputLabel id="rowsPerPageLabel">{labelText}</InputLabel>
+          <InputLabel id="rowsPerPageLabel">{t('label')}</InputLabel>
           <Select
             labelId="rowsPerPageLabel"
             id="rowsPerPage"
-            label={labelText}
+            label={t('label')}
             value={pageSize}
             onChange={handlePageSizeChange}
           >

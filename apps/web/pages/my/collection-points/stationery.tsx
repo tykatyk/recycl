@@ -14,7 +14,9 @@ export default function MyStationeryCollectionPoints() {
   return (
     <RedirectUnathenticatedUser>
       <Head>
-        <title>{`${t('title')} | ${brand}`}</title>
+        <title>
+          {t('title')} | {brand}
+        </title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>

@@ -14,8 +14,10 @@ import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import PlacesAutocompleteNew from './formInputs/PlacesAutocompleteNew'
+import { useTranslations } from 'next-intl'
 
 export function DateField({ formik }) {
+  const t = useTranslations('CollectionPointFormUpdate.form')
   return (
     <Grid size={{ xs: 12 }}>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
@@ -29,11 +31,11 @@ export function DateField({ formik }) {
               error: formik.touched.date && Boolean(formik.errors.date),
               helperText:
                 (formik.touched.date && formik.errors.date) ||
-                '*Обязательное поле',
+                `*${t('date.helperText')}`,
               onBlur: () => formik.setFieldTouched('date', true),
             },
           }}
-          label="Дата и время начала приема вторсырья"
+          label={t('date.label')}
           disabled={formik.isSubmitting}
           value={formik.values.date}
           onChange={(value) => {
@@ -46,17 +48,19 @@ export function DateField({ formik }) {
 }
 
 export function PhoneField({ formik }) {
+  const t = useTranslations('CollectionPointFormUpdate.form')
   return (
     <Grid size={{ xs: 12 }}>
       <TextField
-        label="Контактный телефон"
+        label={t('phone.label')}
         color="secondary"
         type="tel"
         fullWidth
         name="phone"
         variant="outlined"
         helperText={
-          (formik.touched.phone && formik.errors.phone) || '*Обязательное поле'
+          (formik.touched.phone && formik.errors.phone) ||
+          `*${t('phone.helperText')}`
         }
         error={formik.touched.phone && Boolean(formik.errors.phone)}
         value={formik.values.phone}
@@ -69,6 +73,7 @@ export function PhoneField({ formik }) {
 }
 
 export function PlaceAutocompleteField({ collectionPointType, formik }) {
+  const t = useTranslations('CollectionPointFormUpdate.form')
   return (
     <Grid size={{ xs: 12 }}>
       <PlacesAutocompleteNew
@@ -78,10 +83,10 @@ export function PlaceAutocompleteField({ collectionPointType, formik }) {
         fullWidth
         label={
           collectionPointType === 'mobile'
-            ? 'Место приема вторсырья'
+            ? t('location.label.mobile')
             : collectionPointType === 'container'
-              ? 'Местоположение сортировочного контейнера'
-              : 'Местоположение пункта приема вторсырья'
+              ? t('location.label.container')
+              : t('location.label.stationary')
         }
         value={formik.values.location}
         onChange={(event, newValue) => {
@@ -91,7 +96,7 @@ export function PlaceAutocompleteField({ collectionPointType, formik }) {
         error={formik.touched.location && Boolean(formik.errors.location)}
         helperText={
           (formik.touched.location && formik.errors.location) ||
-          '*Обязательное поле'
+          `*${t('location.helperText')}`
         }
         disabled={formik.isSubmitting}
       />
@@ -100,15 +105,15 @@ export function PlaceAutocompleteField({ collectionPointType, formik }) {
 }
 
 export function WasteTypeField({ wasteTypes, formik }) {
+  const t = useTranslations('CollectionPointFormUpdate.form')
+
   return (
     <Grid size={{ xs: 12 }}>
       <FormControl
         fullWidth
         error={formik.touched.wasteTypes && Boolean(formik.errors.wasteTypes)}
       >
-        <InputLabel id="wasteTypes-label">
-          {'Типы принимаемого вторсырья'}
-        </InputLabel>
+        <InputLabel id="wasteTypes-label">{t('wasteType.label')}</InputLabel>
         <Select
           id={'wasteTypes'}
           name={'wasteTypes'}
@@ -126,7 +131,7 @@ export function WasteTypeField({ wasteTypes, formik }) {
           onBlur={(event) => {
             formik.setFieldTouched('wasteTypes', true)
           }}
-          label={'Типы принимаемого вторсырья'}
+          label={t('wasteType.label')}
         >
           {wasteTypes.map((item, index: number) => (
             <MenuItem key={index} value={item.name}>
@@ -136,7 +141,7 @@ export function WasteTypeField({ wasteTypes, formik }) {
         </Select>
         <FormHelperText>
           {(formik.touched.wasteTypes && formik.errors.wasteTypes) ||
-            '*Обязательное поле'}
+            ` *${t('wasteType.helperText')}`}
         </FormHelperText>
       </FormControl>
     </Grid>
@@ -144,6 +149,7 @@ export function WasteTypeField({ wasteTypes, formik }) {
 }
 
 export function CommentField({ formik }) {
+  const t = useTranslations('CollectionPointFormUpdate.form')
   return (
     <Grid size={{ xs: 12 }}>
       <TextField
@@ -153,7 +159,7 @@ export function CommentField({ formik }) {
         fullWidth
         name="comment"
         id="comment"
-        label="Описание"
+        label={t('comment.label')}
         helperText={formik.touched.comment && formik.errors.comment}
         value={formik.values.comment}
         disabled={formik.isSubmitting}
@@ -165,10 +171,11 @@ export function CommentField({ formik }) {
 }
 
 export function SubmitButton({ formik }) {
+  const t = useTranslations('CollectionPointFormUpdate.form')
   return (
     <Grid size={{ xs: 12 }}>
       <Button variant="contained" type="submit" disabled={formik.isSubmitting}>
-        Сохранить
+        {t('submit')}
         {formik.isSubmitting && <ButtonSubmittingCircle />}
       </Button>
     </Grid>
@@ -176,6 +183,8 @@ export function SubmitButton({ formik }) {
 }
 
 export function CollectionPointsDescription() {
+  const t = useTranslations('CollectionPointFormUpdate.form.description')
+
   return (
     <Box
       bgcolor="secondary.main"
@@ -193,32 +202,21 @@ export function CollectionPointsDescription() {
         },
       }}
     >
-      <Typography gutterBottom>
-        Пункты приема вторсырья делятся на три вида:
-      </Typography>
+      <Typography gutterBottom>{t('intro')}</Typography>
+
       <Box component="ol" sx={{ pl: 3, pb: 1, m: 0 }}>
-        <li>Сортировочные контейнеры.</li>
-        <li>Передвижные (мобильные) пункты.</li>
-        <li>Стационарные пункты.</li>
+        <li>{t('types.sortingContainers')}</li>
+        <li>{t('types.mobilePoints')}</li>
+        <li>{t('types.stationaryPoints')}</li>
       </Box>
-      <Typography gutterBottom>
-        Сортировочные контейнеры это любые емкости для сбора вторсырья, которые
-        устанавливаются в магазинах, торговых центрах или на улице. Например
-        коробки для сбора отработанных батареек, текстиля и т.д.
-      </Typography>
-      <Typography gutterBottom>
-        Передвижные (мобильные) пункты, это пункты которые принимают вторсырье в
-        определенное время и в определенном месте. При добавлении этих пунктов
-        необходимо указать дату начала события по сбору вторсырья.
-      </Typography>
-      <Typography gutterBottom>
-        Стационарные пункты, это площадки или здания где принимают вторсырье.
-      </Typography>
-      <Typography gutterBottom>
-        При добавлении пункта приема вторсырья необходимо указать его вид,
-        местоположение, типы вторсырья, которые принимаются этим пунктом, а
-        также контактный телефон лица, отвечающего за данный пункт.
-      </Typography>
+
+      <Typography gutterBottom>{t('sortingContainers')}</Typography>
+
+      <Typography gutterBottom>{t('mobilePoints')}</Typography>
+
+      <Typography gutterBottom>{t('stationaryPoints')}</Typography>
+
+      <Typography gutterBottom>{t('requirements')}</Typography>
     </Box>
   )
 }

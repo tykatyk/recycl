@@ -21,8 +21,8 @@ import {
   wasteTypeFetcher,
   userPhoneFetcher,
 } from '../../lib/helpers/dataFetcher'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Ошибка при сохранении документа'
 const api = '/api/my/collection-points'
 const indexRoute = '/my/collection-points'
 
@@ -41,6 +41,7 @@ export default function CollectionPointFormCreate(
   const [wasteTypes, setWasteTypes] = useState<any>([]) //ToDo: add type
   const [userPhone, setUserPhone] = useState<string>('')
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('CollectionPointFormCreate')
 
   const createHandler = useCallback(
     (
@@ -61,7 +62,7 @@ export default function CollectionPointFormCreate(
         })
         .then((data) => {
           if (data.error) {
-            enqueueSnackbar(errorMessage, { variant: 'error' })
+            enqueueSnackbar(t('errorMessage'), { variant: 'error' })
           } else if (data.message) {
             resetForm()
             const route =
@@ -74,7 +75,7 @@ export default function CollectionPointFormCreate(
           }
         })
         .catch((error) => {
-          enqueueSnackbar(errorMessage, { variant: 'error' })
+          enqueueSnackbar(t('errorMessage'), { variant: 'error' })
         })
         .finally(() => {
           setSubmitting(false)
@@ -127,7 +128,7 @@ export default function CollectionPointFormCreate(
         setWasteTypes(wasteTypeData)
         setUserPhone(phoneData ? phoneData.phone : '')
       } catch (error) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       } finally {
         setLoading(false)
       }

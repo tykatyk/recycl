@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Tab, Tabs, Box } from '@mui/material'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import { useTranslations } from 'next-intl'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -42,6 +43,7 @@ interface AdTabProps {
 
 export default function CollectionPointTabs(props: AdTabProps) {
   const { children, value, handleChange } = props
+  const t = useTranslations('CollectionPointTabs')
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -61,11 +63,19 @@ export default function CollectionPointTabs(props: AdTabProps) {
           indicatorColor="secondary"
           value={value}
           onChange={handleChange}
-          aria-label="Мои пункты приема вторсырья"
+          aria-label={t('ariaLabel')}
         >
-          <Tab value="container" label="Контейнеры" {...a11yProps(0)} />
-          <Tab value="mobile" label="Передвижные" {...a11yProps(1)} />
-          <Tab value="stationery" label="Стационарные" {...a11yProps(2)} />
+          <Tab
+            value="container"
+            label={t('containerLabel')}
+            {...a11yProps(0)}
+          />
+          <Tab value="mobile" label={t('mobileLabel')} {...a11yProps(1)} />
+          <Tab
+            value="stationery"
+            label={t('stationaryLabel')}
+            {...a11yProps(2)}
+          />
         </Tabs>
       </Box>
 

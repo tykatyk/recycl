@@ -35,16 +35,13 @@ import CollectionPointTabs from '../uiParts/CollectionPointTabs'
 import { CollectionPointsDescription } from '../../components/uiParts/CollectionPointComponents'
 import dayjs from 'dayjs'
 import ActionsBar from '../uiParts/ActionsBar'
+import { useTranslations } from 'next-intl'
 
 const apiUrl = '/api/my/collection-points'
 const baseUrl = '/my/collection-points'
 
 const stationeryCollectionPointsRoute = `${baseUrl}/stationery`
 const mobileCollectionPointsRoute = `${baseUrl}/mobile`
-
-const editButtonText = 'Редактировать'
-const deleteButtonText = 'Удалить'
-const fetchDataErrorText = 'Не удалось загрузить данные'
 
 const getHref = (options: HrefOptions) => {
   const { page, pageSize } = options
@@ -85,6 +82,8 @@ export default function MyCollectionPointsList(
   const firstItemRef = useRef<HTMLDivElement>(null)
   const scrollPosRef = useRef<number>(0)
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('MyCollectionPointsList')
+  const tCollectionPointTypes = useTranslations('CollectionPointTypes')
 
   const handleDelete = async (documentIds: string[]) => {
     setStatus('actionPerforming')
@@ -96,11 +95,11 @@ export default function MyCollectionPointsList(
       },
     })
     if (!response.ok) {
-      enqueueSnackbar('Ошибка при удалении элемента', { variant: 'error' })
+      enqueueSnackbar(t('deletionError'), { variant: 'error' })
       return
     }
     setStatus('')
-    enqueueSnackbar('Элемент удален', { variant: 'success' })
+    enqueueSnackbar(t('deletionSuccess'), { variant: 'success' })
     await fetchData()
   }
 
@@ -159,7 +158,7 @@ export default function MyCollectionPointsList(
       })
 
       if (!response.ok) {
-        throw new Error(fetchDataErrorText)
+        throw new Error(t('dataFetchingError'))
       }
       const data = await response.json()
       const page = data.pagination.page
@@ -329,7 +328,7 @@ export default function MyCollectionPointsList(
                             slotProps={{
                               input: {
                                 'data-id': `${item._id}`,
-                                'aria-label': 'Выбрать строку',
+                                'aria-label': t('selectRow'),
                               } as any,
                             }}
                             onChange={(e) => {
@@ -363,7 +362,7 @@ export default function MyCollectionPointsList(
                                 sx={{ color: 'grey.400', fontWeight: 'light' }}
                                 variant="body2"
                               >
-                                {'Дата и время события: '}
+                                {`${t('data.mobile.date')}: `}
                               </Typography>
                               <Typography component={'span'} variant="body2">
                                 {dayjs(item.date).format('DD.MM.YYYY HH:mm')}
@@ -380,7 +379,7 @@ export default function MyCollectionPointsList(
                                 fontWeight: 'light',
                               }}
                             >
-                              Виды вторсырья, которые принимаются:
+                              {`${t('data.wasteTypes')}:`}
                             </Typography>
                             <Stack direction="row" spacing={1}>
                               {item.wasteTypes.map(
@@ -398,10 +397,10 @@ export default function MyCollectionPointsList(
                               sx={{ color: 'grey.400', fontWeight: 'light' }}
                               variant="body2"
                             >
-                              {'Тип пункта приема вторсырья: '}
+                              {`${t('data.collectionPointType')}: `}
                             </Typography>
                             <Typography component={'span'} variant="body2">
-                              {collectionPointTypes[item.variant].toLowerCase()}
+                              {tCollectionPointTypes(item.variant)}
                             </Typography>
                           </Box>
 
@@ -413,7 +412,7 @@ export default function MyCollectionPointsList(
                                 color="secondary"
                                 startIcon={<EditIcon />}
                               >
-                                {editButtonText}
+                                {t('editBtn')}
                               </Button>
                               <Button
                                 size="small"
@@ -423,7 +422,7 @@ export default function MyCollectionPointsList(
                                   await handleDelete([item._id])
                                 }}
                               >
-                                {deleteButtonText}
+                                {t('deleteBtn')}
                               </Button>
                             </Stack>
                           </Box>

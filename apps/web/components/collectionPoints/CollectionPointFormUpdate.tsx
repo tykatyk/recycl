@@ -18,8 +18,8 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import dayjs from 'dayjs'
 import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Возникла ошибка при сохранении заявки'
 const api = '/api/my/collection-points'
 
 type CollectionPointFormProps = {
@@ -38,6 +38,7 @@ export default function CollectionPointFormUpdate(
   const { id } = router.query
 
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('CollectionPointFormUpdate')
 
   const [initialValues, setInitialValues] = useState<CollectionPoint>(() => {
     const initVal = {
@@ -105,7 +106,7 @@ export default function CollectionPointFormUpdate(
         ])
         setWasteTypes(wasteTypeData)
       } catch (error) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       } finally {
         setLoading(false)
       }
@@ -152,13 +153,13 @@ export default function CollectionPointFormUpdate(
       })
       .then((data) => {
         if (data.error) {
-          enqueueSnackbar(errorMessage, { variant: 'error' })
+          enqueueSnackbar(t('errorMessage'), { variant: 'error' })
         } else if (data.message) {
           router.back()
         }
       })
       .catch((error) => {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       })
       .finally(() => {
         setSubmitting(false)
