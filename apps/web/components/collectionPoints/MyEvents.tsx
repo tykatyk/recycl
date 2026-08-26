@@ -11,7 +11,7 @@ import Layout from '../layouts/Layout'
 import Tabs from '../uiParts/CollectionPointTabs'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import NoRows from '../uiParts/NoRows'
-import ErrorComponet from '../uiParts/Error'
+import DataLoadingError from '../uiParts/DataLoadingError'
 import Link from '../uiParts/Link'
 import {
   rowsPerPageOptions,
@@ -374,7 +374,7 @@ export default function MyEvents(props: {
   if (loading) {
     content = <PageLoadingCircle />
   } else if (backendError) {
-    content = <ErrorComponet />
+    content = <DataLoadingError />
   } else if (data.length > 0) {
     content = (
       <>

@@ -1,15 +1,18 @@
 import { Typography, Box, Button } from '@mui/material'
+import { useTranslations } from 'next-intl'
 
 export default function SuccessfullUnsubscribe() {
+  const t = useTranslations('SuccessfullUnsubscribe')
+
   return (
     <>
       <Typography gutterBottom variant="h4" component="h1" sx={{ mb: 8 }}>
-        Вы успешно отписались от рассылки
+        {t('successMessage')}
       </Typography>
 
       <Box>
         <Button variant="contained" color="secondary" href="/">
-          Подписаться снова
+          {t('resubscribe')}
         </Button>
       </Box>
     </>

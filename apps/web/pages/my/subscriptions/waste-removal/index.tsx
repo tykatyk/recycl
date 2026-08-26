@@ -9,40 +9,22 @@ import ButtonSubmittingCircle from '../../../../components/uiParts/ButtonSubmitt
 import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
-import { default as ErrorComponent } from '../../../../components/uiParts/Error'
+import DataLoadingError from '../../../../components/uiParts/DataLoadingError'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import NotSubscribed from '../../../../components/subscriptions/NotSubscribed'
 import Head from 'next/head'
+import { useTranslations } from 'next-intl'
 
 const api = '/api/my/subscriptions'
 const wasteRemovalApi = `${api}/waste-removal`
 const frontendUrl = '/my/subscriptions'
-
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const title = `Указать радиус поиска пунктов приема вторсырья | ${brand}`
 
-const errorMessage = 'Что то пошло не так'
-const successMessage = 'Значение сохранено'
-const notSubscribedMessage =
-  'У вас отключены уведомления о появлении пунктов приема вторсырья'
-
-const ErrorView = () => {
-  return (
-    <Stack spacing={3} sx={{ alignItems: 'center' }}>
-      <ErrorComponent />
-      <Box>
-        <Button variant="outlined" color="secondary" href={`${frontendUrl}`}>
-          Вернуться
-        </Button>
-      </Box>
-    </Stack>
-  )
-}
-
-const Content = () => {
+export default function WasteRemovalSubscription() {
   const [initialValues, setInitialValues] = useState({ radius: '' } as any)
   const [viewStatus, setViewStatus] = useState('')
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('WasteRemovalSubscriptionPage')
 
   useEffect(() => {
     const getUserSubscriptions = async () => {
@@ -59,7 +41,7 @@ const Content = () => {
       const response = await fetch(`${wasteRemovalApi}`)
 
       if (!response.ok) {
-        throw new Error(errorMessage)
+        throw new Error(t('errorMessage'))
       }
       return await response.json()
     }
@@ -82,7 +64,7 @@ const Content = () => {
         if (!data) return
         setInitialValues({ radius: data.radius })
       } catch (error) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('errorMessage'), { variant: 'error' })
         setViewStatus('error')
       }
     }
@@ -98,19 +80,24 @@ const Content = () => {
     })
 
     if (!response.ok) {
-      enqueueSnackbar(errorMessage, { variant: 'error' })
+      enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       return
     }
 
-    enqueueSnackbar(successMessage, { variant: 'success' })
+    enqueueSnackbar(t('successMessage'), { variant: 'success' })
   }
 
-  const MainContent = () => {
+  const Content = () => {
     return (
       <>
         <Box sx={{ mt: 2, mb: 3 }}>
-          <Typography component={'h1'} variant="h4" align="center">
-            Укажите радиус поиска пунктов приема вторсырья из ваших обьявлений
+          <Typography
+            component={'h1'}
+            variant="h4"
+            align="center"
+            sx={{ mt: 2, mb: 3 }}
+          >
+            {t('h1')}
           </Typography>
         </Box>
 
@@ -135,15 +122,15 @@ const Content = () => {
                       name="radius"
                       variant="outlined"
                       component={TextFieldFormik}
-                      label="Радиус поиска"
-                      helperText="*Обязательное поле"
+                      label={`${t('form.searchRadius.label')}`}
+                      helperText={`*${t('form.searchRadius.helperText')}`}
                       type="number"
                       size="small"
                       sx={{ minWidth: 250 }}
                       inputProps={{ min: 1, max: 200 }}
                       InputProps={{
                         endAdornment: (
-                          <InputAdornment position="end">Км</InputAdornment>
+                          <InputAdornment position="end">{`${t('form.searchRadius.endAdornment')}`}</InputAdornment>
                         ),
                       }}
                       disabled={false}
@@ -161,7 +148,7 @@ const Content = () => {
                         disabled={isSubmitting}
                         sx={{ ml: 1, mr: 1 }}
                       >
-                        Сохранить
+                        {t('form.submit')}
                         {isSubmitting && <ButtonSubmittingCircle />}
                       </Button>
                       <Button
@@ -170,7 +157,7 @@ const Content = () => {
                         href={`${frontendUrl}`}
                         sx={{ ml: 1, mr: 1 }}
                       >
-                        Вернуться
+                        {t('backBtn')}
                       </Button>
                     </Box>
                   </Stack>
@@ -188,24 +175,20 @@ const Content = () => {
       case 'loading':
         return <PageLoadingCircle />
       case 'unsubscribed':
-        return <NotSubscribed message={notSubscribedMessage} />
+        return <NotSubscribed message={t('notSubscribed')} />
       case 'error':
-        return <ErrorView />
+        return <DataLoadingError />
       case 'ok':
-        return <MainContent />
+        return <Content />
       default:
         return null
     }
   }
 
-  return renderContent()
-}
-
-export default function WasteRemovalSubscriptionConfig() {
   return (
     <RedirectUnathenticatedUser>
       <Head>
-        <title>{title}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
@@ -216,9 +199,17 @@ export default function WasteRemovalSubscriptionConfig() {
             flexDirection: 'column',
           }}
         >
-          <Content />
+          {renderContent()}
         </Box>
       </Layout>
     </RedirectUnathenticatedUser>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../../../../messages/${locale}.json`)).default,
+    },
+  }
 }

@@ -1,49 +1,50 @@
 import { Typography, Box, Grid, Button, Alert } from '@mui/material'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import { useEffect, useState } from 'react'
-import { emailSchema } from '../../lib/validation'
+import { email } from '@recycl/shared/dist/validation'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import CustomSnackbar from '../uiParts/Snackbars'
 import Link from '../uiParts/Link'
 import { unsubscribeApiResponseCodes } from '../../lib/helpers/responses'
 import type { UnsubscribeApiResponse } from '../../lib/types/subscription'
+import { useTranslations } from 'next-intl'
 
 const unsubscribeAPI = '/api/my/subscriptions/unsubscribe'
-const errorMessge = 'Ошибка при получении данных'
-
 const { SUCCESS, NOT_FOUND } = unsubscribeApiResponseCodes
 
 export default function TokenNotFound() {
   const [message, setMessage] = useState<string>('')
   const [severity, setSeverity] = useState<string>('success')
   const [data, setData] = useState<UnsubscribeApiResponse | null>(null)
+  const t = useTranslations('TokenNotFound')
 
   const handleTokenNotFound = async (email: string) => {
-    const response = await fetch(unsubscribeAPI, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ scope: 'email', data: email }),
-    })
-    if (!response.ok) {
-      setSeverity('error')
-      if (response.status == 400) {
-        setMessage('Недействительный адрес электронной почты')
-      } else if (response.status == 404) {
-        setMessage('Пользователь с таким email не найден')
-      } else {
-        setMessage(errorMessge)
+    try {
+      const response = await fetch(unsubscribeAPI, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scope: 'email', data: email }),
+      })
+      if (!response.ok) {
+        setSeverity('error')
+        if (response.status == 400) {
+          setMessage(t('incorrectEmail'))
+        } else if (response.status == 404) {
+          setMessage(t('userNotFound'))
+        } else {
+          throw new Error('Something went wrong')
+        }
       }
 
-      return
+      const data = await response.json()
+
+      setData(data)
+    } catch (error) {
+      setMessage(t('errorMessge'))
     }
-
-    //ToDo: try catch
-    const data = await response.json()
-
-    setData(data)
   }
 
   useEffect(() => {
@@ -52,17 +53,17 @@ export default function TokenNotFound() {
     switch (data.status) {
       case SUCCESS:
         setSeverity('success')
-        setMessage('Письмо отправлено. Проверьте электронную почту')
+        setMessage(t('letterSent'))
         break
 
       case NOT_FOUND:
         setSeverity('success')
-        setMessage('Этот email не подписан ни на одну рассылку')
+        setMessage(t('addressNotSubscribed'))
         break
 
       default:
         setSeverity('success')
-        setMessage('Этот email не подписан ни на одну рассылку')
+        setMessage(t('addressNotSubscribed'))
         break
     }
   }, [data])
@@ -70,29 +71,28 @@ export default function TokenNotFound() {
   return (
     <>
       <Typography variant="h4" component="h1" sx={{ mb: 4 }} align="center">
-        Эта ссылка больше не действительна
+        {t('linkNotValid')}
       </Typography>
       <Typography sx={{ mb: 2 }} align="center">
-        Для отписки от всех рассылок перейдите по ссылке из письма, которое мы
-        вам отправим.
+        {t('unsubscribeAll')}
       </Typography>
       <Typography sx={{ mb: 2 }} align="center">
         <span>
-          Вы также можете{' '}
+          {`${t('youCan')} `}
           <Link
             href="/my/subscriptions"
             sx={{ color: '#fff', textDecoration: 'underline' }}
           >
-            выбрать рассылки
+            {`${t('selectSubscriptions')} `}
           </Link>{' '}
-          которые вам интересны.
+          {`${t('youAreInterestedIn')}.`}
         </span>
       </Typography>
       <Box>
         <Formik
           enableReinitialize
           initialValues={{ email: '' }}
-          validationSchema={emailSchema}
+          validationSchema={email}
           //ToDo: add types to values
           onSubmit={(values: any, actions: FormikHelpers<Event>) => {}}
         >
@@ -124,7 +124,7 @@ export default function TokenNotFound() {
                       fullWidth
                       name="email"
                       variant="outlined"
-                      helperText="*Обязательное поле"
+                      helperText={`*${t('form.yourEmail.helperText')}`}
                       disabled={isSubmitting}
                     />
                   </Grid>
@@ -144,7 +144,7 @@ export default function TokenNotFound() {
                           })
                       }}
                     >
-                      Отправить
+                      {t('form.submit')}
                       {isSubmitting && <ButtonSubmittingCircle />}
                     </Button>
                   </Grid>

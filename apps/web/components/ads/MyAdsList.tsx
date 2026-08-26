@@ -19,7 +19,7 @@ import NoRows from '../uiParts/NoRows'
 import HeadingWithDescription from '../uiParts/HeadingWithDescription'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
-import ErrorComponet from '../uiParts/Error'
+import DataLoadingError from '../uiParts/DataLoadingError'
 import {
   getValidPageNumber,
   getValidPageSize,
@@ -259,7 +259,7 @@ export default function MyAdsList(props: MyAdsProps) {
     return () => observer.disconnect()
   }, [actionsBarRef.current])
 
-  if (status === 'error') return <ErrorComponet />
+  if (status === 'error') return <DataLoadingError />
 
   if (!data && status === 'loading') return <PageLoadingCircle />
 

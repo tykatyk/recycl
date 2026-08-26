@@ -18,17 +18,11 @@ import HeadingWithDescription, {
 } from '../../../components/uiParts/HeadingWithDescription'
 import { enqueueSnackbar } from 'notistack'
 import Head from 'next/head'
-
-const errorMessage = 'Что то пошло не так'
-const enabledText = 'Включено'
-const disabledText = 'Выключено'
-const configText = 'Настроить'
+import { useTranslations } from 'next-intl'
 
 const api = '/api/my/subscriptions'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const h1 = 'Мои подписки на получение уведомлений'
-const title = `${h1} | ${brand}`
 
 type SubscriptionName = string[]
 
@@ -38,6 +32,8 @@ export default function MySubscriptions() {
   >([])
   const [userSubs, setUserSubs] = useState<SubscriptionName>([])
   const [loading, setLoading] = useState(false)
+  const t = useTranslations('MySubscriptionsPage')
+  const tSubscriptionDetails = useTranslations('SubscriptionDetails')
 
   const userSubsForSearch = useMemo(() => {
     return new Set(userSubs)
@@ -62,7 +58,7 @@ export default function MySubscriptions() {
   async function fetchAllSubscriptions() {
     const response = await fetch(`${api}/variant`)
     if (!response.ok) {
-      throw new Error(errorMessage)
+      throw new Error(t('errorMessage'))
     }
     return await response.json()
   }
@@ -70,7 +66,7 @@ export default function MySubscriptions() {
   async function fetchUserSubscriptions() {
     const response = await fetch(`${api}?subscribed=true`)
     if (!response.ok) {
-      throw new Error(errorMessage)
+      throw new Error(t('errorMessage'))
     }
     return (await response.json()) || []
   }
@@ -85,7 +81,7 @@ export default function MySubscriptions() {
       headers: { 'Content-Type': 'application/json' },
     })
     if (!response.ok) {
-      throw new Error(errorMessage)
+      throw new Error(t('errorMessage'))
     }
   }
 
@@ -97,7 +93,7 @@ export default function MySubscriptions() {
         const userSubs = await fetchUserSubscriptions()
         setUserSubs(userSubs)
       } catch (e) {
-        enqueueSnackbar(errorMessage, { variant: 'error' })
+        enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       }
     }
     setLoading(true)
@@ -122,11 +118,11 @@ export default function MySubscriptions() {
           <HeadingWithDescription
             detailedDescription={
               <HeadingDetails
-                details={subscriptionConfig[sub.name].description}
+                details={tSubscriptionDetails(`${sub.name}.description`)}
               />
             }
           >
-            <Typography>{subscriptionConfig[sub.name].title}</Typography>
+            <Typography>{tSubscriptionDetails(`${sub.name}.title`)}</Typography>
           </HeadingWithDescription>
         </Grid>
 
@@ -141,7 +137,9 @@ export default function MySubscriptions() {
                 inputProps={{ 'aria-label': 'controlled' }}
               />
             }
-            label={userSubsForSearch.has(sub.name) ? enabledText : disabledText}
+            label={
+              userSubsForSearch.has(sub.name) ? t('enabled') : t('disabled')
+            }
           />
         </Grid>
         <Grid size={{ xs: 12 }}>
@@ -152,7 +150,7 @@ export default function MySubscriptions() {
             href={subscriptionConfig[sub.name].href}
             disabled={userSubsForSearch.has(sub.name) ? false : true}
           >
-            {configText}
+            {t('configBtn')}
           </Button>
         </Grid>
       </Grid>
@@ -168,7 +166,7 @@ export default function MySubscriptions() {
   return (
     <RedirectUnathenticatedUser>
       <Head>
-        <title>{title}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
@@ -178,11 +176,19 @@ export default function MySubscriptions() {
             variant="h4"
             component="h1"
           >
-            {h1}
+            {t('title')}
           </Typography>
           {content}
         </Box>
       </Layout>
     </RedirectUnathenticatedUser>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../../../messages/${locale}.json`)).default,
+    },
+  }
 }

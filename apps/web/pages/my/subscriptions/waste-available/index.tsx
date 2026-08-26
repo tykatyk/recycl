@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import { useRouter } from 'next/router'
-import { useEffect, useState, useRef, RefObject, useLayoutEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Cookies from 'js-cookie'
 import Layout from '../../../../components/layouts/Layout'
 import ScrollTopButton from '../../../../components/uiParts/ScrollToTopButton'
@@ -25,8 +25,7 @@ import HeadingWithDescription, {
 import DataGridFooter from '../../../../components/uiParts/DataGridFooter'
 import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
 import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
-import ErrorComponet from '../../../../components/uiParts/Error'
-import { subscriptionConfig } from '../../../../lib/helpers/subscription'
+import DataLoadingError from '../../../../components/uiParts/DataLoadingError'
 import {
   getValidPageNumber,
   getValidPageSize,
@@ -37,35 +36,19 @@ import type { PaginatedData } from '../../../../lib/types/pagination'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Head from 'next/head'
+import { useTranslations } from 'next-intl'
+import ActionsBar from '../../../../components/uiParts/ActionsBar'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const title = 'Мои подписки на получение уведомлений о появлении вторсырья'
-
 const apiUrl = '/api/my/subscriptions/waste-available'
 const baseUrl = '/my/subscriptions/waste-available'
 const createSubscriptionUrl = `${baseUrl}/create`
-
-const noDataHeaderText = 'Еще нет ни одной подписки'
-const noDataHelperText =
-  'Укажите типы вторсырья, которые вас интересуют и добавьте регион поиска'
-const addItemButtonText = 'Добавить'
-const editButtonText = 'Редактировать'
-const deleteButtonText = 'Удалить'
-const fetchDataErrorText = 'Не удалось загрузить данные'
-
-const getSearchRadiusText = (radius: number) => {
-  return `Радиус поиска: ${radius} км`
-}
 
 const getHref = (options: HrefOptions) => {
   const { page, pageSize } = options
   const href = `${baseUrl}?page=${page}&pageSize=${pageSize}`
 
   return href
-}
-
-const renderItem = (item: PaginationRenderItemParams) => {
-  return <PaginationItem {...item} />
 }
 
 const DeletingModal = (params: { open: boolean }) => {
@@ -88,6 +71,7 @@ const DeletingModal = (params: { open: boolean }) => {
 }
 
 const NoData = () => {
+  const t = useTranslations('NoData')
   return (
     <Box
       sx={{
@@ -97,25 +81,32 @@ const NoData = () => {
         alignItems: 'center',
       }}
     >
-      <Typography component={'h1'} variant="h6" sx={{ mb: 2 }} align="center">
-        {noDataHeaderText}
+      <Typography
+        component={'h1'}
+        variant="h4"
+        sx={{ mt: 2, mb: 3 }}
+        align="center"
+      >
+        {t('title')}
       </Typography>
       <Typography sx={{ mb: 4 }} align="center">
-        {noDataHelperText}
+        {t('helperText')}
       </Typography>
       <Button variant="contained" href={createSubscriptionUrl}>
-        {addItemButtonText}
+        {t('addItem')}
       </Button>
     </Box>
   )
 }
 
 const Header = () => {
+  const t = useTranslations('WasteAvailableSubscriptions')
+  const tSubscriptionDetails = useTranslations('SubscriptionDetails')
   return (
     <HeadingWithDescription
       detailedDescription={
         <HeadingDetails
-          details={subscriptionConfig.wasteAvailable.description}
+          details={tSubscriptionDetails('wasteAvailable.description')}
         />
       }
     >
@@ -125,112 +116,9 @@ const Header = () => {
         align="center"
         sx={{ mt: 2, mb: 3, width: '100%' }}
       >
-        {title}
+        {t('title')}
       </Typography>
     </HeadingWithDescription>
-  )
-}
-type ActionsBarProps = {
-  actionsBarRef: RefObject<HTMLDivElement | null>
-  isSticky: boolean
-  handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void
-  handleDeleteMany: () => Promise<void>
-  selectedCount: number
-  total: number
-}
-
-const ActionsBar = (props: ActionsBarProps) => {
-  const {
-    actionsBarRef,
-    isSticky,
-    handleSelectAll,
-    handleDeleteMany,
-    selectedCount,
-    total,
-  } = props
-  const selectAllRowsLabel = {
-    slotProps: {
-      input: { 'aria-label': 'Выбрать все строки' },
-    },
-  }
-
-  return (
-    <Box>
-      <Box
-        ref={actionsBarRef}
-        sx={{
-          position: isSticky ? 'fixed' : 'sticky',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          backgroundColor: isSticky ? '#1a2b34' : 'background.default',
-          boxShadow: isSticky ? '0 2px 4px #3c4b53' : 'none',
-          transition: isSticky ? 'background 0.3s' : 'none',
-        }}
-      >
-        <Box
-          sx={{
-            maxWidth: 900,
-            margin: 'auto',
-            pl: isSticky ? 5 : 2,
-            pr: isSticky ? 5 : 2,
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Box sx={{ p: 2, pl: 0 }}>
-                <Checkbox
-                  checked={selectedCount > 0}
-                  color="secondary"
-                  {...selectAllRowsLabel}
-                  onChange={(e) => {
-                    handleSelectAll(e)
-                  }}
-                />
-              </Box>
-
-              <Box sx={{ pr: 2 }}>
-                <Typography variant="body2" sx={{ color: 'grey.400' }}>
-                  {`Выбрано ${selectedCount} из ${total}`}
-                </Typography>
-              </Box>
-              <Box>
-                <Button
-                  size="small"
-                  disabled={selectedCount === 0}
-                  color="secondary"
-                  onClick={handleDeleteMany}
-                >
-                  Удалить выбранные
-                </Button>
-              </Box>
-            </Box>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', pr: 2, pl: 2 }}>
-              <Button
-                size="small"
-                variant="outlined"
-                href={createSubscriptionUrl}
-              >
-                {addItemButtonText}
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
   )
 }
 
@@ -248,16 +136,11 @@ const SubscriptionList = () => {
   const firstItemRef = useRef<HTMLDivElement>(null)
   const scrollPosRef = useRef<number>(0)
   const { enqueueSnackbar } = useSnackbar()
-
-  const selectRowLabel = {
-    slotProps: {
-      input: { 'aria-label': 'Выбрать строку' },
-    },
-  }
+  const t = useTranslations('SubscriptionList')
 
   const handleDelete = async (documentIds: string[]) => {
     setStatus('deleting')
-    const response = await fetch('/api/my/subscriptions/waste-available', {
+    const response = await fetch(apiUrl, {
       method: 'DELETE',
       body: JSON.stringify({ documentIds }),
       headers: {
@@ -265,17 +148,12 @@ const SubscriptionList = () => {
       },
     })
     if (!response.ok) {
-      enqueueSnackbar('Ошибка при удалении элемента', { variant: 'error' })
+      enqueueSnackbar(t('deletionError'), { variant: 'error' })
       return
     }
     setStatus('')
-    enqueueSnackbar('Элемент удален', { variant: 'success' })
+    enqueueSnackbar(t('deletionSuccess'), { variant: 'success' })
     fetchData()
-  }
-
-  const deleteMany = async () => {
-    await handleDelete(selected)
-    setSelected([])
   }
 
   const handleSelect = (id: string) => {
@@ -329,7 +207,7 @@ const SubscriptionList = () => {
       )
 
       if (!response.ok) {
-        throw new Error(fetchDataErrorText)
+        throw new Error(t('fetchDataError'))
       }
       const data = await response.json()
       const page = data.pagination.page
@@ -403,7 +281,7 @@ const SubscriptionList = () => {
     return () => observer.disconnect()
   }, [actionsBarRef.current])
 
-  if (status === 'error') return <ErrorComponet />
+  if (status === 'error') return <DataLoadingError />
 
   if (!data && status === 'loading') return <PageLoadingCircle />
 
@@ -442,7 +320,10 @@ const SubscriptionList = () => {
               actionsBarRef={actionsBarRef}
               isSticky={isSticky}
               handleSelectAll={handleSelectAll}
-              handleDeleteMany={deleteMany}
+              handleDeleteMany={async () => {
+                await handleDelete(selected)
+                setSelected([])
+              }}
               selectedCount={selected.length}
               total={Math.min(data.pagination.pageSize, data.items.length)}
             />
@@ -467,9 +348,11 @@ const SubscriptionList = () => {
                       <Box sx={{ p: 2, pl: 0 }}>
                         <Checkbox
                           color="secondary"
-                          {...selectRowLabel}
                           slotProps={{
-                            input: { 'data-id': `${item._id}` } as any,
+                            input: {
+                              'data-id': `${item._id}`,
+                              'aria-label': t('selectRow'),
+                            } as any,
                           }}
                           onChange={(e) => {
                             const id = e.target.dataset.id
@@ -488,7 +371,7 @@ const SubscriptionList = () => {
                             }}
                             variant="body2"
                           >
-                            Где искать:
+                            {`${t('whereToSearch')}:`}
                           </Typography>
                           <Typography variant="h6">
                             {item.location.description}
@@ -503,7 +386,7 @@ const SubscriptionList = () => {
                             }}
                             variant="body2"
                           >
-                            Что искать:
+                            {`${t('whatToSearch')}:`}
                           </Typography>
                           <Stack direction="row" spacing={1}>
                             {item.wasteTypes.map(
@@ -518,7 +401,7 @@ const SubscriptionList = () => {
                             sx={{ color: 'grey.400', fontWeight: 'light' }}
                             variant="body2"
                           >
-                            {getSearchRadiusText(item.radius)}
+                            {t('searchRadius', { radius: item.radius })}
                           </Typography>
                         </Box>
                         <Box sx={{ pt: 1 }}>
@@ -529,7 +412,7 @@ const SubscriptionList = () => {
                               color="secondary"
                               startIcon={<EditIcon />}
                             >
-                              {editButtonText}
+                              {t('editBtn')}
                             </Button>
                             <Button
                               size="small"
@@ -539,7 +422,7 @@ const SubscriptionList = () => {
                                 await handleDelete([item._id])
                               }}
                             >
-                              {deleteButtonText}
+                              {t('deleteBtn')}
                             </Button>
                           </Stack>
                         </Box>
@@ -580,7 +463,9 @@ const SubscriptionList = () => {
 
             router.push(href, undefined, { locale })
           }}
-          renderItem={renderItem}
+          renderItem={(item: PaginationRenderItemParams) => (
+            <PaginationItem {...item} />
+          )}
         />
       </Box>
     )
@@ -589,10 +474,11 @@ const SubscriptionList = () => {
 }
 
 export default function WasteAvailableSubscriptions() {
+  const t = useTranslations('WasteAvailableSubscriptions')
   return (
     <RedirectUnathenticatedUser>
       <Head>
-        <title>{`${title} | ${brand}`}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
@@ -611,4 +497,12 @@ export default function WasteAvailableSubscriptions() {
       </Layout>
     </RedirectUnathenticatedUser>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../../../../messages/${locale}.json`)).default,
+    },
+  }
 }

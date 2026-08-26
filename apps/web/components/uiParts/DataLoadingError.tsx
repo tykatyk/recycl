@@ -1,7 +1,9 @@
 import InfoIcon from '@mui/icons-material/Info'
 import { Box } from '@mui/material'
+import { useTranslations } from 'next-intl'
 
-export default function Error() {
+export default function DataLoadingError() {
+  const t = useTranslations('DataLoadingError')
   return (
     <Box
       sx={{
@@ -17,7 +19,7 @@ export default function Error() {
           color: 'error.main',
         }}
       >
-        Ошибка при загрузке данных
+        {t('errorMessage')}
       </Box>
     </Box>
   )

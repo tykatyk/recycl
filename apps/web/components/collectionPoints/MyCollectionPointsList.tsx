@@ -20,7 +20,7 @@ import NoRows from '../../components/uiParts/NoRows'
 import HeadingWithDescription from '../../components/uiParts/HeadingWithDescription'
 import DataGridFooter from '../../components/uiParts/DataGridFooter'
 import PageLoadingCircle from '../../components/uiParts/PageLoadingCircle'
-import ErrorComponet from '../../components/uiParts/Error'
+import DataLoadingError from '../uiParts/DataLoadingError'
 import {
   getValidPageNumber,
   getValidPageSize,
@@ -233,7 +233,7 @@ export default function MyCollectionPointsList(
     return () => observer.disconnect()
   }, [actionsBarRef.current])
 
-  if (status === 'error') return <ErrorComponet />
+  if (status === 'error') return <DataLoadingError />
 
   if (!data && status === 'loading') return <PageLoadingCircle />
 

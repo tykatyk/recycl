@@ -1,15 +1,19 @@
-import Layout from '../../../../components/layouts/Layout'
+//this component is intended to unsubscribe users by token
+//currently not used because unsubscribe is maintained by email provider
+
+import Layout from '../layouts/Layout'
 import { Grid } from '@mui/material'
 import { useRouter } from 'next/router'
-import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
+import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { ReactElement, useCallback, useEffect, useState } from 'react'
-import CustomSnackbar from '../../../../components/uiParts/Snackbars'
-import SuccessfullUnsubscribe from '../../../../components/subscriptions/SuccsesfulUnsubscribe'
-import TokenNotFound from '../../../../components/subscriptions/TokenNotFound'
-import TokenExpiredOrUsed from '../../../../components/subscriptions/TokenExpiredOrUsed'
-import { unsubscribeApiResponseCodes } from '../../../../lib/helpers/responses'
-import { UnsubscribeApiResponse } from '../../../../lib/types/subscription'
+import CustomSnackbar from '../uiParts/Snackbars'
+import SuccessfullUnsubscribe from '../subscriptions/SuccsesfulUnsubscribe'
+import TokenNotFound from '../subscriptions/TokenNotFound'
+import TokenExpiredOrUsed from '../subscriptions/TokenExpiredOrUsed'
+import { unsubscribeApiResponseCodes } from '../../lib/helpers/responses'
+import { UnsubscribeApiResponse } from '../../lib/types/subscription'
 import Head from 'next/head'
+// import { useTranslations } from 'next-intl'
 
 const { SUCCESS, NOT_FOUND, TOKEN_USED, TOKEN_EXPIRED } =
   unsubscribeApiResponseCodes
@@ -48,6 +52,7 @@ export default function Unsubscribe() {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
   const [data, setData] = useState<UnsubscribeApiResponse | null>(null)
+  // const t = useTranslations('UnsubscribePage')
 
   const dataFetcher = useCallback(async () => {
     if (typeof token !== 'string') return null
@@ -72,7 +77,6 @@ export default function Unsubscribe() {
     dataFetcher()
       .then((data) => {
         setData(data)
-        // setData({ status: NOT_FOUND })
       })
       .catch((_) => {
         setError(errorMessge)
@@ -122,4 +126,12 @@ export default function Unsubscribe() {
       </Layout>
     </>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      messages: (await import(`../../../../messages/${locale}.json`)).default,
+    },
+  }
 }
