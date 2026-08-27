@@ -4,16 +4,15 @@ import ConfirmDialog from '../ConfirmDialog'
 import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
 import { signOut } from 'next-auth/react'
 import { enqueueSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Что то пошло не так'
-const dialogMessage = `Удаление аккаунта приведет к удалению всех ваших данных.
-  Это действие нельзя отменить. Вы действительно хотите продолжить?`
 const api = '/api/my/account/delete'
 
 export default function DeleteAccountComponent() {
   const [loading, setLoading] = useState(false)
-
   const [open, setOpen] = React.useState(false)
+  const t = useTranslations('AccountSettings.DeleteAccountComponent')
+
   const handleDelete = async () => {
     try {
       setLoading(true)
@@ -24,14 +23,14 @@ export default function DeleteAccountComponent() {
         },
       })
 
-      if (response.status !== 204) throw new Error(errorMessage)
+      if (response.status !== 204) throw new Error(t('errorMessage'))
 
-      enqueueSnackbar('Ваш аккаунт удален', {
+      enqueueSnackbar(t('successMessage'), {
         variant: 'success',
       })
       signOut()
     } catch (error) {
-      enqueueSnackbar(errorMessage, {
+      enqueueSnackbar(t('errorMessage'), {
         variant: 'error',
       })
     } finally {
@@ -52,14 +51,14 @@ export default function DeleteAccountComponent() {
           disabled={loading}
           style={{ width: 'auto' }}
         >
-          Удалить аккаунт
+          {t('deleteBtn')}
           {loading && <ButtonSubmittingCircle />}
         </Button>
       </Box>
 
       <ConfirmDialog
-        title="Подтвердите удаление аккаунта"
-        message={dialogMessage}
+        title={t('confirmTitle')}
+        message={t('confirmMessage')}
         open={open}
         handleConfirm={async () => {
           setOpen(false)

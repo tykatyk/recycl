@@ -5,11 +5,12 @@ import ButtonSubmittingCircle from '../ButtonSubmittingCircle'
 import { enqueueSnackbar } from 'notistack'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Что то пошло не так'
 const api = '/api/my/account/email'
 
 export default function PhoneForm() {
+  const t = useTranslations('AccountSettings.ChangeEmailForm')
   return (
     <Box>
       <Formik
@@ -30,12 +31,9 @@ export default function PhoneForm() {
             })
 
             if (response.status === 200) {
-              enqueueSnackbar(
-                'Письмо подтверждения отправлено на новый адрес',
-                {
-                  variant: 'success',
-                },
-              )
+              enqueueSnackbar(t('successMessage'), {
+                variant: 'success',
+              })
               return
             }
 
@@ -43,6 +41,7 @@ export default function PhoneForm() {
             const { error } = data
 
             if (error.type === 'perField') {
+              //ToDo: what is returned from api
               setErrors(error.message)
               return
             }
@@ -52,12 +51,10 @@ export default function PhoneForm() {
               })
               return
             }
-            enqueueSnackbar(errorMessage, {
-              variant: 'error',
-            })
+            throw new Error('Something went wrong')
             return
           } catch (error) {
-            enqueueSnackbar(errorMessage, {
+            enqueueSnackbar(t('errorMessage'), {
               variant: 'error',
             })
           }
@@ -72,7 +69,7 @@ export default function PhoneForm() {
                   margin="normal"
                   fullWidth
                   id="email"
-                  label="Новый email адрес"
+                  label={t('label')}
                   name="email"
                   component={TextFieldFormik}
                 />
@@ -85,7 +82,7 @@ export default function PhoneForm() {
                   disabled={isSubmitting}
                   style={{ width: 'auto' }}
                 >
-                  Сохранить
+                  {t('submit')}
                   {isSubmitting && <ButtonSubmittingCircle />}
                 </Button>
               </Box>

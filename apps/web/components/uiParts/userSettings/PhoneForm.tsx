@@ -9,13 +9,15 @@ import { userPhoneFetcher } from '../../../lib/helpers/dataFetcher'
 import { enqueueSnackbar } from 'notistack'
 import { phone as phoneValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Что то пошло не так'
 const api = '/api/my/account/phone'
+
 export default function PhoneForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const [phone, setPhone] = useState('')
+  const t = useTranslations('AccountSettings.PhoneForm')
 
   const css = {
     width: '100%',
@@ -58,7 +60,7 @@ export default function PhoneForm() {
           <ErrorOutlineIcon />
         </Avatar>
         <Typography variant="body2" color="error">
-          Ошибка при получении данных
+          {t('dataFetchingError')}
         </Typography>
       </Box>
     )
@@ -83,7 +85,7 @@ export default function PhoneForm() {
             })
 
             if (response.status === 200) {
-              enqueueSnackbar('Данные успешно обновлены', {
+              enqueueSnackbar(t('successMessage'), {
                 variant: 'success',
               })
               return
@@ -103,11 +105,9 @@ export default function PhoneForm() {
               })
               return
             }
-            enqueueSnackbar(errorMessage, {
-              variant: 'error',
-            })
+            throw new Error('Something went wrong')
           } catch (error) {
-            enqueueSnackbar(errorMessage, {
+            enqueueSnackbar(t('errorMessage'), {
               variant: 'error',
             })
           }
@@ -122,7 +122,7 @@ export default function PhoneForm() {
                   margin="normal"
                   fullWidth
                   id="phone"
-                  label="Номер телефона"
+                  label={t('label')}
                   name="phone"
                   component={TextFieldFormik}
                 />
@@ -135,7 +135,7 @@ export default function PhoneForm() {
                   disabled={isSubmitting}
                   style={{ width: 'auto' }}
                 >
-                  Сохранить
+                  {t('submit')}
                   {isSubmitting && <ButtonSubmittingCircle />}
                 </Button>
               </Box>

@@ -3,25 +3,24 @@ import LayoutWithoutHeader from '../../../../components/layouts/LayoutWithoutHea
 import { Box, Alert, Button } from '@mui/material'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import { useTranslations } from 'next-intl'
 
 type ChangeEmailProps = {
   urlIsValid: boolean
 }
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const title = `Смена email | ${brand}`
-
-const buttonText = 'На главную'
 
 export default function ChangeEmail(props: ChangeEmailProps) {
   const { urlIsValid } = props
   const router = useRouter()
   const { locale } = router
+  const t = useTranslations('ChangeEmailPage')
 
   return (
     <>
       <Head>
-        <title>{title}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <LayoutWithoutHeader>
@@ -47,9 +46,7 @@ export default function ChangeEmail(props: ChangeEmailProps) {
                 severity={urlIsValid ? 'success' : 'error'}
                 sx={{ color: '#fff' }}
               >
-                {urlIsValid
-                  ? 'Адрес электронной почты успешно изменен'
-                  : 'Срок действия ссылки истек'}
+                {urlIsValid ? t('successMessage') : t('errorMessage')}
               </Alert>
             </Box>
 
@@ -64,7 +61,7 @@ export default function ChangeEmail(props: ChangeEmailProps) {
                 sx={{ color: '#fff' }}
                 variant={'outlined'}
               >
-                {buttonText}
+                {t('homeBtn')}
               </Button>
             </Box>
           </Box>
@@ -74,10 +71,10 @@ export default function ChangeEmail(props: ChangeEmailProps) {
   )
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps({ query, locale }) {
   await dbConnect()
   const user = await UserModel.findOne({
-    resetEmailToken: context.query.token,
+    resetEmailToken: query.token,
   })
 
   if (!user) {
@@ -102,6 +99,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       urlIsValid: true,
+      messages: (await import(`../../../../messages/${locale}.json`)).default,
     },
   }
 }

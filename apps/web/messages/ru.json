@@ -509,5 +509,38 @@
     "noVariants": "Нет вариантов",
     "loading": "Загрузка",
     "placeholder": "Введите адрес"
+  },
+  "AccountSettings": {
+    "title": "Настройки аккаунта",
+    "changeContactData": "Изменить контактные данные",
+    "changePhone": "Изменить номер телефона",
+    "changeEmail": "Изменить email-адрес",
+    "deleteAccount": "Удалить аккаунт",
+    "PhoneForm": {
+      "successMessage": "Данные успешно обновлены",
+      "errorMessage": "Что то пошло не так",
+      "dataFetchingError": "Ошибка при получении данных",
+      "label": "Номер телефона",
+      "submit": "Сохранить"
+    },
+    "ChangeEmailForm": {
+      "successMessage": "Письмо подтверждения отправлено на новый адрес",
+      "errorMessage": "Что то пошло не так",
+      "label": "Новый email адрес",
+      "submit": "Сохранить"
+    },
+    "DeleteAccountComponent": {
+      "deleteBtn": "Удалить аккаунт",
+      "successMessage": "Ваш аккаунт удален",
+      "errorMessage": "Что то пошло не так",
+      "confirmMessage": "Удаление аккаунта приведет к удалению всех ваших данных. Это действие нельзя отменить. Вы действительно хотите продолжить?",
+      "confirmTitle": "Подтвердите удаление аккаунта"
+    }
+  },
+  "ChangeEmailPage": {
+    "title": "Смена email",
+    "homeBtn": "На главную",
+    "successMessage": "Адрес электронной почты успешно изменен",
+    "errorMessage": "Срок действия ссылки истек"
   }
 }
