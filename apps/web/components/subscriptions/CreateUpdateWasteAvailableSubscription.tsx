@@ -1,42 +1,32 @@
 import { useEffect, useState } from 'react'
-import SubscriptionForm from './SubscriptionForm'
+import SubscriptionForm from './WasteAvailableSubscriptionForm'
 import { Formik, FormikHelpers } from 'formik'
 import { getNormalizedValues } from '../../lib/helpers/eventHelpers'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import { useRouter } from 'next/router'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import type { Waste } from '../../lib/types/waste'
 import Layout from '../layouts/Layout'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
-import { default as ErrorComponent } from '../uiParts/Error'
+import DataLoadingError from '../uiParts/DataLoadingError'
 import { wasteAvailableSubscriptionSchema } from '../../lib/validation'
 import NotSubscribed from './NotSubscribed'
 import * as yup from 'yup'
-import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
 import Head from 'next/head'
 import { enqueueSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-
-const createTitle =
-  'Создать подписку на получение уведомлений о наличии вторсырья'
-const updateTitle =
-  'Редактировать подписку на получение уведомлений о наличии вторсырья'
-
-const errorMessage = 'Возникла ошибка при сохранении заявки'
-const notSubscribedMessage =
-  ' У вас отключены уведомления о появлении вторсырья.'
-
-const createRoute = `/api/my/subscriptions/waste-available`
-const updateRoute = (id: string) =>
-  `/api/my/subscriptions/waste-available/${id}`
+const api = '/api/my/subscriptions'
+const createRoute = `${api}/waste-available`
+const updateRoute = (id: string) => `${api}/waste-available/${id}`
 const indexRoute = '/my/subscriptions/waste-available'
+const wasteTypesApi = '/api/waste-types'
 
-export default function CreateSubscription(params: {
+export default function CreateUpdateWasteAvailableSubscription(params: {
   action: 'create' | 'update'
 }) {
   const { action } = params
-  const title = action === 'create' ? createTitle : updateTitle
   const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
   const router = useRouter()
   const { locale } = router
@@ -47,10 +37,12 @@ export default function CreateSubscription(params: {
     radius: '',
   } as any)
   const { id = '' } = router.query
+  const t = useTranslations('CreateUpdateWasteAvailableSubscription')
+  const title = action === 'create' ? t('createTitle') : t('updateTitle')
 
   useEffect(() => {
     const getUserSubscriptions = async () => {
-      const response = await fetch(`/api/my/subscriptions`)
+      const response = await fetch(api)
 
       if (!response.ok) {
         throw new Error('Response is not OK')
@@ -60,7 +52,7 @@ export default function CreateSubscription(params: {
     }
 
     const getWasteTypes = async () => {
-      const response = await fetch('/api/waste-types')
+      const response = await fetch(wasteTypesApi)
 
       if (!response.ok) {
         throw new Error('Response is not OK')
@@ -94,14 +86,15 @@ export default function CreateSubscription(params: {
   }, [])
 
   useEffect(() => {
+    if (action !== 'update' || !id) return
+
     const fetcher = async () => {
-      if (!id) return
+      if (typeof id !== 'string') return
 
-      const response = await fetch(
-        `/api/my/subscriptions/waste-available/${id}`,
-      )
+      const url = updateRoute(id)
+      const response = await fetch(url)
 
-      if (!response.ok) throw new Error(errorMessage)
+      if (!response.ok) throw new Error(t('errorMessage'))
 
       const data = await response.json()
       setInitialValues(data)
@@ -147,17 +140,18 @@ export default function CreateSubscription(params: {
       if (!response.ok) {
         if (response.status === 422) {
           const data = await response.json()
+          //ToDo: what is returned from the api
           enqueueSnackbar(data.error, { variant: 'error' })
           return
         }
-        throw new Error(errorMessage)
+        throw new Error(t('errorMessage'))
       }
 
       action === 'create'
         ? router.push(indexRoute, undefined, { locale })
         : router.back()
     } catch (error) {
-      enqueueSnackbar(errorMessage, { variant: 'error' })
+      enqueueSnackbar(t('errorMessage'), { variant: 'error' })
     } finally {
       setSubmitting(false)
     }
@@ -168,7 +162,7 @@ export default function CreateSubscription(params: {
       <>
         <Box sx={{ mt: 2, mb: 3 }}>
           <Typography component={'h1'} variant="h4" align="center">
-            {action === 'create' ? createTitle : updateTitle}
+            {action === 'create' ? t('createTitle') : t('updateTitle')}
           </Typography>
         </Box>
 
@@ -179,23 +173,12 @@ export default function CreateSubscription(params: {
             validationSchema={wasteAvailableSubscriptionSchema}
             onSubmit={formHandler}
           >
-            <SubscriptionForm wasteTypes={wasteTypes} />
+            {({ values }) => {
+              return <SubscriptionForm wasteTypes={wasteTypes} />
+            }}
           </Formik>
         </Box>
       </>
-    )
-  }
-
-  const ErrorView = () => {
-    return (
-      <Stack spacing={3} sx={{ alignItems: 'center' }}>
-        <ErrorComponent />
-        <Box>
-          <Button variant="outlined" color="secondary" href="/my/subscriptions">
-            Вернуться
-          </Button>
-        </Box>
-      </Stack>
     )
   }
 
@@ -204,9 +187,9 @@ export default function CreateSubscription(params: {
       case 'loading':
         return <PageLoadingCircle />
       case 'unsubscribed':
-        return <NotSubscribed message={notSubscribedMessage} />
+        return <NotSubscribed message={t('notSubscribed')} />
       case 'error':
-        return <ErrorView />
+        return <DataLoadingError />
       case 'ok':
         return <CreateUpdateForm />
       default:
@@ -215,7 +198,7 @@ export default function CreateSubscription(params: {
   }
 
   return (
-    <RedirectUnathenticatedUser>
+    <>
       <Head>
         <title>{`${title} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -225,7 +208,6 @@ export default function CreateSubscription(params: {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
             alignItems: 'center',
             width: '100%',
           }}
@@ -233,6 +215,6 @@ export default function CreateSubscription(params: {
           {renderContent()}
         </Box>
       </Layout>
-    </RedirectUnathenticatedUser>
+    </>
   )
 }

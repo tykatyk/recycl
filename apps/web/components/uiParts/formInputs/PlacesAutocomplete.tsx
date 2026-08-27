@@ -7,6 +7,11 @@ import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
+import { useTranslations } from 'next-intl'
+
+const noVariants = 'Нет вариантов'
+const loading = 'Загрузка'
+const placeholder = 'Введите адрес'
 
 let autocompleteService = null
 
@@ -28,6 +33,7 @@ function PlacesAutocompleteComponent(props) {
   const [options, setOptions] = React.useState([])
   const [sessionToken, setSessionToken] = React.useState(null)
   const placesLib = useMapsLibrary('places')
+  const t = useTranslations('PlacesAutocompleteComponent')
 
   const fetch = useMemo(
     () =>
@@ -106,8 +112,8 @@ function PlacesAutocompleteComponent(props) {
   return (
     <Autocomplete
       value={value}
-      noOptionsText="Нет вариантов"
-      loadingText="Загрузка"
+      noOptionsText={t('noVariants')}
+      loadingText={t('loading')}
       getOptionLabel={(option) =>
         typeof option === 'string'
           ? option
@@ -162,6 +168,7 @@ function PlacesAutocompleteComponent(props) {
             helperText={helperText}
             label={label}
             error={error}
+            placeholder={t('placeholder')}
           />
         )
       }}

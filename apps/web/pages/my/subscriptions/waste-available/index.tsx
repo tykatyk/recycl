@@ -137,6 +137,7 @@ const SubscriptionList = () => {
   const scrollPosRef = useRef<number>(0)
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('SubscriptionList')
+  const tNoData = useTranslations('NoData')
 
   const handleDelete = async (documentIds: string[]) => {
     setStatus('deleting')
@@ -326,7 +327,17 @@ const SubscriptionList = () => {
               }}
               selectedCount={selected.length}
               total={Math.min(data.pagination.pageSize, data.items.length)}
-            />
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', pr: 2, pl: 2 }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  href={createSubscriptionUrl}
+                >
+                  {tNoData('addItem')}
+                </Button>
+              </Box>
+            </ActionsBar>
             <Stack spacing={2} sx={{ width: '100%' }}>
               {data.items.map((item, idx: number) => {
                 return (

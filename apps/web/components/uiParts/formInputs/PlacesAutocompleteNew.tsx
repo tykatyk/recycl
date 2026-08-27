@@ -7,6 +7,7 @@ import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 import type { PlaceTypeWithMatchedSubstrings } from '../../../lib/types/placeAutocomplete'
+import { useTranslations } from 'next-intl'
 
 type PlacesAutocompleteProps = {
   name: string
@@ -21,6 +22,7 @@ type PlacesAutocompleteProps = {
 }
 
 function PlacesAutocompleteNew(props: PlacesAutocompleteProps) {
+  const t = useTranslations('PlacesAutocompleteComponent')
   const {
     name,
     label,
@@ -98,8 +100,8 @@ function PlacesAutocompleteNew(props: PlacesAutocompleteProps) {
     <Autocomplete
       value={value}
       onChange={onChange}
-      noOptionsText="Нет вариантов"
-      loadingText="Загрузка"
+      noOptionsText={t('noVariants')}
+      loadingText={t('loading')}
       getOptionLabel={(option) =>
         typeof option === 'string'
           ? option
@@ -135,6 +137,7 @@ function PlacesAutocompleteNew(props: PlacesAutocompleteProps) {
             label={label}
             error={error}
             onBlur={onBlur}
+            placeholder={t('placeholder')}
           />
         )
       }}

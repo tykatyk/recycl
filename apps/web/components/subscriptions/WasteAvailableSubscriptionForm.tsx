@@ -13,13 +13,17 @@ import 'dayjs/locale/ru'
 import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import type { Waste } from '../../lib/types/waste'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
+import { useTranslations } from 'next-intl'
 
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
 
-const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
+export default function WasteAvailableSubscriptionForm(props: {
+  wasteTypes: Waste[]
+}) {
   const { wasteTypes } = props
   const { isSubmitting } = useFormikContext<CollectionPoint>()
+  const t = useTranslations('CreateUpdateWasteAvailableSubscription.form')
 
   return (
     <Form>
@@ -31,8 +35,8 @@ const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
             variant="outlined"
             fullWidth
             component={PlacesAutocomplete}
-            label="Местоположение"
-            helperText="*Обязательное поле"
+            label={t('location.label')}
+            helperText={`*${t('location.helperText')}`}
             disabled={isSubmitting}
           />
         </Box>
@@ -44,12 +48,16 @@ const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
             variant="outlined"
             fullWidth
             component={TextFieldFormik}
-            label="Радиус поиска, км"
-            helperText="*Обязательное поле"
+            label={t('searchRadius.label')}
+            helperText={`*${t('searchRadius.helperText')}`}
             type="number"
             inputProps={{ min: 1, max: 200 }}
             InputProps={{
-              endAdornment: <InputAdornment position="end">Км</InputAdornment>,
+              endAdornment: (
+                <InputAdornment position="end">
+                  {t('searchRadius.endAdornment')}
+                </InputAdornment>
+              ),
             }}
             disabled={isSubmitting}
           />
@@ -59,8 +67,8 @@ const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
           <Field
             id="wasteTypes"
             name="wasteTypes"
-            label="Типы вторсырья"
-            helperText="*Обязательное поле"
+            label={t('wasteTypes.label')}
+            helperText={`*${t('wasteTypes.helperText')}`}
             component={TextFieldFormik}
             fullWidth
             select
@@ -102,7 +110,6 @@ const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
                   sx={{
                     '&.Mui-selected': {
                       background: '#2e3638',
-                      // background: '#333b3f',
                     },
                   }}
                   key={item['_id']}
@@ -116,7 +123,7 @@ const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
         </Box>
         <Box>
           <Button variant="contained" type="submit" disabled={isSubmitting}>
-            Сохранить
+            {t('submit')}
             {isSubmitting && <ButtonSubmittingCircle />}
           </Button>
         </Box>
@@ -124,5 +131,3 @@ const SubscriptionForm = (props: { wasteTypes: Waste[] }) => {
     </Form>
   )
 }
-
-export default SubscriptionForm

@@ -9,6 +9,7 @@ type ActionsBarProps = {
   handleDeleteMany: () => Promise<void>
   selectedCount: number
   total: number
+  children?: React.ReactNode
 }
 
 export default function ActionsBar(props: ActionsBarProps) {
@@ -20,6 +21,7 @@ export default function ActionsBar(props: ActionsBarProps) {
     handleDeleteMany,
     selectedCount,
     total,
+    children,
   } = props
   const selectAllRowsLabel = {
     slotProps: {
@@ -90,6 +92,7 @@ export default function ActionsBar(props: ActionsBarProps) {
                 </Button>
               </Box>
             </Box>
+            {children}
           </Box>
         </Box>
       </Box>
