@@ -7,14 +7,18 @@ import GppMaybeIcon from '@mui/icons-material/GppMaybe'
 import { useCallback, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import ComplaintDialog from '../uiParts/ComplaintDialog'
 import dayjs from 'dayjs'
+import { useTranslations } from 'next-intl'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
-const phoneLoadingErrorMessage = 'Что то пошло не так'
+
+const api = '/api/collection-points/phone'
 
 export default function SingleCollectionPoint(props) {
+  const t = useTranslations('SingleCollectionPoint')
+  const tCollectionPointTypes = useTranslations('CollectionPointTypes')
+
   const { data } = props
   const [showPhone, setShowPhone] = useState(false)
   const [phone, setPhone] = useState(defaultPhone)
@@ -30,7 +34,7 @@ export default function SingleCollectionPoint(props) {
 
     try {
       setLoading(true)
-      const result = await fetch('/api/collection-points/phone', {
+      const result = await fetch(api, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adId }),
@@ -40,7 +44,7 @@ export default function SingleCollectionPoint(props) {
       setPhone(data)
       setShowPhone(true)
     } catch (error) {
-      enqueueSnackbar(phoneLoadingErrorMessage, { variant: 'error' })
+      enqueueSnackbar(t('errorMessage'), { variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -51,7 +55,7 @@ export default function SingleCollectionPoint(props) {
       <Box sx={{ mb: 3 }}>
         <Box sx={{ mb: 1 }}>
           <Typography component="h1" variant="h4">
-            Пункт приема вторсырья
+            {t('h1')}
           </Typography>
         </Box>
         <Box sx={{ mb: 2 }}>
@@ -65,7 +69,7 @@ export default function SingleCollectionPoint(props) {
             }}
           >
             <LocationPinIcon />
-            {`Местоположение: ${data.location.description}`}
+            {t('location', { locationDescription: data.location.description })}
           </Typography>
         </Box>
       </Box>
@@ -83,20 +87,22 @@ export default function SingleCollectionPoint(props) {
         <Box>
           <Grid container spacing={2}>
             <Chip
-              label={`Тип пункта приема: ${collectionPointTypes[data.variant].toLowerCase()}`}
+              //ToDo
+              label={`${t('collectionPointType')}: ${tCollectionPointTypes(data.variant.toLowerCase())}`}
               size="small"
             />
-            <Chip label={`Добавил: ${data.user.name}`} size="small" />
+            <Chip
+              label={t('addedBy', { userName: data.user.name })}
+              size="small"
+            />
           </Grid>
         </Box>
 
         {data.variant === 'mobile' && (
           <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
-            <Typography
-              component={'h2'}
-              variant="h5"
-              gutterBottom
-            >{`Дата и время начала`}</Typography>
+            <Typography component={'h2'} variant="h5" gutterBottom>
+              {t('startingDate')}
+            </Typography>
             <Typography>
               {dayjs(data.date).format('DD.MM.YYYY HH:MM')}
             </Typography>
@@ -104,11 +110,9 @@ export default function SingleCollectionPoint(props) {
         )}
 
         <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
-          <Typography
-            component={'h2'}
-            variant="h5"
-            gutterBottom
-          >{`Виды вторсырья, которые принимаются`}</Typography>
+          <Typography component={'h2'} variant="h5" gutterBottom>
+            {t('wasteTypes')}
+          </Typography>
 
           <Grid container spacing={2}>
             {data.wasteTypes.map((item, idx) => {
@@ -118,7 +122,7 @@ export default function SingleCollectionPoint(props) {
         </Box>
         <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
           <Typography component={'h2'} variant="h5" gutterBottom>
-            Контактный телефон
+            {t('contactPhone')}
           </Typography>
           <Box>
             <Grid container spacing={2} sx={{ alignItems: 'center' }}>
@@ -139,7 +143,7 @@ export default function SingleCollectionPoint(props) {
                   color="secondary"
                   loading={loading}
                 >
-                  Показать
+                  {t('showPhoneBtn')}
                 </Button>
               )}
             </Grid>
@@ -149,7 +153,7 @@ export default function SingleCollectionPoint(props) {
         {data.comment && (
           <Box>
             <Typography component={'h2'} variant="h5" gutterBottom>
-              Опиcание
+              {t('description')}
             </Typography>
             <Typography>{data.comment}</Typography>
           </Box>
@@ -166,7 +170,7 @@ export default function SingleCollectionPoint(props) {
               }}
               startIcon={<GppMaybeIcon />}
             >
-              Пожаловаться
+              {t('complain')}
             </Button>
           </Box>
           <ComplaintDialog

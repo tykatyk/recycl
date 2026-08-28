@@ -23,6 +23,7 @@ export default function CreateCollectionPoint() {
   const { locale } = router
   const [selected, setSelected] = useState<string>('')
   const t = useTranslations('CreateCollectionPointPage')
+  const tCollectionPointTypes = useTranslations('CollectionPointTypes')
 
   return (
     <>
@@ -61,9 +62,9 @@ export default function CreateCollectionPoint() {
                     setSelected(e.target.value)
                   }}
                 >
-                  {Object.keys(collectionPointTypes).map((key, index) => (
+                  {collectionPointTypes.map((key, index) => (
                     <MenuItem key={index} value={key}>
-                      {collectionPointTypes[key]}
+                      {tCollectionPointTypes(key)}
                     </MenuItem>
                   ))}
                 </Select>

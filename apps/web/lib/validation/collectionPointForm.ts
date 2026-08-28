@@ -10,7 +10,7 @@ export const collectionPointSchema = yup.object({
   variant: yup
     .string()
     .required()
-    .oneOf(Object.keys(collectionPointTypes))
+    .oneOf(collectionPointTypes)
     .default('container'),
   date: yup.string().when('variant', {
     is: 'mobile',

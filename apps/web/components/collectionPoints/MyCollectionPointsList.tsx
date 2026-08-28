@@ -30,7 +30,7 @@ import type { PaginatedData } from '../../lib/types/pagination'
 import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import { CollectionPointVariant } from '@recycl/shared/dist/constants'
 import CollectionPointTabs from '../uiParts/CollectionPointTabs'
 import { CollectionPointsDescription } from '../../components/uiParts/CollectionPointComponents'
 import dayjs from 'dayjs'
@@ -49,7 +49,7 @@ const getHref = (options: HrefOptions) => {
 }
 
 const handleVariantChange = (
-  newVariant: keyof typeof collectionPointTypes,
+  newVariant: CollectionPointVariant,
   locale: string,
 ) => {
   if (newVariant === 'container') {
@@ -62,7 +62,7 @@ const handleVariantChange = (
 }
 
 type MyCollectionPointsListProps = {
-  variant?: keyof typeof collectionPointTypes
+  variant?: CollectionPointVariant
   h1: string
 }
 export default function MyCollectionPointsList(

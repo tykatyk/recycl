@@ -5,7 +5,7 @@ import type {
   OrderBy,
   PaginationOptions,
 } from '../../types/pagination'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import { CollectionPointVariant } from '@recycl/shared/dist/constants'
 const { asc, desc } = validSortOrder
 
 type SortOption = -1 | 1
@@ -35,7 +35,7 @@ const getSortQuery = (
 const collectionPointsQueries = {
   getAll: async (
     queryParams: PaginationOptions & {
-      variant: keyof typeof collectionPointTypes
+      variant: CollectionPointVariant
     },
     user: string,
   ) => {

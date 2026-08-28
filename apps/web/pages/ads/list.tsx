@@ -27,14 +27,12 @@ export default function AdsListView(props: AdsOnListProps) {
   return <AdsOnList {...props} />
 }
 
-export async function getServerSideProps(context) {
-  const { locale } = context
+export async function getServerSideProps({ locale, query }) {
   const messages = {
     messages: (await import(`../../messages/${locale}.json`)).default,
   }
 
   try {
-    const { query } = context
     //ToDo: add verification that locationDescription really belongs to locationId
     const {
       searchRadius = 0,

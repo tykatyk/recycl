@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { Tab, Tabs, Box } from '@mui/material'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import { CollectionPointVariant } from '@recycl/shared/dist/constants'
 import { useTranslations } from 'next-intl'
 
 interface TabPanelProps {
   children?: React.ReactNode
   index: string
-  value: keyof typeof collectionPointTypes
+  value: CollectionPointVariant
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -34,10 +34,10 @@ function a11yProps(index: number) {
 
 interface AdTabProps {
   children: React.ReactNode
-  value: keyof typeof collectionPointTypes
+  value: CollectionPointVariant
   handleChange: (
     event: React.SyntheticEvent,
-    newValue: keyof typeof collectionPointTypes,
+    newValue: CollectionPointVariant,
   ) => void
 }
 

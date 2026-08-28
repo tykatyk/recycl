@@ -15,7 +15,7 @@ import {
 } from '../uiParts/CollectionPointComponents'
 import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import { CollectionPointVariant } from '@recycl/shared/dist/constants'
 import dayjs from 'dayjs'
 import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
 import { useTranslations } from 'next-intl'
@@ -23,7 +23,7 @@ import { useTranslations } from 'next-intl'
 const api = '/api/my/collection-points'
 
 type CollectionPointFormProps = {
-  variant: keyof typeof collectionPointTypes
+  variant: CollectionPointVariant
   h1: string
 }
 export default function CollectionPointFormUpdate(

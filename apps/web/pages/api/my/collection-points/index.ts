@@ -24,7 +24,10 @@ import {
 } from '../../../../lib/validation'
 import mongoose from 'mongoose'
 import getCoords from '../../../../lib/helpers/getCoords'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import {
+  collectionPointTypes,
+  CollectionPointVariant,
+} from '@recycl/shared/dist/constants'
 
 const queryValidationSchema = yup.object({
   page: paginationPageNumberSchema,
@@ -38,9 +41,9 @@ const queryValidationSchema = yup.object({
     .transform((value) => (validOrderBy[value] ? value : undefined))
     .default(validOrderBy.createdAt),
   variant: yup
-    .string<keyof typeof collectionPointTypes>()
+    .string<CollectionPointVariant>()
     .transform((value) =>
-      Object.keys(collectionPointTypes).includes(value) ? value : undefined,
+      collectionPointTypes.includes(value) ? value : undefined,
     )
     .default('container'),
 })

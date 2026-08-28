@@ -16,7 +16,7 @@ import {
 } from '../uiParts/CollectionPointComponents'
 import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import type { CollectionPointVariant } from '@recycl/shared/dist/constants'
 import {
   wasteTypeFetcher,
   userPhoneFetcher,
@@ -27,7 +27,7 @@ const api = '/api/my/collection-points'
 const indexRoute = '/my/collection-points'
 
 type CollectionPointFormProps = {
-  variant: keyof typeof collectionPointTypes
+  variant: CollectionPointVariant
   h1: string
 }
 export default function CollectionPointFormCreate(

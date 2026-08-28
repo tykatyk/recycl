@@ -8,14 +8,14 @@ import type { CollectionPoint } from '../types/collectionPoint'
 import WasteTypeModel from '@recycl/shared/dist/server/db/models/wasteType'
 import mongoose from 'mongoose'
 import type { Lng, Lat } from '@recycl/shared/dist/server/types'
-import { collectionPointTypes } from '@recycl/shared/dist/constants'
+import { CollectionPointVariant } from '@recycl/shared/dist/constants'
 
 type AggregatedCollectionPoint = {
   _id: string
   documents: [
     CollectionPoint & {
       _id: mongoose.Types.ObjectId
-      variant: keyof typeof collectionPointTypes
+      variant: CollectionPointVariant
     },
   ]
   wasteLocation: {

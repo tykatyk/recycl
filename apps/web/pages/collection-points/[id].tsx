@@ -8,15 +8,18 @@ import BlockIcon from '@mui/icons-material/Block'
 import { useRouter } from 'next/router'
 import { isValidObjectId } from 'mongoose'
 import Head from 'next/head'
+import Link from '../../components/uiParts/Link'
+import { useTranslations } from 'use-intl'
 
 const { documentActivityStatus } = constants
 const { active } = documentActivityStatus
-const headerText = 'Это объявление не активно'
-const backButtonText = 'Назад'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
+const collectionPointsListUrl = '/collection-points/list'
 
 function ContentNotAvailableView() {
   const router = useRouter()
+  const { locale } = router
+  const t = useTranslations('CollectionPointPage')
 
   return (
     <Box
@@ -40,21 +43,23 @@ function ContentNotAvailableView() {
             mb: 1,
           }}
         >
-          <BlockIcon fontSize="large" color="error" />
+          <BlockIcon fontSize="large" />
         </Box>
-        <Typography component="h1" variant="h5" mb={3}>
-          {headerText}
+        <Typography component="h1" variant="h4" sx={{ mb: 2 }}>
+          {t('errorTitle')}
         </Typography>
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Button
+          component={Link}
           sx={{ mb: 1 }}
           variant="contained"
           color="secondary"
-          onClick={() => router.back()}
+          href={collectionPointsListUrl}
+          locale={locale}
         >
-          {backButtonText}
+          {t('vieOtherBtn')}
         </Button>
       </Box>
     </Box>
@@ -63,12 +68,13 @@ function ContentNotAvailableView() {
 
 export default function CollectionPoint(props) {
   const { data, error } = props
+  const t = useTranslations('CollectionPointPage')
 
   if (error) {
     return (
       <>
         <Head>
-          <title>{`Обьявление больше не доступно | ${brand}`}</title>
+          <title>{`${t('errorTitle')} | ${brand}`}</title>
         </Head>
         <Layout>
           <ContentNotAvailableView />
@@ -80,11 +86,8 @@ export default function CollectionPoint(props) {
   return (
     <>
       <Head>
-        <title>{`Пункт приема вторсырья ${data.location.description} | ${brand}`}</title>
-        <meta
-          name="description"
-          content={`Пункт приема вторсырья. ${data.location.description}`}
-        />
+        <title>{`${t('successTitle', { description: data.location.description })} | ${brand}`}</title>
+        <meta name="description" content={t('successTitle')} />
       </Head>
       <Layout>
         <SingleCollectionPoint data={data} />
@@ -93,9 +96,8 @@ export default function CollectionPoint(props) {
   )
 }
 
-export async function getServerSideProps(context) {
-  const { res } = context
-  const { id } = context.query
+export async function getServerSideProps({ res, locale, query }) {
+  const { id } = query
 
   if (!isValidObjectId(id)) {
     return {
@@ -139,6 +141,7 @@ export async function getServerSideProps(context) {
         },
         createdAt: data.createdAt.toDateString(),
       },
+      messages: (await import(`../../messages/${locale}.json`)).default,
     },
   }
 }

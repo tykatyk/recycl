@@ -4,11 +4,13 @@ export const documentActivityStatus = {
   disabled: 'disabled',
 } as const
 
-export const collectionPointTypes = {
-  stationery: 'Стационарный',
-  mobile: 'Передвижной',
-  container: 'Сортировочный контейнер',
-} as const
+export const collectionPointTypes = [
+  'stationery',
+  'mobile',
+  'container',
+] as const
+
+export type CollectionPointVariant = (typeof collectionPointTypes)[number]
 
 export const userRoles = { user: 'user', admin: 'admin' }
 
