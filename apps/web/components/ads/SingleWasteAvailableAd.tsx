@@ -8,9 +8,10 @@ import { useCallback, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
 import ComplaintDialog from '../uiParts/ComplaintDialog'
+import { useTranslations } from 'use-intl'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
-const phoneLoadingErrorMessage = 'Что то пошло не так'
+const api = '/api/ads/phone'
 
 export default function SingleWasteAvailableAd(props) {
   const { data } = props
@@ -18,9 +19,10 @@ export default function SingleWasteAvailableAd(props) {
   const [phone, setPhone] = useState(defaultPhone)
   const [loading, setLoading] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
-  const creationDate = new Date(data.createdAt)
   const [complaintDialogOpen, setComplaintDialogOpen] = useState(false)
+  const t = useTranslations('SingleWasteAvailableAd')
 
+  const creationDate = new Date(data.createdAt)
   const formattedDate = new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
     month: 'long',
@@ -35,7 +37,7 @@ export default function SingleWasteAvailableAd(props) {
 
     try {
       setLoading(true)
-      const result = await fetch('/api/ads/phone', {
+      const result = await fetch(api, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adId }),
@@ -45,7 +47,7 @@ export default function SingleWasteAvailableAd(props) {
       setPhone(data)
       setShowPhone(true)
     } catch (error) {
-      enqueueSnackbar(phoneLoadingErrorMessage, { variant: 'error' })
+      enqueueSnackbar(t('errorMessage'), { variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -71,7 +73,7 @@ export default function SingleWasteAvailableAd(props) {
             }}
           >
             <LocationPinIcon />
-            {`Местоположение: ${data.wasteLocation.description}`}
+            {`${t('location')}: ${data.wasteLocation.description}`}
           </Typography>
         </Box>
       </Box>
@@ -88,24 +90,21 @@ export default function SingleWasteAvailableAd(props) {
       >
         <Box>
           <Grid container spacing={2}>
-            <Chip label={`Тип вторсырья: ${data.wasteType}`} size="small" />
-
-            <Chip label={`Объявление создано: ${formattedDate}`} size="small" />
-            <Chip label={`Добавил: ${data.user.name}`} size="small" />
+            <Chip label={`${t('wasteType')}: ${data.wasteType}`} size="small" />
+            <Chip label={`${t('adCreated')}: ${formattedDate}`} size="small" />
+            <Chip label={`${t('addedUser')}: ${data.user.name}`} size="small" />
           </Grid>
         </Box>
 
         <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
-          <Typography
-            component={'h2'}
-            variant="h5"
-            gutterBottom
-          >{`Вес вторсырья`}</Typography>
-          <Typography>{`${data.quantity} кг`}</Typography>
+          <Typography component={'h2'} variant="h5" gutterBottom>
+            {t('wasteWeight')}
+          </Typography>
+          <Typography>{`${data.quantity} ${t('quantityDimension')}`}</Typography>
         </Box>
         <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
           <Typography component={'h2'} variant="h5" gutterBottom>
-            Контактный телефон
+            {t('contactPhone')}
           </Typography>
           <Box>
             <Grid container spacing={2} sx={{ alignItems: 'center' }}>
@@ -126,7 +125,7 @@ export default function SingleWasteAvailableAd(props) {
                   color="secondary"
                   loading={loading}
                 >
-                  Показать
+                  {t('view')}
                 </Button>
               )}
             </Grid>
@@ -136,7 +135,7 @@ export default function SingleWasteAvailableAd(props) {
         {data.comment && (
           <Box sx={{ p: 2, background: `${background}`, borderRadius: 2 }}>
             <Typography component={'h2'} variant="h5" gutterBottom>
-              Опиcание
+              {t('description')}
             </Typography>
             <Typography>{data.comment}</Typography>
           </Box>
@@ -153,7 +152,7 @@ export default function SingleWasteAvailableAd(props) {
               }}
               startIcon={<GppMaybeIcon />}
             >
-              Пожаловаться
+              {t('complain')}
             </Button>
           </Box>
           <ComplaintDialog

@@ -5,7 +5,7 @@ const { phone, waste, location, notOnlySpaces, validationMessages, comment } =
   validation
 const { required, type, positive, minLength, maxLength } = validationMessages
 
-export default yup.object().shape({
+export default yup.object({
   title: yup
     .string()
     .concat(notOnlySpaces)
