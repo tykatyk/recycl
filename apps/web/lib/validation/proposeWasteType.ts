@@ -3,6 +3,7 @@ import {
   validationMessages,
   email,
   notOnlySpaces,
+  comment,
 } from '@recycl/shared/dist/validation'
 
 const { required, minLength, maxLength } = validationMessages
@@ -21,11 +22,7 @@ const proposeWasteTypeSchema = yup.object().shape({
     .required(required)
     .min(3, minLength)
     .max(255, maxLength),
-  additionalNotes: yup
-    .string()
-    .concat(notOnlySpaces)
-    .default('')
-    .max(1000, maxLength),
+  additionalNotes: comment.default(''),
 })
 
 export { proposeWasteTypeSchema }

@@ -1,28 +1,9 @@
 import * as yup from 'yup'
-import { validation } from '@recycl/shared'
 import { rowsPerPageOptions } from '../helpers/eventHelpers'
-
-const {
-  location,
-  password: passwordValidator,
-  confirmPassword: confirmPasswordValidator,
-} = validation
 
 const ONE_HUNDRED = 100
 const min = rowsPerPageOptions[0]
 const max = rowsPerPageOptions[rowsPerPageOptions.length - 1] ?? ONE_HUNDRED
-
-export const password = yup.object().shape({
-  password: passwordValidator,
-})
-
-export const confirmPassword = yup.object().shape({
-  confirmPassword: confirmPasswordValidator,
-})
-
-export const userLocation = yup.object().shape({
-  userLocation: location,
-})
 
 export const paginationPageNumberSchema = yup
   .number()

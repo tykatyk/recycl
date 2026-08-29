@@ -1,9 +1,7 @@
 import * as yup from 'yup'
-import { validation } from '@recycl/shared'
+import { validationMessages } from '@recycl/shared/dist/validation'
 
-const { validationMessages: messages } = validation
-
-const { onlyDigits, onlyIntegers } = messages
+const { onlyDigits, onlyIntegers } = validationMessages
 const NO_CONTEXT_MIN = 0
 const NO_CONTEXT_MAX = 10_000_000
 

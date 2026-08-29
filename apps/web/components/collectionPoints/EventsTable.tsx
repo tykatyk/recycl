@@ -42,7 +42,7 @@ import {
   validSortOrder,
 } from '../../lib/helpers/eventHelpers'
 import type { Options, ConfigOptions } from '../../lib/helpers/eventHelpers'
-import { validation } from '@recycl/shared'
+import { date as dateValidator } from '@recycl/shared/dist/validation'
 import {
   Root,
   Spacer,
@@ -52,8 +52,6 @@ import {
 
 import { visuallyHidden } from '@mui/utils'
 import { documentActivityStatus } from '@recycl/shared/dist/constants'
-
-const { date } = validation
 
 const isInactive: IsInactive = {
   isInactive: '1',
@@ -351,7 +349,7 @@ export default function EventsTable({
                               if (staleAd) setStaleAd('')
 
                               try {
-                                await date.validate(row.date)
+                                await dateValidator.validate(row.date)
                               } catch (e) {
                                 setStaleAd(row._id)
                                 setValidationError(validationErrorMsg)

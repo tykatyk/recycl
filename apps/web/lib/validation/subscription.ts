@@ -1,16 +1,12 @@
 import * as yup from 'yup'
-import { validation } from '@recycl/shared'
+import { wasteArray, location, radius } from '@recycl/shared/dist/validation'
 
 export const wasteAvailableSubscriptionSchema = yup.object({
-  location: validation.location,
-  wasteTypes: yup
-    .array()
-    .of(yup.string().required(validation.validationMessages.required))
-    .required()
-    .min(1, (min) => `Выберите хотя бы ${min.min} элемент`),
-  radius: validation.radius,
+  location,
+  wasteTypes: wasteArray,
+  radius,
 })
 
 export const wasteRemovalSubscriptionSchema = yup.object({
-  radius: validation.radius,
+  radius,
 })

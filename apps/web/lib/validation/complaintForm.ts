@@ -1,7 +1,9 @@
 import * as yup from 'yup'
-import { validation } from '@recycl/shared'
+import {
+  validationMessages,
+  notOnlySpaces,
+} from '@recycl/shared/dist/validation'
 
-const { validationMessages, notOnlySpaces } = validation
 const { required, maxLength, minLength } = validationMessages
 
 export const complaintFormSchema = yup.object({

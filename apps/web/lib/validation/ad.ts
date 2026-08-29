@@ -1,9 +1,15 @@
 import * as yup from 'yup'
-import { validation } from '@recycl/shared'
+import {
+  phone,
+  waste,
+  location,
+  notOnlySpaces,
+  validationMessages,
+  comment,
+} from '@recycl/shared/dist/validation'
 
-const { phone, waste, location, notOnlySpaces, validationMessages, comment } =
-  validation
-const { required, type, positive, minLength, maxLength } = validationMessages
+const { required, onlyDigits, positive, minLength, maxLength } =
+  validationMessages
 
 export default yup.object({
   title: yup
@@ -14,7 +20,11 @@ export default yup.object({
     .max(255, maxLength),
   wasteLocation: location,
   wasteType: waste,
-  quantity: yup.number().typeError(type).positive(positive).required(required),
+  quantity: yup
+    .number()
+    .typeError(onlyDigits)
+    .positive(positive)
+    .required(required),
   contactPhone: phone.required(required),
   comment,
 })

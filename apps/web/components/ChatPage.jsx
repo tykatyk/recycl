@@ -34,9 +34,10 @@ import {
   GET_DIALOG,
   GET_UNREAD_DIALOG_IDS,
 } from '../lib/graphql/queries/message'
-import { chatSchema } from '../lib/validation'
 import { whitespaceRegex } from '../lib/validation/regularExpressions'
 import io from 'socket.io-client'
+import { comment, validationMessages } from '@recycl/shared/dist/validation'
+const { required } = validationMessages
 
 const PREFIX = 'ChatPage'
 
@@ -134,7 +135,7 @@ const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
     [`& .${classes.remainedSymbolsIndicator}`]: {
       marginLeft: theme.spacing(2),
     },
-  })
+  }),
 )
 
 const messageContainerHeight = 400
@@ -241,14 +242,22 @@ export default function ChatPage(props) {
         canLoadMore.current = false
       }
     },
-    [dialogId, canLoadMore, anchorIndex, apolloClient, loading, itemsRef, items]
+    [
+      dialogId,
+      canLoadMore,
+      anchorIndex,
+      apolloClient,
+      loading,
+      itemsRef,
+      items,
+    ],
   )
 
   const handleResize = useCallback(
     (isLoaded) => {
       if (isLoaded) handleScroll()
     },
-    [handleScroll]
+    [handleScroll],
   )
 
   const handleSubmit = async (values, options) => {
@@ -333,7 +342,7 @@ export default function ChatPage(props) {
       showScrollBottom,
       newMessage,
       scrolledToBottom,
-    ]
+    ],
   )
 
   const handleScrollBottomClick = () => {
@@ -511,7 +520,7 @@ export default function ChatPage(props) {
     let dateTime
     if (currDate != date || currMonth != month) {
       dateTime = `${hours}:${minutes.substring(
-        minutes.length - 2
+        minutes.length - 2,
       )}, ${creationDate.toLocaleString('ru-RU', {
         day: '2-digit',
         month: 'short',
@@ -589,7 +598,7 @@ export default function ChatPage(props) {
     if (dialogData) {
       const firstMessage = items[0]
       setTitle(
-        `Диалог с ${dialogData.receiverName} относительно ${firstMessage.ad.wasteType.name}`
+        `Диалог с ${dialogData.receiverName} относительно ${firstMessage.ad.wasteType.name}`,
       )
     }
   }, [dialogData, items])
@@ -762,7 +771,7 @@ export default function ChatPage(props) {
             <Formik
               enableReinitialize
               initialValues={{ message: '' }}
-              validationSchema={chatSchema}
+              validationSchema={{ message: comment.required(required) }}
               validateOnChange={false}
               validateOnBlur={false}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
@@ -781,7 +790,7 @@ export default function ChatPage(props) {
                   setFieldValue(
                     'message',
                     values.message.substring(0, remainedSymbols),
-                    false
+                    false,
                   )
                 }
 

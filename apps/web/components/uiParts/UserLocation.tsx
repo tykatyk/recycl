@@ -5,11 +5,11 @@ import { Formik, Form, Field } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import PlacesAutocomplete from './formInputs/PlacesAutocomplete'
 import ReCAPTCHA from 'react-google-recaptcha'
-import { userLocationSchema } from '../../lib/validation'
 import * as yup from 'yup'
 import { useSnackbar } from 'notistack'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 import { useTranslations } from 'use-intl'
+import { location } from '@recycl/shared/dist/validation'
 
 function UserLocationComponent(props) {
   const [recaptcha, setRecaptcha] = useState('')
@@ -49,12 +49,14 @@ function UserLocationComponent(props) {
         </Typography>
       </Box>
 
-      <Formik<yup.InferType<typeof userLocationSchema>>
+      <Formik<{ userLocation: yup.InferType<typeof location> }>
         enableReinitialize
         initialValues={{
           userLocation: null as any,
         }}
-        validationSchema={userLocationSchema}
+        validationSchema={{
+          userLocation: location,
+        }}
         onSubmit={(values, { setSubmitting, resetForm }) => {
           if (!recaptcha || !geocoder) {
             setSubmitting(false)

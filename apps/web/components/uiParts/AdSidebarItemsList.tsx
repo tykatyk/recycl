@@ -11,11 +11,8 @@ import { useEffect, useState } from 'react'
 import PlacesAutocompleteNew from './formInputs/PlacesAutocompleteNew'
 import { useFormik } from 'formik'
 import NumberField from './formInputs/NumberField'
-import {
-  adSearchFormSchema,
-  minRadius,
-  maxRadius,
-} from '../../lib/validation/adSearchForm'
+import { adSearchFormSchema } from '../../lib/validation/adSearchForm'
+import { minRadius, maxRadius } from '@recycl/shared/dist/constants'
 import { useSnackbar } from 'notistack'
 import { InferType } from 'yup'
 import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutocomplete'
