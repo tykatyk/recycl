@@ -10,17 +10,6 @@ const userQueries = {
     }
   },
 
-  getByToken: async (token) => {
-    try {
-      return await User.findOne({
-        resetPasswordToken: token,
-        resetPasswordExpires: { $gt: Date.now() },
-      }).exec()
-    } catch (error) {
-      return error
-    }
-  },
-
   getAll: async () => {
     try {
       return await User.find()

@@ -1,8 +1,6 @@
 import { useMemo } from 'react'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
-import { ApolloProvider } from '@apollo/client/react'
-import { initializeApollo } from '../lib/apolloClient/apolloClient'
 import { SessionProvider } from 'next-auth/react'
 import theme from '../lib/helpers/themeStub'
 import GlobalCss from '../components/uiParts/GlobalCss'
@@ -25,8 +23,6 @@ export default function App(props: AppProps) {
     pageProps: { session, ...pageProps },
   } = props
 
-  const apolloClient = useMemo(() => initializeApollo(), [])
-
   return (
     <>
       <Head>
@@ -39,24 +35,22 @@ export default function App(props: AppProps) {
         <CssBaseline />
         <GlobalCss />
         <SessionProvider session={session}>
-          <ApolloProvider client={apolloClient}>
-            <SnackbarProvider
-              maxSnack={3}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
+          <SnackbarProvider
+            maxSnack={3}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+          >
+            <NextIntlClientProvider
+              locale={router.locale}
+              messages={pageProps.messages}
+              timeZone="Europe/Kiev"
             >
-              <NextIntlClientProvider
-                locale={router.locale}
-                messages={pageProps.messages}
-                timeZone="Europe/Kiev"
-              >
-                <Component {...pageProps} />
-              </NextIntlClientProvider>
-            </SnackbarProvider>
-            <CookieConsentPopup />
-          </ApolloProvider>
+              <Component {...pageProps} />
+            </NextIntlClientProvider>
+          </SnackbarProvider>
+          <CookieConsentPopup />
         </SessionProvider>
       </ThemeProvider>
     </>

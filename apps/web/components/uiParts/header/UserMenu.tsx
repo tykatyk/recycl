@@ -10,7 +10,6 @@ import {
 import Link from '../Link'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
-import { initializeApollo } from '../../../lib/apolloClient/apolloClient'
 import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -22,7 +21,6 @@ import { useId } from 'react'
 import { useTranslations } from 'next-intl'
 
 const authenticated = 'authenticated'
-const apolloClient = initializeApollo()
 
 export default function UserMenu(props) {
   const theme = useTheme()
@@ -134,7 +132,6 @@ export default function UserMenu(props) {
             await signOut({
               callbackUrl: `${window.location.origin}`,
             })
-            await apolloClient.resetStore()
           }
         }}
         component={Link}
