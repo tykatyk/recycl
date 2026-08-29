@@ -1,7 +1,6 @@
 import { Box, Button, InputAdornment, Stack, Typography } from '@mui/material'
 import Layout from '../../../../components/layouts/Layout'
-import { Formik, Form, Field } from 'formik'
-import TextFieldFormik from '../../../../components/uiParts/formInputs/TextFieldFormik'
+import { useFormik } from 'formik'
 import { wasteRemovalSubscriptionSchema } from '../../../../lib/validation'
 import * as yup from 'yup'
 import { useEffect, useState } from 'react'
@@ -14,17 +13,134 @@ import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscriptio
 import NotSubscribed from '../../../../components/subscriptions/NotSubscribed'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import NumberField from '../../../../components/uiParts/formInputs/NumberField'
+import { minRadius, maxRadius } from '@recycl/shared/dist/constants'
 
 const api = '/api/my/subscriptions'
 const wasteRemovalApi = `${api}/waste-removal`
 const frontendUrl = '/my/subscriptions'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
+const translateError = (error: yup.ValidationError) => {
+  console.log(error.params)
+  return error.message
+}
+
+const validate = async (values) => {
+  try {
+    await wasteRemovalSubscriptionSchema.validate(values, {
+      abortEarly: false,
+    })
+
+    return {}
+  } catch (error) {
+    if (!(error instanceof yup.ValidationError)) {
+      return {}
+    }
+
+    return error.inner.reduce<Record<string, string>>(
+      (errors, validationError) => {
+        if (validationError.path && !errors[validationError.path]) {
+          errors[validationError.path] = translateError(validationError)
+        }
+
+        return errors
+      },
+      {},
+    )
+  }
+}
+
+const Content = ({ formik, t }) => {
+  return (
+    <>
+      <Box sx={{ mt: 2, mb: 3 }}>
+        <Typography
+          component={'h1'}
+          variant="h4"
+          align="center"
+          sx={{ mt: 2, mb: 3 }}
+        >
+          {t('h1')}
+        </Typography>
+      </Box>
+
+      <Box sx={{ mb: 3, minWidth: 300 }}>
+        <form onSubmit={formik.handleSubmit}>
+          <Stack
+            spacing={3}
+            sx={{ justifyContent: 'center', alignItems: 'center' }}
+          >
+            <Box sx={{ maxWidth: 250 }}>
+              <NumberField
+                min={minRadius}
+                max={maxRadius}
+                size="small"
+                disabled={formik.isSubmitting}
+                label={`${t('form.searchRadius.label')}`}
+                id="radius"
+                name="radius"
+                value={formik.values.radius}
+                onValueChange={(value) => {
+                  formik.setFieldValue('radius', value)
+
+                  if (!formik.touched.radius) {
+                    formik.setFieldTouched('radius', true, false)
+                  }
+                }}
+                error={formik.touched.radius && Boolean(formik.errors.radius)}
+                helperText={formik.touched.radius && formik.errors.radius}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                width: '100%',
+                justifyContent: 'center',
+              }}
+            >
+              <Button
+                variant="contained"
+                type="submit"
+                disabled={formik.isSubmitting}
+                sx={{ ml: 1, mr: 1 }}
+              >
+                {t('form.submit')}
+                {formik.isSubmitting && <ButtonSubmittingCircle />}
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                href={`${frontendUrl}`}
+                sx={{ ml: 1, mr: 1 }}
+              >
+                {t('backBtn')}
+              </Button>
+            </Box>
+          </Stack>
+        </form>
+      </Box>
+    </>
+  )
+}
+
 export default function WasteRemovalSubscription() {
   const [initialValues, setInitialValues] = useState({ radius: '' } as any)
   const [viewStatus, setViewStatus] = useState('')
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('WasteRemovalSubscriptionPage')
+
+  const formik = useFormik<
+    yup.InferType<typeof wasteRemovalSubscriptionSchema>
+  >({
+    enableReinitialize: true,
+    initialValues: initialValues as any,
+    // validationSchema: wasteRemovalSubscriptionSchema,
+    validate: validate,
+    onSubmit: (values) => {
+      formHandler(values)
+    },
+  })
 
   useEffect(() => {
     const getUserSubscriptions = async () => {
@@ -87,99 +203,20 @@ export default function WasteRemovalSubscription() {
     enqueueSnackbar(t('successMessage'), { variant: 'success' })
   }
 
-  const Content = () => {
-    return (
-      <>
-        <Box sx={{ mt: 2, mb: 3 }}>
-          <Typography
-            component={'h1'}
-            variant="h4"
-            align="center"
-            sx={{ mt: 2, mb: 3 }}
-          >
-            {t('h1')}
-          </Typography>
-        </Box>
-
-        <Box sx={{ mb: 3, minWidth: 300 }}>
-          <Formik<yup.InferType<typeof wasteRemovalSubscriptionSchema>>
-            enableReinitialize
-            initialValues={initialValues as any}
-            validationSchema={wasteRemovalSubscriptionSchema}
-            onSubmit={(values) => {
-              formHandler(values)
-            }}
-          >
-            {({ isSubmitting }) => {
-              return (
-                <Form>
-                  <Stack
-                    spacing={3}
-                    sx={{ justifyContent: 'center', alignItems: 'center' }}
-                  >
-                    <Field
-                      id="radius"
-                      name="radius"
-                      variant="outlined"
-                      component={TextFieldFormik}
-                      label={`${t('form.searchRadius.label')}`}
-                      helperText={`*${t('form.searchRadius.helperText')}`}
-                      type="number"
-                      size="small"
-                      sx={{ minWidth: 250 }}
-                      inputProps={{ min: 1, max: 200 }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">{`${t('form.searchRadius.endAdornment')}`}</InputAdornment>
-                        ),
-                      }}
-                      disabled={false}
-                    />
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        width: '100%',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Button
-                        variant="contained"
-                        type="submit"
-                        disabled={isSubmitting}
-                        sx={{ ml: 1, mr: 1 }}
-                      >
-                        {t('form.submit')}
-                        {isSubmitting && <ButtonSubmittingCircle />}
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="secondary"
-                        href={`${frontendUrl}`}
-                        sx={{ ml: 1, mr: 1 }}
-                      >
-                        {t('backBtn')}
-                      </Button>
-                    </Box>
-                  </Stack>
-                </Form>
-              )
-            }}
-          </Formik>
-        </Box>
-      </>
-    )
-  }
-
   const renderContent = () => {
     switch (viewStatus) {
       case 'loading':
         return <PageLoadingCircle />
+
       case 'unsubscribed':
         return <NotSubscribed message={t('notSubscribed')} />
+
       case 'error':
         return <DataLoadingError />
+
       case 'ok':
-        return <Content />
+        return <Content formik={formik} t={t} />
+
       default:
         return null
     }
