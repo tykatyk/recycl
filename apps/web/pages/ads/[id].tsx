@@ -9,82 +9,79 @@ import { useRouter } from 'next/router'
 import { isValidObjectId } from 'mongoose'
 import Head from 'next/head'
 import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
+import { useTranslations } from 'next-intl'
 
 const { documentActivityStatus } = constants
 const { active } = documentActivityStatus
-const headerText = 'Это объявление не активно'
-const backButtonText = 'Назад'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
-function ContentNotAvailableView() {
+function ContentNotAvailable() {
   const router = useRouter()
+  const t = useTranslations('SingleWasteAvailableAdPage.ContentNotAvailable')
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
+    <>
+      <Head>
+        <title>{`${t('title')} | ${brand}`}</title>
+      </Head>
+      <Layout>
         <Box
           sx={{
-            mb: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          <BlockIcon fontSize="large" color="error" />
-        </Box>
-        <Typography component="h1" variant="h5" mb={3}>
-          {headerText}
-        </Typography>
-      </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              mb: 3,
+            }}
+          >
+            <Box
+              sx={{
+                mb: 1,
+              }}
+            >
+              <BlockIcon fontSize="large" color="error" />
+            </Box>
+            <Typography component="h1" variant="h4" mb={3}>
+              {t('title')}
+            </Typography>
+          </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Button
-          sx={{ mb: 1 }}
-          variant="contained"
-          color="secondary"
-          onClick={() => router.back()}
-        >
-          {backButtonText}
-        </Button>
-      </Box>
-    </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              sx={{ mb: 1 }}
+              variant="contained"
+              color="secondary"
+              onClick={() => router.back()}
+            >
+              {t('backBtn')}
+            </Button>
+          </Box>
+        </Box>
+      </Layout>
+    </>
   )
 }
 type WasteAvailableAdProps = {
   data: Ad & { _id: string }
   error: any
 }
-export default function wasteAvailableAd(props: WasteAvailableAdProps) {
+export default function WasteAvailableAd(props: WasteAvailableAdProps) {
   const { data, error } = props
+  const t = useTranslations('SingleWasteAvailableAdPage')
 
-  if (error) {
-    return (
-      <>
-        <Head>
-          <title>{`Обьявление больше не доступно | ${brand}`}</title>
-        </Head>
-        <Layout>
-          <ContentNotAvailableView />
-        </Layout>
-      </>
-    )
-  }
+  if (error) return <ContentNotAvailable />
 
   return (
     <>
       <Head>
-        <title>{`${data.title} | Вторсырьё на ${brand}`}</title>
+        <title>{`${data.title} | ${t('wasteOn')} ${brand}`}</title>
         <meta
           name="description"
           content={`${data.title}. ${data.comment?.slice(0, 150)}`}
@@ -97,9 +94,8 @@ export default function wasteAvailableAd(props: WasteAvailableAdProps) {
   )
 }
 
-export async function getServerSideProps(context) {
-  const { res } = context
-  const { id } = context.query
+export async function getServerSideProps({ res, query, locale }) {
+  const { id } = query
 
   if (!isValidObjectId(id)) {
     return {
@@ -121,13 +117,14 @@ export async function getServerSideProps(context) {
       notFound: true,
     }
   }
-
+  const messages = (await import(`../../messages/${locale}.json`)).default
   if (data.status !== active) {
     res.statusCode = 403
     return {
       props: {
         data: null,
         error: FORBIDDEN,
+        messages,
       },
     }
   }
@@ -143,6 +140,7 @@ export async function getServerSideProps(context) {
         },
         createdAt: data.createdAt.toDateString(),
       },
+      messages,
     },
   }
 }
