@@ -15,7 +15,7 @@ import {
   validSortOrder,
 } from '../../../../lib/helpers/eventHelpers'
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
-import { METHOD_NOT_ALLOWED } from '../../../../lib/errors'
+import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
 import { SortOrder, OrderBy } from '../../../../lib/types/pagination'
 import {
   collectionPointSchema,
@@ -28,6 +28,8 @@ import {
   collectionPointTypes,
   CollectionPointVariant,
 } from '@recycl/shared/dist/constants'
+
+const { METHOD_NOT_ALLOWED } = responseErrrorCodes
 
 const queryValidationSchema = yup.object({
   page: paginationPageNumberSchema,

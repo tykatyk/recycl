@@ -3,22 +3,25 @@
 
 import Layout from '../layouts/Layout'
 import { Grid } from '@mui/material'
-import { useRouter } from 'next/router'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
-import { ReactElement, useCallback, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import CustomSnackbar from '../uiParts/Snackbars'
 import SuccessfullUnsubscribe from '../subscriptions/SuccsesfulUnsubscribe'
 import TokenNotFound from '../subscriptions/TokenNotFound'
 import TokenExpiredOrUsed from '../subscriptions/TokenExpiredOrUsed'
-import { unsubscribeApiResponseCodes } from '../../lib/helpers/responses'
-import { UnsubscribeApiResponse } from '../../lib/types/subscription'
+import {
+  responseErrrorCodes,
+  responseStatuses,
+} from '../../lib/helpers/errorHelpers'
+import type { ApiResponseStatus } from '../../lib/helpers/responses'
 import Head from 'next/head'
 // import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
 
-const { SUCCESS, NOT_FOUND, TOKEN_USED, TOKEN_EXPIRED } =
-  unsubscribeApiResponseCodes
+const { NOT_FOUND, EXPIRED } = responseErrrorCodes
+const { SUCCESS, ERROR } = responseStatuses
 const titleHeading = 'Отписаться от рассылки'
-const errorMessge = 'Ошибка при загрузке данных'
+const errorMessge = 'Что то пошло не так'
 const unsubscribeRoute = '/api/my/subscriptions/unsubscribe'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
@@ -26,20 +29,23 @@ const ShowUnsubscibe = ({
   data,
   token,
 }: {
-  data: UnsubscribeApiResponse | null
+  data: ApiResponseStatus
   token: string
 }) => {
-  switch (data?.status) {
+  switch (data.status) {
     case SUCCESS:
       return <SuccessfullUnsubscribe />
-    case NOT_FOUND:
-      return <TokenNotFound />
-    case TOKEN_USED:
-    case TOKEN_EXPIRED:
-      return <TokenExpiredOrUsed token={token} />
 
+    case ERROR: {
+      if (data.error.code === NOT_FOUND) {
+        return <TokenNotFound />
+      }
+      if (data.error.code === EXPIRED) {
+        return <TokenExpiredOrUsed token={token} />
+      }
+      break
+    }
     default:
-      //ToDo: handle default case
       return null
   }
 }
@@ -51,39 +57,34 @@ export default function Unsubscribe() {
   const token = router.query.token
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
-  const [data, setData] = useState<UnsubscribeApiResponse | null>(null)
+  const [data, setData] = useState<ApiResponseStatus | null>(null)
   // const t = useTranslations('UnsubscribePage')
 
-  const dataFetcher = useCallback(async () => {
-    if (typeof token !== 'string') return null
-
-    const queryString = new URLSearchParams({ token }).toString()
-    const urlWithParams = `${unsubscribeRoute}?${queryString}`
-
-    //ToDo: maybe use try catch
-    const response = await fetch(urlWithParams)
-    if (!response.ok) {
-      setError(errorMessge)
-      return null
-    }
-    const data = (await response.json()) as UnsubscribeApiResponse
-    return data
-  }, [token])
-
   useEffect(() => {
-    if (typeof token !== 'string') return
+    const handler = async () => {
+      if (typeof token !== 'string') return
 
-    setLoading(true)
-    dataFetcher()
-      .then((data) => {
+      try {
+        setLoading(true)
+
+        const queryString = new URLSearchParams({ token }).toString()
+        const urlWithParams = `${unsubscribeRoute}?${queryString}`
+
+        const response = await fetch(urlWithParams)
+        if (!response.ok) {
+          setError(errorMessge)
+          return
+        }
+        const data = (await response.json()) as ApiResponseStatus
+
         setData(data)
-      })
-      .catch((_) => {
+      } catch (error) {
         setError(errorMessge)
-      })
-      .finally(() => {
+      } finally {
         setLoading(false)
-      })
+      }
+    }
+    handler()
   }, [token])
 
   if (typeof token !== 'string') return null
@@ -92,6 +93,8 @@ export default function Unsubscribe() {
     content = <PageLoadingCircle />
   } else if (data) {
     content = <ShowUnsubscibe data={data} token={token} />
+  } else {
+    content = null
   }
 
   return (

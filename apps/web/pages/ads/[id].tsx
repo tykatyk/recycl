@@ -2,7 +2,7 @@ import SingleWasteAvailableAd from '../../components/ads/SingleWasteAvailableAd'
 import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
 import { constants } from '@recycl/shared/dist'
 import Layout from '../../components/layouts/Layout'
-import { FORBIDDEN } from '../../lib/errors'
+import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
 import { Box, Button, Typography } from '@mui/material'
 import BlockIcon from '@mui/icons-material/Block'
 import { useRouter } from 'next/router'
@@ -10,6 +10,7 @@ import { isValidObjectId } from 'mongoose'
 import Head from 'next/head'
 import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 import { useTranslations } from 'next-intl'
+const { FORBIDDEN } = responseErrrorCodes
 
 const { documentActivityStatus } = constants
 const { active } = documentActivityStatus

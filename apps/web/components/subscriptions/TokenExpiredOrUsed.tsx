@@ -3,8 +3,8 @@ import { ReactElement, useCallback, useState } from 'react'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import CustomSnackbar from '../uiParts/Snackbars'
 import SuccessfullUnsubscribe from './SuccsesfulUnsubscribe'
-import { unsubscribeApiResponseCodes } from '../../lib/helpers/responses'
-import type { UnsubscribeApiResponse } from '../../lib/types/subscription'
+import { responseStatuses } from '../../lib/helpers/errorHelpers'
+import type { ApiResponseStatus } from '../../lib/helpers/responses'
 
 const unsubscribeAPI = '/api/my/subscriptions/unsubscribe'
 
@@ -12,7 +12,7 @@ const errorMessge = 'Ошибка при получении данных'
 const headingText = 'Cрок действия ссылки истек'
 const mainText = 'Для отписки от рассылки нажмите кнопку'
 const buttonText = 'Отписаться'
-const { SUCCESS, NOT_FOUND } = unsubscribeApiResponseCodes
+const { SUCCESS } = responseStatuses
 
 const UnsubscribeExpiredOrUsedToken = ({
   handleTokenExpiredOrUsed,
@@ -50,7 +50,7 @@ const UnsubscribeExpiredOrUsedToken = ({
 
 export default function TokenExpiredOrUsed({ token }: { token: string }) {
   const [error, setError] = useState<string>('')
-  const [data, setData] = useState<UnsubscribeApiResponse | null>(null)
+  const [data, setData] = useState<ApiResponseStatus | null>(null)
   let content: ReactElement | null = null
 
   const handleTokenExpiredOrUsed = useCallback(async () => {
@@ -71,7 +71,7 @@ export default function TokenExpiredOrUsed({ token }: { token: string }) {
 
       return
     }
-    const data: UnsubscribeApiResponse = await response.json()
+    const data: ApiResponseStatus = await response.json()
 
     setData(data)
   }, [token])

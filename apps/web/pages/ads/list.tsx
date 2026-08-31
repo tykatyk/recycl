@@ -1,6 +1,6 @@
 import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
 import AdsOnList, { AdsOnListProps } from '../../components/ads/AdsOnList'
-import { INTERNAL_SERVER_ERROR } from '../../lib/errors'
+import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
 import {
   adSearchFormSchema,
   paginationPageNumberSchema,
@@ -9,6 +9,7 @@ import {
 import getCoords from '../../lib/helpers/getCoords'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
 import * as yup from 'yup'
+const { INTERNAL_SERVER_ERROR } = responseErrrorCodes
 
 async function getPlaceCoordinates(placeId: string) {
   await dbConnect()

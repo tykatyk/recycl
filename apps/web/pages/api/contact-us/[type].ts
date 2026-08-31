@@ -71,7 +71,7 @@ const generalContactHandler = async (
   res.status(200).json({ success: true })
 }
 
-const proposeWasteTypeContactHandler = async (
+const proposeWasteTypeHandler = async (
   req: NextApiRequest,
   res: NextApiResponse,
 ) => {
@@ -125,7 +125,7 @@ const proposeWasteTypeContactHandler = async (
 
 const requestHandlers = {
   general: generalContactHandler,
-  'propose-waste-type': proposeWasteTypeContactHandler,
+  'propose-waste-type': proposeWasteTypeHandler,
 }
 
 async function contactUsHandler(req: NextApiRequest, res: NextApiResponse) {

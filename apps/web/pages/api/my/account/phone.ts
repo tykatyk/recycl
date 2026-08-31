@@ -1,10 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { METHOD_NOT_ALLOWED } from '../../../../lib/errors'
+import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
 import { phone as phoneValidator } from '@recycl/shared/dist/validation'
+const { METHOD_NOT_ALLOWED } = responseErrrorCodes
 
 async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)

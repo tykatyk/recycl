@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import * as yup from 'yup'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
-import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
+import { responseErrrorCodes } from '../../../lib/helpers/errorHelpers'
 import { getClusters } from '../../../lib/helpers/adsClusterMaker'
 import type { BBox } from '@recycl/shared/dist/server/types'
+
+const { METHOD_NOT_ALLOWED } = responseErrrorCodes
 
 const minZoom = 0
 const maxZoom = 22

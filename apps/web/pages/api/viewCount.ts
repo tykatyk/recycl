@@ -1,13 +1,16 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import eventModel from '../../../../packages/db/models/wasteRemovalEvent'
-import type { WasteRemovalEvent } from '../../../../packages/db/models/wasteRemovalEvent'
-import dbConnect from '../../../../packages/db/connection'
-import { METHOD_NOT_ALLOWED } from '../../lib/helpers/errorHelpers'
+import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
 import cryptoRandomString from 'crypto-random-string'
 import dayjs from 'dayjs'
 import { HydratedDocument } from 'mongoose'
+import {
+  dbConnect,
+  CollectionPointModel as eventModel,
+} from '@recycl/shared/dist/server/db'
+import type { CollectionPoint as WasteRemovalEvent } from '../../lib/types/collectionPoint'
+const { METHOD_NOT_ALLOWED } = responseErrrorCodes
 
 export default async function viewCounter(
   req: NextApiRequest,

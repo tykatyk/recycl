@@ -1,6 +1,5 @@
 import { ValidationError } from 'yup'
 import { FormikErrors, FormikHelpers, FormikValues } from 'formik'
-import type { FormValidationError } from '../types/error'
 import { Dispatch, SetStateAction } from 'react'
 import {
   NextApiRequest,
@@ -9,7 +8,31 @@ import {
   GetServerSidePropsContext,
 } from 'next'
 import { validationErrorResponse } from './responses'
-import { INTERNAL_SERVER_ERROR } from '../errors'
+
+export const responseErrrorCodes = {
+  NOT_FOUND: 'NOT_FOUND',
+  EXPIRED: 'EXPIRED',
+  INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  METHOD_NOT_ALLOWED: 'METHOD_NOT_ALLOWED',
+  FORBIDDEN: 'FORBIDDEN',
+  CAPTCHA_FAILED: 'CAPTCHA_FAILED',
+} as const
+
+export const responseStatuses = {
+  ERROR: 'ERROR',
+  SUCCESS: 'SUCCESS',
+} as const
+
+export type FormValidationError =
+  | {
+      type: 'perForm'
+      message: string
+    }
+  | {
+      type: 'perField'
+      message: FormikErrors<FormikValues>
+    }
 
 export function mapErrors(error: ValidationError) {
   if (Array.isArray(error)) return null
@@ -34,11 +57,6 @@ export function showErrorMessages(
   setErrors: FormikHelpers<FormikValues>['setErrors'],
   setNotification: Dispatch<SetStateAction<string>>,
 ) {
-  if (!error) {
-    setNotification(INTERNAL_SERVER_ERROR)
-    return
-  }
-
   switch (error.type) {
     case 'perField':
       setErrors(error.message)
@@ -49,7 +67,7 @@ export function showErrorMessages(
       break
 
     default:
-      setNotification(INTERNAL_SERVER_ERROR)
+      setNotification(responseErrrorCodes.INTERNAL_SERVER_ERROR)
   }
 }
 
@@ -80,7 +98,11 @@ export const apiHandler =
         return validationErrorResponse(e, res)
       }
       res.status(500).json({
-        error: INTERNAL_SERVER_ERROR,
+        status: responseStatuses.ERROR,
+        error: {
+          code: responseErrrorCodes.INTERNAL_SERVER_ERROR,
+          message: responseErrrorCodes.INTERNAL_SERVER_ERROR,
+        },
       })
     }
   }

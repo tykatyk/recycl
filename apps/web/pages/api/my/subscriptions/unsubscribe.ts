@@ -5,29 +5,36 @@ import {
   SubscriptionModel,
   UnsubscribeToken,
 } from '@recycl/shared/dist/server/db'
-import { unsubscribeApiResponseCodes } from '../../../../lib/helpers/responses'
-import { emailSchema } from '../../../../lib/validation'
-import type { UnsubscribeApiResponse } from '../../../../lib/types/subscription'
+import {
+  responseErrrorCodes,
+  responseStatuses,
+} from '../../../../lib/helpers/errorHelpers'
+import { email as emailSchema } from '@recycl/shared/dist/validation'
+import { validationErrorResponse } from '../../../../lib/helpers/responses'
+import type { ApiResponseStatus } from '../../../../lib/helpers/responses'
 
-const { NOT_FOUND, TOKEN_EXPIRED, TOKEN_USED, SUCCESS } =
-  unsubscribeApiResponseCodes
+const { NOT_FOUND, EXPIRED } = responseErrrorCodes
+const { SUCCESS, ERROR } = responseStatuses
 
 const tokenNotFoundUnsubscribe = async (
   email: string | string[] | undefined,
-  res: NextApiResponse<UnsubscribeApiResponse>,
+  res: NextApiResponse<ApiResponseStatus>,
 ) => {
   let validatedEmail = ''
   try {
-    const validated = await emailSchema.validate({ email })
-    validatedEmail = validated.email
+    const validated = await emailSchema.validate(email)
+    validatedEmail = validated
   } catch (error) {
-    return res.status(400).end()
+    return validationErrorResponse(error, res)
   }
 
   await dbConnect()
   const user = await UserModel.findOne({ email: validatedEmail }).select('_id')
   if (!user) {
-    return res.status(404).end()
+    return res.json({
+      status: ERROR,
+      error: { code: NOT_FOUND, message: 'User not found' },
+    })
   }
 
   //ToDo: Instead of immediate unsubscribe,send an email to the user with a link to unsubscribe
@@ -39,7 +46,13 @@ const tokenNotFoundUnsubscribe = async (
   )
 
   if (!subscription) {
-    return res.json({ status: NOT_FOUND })
+    return res.json({
+      status: ERROR,
+      error: {
+        code: NOT_FOUND,
+        message: 'Subscription not found',
+      },
+    })
   }
 
   return res.json({ status: SUCCESS })
@@ -47,7 +60,7 @@ const tokenNotFoundUnsubscribe = async (
 
 const initialUnsubscribe = async (
   token: string | string[] | undefined,
-  res: NextApiResponse<UnsubscribeApiResponse>,
+  res: NextApiResponse<ApiResponseStatus>,
 ) => {
   if (typeof token !== 'string') {
     return res.status(400).end()
@@ -59,7 +72,10 @@ const initialUnsubscribe = async (
   })
 
   if (!unsubscribeToken) {
-    return res.status(200).json({ status: NOT_FOUND })
+    return res.json({
+      status: ERROR,
+      error: { code: NOT_FOUND, message: 'Unsubscribe token not found' },
+    })
   }
 
   const subscription = await SubscriptionModel.findOne({
@@ -67,17 +83,19 @@ const initialUnsubscribe = async (
   })
 
   if (!subscription) {
-    return res.status(200).json({ status: NOT_FOUND })
+    return res.json({
+      status: ERROR,
+      error: { code: NOT_FOUND, message: 'Subscription not found' },
+    })
   }
 
   const { used, expires } = unsubscribeToken
 
-  if (used) {
-    return res.status(200).json({ status: TOKEN_USED })
-  }
-
-  if (expires < new Date()) {
-    return res.status(200).json({ status: TOKEN_EXPIRED })
+  if (used || expires < new Date()) {
+    return res.status(200).json({
+      status: ERROR,
+      error: { code: EXPIRED, message: 'Token used or expired' },
+    })
   }
 
   subscription.subscribed = false
@@ -86,12 +104,12 @@ const initialUnsubscribe = async (
   unsubscribeToken.used = true
   await unsubscribeToken.save()
 
-  return res.status(200).json({ status: SUCCESS })
+  return res.json({ status: SUCCESS })
 }
 
 const tokenExpiredOrUsedUnsubscribe = async (
   token: string | string[] | undefined,
-  res: NextApiResponse<UnsubscribeApiResponse>,
+  res: NextApiResponse<ApiResponseStatus>,
 ) => {
   if (typeof token !== 'string') {
     return res.status(400).end()
@@ -104,7 +122,13 @@ const tokenExpiredOrUsedUnsubscribe = async (
   })
 
   if (!unsubscribeToken) {
-    return res.status(404).json({ status: NOT_FOUND })
+    return res.status(200).json({
+      status: ERROR,
+      error: {
+        code: NOT_FOUND,
+        message: 'Unsubscribe token not found',
+      },
+    })
   }
 
   const subscription = await SubscriptionModel.findOne({
@@ -112,13 +136,19 @@ const tokenExpiredOrUsedUnsubscribe = async (
   })
 
   if (!subscription) {
-    return res.status(404).json({ status: NOT_FOUND })
+    return res.json({
+      status: ERROR,
+      error: {
+        code: NOT_FOUND,
+        message: 'Subscription not found',
+      },
+    })
   }
 
   const { subscribed } = subscription
 
   if (!subscribed) {
-    return res.status(200).json({ status: SUCCESS })
+    return res.json({ status: SUCCESS })
   }
 
   subscription.subscribed = false
@@ -127,7 +157,7 @@ const tokenExpiredOrUsedUnsubscribe = async (
   unsubscribeToken.used = true
   await unsubscribeToken.save()
 
-  return res.status(200).json({ status: SUCCESS })
+  return res.json({ status: SUCCESS })
 }
 
 export default async function Unsubscribe(

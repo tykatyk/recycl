@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { METHOD_NOT_ALLOWED } from '../../lib/errors'
+import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
 import {
   dbConnect,
   ComplaintModel,
@@ -15,6 +15,8 @@ import { email as emailValidator } from '@recycl/shared/dist/validation'
 import { checkCaptcha } from '../../lib/helpers/checkCaptcha'
 import { captchaNotPassedResponse } from '../../lib/helpers/responses'
 import { complaintContentVariants } from '@recycl/shared/dist/constants'
+
+const { METHOD_NOT_ALLOWED } = responseErrrorCodes
 
 async function complaintHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

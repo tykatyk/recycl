@@ -1,13 +1,12 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import eventModel from '../../../../packages/db/models/wasteRemovalEvent'
-import dbConnect from '../../../../packages/db/connection'
+import { apiHandler, responseErrrorCodes } from '../../lib/helpers/errorHelpers'
 import {
-  apiHandler,
-  INTERNAL_SERVER_ERROR,
-  METHOD_NOT_ALLOWED,
-} from '../../lib/helpers/errorHelpers'
+  dbConnect,
+  CollectionPointModel as eventModel,
+} from '@recycl/shared/dist/server/db'
+const { INTERNAL_SERVER_ERROR, METHOD_NOT_ALLOWED } = responseErrrorCodes
 
 async function resetViewCount(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

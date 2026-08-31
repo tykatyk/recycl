@@ -1,5 +1,5 @@
 import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
-import { INTERNAL_SERVER_ERROR } from '../../lib/errors'
+import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
 import {
   adSearchFormSchema,
   paginationPageNumberSchema,
@@ -42,6 +42,8 @@ import NoRows from '../../components/uiParts/NoRows'
 import { HrefOptions } from '../../lib/types/pagination'
 import { useTranslations } from 'next-intl'
 import type { CollectionPoint } from '../../lib/types/collectionPoint'
+
+const { INTERNAL_SERVER_ERROR } = responseErrrorCodes
 
 const baseUrl = '/collection-points/list'
 const mapViewUrl = '/collection-points'

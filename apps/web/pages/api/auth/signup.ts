@@ -1,10 +1,11 @@
 import { registerSchema } from '../../../lib/validation'
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
 import { captchaNotPassedResponse } from '../../../lib/helpers/responses'
-import { METHOD_NOT_ALLOWED } from '../../../lib/errors'
+import { responseErrrorCodes } from '../../../lib/helpers/errorHelpers'
 import { apiHandler } from '../../../lib/helpers/errorHelpers'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
+const { METHOD_NOT_ALLOWED } = responseErrrorCodes
 
 async function signUpHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

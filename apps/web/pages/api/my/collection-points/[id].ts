@@ -9,10 +9,11 @@ import {
   CollectionPointStationeryModel,
   CollectionPointModel,
 } from '@recycl/shared/dist/server/db'
-import { METHOD_NOT_ALLOWED } from '../../../../lib/errors'
+import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
 import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import { isValidObjectId } from 'mongoose'
 import getCoords from '../../../../lib/helpers/getCoords'
+const { METHOD_NOT_ALLOWED } = responseErrrorCodes
 
 async function collectionPointHandler(
   req: NextApiRequest,

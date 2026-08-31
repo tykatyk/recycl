@@ -6,17 +6,21 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import CustomSnackbar from '../uiParts/Snackbars'
 import Link from '../uiParts/Link'
-import { unsubscribeApiResponseCodes } from '../../lib/helpers/responses'
-import type { UnsubscribeApiResponse } from '../../lib/types/subscription'
+import {
+  responseErrrorCodes,
+  responseStatuses,
+} from '../../lib/helpers/errorHelpers'
+import type { ApiResponseStatus } from '../../lib/helpers/responses'
 import { useTranslations } from 'next-intl'
 
 const unsubscribeAPI = '/api/my/subscriptions/unsubscribe'
-const { SUCCESS, NOT_FOUND } = unsubscribeApiResponseCodes
+const { SUCCESS, ERROR } = responseStatuses
+const { NOT_FOUND } = responseErrrorCodes
 
 export default function TokenNotFound() {
   const [message, setMessage] = useState<string>('')
   const [severity, setSeverity] = useState<string>('success')
-  const [data, setData] = useState<UnsubscribeApiResponse | null>(null)
+  const [data, setData] = useState<ApiResponseStatus | null>(null)
   const t = useTranslations('TokenNotFound')
 
   const handleTokenNotFound = async (email: string) => {
@@ -35,7 +39,7 @@ export default function TokenNotFound() {
         } else if (response.status == 404) {
           setMessage(t('userNotFound'))
         } else {
-          throw new Error('Something went wrong')
+          throw new Error(t('errorMessage'))
         }
       }
 
@@ -43,7 +47,7 @@ export default function TokenNotFound() {
 
       setData(data)
     } catch (error) {
-      setMessage(t('errorMessge'))
+      setMessage(t('errorMessage'))
     }
   }
 
@@ -56,14 +60,17 @@ export default function TokenNotFound() {
         setMessage(t('letterSent'))
         break
 
-      case NOT_FOUND:
-        setSeverity('success')
-        setMessage(t('addressNotSubscribed'))
+      case ERROR: {
+        if (data.error.code === NOT_FOUND) {
+          setSeverity('success')
+          setMessage(t('addressNotSubscribed'))
+        }
         break
+      }
 
       default:
-        setSeverity('success')
-        setMessage(t('addressNotSubscribed'))
+        setSeverity('error')
+        setMessage(t('errorMessage'))
         break
     }
   }, [data])

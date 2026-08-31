@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { Message } from '@recycl/shared/dist/server/db'
-import { INTERNAL_SERVER_ERROR } from '../../errors/index'
+import { responseErrrorCodes } from '../errorHelpers'
+const { INTERNAL_SERVER_ERROR } = responseErrrorCodes
 
 const messageQueries = {
   create: async (data, user) => {
