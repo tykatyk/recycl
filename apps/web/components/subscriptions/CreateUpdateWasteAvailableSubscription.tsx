@@ -138,12 +138,6 @@ export default function CreateUpdateWasteAvailableSubscription(params: {
       })
 
       if (!response.ok) {
-        if (response.status === 422) {
-          const data = await response.json()
-          //ToDo: what is returned from the api
-          enqueueSnackbar(data.error, { variant: 'error' })
-          return
-        }
         throw new Error(t('errorMessage'))
       }
 

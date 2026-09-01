@@ -5,7 +5,7 @@ import {
   SubscriptionVariantModel as SubscriptionVariant,
   dbConnect,
 } from '@recycl/shared/dist/server/db'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../lib/helpers/responses'
 import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
 const { METHOD_NOT_ALLOWED } = responseErrrorCodes
 

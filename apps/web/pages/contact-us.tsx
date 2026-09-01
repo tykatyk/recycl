@@ -7,7 +7,6 @@ import ButtonSubmittingCircle from '../components/uiParts/ButtonSubmittingCircle
 import { Formik, Form, Field } from 'formik'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { useSnackbar } from 'notistack'
-import { showErrorMessages } from '../lib/helpers/errorHelpers'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 
@@ -65,16 +64,7 @@ export default function ContactUsPage() {
                 })
 
                 if (!response.ok) {
-                  const data = await response.json()
-
-                  showErrorMessages(
-                    data.error,
-                    setErrors,
-                    (message: string) => {
-                      enqueueSnackbar(message, { variant: 'error' })
-                    },
-                  )
-                  return
+                  throw new Error('Something went wrong')
                 }
                 enqueueSnackbar(t('successMessage'), { variant: 'success' })
                 resetForm()

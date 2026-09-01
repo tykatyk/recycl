@@ -5,7 +5,7 @@ import {
   WasteRemovalSubscriptionModel,
   dbConnect,
 } from '@recycl/shared/dist/server/db'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../lib/helpers/responses'
 import { wasteRemovalSubscriptionSchema } from '../../../../lib/validation'
 
 async function wasteRemovalSubscriptionApiHandler(
@@ -20,7 +20,6 @@ async function wasteRemovalSubscriptionApiHandler(
 
   switch (req.method) {
     case 'GET': {
-      console.log(session.id)
       const subscription = await WasteRemovalSubscriptionModel.findOne({
         user: session.id,
       })

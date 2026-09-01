@@ -5,10 +5,11 @@ import {
   contactUsSchema,
 } from '../../../lib/validation'
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import {} from '../../../lib/helpers/responses'
 import {
   validationErrorResponse,
   captchaNotPassedResponse,
+  apiHandler,
 } from '../../../lib/helpers/responses'
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 import * as yup from 'yup'
@@ -18,6 +19,8 @@ import {
   getHtml,
 } from '../../../lib/helpers/email/mailer'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
+import { responseStatuses } from '../../../lib/helpers/errorHelpers'
+const { SUCCESS } = responseStatuses
 
 const getEmailFrom = (email: string) => email.toLowerCase().replace(/\s/g, '')
 
@@ -68,7 +71,7 @@ const generalContactHandler = async (
 
   await handleEmailSending(emailParams)
 
-  res.status(200).json({ success: true })
+  res.json({ status: SUCCESS })
 }
 
 const proposeWasteTypeHandler = async (
@@ -120,7 +123,7 @@ const proposeWasteTypeHandler = async (
 
   await handleEmailSending(emailParams)
 
-  res.status(200).json({ success: true })
+  res.json({ status: SUCCESS })
 }
 
 const requestHandlers = {
