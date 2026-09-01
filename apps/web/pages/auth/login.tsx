@@ -38,9 +38,9 @@ export default function LoginPage() {
   const t = useTranslations('LoginPage')
 
   useEffect(() => {
-  if (status === 'authenticated') {
+    if (status === 'authenticated') {
       router.replace('/', undefined, { locale })
-  }
+    }
   }, [status, locale, router])
 
   return (
@@ -112,12 +112,11 @@ export default function LoginPage() {
                 resetForm()
                 router.push('/', undefined, { locale })
               } catch (error) {
-              } finally {
-                recaptchaRef.current?.reset()
+                enqueueSnackbar(t('errorMessage'), { variant: 'error' })
               }
             }}
           >
-            {({ isSubmitting, submitForm }) => {
+            {({ isSubmitting, submitForm, validateForm, setTouched }) => {
               return (
                 <>
                   <Box sx={{ mb: 2, minWidth: 470 }}>
@@ -136,10 +135,28 @@ export default function LoginPage() {
                       </Box>
                       <Box>
                         <Button
-                          type="submit"
                           fullWidth
                           variant="contained"
                           disabled={isSubmitting}
+                          onClick={async () => {
+                            const errors = await validateForm()
+
+                            if (Object.keys(errors).length > 0) {
+                              setTouched(
+                                Object.keys(errors).reduce(
+                                  (acc, key) => ({ ...acc, [key]: true }),
+                                  {},
+                                ),
+                              )
+                              return
+                            }
+
+                            if (!showRecaptcha) {
+                              setShowRecaptcha(true)
+                            } else {
+                              recaptchaRef.current?.reset()
+                            }
+                          }}
                         >
                           {t('submit')}
                           {isSubmitting && <ButtonSubmittingCircle />}
@@ -191,18 +208,20 @@ export default function LoginPage() {
                     </Link>
                   </Box>
 
-                  <Box
-                    sx={{
-                      display: showRecaptcha ? 'flex' : 'none',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <ReCAPTCHA
-                      ref={recaptchaRef}
-                      sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                      onChange={() => submitForm()}
-                    />
-                  </Box>
+                  {showRecaptcha && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                        onChange={() => submitForm()}
+                      />
+                    </Box>
+                  )}
                 </>
               )
             }}
