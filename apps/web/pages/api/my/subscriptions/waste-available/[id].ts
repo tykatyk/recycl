@@ -5,7 +5,7 @@ import {
   WasteAvailableSubscriptionModel,
   dbConnect,
 } from '@recycl/shared/dist/server/db/'
-import { apiHandler } from '../../../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../../lib/helpers/responses'
 import getCoords from '../../../../../lib/helpers/getCoords'
 import { wasteAvailableSubscriptionSchema } from '../../../../../lib/validation'
 

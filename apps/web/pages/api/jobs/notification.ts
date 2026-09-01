@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../lib/helpers/responses'
 import {
   dbConnect,
   SubscriptionVariantModel,

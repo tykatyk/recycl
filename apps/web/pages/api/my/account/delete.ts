@@ -7,7 +7,7 @@ import {
   CollectionPointModel,
   SubscriptionModel,
 } from '@recycl/shared/dist/server/db'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../lib/helpers/responses'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
 const { METHOD_NOT_ALLOWED } = responseErrrorCodes

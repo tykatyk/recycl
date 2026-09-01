@@ -5,7 +5,6 @@ import {
   ComplaintModel,
   UserModel,
 } from '@recycl/shared/dist/server/db'
-import { apiHandler } from '../../lib/helpers/errorHelpers'
 import { complaintFormSchema } from '../../lib/validation/complaintForm'
 import { authOptions } from './auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
@@ -13,7 +12,10 @@ import { getEmailText } from '../../lib/helpers/email/mailer'
 import { handleEmailSending, getHtml } from '../../lib/helpers/email/mailer'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
 import { checkCaptcha } from '../../lib/helpers/checkCaptcha'
-import { captchaNotPassedResponse } from '../../lib/helpers/responses'
+import {
+  captchaNotPassedResponse,
+  apiHandler,
+} from '../../lib/helpers/responses'
 import { complaintContentVariants } from '@recycl/shared/dist/constants'
 
 const { METHOD_NOT_ALLOWED } = responseErrrorCodes

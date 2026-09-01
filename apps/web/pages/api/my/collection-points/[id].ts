@@ -10,7 +10,7 @@ import {
   CollectionPointModel,
 } from '@recycl/shared/dist/server/db'
 import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../lib/helpers/responses'
 import { isValidObjectId } from 'mongoose'
 import getCoords from '../../../../lib/helpers/getCoords'
 const { METHOD_NOT_ALLOWED } = responseErrrorCodes

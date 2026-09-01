@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../lib/helpers/responses'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
 import { phone as phoneValidator } from '@recycl/shared/dist/validation'

@@ -14,7 +14,7 @@ import {
   validOrderBy,
   validSortOrder,
 } from '../../../../lib/helpers/eventHelpers'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../../lib/helpers/responses'
 import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
 import { SortOrder, OrderBy } from '../../../../lib/types/pagination'
 import {

@@ -2,7 +2,7 @@ import { registerSchema } from '../../../lib/validation'
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
 import { captchaNotPassedResponse } from '../../../lib/helpers/responses'
 import { responseErrrorCodes } from '../../../lib/helpers/errorHelpers'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../lib/helpers/responses'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 const { METHOD_NOT_ALLOWED } = responseErrrorCodes

@@ -1,16 +1,12 @@
 import { ValidationError } from 'yup'
 import { FormikErrors, FormikHelpers, FormikValues } from 'formik'
 import { Dispatch, SetStateAction } from 'react'
-import {
-  NextApiRequest,
-  NextApiResponse,
-  GetServerSideProps,
-  GetServerSidePropsContext,
-} from 'next'
-import { validationErrorResponse } from './responses'
+import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 
 export const responseErrrorCodes = {
   NOT_FOUND: 'NOT_FOUND',
+  EEXISTS: 'EEXISTS',
+  ESAME_VALUE: 'ESAME_VALUE',
   EXPIRED: 'EXPIRED',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
@@ -70,42 +66,6 @@ export function showErrorMessages(
       setNotification(responseErrrorCodes.INTERNAL_SERVER_ERROR)
   }
 }
-
-export const apiHandler =
-  (
-    handler: (
-      req: NextApiRequest,
-      res: NextApiResponse,
-    ) => Promise<void | NextApiResponse<any>>,
-    allowValidationErrorsOnFrontend: boolean = false,
-  ) =>
-  async (req: NextApiRequest, res: NextApiResponse) => {
-    try {
-      await handler(req, res)
-    } catch (e) {
-      if (
-        process.env.NODE_ENV === 'development' ||
-        process.env.VERCEL_ENV === 'development'
-      ) {
-        console.error(e)
-      } else {
-        console.error(
-          `[${new Date().toISOString()}] ${req.method} ${req.url} failed:`,
-        )
-      }
-
-      if (e instanceof ValidationError && allowValidationErrorsOnFrontend) {
-        return validationErrorResponse(e, res)
-      }
-      res.status(500).json({
-        status: responseStatuses.ERROR,
-        error: {
-          code: responseErrrorCodes.INTERNAL_SERVER_ERROR,
-          message: responseErrrorCodes.INTERNAL_SERVER_ERROR,
-        },
-      })
-    }
-  }
 
 type Callback<P extends { [key: string]: any }> = (
   context: GetServerSidePropsContext,

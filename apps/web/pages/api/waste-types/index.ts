@@ -1,5 +1,5 @@
 import { WasteType, dbConnect } from '@recycl/shared/dist/server/db/'
-import { apiHandler } from '../../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../../lib/helpers/responses'
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 
 async function wasteTypes(req: NextApiRequest, res: NextApiResponse) {

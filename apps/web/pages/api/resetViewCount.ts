@@ -1,7 +1,8 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { apiHandler, responseErrrorCodes } from '../../lib/helpers/errorHelpers'
+import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
+import { apiHandler } from '../../lib/helpers/responses'
 import {
   dbConnect,
   CollectionPointModel as eventModel,
