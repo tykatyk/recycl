@@ -4,22 +4,11 @@ import Link from './Link'
 import Cookies from 'js-cookie'
 import { Box } from '@mui/material'
 
-const css = {
-  color: '#fff',
-  fontSize: 12,
-  textDecoration: 'none',
-  '&:hover': {
-    textDecoration: 'underline',
-  },
-}
-
 export default function LocaleSwitcher() {
   const t = useTranslations('LocaleSwitcher')
 
-  const { locale, locales, asPath } = useRouter()
-  const otherLocale = locales?.find((cur) => cur !== locale) as string
-
-  if (!otherLocale) {
+  const { locale, locales, pathname, query } = useRouter()
+  if (!locale || !locales) {
     return null
   }
 
@@ -32,16 +21,24 @@ export default function LocaleSwitcher() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      {locales?.map((localeItem, idx) => {
+      {locales?.map((localeItem) => {
         return (
-          <Box key={idx}>
+          <Box key={localeItem}>
             <Link
-              href={asPath}
+              href={{
+                pathname,
+                query,
+              }}
               locale={localeItem}
               onClick={() => handleClick(localeItem)}
               sx={{
-                ...css,
+                color: '#fff',
+                fontSize: 12,
                 textDecoration: localeItem === locale ? 'underline' : 'none',
+
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
               }}
             >
               {t('switchLocale', { locale: localeItem })}

@@ -155,7 +155,7 @@ export default function RegisterPage() {
                       variant="body2"
                       style={{ color: `${theme.palette.text.secondary}` }}
                     >
-                      {t('form.submit')}
+                      {t('form.logIn')}
                     </Link>
                   </Box>
                   <Box

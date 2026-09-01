@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
 import { Avatar, Button, Typography, Box } from '@mui/material'
 import { Formik, Form, Field } from 'formik'
@@ -9,7 +9,6 @@ import ButtonSubmittingCircle from '../../components/uiParts/ButtonSubmittingCir
 import { signIn, useSession } from 'next-auth/react'
 import LayoutWithoutHeader from '../../components/layouts/LayoutWithoutHeader'
 import ReCAPTCHA from 'react-google-recaptcha'
-import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
@@ -25,19 +24,24 @@ const brand = process.env.NEXT_PUBLIC_BRAND || ''
 export default function LoginPage() {
   const theme = useTheme()
   const [showRecaptcha, setShowRecaptcha] = useState(false)
-  const searchParams = useSearchParams()
-  const from = searchParams.get('from')
-  const validFrom = from && from[0] === '/' ? from : null
-  const callbackUrl = validFrom ? validFrom : process.env.NEXT_PUBLIC_URL
-  const { status } = useSession()
   const router = useRouter()
-  const { locale } = router
+  const { locale, query } = router
+  const { from } = query
+  const validFrom =
+    typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
+      ? from
+      : ''
+  const callbackUrl = validFrom ? validFrom : process.env.NEXT_PUBLIC_URL || ''
+  const { status } = useSession()
+
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const t = useTranslations('LoginPage')
 
+  useEffect(() => {
   if (status === 'authenticated') {
-    router.push('/', undefined, { locale })
+      router.replace('/', undefined, { locale })
   }
+  }, [status, locale, router])
 
   return (
     <>
@@ -180,7 +184,7 @@ export default function LoginPage() {
                     <Link
                       href={registerUrl}
                       variant="body2"
-                      style={{ color: `${theme.palette.text.secondary}` }}
+                      sx={{ color: 'text.secondary' }}
                       locale={locale}
                     >
                       {t('signUp')}
