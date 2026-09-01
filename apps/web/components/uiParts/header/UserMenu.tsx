@@ -22,9 +22,41 @@ import { useTranslations } from 'next-intl'
 
 const authenticated = 'authenticated'
 
+const LogIn = () => {
+  const t = useTranslations('Header.userMenu')
+  return (
+    <MenuItem component={Link} href={`/auth/login`}>
+      <ListItemIcon>
+        <LoginIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText>{t('logIn')}</ListItemText>
+    </MenuItem>
+  )
+}
+
+const LogOut = ({ status }) => {
+  const t = useTranslations('Header.userMenu')
+  return (
+    <MenuItem
+      onClick={() => {
+        if (status === 'authenticated') {
+          signOut({
+            callbackUrl: '/',
+          })
+        }
+      }}
+    >
+      <ListItemIcon>
+        <LogoutIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText>{t('logOut')}</ListItemText>
+    </MenuItem>
+  )
+}
+
 export default function UserMenu(props) {
   const theme = useTheme()
-  const { locale, asPath } = useRouter()
+  const { locale } = useRouter()
 
   const { data: session, status } = useSession()
   const { open, anchorEl, handleClose } = props
@@ -126,28 +158,7 @@ export default function UserMenu(props) {
         menuItems.map((item, index) => {
           return showSubmenu(item, index)
         })}
-      <MenuItem
-        onClick={async () => {
-          if (status === 'authenticated') {
-            await signOut({
-              callbackUrl: `${window.location.origin}`,
-            })
-          }
-        }}
-        component={Link}
-        href={status === 'authenticated' ? '/' : `/auth/login/?from=${asPath}`}
-      >
-        <ListItemIcon>
-          {status === 'authenticated' ? (
-            <LogoutIcon fontSize="small" />
-          ) : (
-            <LoginIcon fontSize="small" />
-          )}
-        </ListItemIcon>
-        <ListItemText>
-          {status === 'authenticated' ? t('logOut') : t('logIn')}
-        </ListItemText>
-      </MenuItem>
+      {status === authenticated ? <LogOut status={status} /> : <LogIn />}
     </Menu>
   )
 }
