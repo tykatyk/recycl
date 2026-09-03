@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { styled } from '@mui/material/styles'
 import { TextField, Button, Typography } from '@mui/material'
 import { Formik, Form, ErrorMessage, useFormikContext } from 'formik'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import { quantitySchema } from '../../lib/validation'
-import { mapErrors } from '../../lib/helpers/errorHelpers'
+import { enqueueSnackbar, useSnackbar } from 'notistack'
+
+const errorMessage = 'Что то пошло не так'
 
 const PREFIX = 'MapSidebarQuantityForm'
 
@@ -51,6 +53,8 @@ const StyledFormik = styled(Formik)(({ theme }) => ({
 }))
 
 const QuantityForm = (props) => {
+  const { enqueueSnackbar } = useSnackbar()
+
   const { min, max } = props
   const {
     isSubmitting,
@@ -159,9 +163,7 @@ export default function MapSidebarQuantityForm(props) {
           })
           .then(() => ({}))
           .catch((error) => {
-            // console.log(JSON.stringify(error, null, 2))
-            const errors = mapErrors(error)
-            return errors
+            enqueueSnackbar(errorMessage, { variant: 'error' })
           })
       }}
     >
