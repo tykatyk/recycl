@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../../lib/helpers/errorHelpers'
 import {
   dbConnect,
   UserModel,
@@ -10,7 +10,7 @@ import {
 import { apiHandler } from '../../../../lib/helpers/responses'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
-const { METHOD_NOT_ALLOWED } = responseErrrorCodes
+const { METHOD_NOT_ALLOWED } = responseErrorCodes
 
 async function deleteUserHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST')

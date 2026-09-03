@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../lib/helpers/errorHelpers'
 import cryptoRandomString from 'crypto-random-string'
 import dayjs from 'dayjs'
 import { HydratedDocument } from 'mongoose'
@@ -10,7 +10,7 @@ import {
   CollectionPointModel as eventModel,
 } from '@recycl/shared/dist/server/db'
 import type { CollectionPoint as WasteRemovalEvent } from '../../lib/types/collectionPoint'
-const { METHOD_NOT_ALLOWED } = responseErrrorCodes
+const { METHOD_NOT_ALLOWED } = responseErrorCodes
 
 export default async function viewCounter(
   req: NextApiRequest,

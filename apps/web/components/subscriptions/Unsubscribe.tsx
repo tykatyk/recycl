@@ -10,7 +10,7 @@ import SuccessfullUnsubscribe from '../subscriptions/SuccsesfulUnsubscribe'
 import TokenNotFound from '../subscriptions/TokenNotFound'
 import TokenExpiredOrUsed from '../subscriptions/TokenExpiredOrUsed'
 import {
-  responseErrrorCodes,
+  responseErrorCodes,
   responseStatuses,
 } from '../../lib/helpers/errorHelpers'
 import type { ApiResponseStatus } from '../../lib/helpers/responses'
@@ -18,7 +18,7 @@ import Head from 'next/head'
 // import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/router'
 
-const { NOT_FOUND, EXPIRED } = responseErrrorCodes
+const { NOT_FOUND, EXPIRED } = responseErrorCodes
 const { SUCCESS, ERROR } = responseStatuses
 const titleHeading = 'Отписаться от рассылки'
 const errorMessge = 'Что то пошло не так'

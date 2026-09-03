@@ -1,13 +1,13 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../lib/helpers/errorHelpers'
 import { apiHandler } from '../../lib/helpers/responses'
 import {
   dbConnect,
   CollectionPointModel as eventModel,
 } from '@recycl/shared/dist/server/db'
-const { INTERNAL_SERVER_ERROR, METHOD_NOT_ALLOWED } = responseErrrorCodes
+const { INTERNAL_SERVER_ERROR, METHOD_NOT_ALLOWED } = responseErrorCodes
 
 async function resetViewCount(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

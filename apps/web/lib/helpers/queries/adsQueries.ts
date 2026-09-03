@@ -1,7 +1,7 @@
 import getCoords from '../getCoords'
 import { AdModel } from '@recycl/shared/dist/server/db'
-import { responseErrrorCodes } from '../errorHelpers'
-const { INTERNAL_SERVER_ERROR } = responseErrrorCodes
+import { responseErrorCodes } from '../errorHelpers'
+const { INTERNAL_SERVER_ERROR } = responseErrorCodes
 
 const adsQueries = {
   create: async (data, user) => {

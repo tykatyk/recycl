@@ -3,13 +3,13 @@ import { authOptions } from '../../auth/[...nextauth]'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { adSchema } from '../../../../lib/validation'
 import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
-import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../../lib/helpers/errorHelpers'
 import { apiHandler } from '../../../../lib/helpers/responses'
 import { isValidObjectId } from 'mongoose'
 import getCoords from '../../../../lib/helpers/getCoords'
 import { AD_EXPIRATION_PERIOD } from '@recycl/shared/dist/constants'
 
-const { METHOD_NOT_ALLOWED } = responseErrrorCodes
+const { METHOD_NOT_ALLOWED } = responseErrorCodes
 
 async function adHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)

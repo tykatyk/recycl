@@ -8,7 +8,7 @@ import {
   validSortOrder,
 } from '../../../../lib/helpers/eventHelpers' //ToDo: rename and refactor eventHelpers
 import { apiHandler } from '../../../../lib/helpers/responses'
-import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../../lib/helpers/errorHelpers'
 import { SortOrder, OrderBy } from '../../../../lib/types/pagination'
 import {
   paginationPageNumberSchema,
@@ -18,7 +18,7 @@ import {
 import mongoose from 'mongoose'
 import getCoords from '../../../../lib/helpers/getCoords'
 import { documentActivityStatus } from '@recycl/shared/dist/constants'
-const { METHOD_NOT_ALLOWED } = responseErrrorCodes
+const { METHOD_NOT_ALLOWED } = responseErrorCodes
 
 const queryValidationSchema = yup.object({
   page: paginationPageNumberSchema,

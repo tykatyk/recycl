@@ -7,7 +7,7 @@ import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import CustomSnackbar from '../uiParts/Snackbars'
 import Link from '../uiParts/Link'
 import {
-  responseErrrorCodes,
+  responseErrorCodes,
   responseStatuses,
   validateForm,
 } from '../../lib/helpers/errorHelpers'
@@ -21,7 +21,7 @@ type Email = {
 
 const unsubscribeAPI = '/api/my/subscriptions/unsubscribe'
 const { SUCCESS, ERROR } = responseStatuses
-const { NOT_FOUND } = responseErrrorCodes
+const { NOT_FOUND } = responseErrorCodes
 
 export default function TokenNotFound() {
   const [message, setMessage] = useState<string>('')

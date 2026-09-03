@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { responseErrrorCodes, responseStatuses } from './errorHelpers'
+import { responseErrorCodes, responseStatuses } from './errorHelpers'
 
-const { CAPTCHA_FAILED } = responseErrrorCodes
+const { CAPTCHA_FAILED } = responseErrorCodes
 const { SUCCESS, ERROR } = responseStatuses
 
 type ErrorResponse = {
   status: typeof ERROR
   error: {
-    code: keyof typeof responseErrrorCodes
+    code: keyof typeof responseErrorCodes
     message: string
   }
 }
@@ -56,8 +56,8 @@ export const apiHandler =
       res.status(500).json({
         status: responseStatuses.ERROR,
         error: {
-          code: responseErrrorCodes.INTERNAL_SERVER_ERROR,
-          message: responseErrrorCodes.INTERNAL_SERVER_ERROR,
+          code: responseErrorCodes.INTERNAL_SERVER_ERROR,
+          message: responseErrorCodes.INTERNAL_SERVER_ERROR,
         },
       })
     }

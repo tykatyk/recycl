@@ -8,7 +8,7 @@ import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '@recycl/shared/dist/constants'
 import { getFullHtml } from '@recycl/shared/dist/email'
 import {
   responseStatuses,
-  responseErrrorCodes,
+  responseErrorCodes,
 } from '../../../../lib/helpers/errorHelpers'
 import {
   ApiResponseStatus,
@@ -16,7 +16,7 @@ import {
 } from '../../../../lib/helpers/responses'
 
 const { ERROR } = responseStatuses
-const { EEXISTS, ESAME_VALUE } = responseErrrorCodes
+const { EEXISTS, ESAME_VALUE } = responseErrorCodes
 
 async function emailHandler(
   req: NextApiRequest,

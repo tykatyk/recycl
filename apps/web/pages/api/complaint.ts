@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../lib/helpers/errorHelpers'
 import {
   dbConnect,
   ComplaintModel,
@@ -18,7 +18,7 @@ import {
 } from '../../lib/helpers/responses'
 import { complaintContentVariants } from '@recycl/shared/dist/constants'
 
-const { METHOD_NOT_ALLOWED } = responseErrrorCodes
+const { METHOD_NOT_ALLOWED } = responseErrorCodes
 
 async function complaintHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { responseErrrorCodes } from '../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../lib/helpers/errorHelpers'
 import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../lib/helpers/responses'
-const { METHOD_NOT_ALLOWED } = responseErrrorCodes
+const { METHOD_NOT_ALLOWED } = responseErrorCodes
 
 async function adsPhoneViewHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

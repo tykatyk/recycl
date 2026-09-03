@@ -6,8 +6,8 @@ import {
   dbConnect,
 } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../../lib/helpers/responses'
-import { responseErrrorCodes } from '../../../../lib/helpers/errorHelpers'
-const { METHOD_NOT_ALLOWED } = responseErrrorCodes
+import { responseErrorCodes } from '../../../../lib/helpers/errorHelpers'
+const { METHOD_NOT_ALLOWED } = responseErrorCodes
 
 async function subscriptionVariants(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {

@@ -6,13 +6,13 @@ import {
   UnsubscribeToken,
 } from '@recycl/shared/dist/server/db'
 import {
-  responseErrrorCodes,
+  responseErrorCodes,
   responseStatuses,
 } from '../../../../lib/helpers/errorHelpers'
 import { email as emailSchema } from '@recycl/shared/dist/validation'
 import type { ApiResponseStatus } from '../../../../lib/helpers/responses'
 
-const { NOT_FOUND, EXPIRED, VALIDATION_ERROR } = responseErrrorCodes
+const { NOT_FOUND, EXPIRED, VALIDATION_ERROR } = responseErrorCodes
 const { SUCCESS, ERROR } = responseStatuses
 
 const tokenNotFoundUnsubscribe = async (

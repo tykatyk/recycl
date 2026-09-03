@@ -2,7 +2,7 @@ import SingleCollectionPoint from '../../components/collectionPoints/SingleColle
 import { CollectionPointModel, dbConnect } from '@recycl/shared/dist/server/db'
 import { constants } from '@recycl/shared/dist'
 import Layout from '../../components/layouts/Layout'
-import { responseErrrorCodes } from '../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../lib/helpers/errorHelpers'
 import { Box, Button, Typography } from '@mui/material'
 import BlockIcon from '@mui/icons-material/Block'
 import { useRouter } from 'next/router'
@@ -10,7 +10,7 @@ import { isValidObjectId } from 'mongoose'
 import Head from 'next/head'
 import Link from '../../components/uiParts/Link'
 import { useTranslations } from 'use-intl'
-const { FORBIDDEN } = responseErrrorCodes
+const { FORBIDDEN } = responseErrorCodes
 
 const { documentActivityStatus } = constants
 const { active } = documentActivityStatus

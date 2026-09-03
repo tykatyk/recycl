@@ -1,13 +1,12 @@
 import { ValidationError } from 'yup'
-import { FormikErrors, FormikHelpers } from 'formik'
-import { Dispatch, SetStateAction } from 'react'
+import { FormikErrors } from 'formik'
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 
 import type { FormikValues } from 'formik'
 import type { ObjectSchema } from 'yup'
 import type { useTranslations } from 'next-intl'
 
-export const responseErrrorCodes = {
+export const responseErrorCodes = {
   NOT_FOUND: 'NOT_FOUND',
   EEXISTS: 'EEXISTS',
   ESAME_VALUE: 'ESAME_VALUE',
