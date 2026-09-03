@@ -3,7 +3,7 @@ import { ReactElement, useCallback, useState } from 'react'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import CustomSnackbar from '../uiParts/Snackbars'
 import SuccessfullUnsubscribe from './SuccsesfulUnsubscribe'
-import { responseStatuses } from '../../lib/helpers/errorHelpers'
+import { responseStatuses } from '../../lib/helpers/responses'
 import type { ApiResponseStatus } from '../../lib/helpers/responses'
 
 const unsubscribeAPI = '/api/my/subscriptions/unsubscribe'

@@ -1,5 +1,5 @@
 import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
-import { responseErrorCodes } from '../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../lib/helpers/responses'
 import {
   adSearchFormSchema,
   paginationPageNumberSchema,

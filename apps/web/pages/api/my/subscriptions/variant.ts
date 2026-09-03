@@ -6,7 +6,7 @@ import {
   dbConnect,
 } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../../lib/helpers/responses'
-import { responseErrorCodes } from '../../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../../lib/helpers/responses'
 const { METHOD_NOT_ALLOWED } = responseErrorCodes
 
 async function subscriptionVariants(req: NextApiRequest, res: NextApiResponse) {

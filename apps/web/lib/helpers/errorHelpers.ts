@@ -6,23 +6,6 @@ import type { FormikValues } from 'formik'
 import type { ObjectSchema } from 'yup'
 import type { useTranslations } from 'next-intl'
 
-export const responseErrorCodes = {
-  NOT_FOUND: 'NOT_FOUND',
-  EEXISTS: 'EEXISTS',
-  ESAME_VALUE: 'ESAME_VALUE',
-  EXPIRED: 'EXPIRED',
-  INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
-  VALIDATION_ERROR: 'VALIDATION_ERROR',
-  METHOD_NOT_ALLOWED: 'METHOD_NOT_ALLOWED',
-  FORBIDDEN: 'FORBIDDEN',
-  CAPTCHA_FAILED: 'CAPTCHA_FAILED',
-} as const
-
-export const responseStatuses = {
-  ERROR: 'ERROR',
-  SUCCESS: 'SUCCESS',
-} as const
-
 export type FormValidationError =
   | {
       type: 'perForm'

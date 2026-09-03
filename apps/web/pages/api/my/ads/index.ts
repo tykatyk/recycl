@@ -8,7 +8,7 @@ import {
   validSortOrder,
 } from '../../../../lib/helpers/eventHelpers' //ToDo: rename and refactor eventHelpers
 import { apiHandler } from '../../../../lib/helpers/responses'
-import { responseErrorCodes } from '../../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../../lib/helpers/responses'
 import { SortOrder, OrderBy } from '../../../../lib/types/pagination'
 import {
   paginationPageNumberSchema,

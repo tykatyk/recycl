@@ -8,7 +8,7 @@ import {
 import {
   responseErrorCodes,
   responseStatuses,
-} from '../../../../lib/helpers/errorHelpers'
+} from '../../../../lib/helpers/responses'
 import { email as emailSchema } from '@recycl/shared/dist/validation'
 import type { ApiResponseStatus } from '../../../../lib/helpers/responses'
 

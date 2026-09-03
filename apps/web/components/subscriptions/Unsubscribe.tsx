@@ -10,12 +10,11 @@ import SuccessfullUnsubscribe from '../subscriptions/SuccsesfulUnsubscribe'
 import TokenNotFound from '../subscriptions/TokenNotFound'
 import TokenExpiredOrUsed from '../subscriptions/TokenExpiredOrUsed'
 import {
+  type ApiResponseStatus,
   responseErrorCodes,
   responseStatuses,
-} from '../../lib/helpers/errorHelpers'
-import type { ApiResponseStatus } from '../../lib/helpers/responses'
+} from '../../lib/helpers/responses'
 import Head from 'next/head'
-// import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/router'
 
 const { NOT_FOUND, EXPIRED } = responseErrorCodes

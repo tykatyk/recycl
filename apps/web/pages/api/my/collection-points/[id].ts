@@ -9,7 +9,7 @@ import {
   CollectionPointStationeryModel,
   CollectionPointModel,
 } from '@recycl/shared/dist/server/db'
-import { responseErrorCodes } from '../../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../../lib/helpers/responses'
 import { apiHandler } from '../../../../lib/helpers/responses'
 import { isValidObjectId } from 'mongoose'
 import getCoords from '../../../../lib/helpers/getCoords'

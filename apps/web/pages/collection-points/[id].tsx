@@ -2,7 +2,7 @@ import SingleCollectionPoint from '../../components/collectionPoints/SingleColle
 import { CollectionPointModel, dbConnect } from '@recycl/shared/dist/server/db'
 import { constants } from '@recycl/shared/dist'
 import Layout from '../../components/layouts/Layout'
-import { responseErrorCodes } from '../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../lib/helpers/responses'
 import { Box, Button, Typography } from '@mui/material'
 import BlockIcon from '@mui/icons-material/Block'
 import { useRouter } from 'next/router'

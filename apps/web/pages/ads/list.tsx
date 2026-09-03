@@ -1,6 +1,6 @@
 import { dbConnect, AdModel } from '@recycl/shared/dist/server/db'
 import AdsOnList, { AdsOnListProps } from '../../components/ads/AdsOnList'
-import { responseErrorCodes } from '../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../lib/helpers/responses'
 import {
   adSearchFormSchema,
   paginationPageNumberSchema,

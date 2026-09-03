@@ -6,11 +6,11 @@ import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import CustomSnackbar from '../uiParts/Snackbars'
 import Link from '../uiParts/Link'
+import { validateForm } from '../../lib/helpers/errorHelpers'
 import {
   responseErrorCodes,
   responseStatuses,
-  validateForm,
-} from '../../lib/helpers/errorHelpers'
+} from '../../lib/helpers/responses'
 import type { ApiResponseStatus } from '../../lib/helpers/responses'
 import { useTranslations } from 'next-intl'
 import { default as yup, InferType } from 'yup'

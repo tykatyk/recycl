@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { Message } from '@recycl/shared/dist/server/db'
-import { responseErrorCodes } from '../errorHelpers'
+import { responseErrorCodes } from '../responses'
 const { INTERNAL_SERVER_ERROR } = responseErrorCodes
 
 const messageQueries = {

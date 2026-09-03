@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import * as yup from 'yup'
 import { apiHandler } from '../../../lib/helpers/responses'
-import { responseErrorCodes } from '../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../lib/helpers/responses'
 import { getCollectionPointClusters } from '../../../lib/helpers/collectionPointsClusterMaker'
 import type { BBox } from '@recycl/shared/dist/server/types'
 

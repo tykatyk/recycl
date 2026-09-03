@@ -7,12 +7,10 @@ import { email as emailValidator } from '@recycl/shared/dist/validation'
 import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '@recycl/shared/dist/constants'
 import { getFullHtml } from '@recycl/shared/dist/email'
 import {
-  responseStatuses,
-  responseErrorCodes,
-} from '../../../../lib/helpers/errorHelpers'
-import {
   ApiResponseStatus,
   apiHandler,
+  responseStatuses,
+  responseErrorCodes,
 } from '../../../../lib/helpers/responses'
 
 const { ERROR } = responseStatuses

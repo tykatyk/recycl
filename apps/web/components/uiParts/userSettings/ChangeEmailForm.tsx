@@ -6,11 +6,11 @@ import { enqueueSnackbar } from 'notistack'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
 import { useTranslations } from 'next-intl'
-import { ApiResponseStatus } from '../../../lib/helpers/responses'
 import {
+  ApiResponseStatus,
   responseStatuses,
-  validateForm,
-} from '../../../lib/helpers/errorHelpers'
+} from '../../../lib/helpers/responses'
+import { validateForm } from '../../../lib/helpers/errorHelpers'
 
 const { ERROR } = responseStatuses
 const api = '/api/my/account/email'

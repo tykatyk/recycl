@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { responseErrorCodes } from '../../../lib/helpers/errorHelpers'
+import { responseErrorCodes } from '../../../lib/helpers/responses'
 import { dbConnect, CollectionPointModel } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../lib/helpers/responses'
 

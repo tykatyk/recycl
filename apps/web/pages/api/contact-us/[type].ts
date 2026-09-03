@@ -18,7 +18,7 @@ import {
   getHtml,
 } from '../../../lib/helpers/email/mailer'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
-import { responseStatuses } from '../../../lib/helpers/errorHelpers'
+import { responseStatuses } from '../../../lib/helpers/responses'
 const { SUCCESS } = responseStatuses
 
 const getEmailFrom = (email: string) => email.toLowerCase().replace(/\s/g, '')
