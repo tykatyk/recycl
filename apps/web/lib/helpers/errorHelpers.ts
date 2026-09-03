@@ -6,16 +6,6 @@ import type { FormikValues } from 'formik'
 import type { ObjectSchema } from 'yup'
 import type { useTranslations } from 'next-intl'
 
-export type FormValidationError =
-  | {
-      type: 'perForm'
-      message: string
-    }
-  | {
-      type: 'perField'
-      message: FormikErrors<FormikValues>
-    }
-
 function translateError(
   error: ValidationError,
   translations: ReturnType<typeof useTranslations>,
@@ -62,24 +52,6 @@ export async function validateForm<T extends FormikValues>(
       {},
     )
   }
-}
-
-export function mapErrors(error: ValidationError) {
-  if (Array.isArray(error)) return null
-
-  let mappedErrors: FormikErrors<FormikValues> = {}
-
-  if (error.inner && error.inner.length > 0) {
-    error.inner.forEach((item: ValidationError, i) => {
-      if (!item.path) return
-      const path = item.path.split('.')[0]
-      if (!path) return
-      if (!mappedErrors[path]) mappedErrors[path] = item.message
-    })
-    return mappedErrors
-  }
-
-  return null
 }
 
 type Callback<P extends { [key: string]: any }> = (
