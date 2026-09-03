@@ -9,7 +9,7 @@ import {
 import Layout from '../../../components/layouts/Layout'
 import PageLoadingCircle from '../../../components/uiParts/PageLoadingCircle'
 import SettingsIcon from '@mui/icons-material/Settings'
-import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../components/uiParts/RedirectUnauthenticatedUser'
 import { useEffect, useMemo, useState } from 'react'
 import type { SubscriptionVariant } from '@recycl/shared/dist/server/db/models/subscriptionVariant'
 import { subscriptionConfig } from '../../../lib/helpers/subscription'
@@ -166,7 +166,7 @@ export default function MySubscriptions() {
   }
 
   return (
-    <RedirectUnathenticatedUser>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -183,7 +183,7 @@ export default function MySubscriptions() {
           {content}
         </Box>
       </Layout>
-    </RedirectUnathenticatedUser>
+    </RedirectUnauthenticatedUser>
   )
 }
 

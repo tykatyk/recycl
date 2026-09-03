@@ -1,6 +1,6 @@
 import Layout from '../../../../components/layouts/Layout'
 import WasteAvailableForm from '../../../../components/ads/WasteAvailableForm'
-import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../../components/uiParts/RedirectUnauthenticatedUser'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 
@@ -10,7 +10,7 @@ export default function CreateAdPage() {
   const t = useTranslations('CreateAdPage')
 
   return (
-    <RedirectUnathenticatedUser>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -18,7 +18,7 @@ export default function CreateAdPage() {
       <Layout>
         <WasteAvailableForm h1={t('h1')} />
       </Layout>
-    </RedirectUnathenticatedUser>
+    </RedirectUnauthenticatedUser>
   )
 }
 

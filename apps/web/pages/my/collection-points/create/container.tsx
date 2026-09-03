@@ -1,6 +1,6 @@
 import Layout from '../../../../components/layouts/Layout'
 import CollectionPointFormCreate from '../../../../components/collectionPoints/CollectionPointFormCreate'
-import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../../components/uiParts/RedirectUnauthenticatedUser'
 import Head from 'next/head'
 import { useTranslations } from 'use-intl'
 
@@ -8,7 +8,7 @@ export default function CreateContainerCollectionPoint() {
   const brand = process.env.NEXT_PUBLIC_BRAND || ''
   const t = useTranslations('CreateContainerCollectionPointPage')
   return (
-    <RedirectUnathenticatedUser>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -16,7 +16,7 @@ export default function CreateContainerCollectionPoint() {
       <Layout>
         <CollectionPointFormCreate variant={'container'} h1={t('h1')} />
       </Layout>
-    </RedirectUnathenticatedUser>
+    </RedirectUnauthenticatedUser>
   )
 }
 

@@ -1,7 +1,7 @@
 import { Box } from '@mui/material'
 import Layout from '../../../components/layouts/Layout'
 import ScrollTopButton from '../../../components/uiParts/ScrollToTopButton'
-import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../components/uiParts/RedirectUnauthenticatedUser'
 import MyAdsList from '../../../components/ads/MyAdsList'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
@@ -17,7 +17,7 @@ export default function MyAdsDisabled() {
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
-        <RedirectUnathenticatedUser>
+        <RedirectUnauthenticatedUser>
           <Box
             sx={{
               width: '100%',
@@ -30,7 +30,7 @@ export default function MyAdsDisabled() {
             <MyAdsList h1={t('h1')} variant="disabled" />
             <ScrollTopButton />
           </Box>
-        </RedirectUnathenticatedUser>
+        </RedirectUnauthenticatedUser>
       </Layout>
     </>
   )

@@ -23,7 +23,7 @@ import HeadingWithDescription, {
   HeadingDetails,
 } from '../../../../components/uiParts/HeadingWithDescription'
 import DataGridFooter from '../../../../components/uiParts/DataGridFooter'
-import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../../components/uiParts/RedirectUnauthenticatedUser'
 import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
 import DataLoadingError from '../../../../components/uiParts/DataLoadingError'
 import {
@@ -487,7 +487,7 @@ const SubscriptionList = () => {
 export default function WasteAvailableSubscriptions() {
   const t = useTranslations('WasteAvailableSubscriptions')
   return (
-    <RedirectUnathenticatedUser>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -506,7 +506,7 @@ export default function WasteAvailableSubscriptions() {
           <ScrollTopButton />
         </Box>
       </Layout>
-    </RedirectUnathenticatedUser>
+    </RedirectUnauthenticatedUser>
   )
 }
 

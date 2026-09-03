@@ -1,6 +1,6 @@
 import Layout from '../../../../components/layouts/Layout'
 import CollectionPointFormCreate from '../../../../components/collectionPoints/CollectionPointFormCreate'
-import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../../components/uiParts/RedirectUnauthenticatedUser'
 import Head from 'next/head'
 import { useTranslations } from 'use-intl'
 
@@ -9,7 +9,7 @@ export default function CreateStationeryCollectionPoint() {
   const t = useTranslations('CreateStationeryCollectionPointPage')
 
   return (
-    <RedirectUnathenticatedUser>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -17,7 +17,7 @@ export default function CreateStationeryCollectionPoint() {
       <Layout>
         <CollectionPointFormCreate variant={'stationery'} h1={t('h1')} />
       </Layout>
-    </RedirectUnathenticatedUser>
+    </RedirectUnauthenticatedUser>
   )
 }
 

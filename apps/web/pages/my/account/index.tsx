@@ -2,7 +2,7 @@ import { Typography, AccordionDetails, Box } from '@mui/material'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../components/uiParts/RedirectUnauthenticatedUser'
 import Layout from '../../../components/layouts/Layout'
 import ContactsForm from '../../../components/uiParts/userSettings/ContactsForm'
 import PhoneForm from '../../../components/uiParts/userSettings/PhoneForm'
@@ -19,7 +19,7 @@ export default function AccountSettings() {
   const id = useId()
 
   return (
-    <RedirectUnathenticatedUser>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -77,7 +77,7 @@ export default function AccountSettings() {
           </Accordion>
         </Box>
       </Layout>
-    </RedirectUnathenticatedUser>
+    </RedirectUnauthenticatedUser>
   )
 }
 

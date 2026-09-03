@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import ButtonSubmittingCircle from '../../../../components/uiParts/ButtonSubmittingCircle'
 import { useSnackbar } from 'notistack'
 import PageLoadingCircle from '../../../../components/uiParts/PageLoadingCircle'
-import RedirectUnathenticatedUser from '../../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../../components/uiParts/RedirectUnauthenticatedUser'
 import DataLoadingError from '../../../../components/uiParts/DataLoadingError'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
 import NotSubscribed from '../../../../components/subscriptions/NotSubscribed'
@@ -201,7 +201,7 @@ export default function WasteRemovalSubscription() {
   }
 
   return (
-    <RedirectUnathenticatedUser>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -217,7 +217,7 @@ export default function WasteRemovalSubscription() {
           {renderContent()}
         </Box>
       </Layout>
-    </RedirectUnathenticatedUser>
+    </RedirectUnauthenticatedUser>
   )
 }
 

@@ -10,7 +10,7 @@ import ChatPage from '../ChatPage'
 import Layout from '../layouts/Layout'
 import Snackbars from '../uiParts/Snackbars'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
-import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../uiParts/RedirectUnauthenticatedUser'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { GET_DIALOGS } from '../../lib/graphql/queries/message'
 import { DELETE_DIALOGS } from '../../lib/graphql/queries/message'
@@ -24,7 +24,7 @@ const classes = {
   root: `${PREFIX}-root`,
 }
 
-const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
+const StyledRedirectUnauthenticatedUser = styled(RedirectUnauthenticatedUser)(
   ({ theme }) => ({
     [`& .${classes.root}`]: {
       maxWidth: 1024,
@@ -276,13 +276,13 @@ export default function DialogsPage() {
     }
 
     return (
-      <StyledRedirectUnathenticatedUser>
+      <StyledRedirectUnauthenticatedUser>
         <Layout title="Мои сообщения | Recycl">
           <Grid className={classes.root} container direction="column">
             {content}
           </Grid>
         </Layout>
-      </StyledRedirectUnathenticatedUser>
+      </StyledRedirectUnauthenticatedUser>
     )
   }
 }

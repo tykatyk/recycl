@@ -20,7 +20,7 @@ import Layout from './layouts/Layout'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import { useApolloClient, useMutation } from '@apollo/client'
-import RedirectUnathenticatedUser from './uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from './uiParts/RedirectUnauthenticatedUser'
 import Snackbars from './uiParts/Snackbars'
 import TextFieldFormik from './uiParts/formInputs/TextFieldFormik'
 import { Formik, Form, Field } from 'formik'
@@ -56,7 +56,7 @@ const classes = {
   remainedSymbolsIndicator: `${PREFIX}-remainedSymbolsIndicator`,
 }
 
-const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
+const StyledRedirectUnauthenticatedUser = styled(RedirectUnauthenticatedUser)(
   ({ theme }) => ({
     [`& .${classes.chatContainer}`]: {
       width: '100%',
@@ -850,10 +850,10 @@ export default function ChatPage(props) {
   }
 
   return (
-    <StyledRedirectUnathenticatedUser>
+    <StyledRedirectUnauthenticatedUser>
       <Layout title={title} currentDialogId={dialogId}>
         {content}
       </Layout>
-    </StyledRedirectUnathenticatedUser>
+    </StyledRedirectUnauthenticatedUser>
   )
 }

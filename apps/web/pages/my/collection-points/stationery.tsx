@@ -1,7 +1,7 @@
 import { Box } from '@mui/material'
 import Layout from '../../../components/layouts/Layout'
 import ScrollTopButton from '../../../components/uiParts/ScrollToTopButton'
-import RedirectUnathenticatedUser from '../../../components/uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../../../components/uiParts/RedirectUnauthenticatedUser'
 import MyCollectionPointsList from '../../../components/collectionPoints/MyCollectionPointsList'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
@@ -12,7 +12,7 @@ export default function MyStationeryCollectionPoints() {
   const t = useTranslations('MyStationeryCollectionPointsPage')
 
   return (
-    <RedirectUnathenticatedUser>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>
           {t('title')} | {brand}
@@ -33,7 +33,7 @@ export default function MyStationeryCollectionPoints() {
           <ScrollTopButton />
         </Box>
       </Layout>
-    </RedirectUnathenticatedUser>
+    </RedirectUnauthenticatedUser>
   )
 }
 

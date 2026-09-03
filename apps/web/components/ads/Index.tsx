@@ -7,7 +7,7 @@ import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import DataGridFooter from '../uiParts/DataGridFooter'
 import NoRows from '../uiParts/NoRows'
 import Error from '../uiParts/DataLoadingError'
-import RedirectUnathenticatedUser from '../uiParts/RedirectUnathenticatedUser'
+import RedirectUnauthenticatedUser from '../uiParts/RedirectUnauthenticatedUser'
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery } from '@apollo/client'
 import { GET_ADS } from '../../lib/graphql/queries/ad'
@@ -20,7 +20,7 @@ const classes = {
   row: `${PREFIX}-row`,
 }
 
-const StyledRedirectUnathenticatedUser = styled(RedirectUnathenticatedUser)(
+const StyledRedirectUnauthenticatedUser = styled(RedirectUnauthenticatedUser)(
   ({ theme }) => ({
     [`& .${classes.root}`]: {
       '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
@@ -111,7 +111,7 @@ export default function Index(props) {
   }
 
   return (
-    <StyledRedirectUnathenticatedUser>
+    <StyledRedirectUnauthenticatedUser>
       <Layout title={`${title} | Recycl`}>
         <Grid
           container
@@ -168,6 +168,6 @@ export default function Index(props) {
           setBackendError(null)
         }}
       />
-    </StyledRedirectUnathenticatedUser>
+    </StyledRedirectUnauthenticatedUser>
   )
 }
