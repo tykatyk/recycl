@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { FormikHelpers, useFormik } from 'formik'
 import { getNormalizedValues } from '../../lib/helpers/eventHelpers'
 import { collectionPointSchema } from '../../lib/validation'
-import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import { useRouter } from 'next/router'
 import { Box, Grid, Typography } from '@mui/material'
 import 'dayjs/locale/ru'
@@ -22,9 +21,13 @@ import {
   userPhoneFetcher,
 } from '../../lib/helpers/dataFetcher'
 import { useTranslations } from 'next-intl'
+import { validateForm } from '../../lib/helpers/errorHelpers'
+import { InferType } from 'yup'
 
 const api = '/api/my/collection-points'
 const indexRoute = '/my/collection-points'
+
+type CollectionPoint = InferType<typeof collectionPointSchema>
 
 type CollectionPointFormProps = {
   variant: CollectionPointVariant
@@ -42,6 +45,7 @@ export default function CollectionPointFormCreate(
   const [userPhone, setUserPhone] = useState<string>('')
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('CollectionPointFormCreate')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const createHandler = useCallback(
     (
@@ -84,29 +88,31 @@ export default function CollectionPointFormCreate(
     [],
   )
 
-  const formik = useFormik({
+  const formik = useFormik<CollectionPoint>({
     initialValues:
       variant === 'mobile'
         ? {
-            user: '' as any,
             location: null as any,
             wasteTypes: [],
             phone: userPhone,
             comment: '',
             variant,
-            viewCount: 0,
             date: null as any,
           }
         : {
-            user: '' as any,
             location: null as any,
             wasteTypes: [],
             phone: userPhone,
             comment: '',
             variant,
-            viewCount: 0,
           },
-    validationSchema: collectionPointSchema,
+    validate: async (values) => {
+      return await validateForm({
+        values,
+        validationSchema: collectionPointSchema,
+        translations: tValidationMessages,
+      })
+    },
     onSubmit: (
       values: CollectionPoint,
       actions: FormikHelpers<CollectionPoint>,

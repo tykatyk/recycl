@@ -43,7 +43,7 @@ const userName = yup
 const comment = yup
   .string()
   .concat(notOnlySpaces)
-  .min(3, minLength)
+  .min(5, minLength)
   .max(1000, maxLength)
 
 const radius = yup

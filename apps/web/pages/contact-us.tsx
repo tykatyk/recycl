@@ -9,6 +9,7 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { useSnackbar } from 'notistack'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import { validateForm } from '../lib/helpers/errorHelpers'
 
 const apiRoute = 'api/contact-us/general'
 const limit = 1000
@@ -18,6 +19,7 @@ export default function ContactUsPage() {
   const [recaptchaToken, setRecaptchaToken] = useState(null)
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const t = useTranslations('ContactUsPage')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const { enqueueSnackbar } = useSnackbar()
 
@@ -48,11 +50,14 @@ export default function ContactUsPage() {
               email: '',
               message: '',
             }}
-            validationSchema={contactUsSchema}
-            onSubmit={async (
-              values,
-              { setSubmitting, setErrors, resetForm },
-            ) => {
+            validate={async (values) => {
+              return await validateForm({
+                values,
+                validationSchema: contactUsSchema,
+                translations: tValidationMessages,
+              })
+            }}
+            onSubmit={async (values, { setSubmitting, resetForm }) => {
               if (!recaptchaToken) return
               setSubmitting(true)
 

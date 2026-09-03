@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { FormikHelpers, useFormik } from 'formik'
 import { collectionPointSchema } from '../../lib/validation'
-import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import { useRouter } from 'next/router'
 import { Box, Grid, Typography } from '@mui/material'
 import 'dayjs/locale/ru'
@@ -19,8 +18,12 @@ import { CollectionPointVariant } from '@recycl/shared/dist/constants'
 import dayjs from 'dayjs'
 import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
 import { useTranslations } from 'next-intl'
+import { validateForm } from '../../lib/helpers/errorHelpers'
+import { InferType } from 'yup'
 
 const api = '/api/my/collection-points'
+
+type CollectionPoint = InferType<typeof collectionPointSchema>
 
 type CollectionPointFormProps = {
   variant: CollectionPointVariant
@@ -39,16 +42,15 @@ export default function CollectionPointFormUpdate(
 
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('CollectionPointFormUpdate')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const [initialValues, setInitialValues] = useState<CollectionPoint>(() => {
     const initVal = {
-      user: '' as any,
       location: null as any,
       wasteTypes: [],
       phone: '',
       comment: '',
       variant: 'container' as const,
-      viewCount: 0,
     }
     if (variant === 'mobile') {
       initVal['date'] = null
@@ -70,25 +72,15 @@ export default function CollectionPointFormUpdate(
       }
       const collectionPoint = await response.json()
 
-      const {
-        user,
-        location,
-        wasteTypes,
-        phone,
-        comment,
-        variant,
-        viewCount,
-        date,
-      } = collectionPoint
+      const { location, wasteTypes, phone, comment, variant, date } =
+        collectionPoint
 
       const initialValues = {
-        user,
         location,
         wasteTypes,
         phone,
         comment,
         variant,
-        viewCount,
       }
 
       if (variant === 'mobile') {
@@ -116,7 +108,13 @@ export default function CollectionPointFormUpdate(
 
   const formik = useFormik({
     initialValues,
-    validationSchema: collectionPointSchema,
+    validate: async (values) => {
+      return await validateForm({
+        values,
+        validationSchema: collectionPointSchema,
+        translations: tValidationMessages,
+      })
+    },
     onSubmit: (
       values: CollectionPoint,
       actions: FormikHelpers<CollectionPoint>,
@@ -138,15 +136,10 @@ export default function CollectionPointFormUpdate(
     { setSubmitting }: FormikHelpers<CollectionPoint>,
   ) => {
     setSubmitting(true)
-    //delete user property from modifiedValues
-    const { user, ...modifiedValues } = values
     fetch(`${api}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        // _id: collectionPoint?._id,
-        ...modifiedValues,
-      }),
+      body: JSON.stringify(values),
     })
       .then((response) => {
         return response.json()

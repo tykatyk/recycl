@@ -32,7 +32,8 @@
     "form": {
       "yourName": "Ім’я або назва організації",
       "yourEmail": "Електронна пошта",
-      "submit": "Зареєструватися"
+      "submit": "Зареєструватися",
+      "logIn": "Вхід"
     }
   },
   "LoginPage": {
@@ -371,6 +372,7 @@
       "quantityEndAdornment": "кг",
       "phone": "Контактний телефон",
       "phoneHelperText": "Обов’язкове поле",
+      "comment": "Коментар",
       "submit": "Зберегти"
     }
   },
@@ -527,7 +529,15 @@
     "ChangeEmailForm": {
       "successMessage": "Лист із підтвердженням надіслано на нову адресу",
       "errorMessage": "Щось пішло не так",
+      "emailInUse": "Ця адреса уже використовується",
+      "emailTheSameAsCurrent": "Ця адреса уже встановлена як поточна",
       "label": "Нова адреса електронної пошти",
+      "submit": "Зберегти"
+    },
+    "ContactsForm": {
+      "successMessage": "Дані успішно оновлено",
+      "errorMessage": "Щось пішло не так",
+      "userNameLabel": "Ім’я або назва організації",
       "submit": "Зберегти"
     },
     "DeleteAccountComponent": {
@@ -594,5 +604,31 @@
     "view": "Показати",
     "description": "Опис",
     "complain": "Поскаржитись"
+  },
+  "ValidationMessages": {
+    "required": "Обов’язкове поле",
+    "positive": "Поле має містити число більше 0",
+    "onlyDigits": "Тільки цифри",
+    "onlyIntegers": "Тільки цілі числа",
+    "email": "Недійсна адреса електронної пошти",
+    "phone": "Недійсний номер телефону",
+    "notOnlySpaces": "Рядок не може складатися лише з пробілів",
+    "wrongType": "Значення має неправильний тип даних",
+    "dateIsSameOrAfter": "Дата/час не може бути раніше поточного моменту",
+    "dateIsOneYearAfterNow": "Не можна вибирати дати в далекому майбутньому",
+    "atLeastOne": "Виберіть хоча б 1 значення",
+    "maxLength": "Максимум {max, plural, one {# символ} few {# символа} other {# символів}}",
+    "minLength": "Мінімум {min, plural, one {# символ} few {# символа} other {# символів}}",
+    "maxNumber": "Значення не повинно бути більшим за {max}",
+    "minNumber": "Значення не повинно бути меншим за {min}"
+  },
+  "ComplaintDialog": {
+    "title": "Поскаржитися на контент",
+    "content": "Опишіть причину скарги",
+    "label": "Текст скарги",
+    "cancel": "Скасувати",
+    "submit": "Надіслати",
+    "errorMessage": "Щось пішло не так",
+    "successMessage": "Повідомлення успішно надіслано"
   }
 }

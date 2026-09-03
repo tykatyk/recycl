@@ -7,8 +7,7 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { useSnackbar } from 'notistack'
 import * as yup from 'yup'
-import { showErrorMessages } from '../lib/helpers/errorHelpers'
-import { useRouter } from 'next/router'
+import { validateForm } from '../lib/helpers/errorHelpers'
 import { useTranslations } from 'use-intl'
 
 const apiRoute = '/api/contact-us/propose-waste-type'
@@ -19,6 +18,7 @@ export default function ProposeWasteType({ setOpen }) {
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('ProposeWasteType')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const formHandler = async (
     values: yup.InferType<typeof proposeWasteTypeSchema>,
@@ -38,11 +38,7 @@ export default function ProposeWasteType({ setOpen }) {
       })
 
       if (!response.ok) {
-        const data = await response.json()
-
-        showErrorMessages(data.error, setErrors, (message: string) => {
-          enqueueSnackbar(message, { variant: 'error' })
-        })
+        enqueueSnackbar(t('errorMessage'), { variant: 'error' })
         return
       }
       setOpen(false)
@@ -71,7 +67,13 @@ export default function ProposeWasteType({ setOpen }) {
           wasteTypeToAdd: '',
           additionalNotes: '',
         }}
-        validationSchema={proposeWasteTypeSchema}
+        validate={async (values) => {
+          return await validateForm({
+            values,
+            validationSchema: proposeWasteTypeSchema,
+            translations: tValidationMessages,
+          })
+        }}
         onSubmit={formHandler}
       >
         {({ isSubmitting, values, setFieldValue }) => {

@@ -1,7 +1,7 @@
-import { Typography, Box, Grid, Button, Alert } from '@mui/material'
+import { Typography, Box, Grid, Button } from '@mui/material'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import { useEffect, useState } from 'react'
-import { email } from '@recycl/shared/dist/validation'
+import { email as emailSchema } from '@recycl/shared/dist/validation'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import CustomSnackbar from '../uiParts/Snackbars'
@@ -9,9 +9,15 @@ import Link from '../uiParts/Link'
 import {
   responseErrrorCodes,
   responseStatuses,
+  validateForm,
 } from '../../lib/helpers/errorHelpers'
 import type { ApiResponseStatus } from '../../lib/helpers/responses'
 import { useTranslations } from 'next-intl'
+import { default as yup, InferType } from 'yup'
+
+type Email = {
+  email: InferType<typeof emailSchema>
+}
 
 const unsubscribeAPI = '/api/my/subscriptions/unsubscribe'
 const { SUCCESS, ERROR } = responseStatuses
@@ -22,6 +28,7 @@ export default function TokenNotFound() {
   const [severity, setSeverity] = useState<string>('success')
   const [data, setData] = useState<ApiResponseStatus | null>(null)
   const t = useTranslations('TokenNotFound')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const handleTokenNotFound = async (email: string) => {
     try {
@@ -99,9 +106,14 @@ export default function TokenNotFound() {
         <Formik
           enableReinitialize
           initialValues={{ email: '' }}
-          validationSchema={email}
-          //ToDo: add types to values
-          onSubmit={(values: any, actions: FormikHelpers<Event>) => {}}
+          validate={async (values) => {
+            return await validateForm({
+              values,
+              validationSchema: yup.object({ email: emailSchema }),
+              translations: tValidationMessages,
+            })
+          }}
+          onSubmit={(values: Email, actions: FormikHelpers<Email>) => {}}
         >
           {({ isSubmitting, values, errors, setSubmitting, resetForm }) => {
             return (

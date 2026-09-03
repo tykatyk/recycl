@@ -10,6 +10,7 @@ import { enqueueSnackbar } from 'notistack'
 import { phone as phoneValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
 import { useTranslations } from 'next-intl'
+import { validateForm } from '../../../lib/helpers/errorHelpers'
 
 const api = '/api/my/account/phone'
 
@@ -18,6 +19,7 @@ export default function PhoneForm() {
   const [error, setError] = useState(false)
   const [phone, setPhone] = useState('')
   const t = useTranslations('AccountSettings.PhoneForm')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const css = {
     width: '100%',
@@ -73,7 +75,13 @@ export default function PhoneForm() {
         initialValues={{
           phone,
         }}
-        validationSchema={yup.object({ phone: phoneValidator })}
+        validate={async (values) => {
+          return await validateForm({
+            values,
+            validationSchema: yup.object({ phone: phoneValidator }),
+            translations: tValidationMessages,
+          })
+        }}
         onSubmit={async (values, { setErrors }) => {
           try {
             const response = await fetch(api, {

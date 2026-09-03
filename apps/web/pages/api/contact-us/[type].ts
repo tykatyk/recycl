@@ -32,12 +32,7 @@ const generalContactHandler = async (
 
   const { recaptchaToken, ...values } = req.body
 
-  try {
-    await contactUsSchema.validate(values, { abortEarly: false })
-  } catch (error) {
-    console.log(error)
-    return validationErrorResponse(error, res)
-  }
+  await contactUsSchema.validate(values, { abortEarly: false })
 
   const {
     email,
@@ -82,12 +77,7 @@ const proposeWasteTypeHandler = async (
 
   const { recaptchaToken, ...values } = req.body
 
-  try {
-    await proposeWasteTypeSchema.validate(values, { abortEarly: false })
-  } catch (error) {
-    console.log(error)
-    return validationErrorResponse(error, res)
-  }
+  await proposeWasteTypeSchema.validate(values, { abortEarly: false })
 
   const { userName, email, wasteTypeToAdd, additionalNotes } =
     values as yup.InferType<typeof proposeWasteTypeSchema>

@@ -10,6 +10,7 @@ import { useSnackbar } from 'notistack'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 import { useTranslations } from 'use-intl'
 import { location } from '@recycl/shared/dist/validation'
+import { validateForm } from '../../lib/helpers/errorHelpers'
 
 function UserLocationComponent(props) {
   const [recaptcha, setRecaptcha] = useState('')
@@ -17,8 +18,9 @@ function UserLocationComponent(props) {
   const { enqueueSnackbar } = useSnackbar()
   const geocodingLib = useMapsLibrary('geocoding')
   const t = useTranslations('UserLocationComponent')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
-  const handleChange = (token) => {
+  const handleChange = (token: string) => {
     setRecaptcha(token)
   }
 
@@ -54,8 +56,14 @@ function UserLocationComponent(props) {
         initialValues={{
           userLocation: null as any,
         }}
-        validationSchema={{
-          userLocation: location,
+        validate={async (values) => {
+          return await validateForm({
+            values,
+            validationSchema: yup.object({
+              userLocation: location,
+            }),
+            translations: tValidationMessages,
+          })
         }}
         onSubmit={(values, { setSubmitting, resetForm }) => {
           if (!recaptcha || !geocoder) {

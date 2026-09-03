@@ -2,14 +2,27 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
-import { apiHandler } from '../../../../lib/helpers/errorHelpers'
 import { getEmailText, sendEmail } from '../../../../lib/helpers/email/mailer'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
 import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '@recycl/shared/dist/constants'
 import { getFullHtml } from '@recycl/shared/dist/email'
+import {
+  responseStatuses,
+  responseErrrorCodes,
+} from '../../../../lib/helpers/errorHelpers'
+import {
+  ApiResponseStatus,
+  apiHandler,
+} from '../../../../lib/helpers/responses'
 
-async function emailHandler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') res.status(405).end()
+const { ERROR } = responseStatuses
+const { EEXISTS, ESAME_VALUE } = responseErrrorCodes
+
+async function emailHandler(
+  req: NextApiRequest,
+  res: NextApiResponse<ApiResponseStatus>,
+) {
+  if (req.method !== 'POST') return res.status(405).end()
 
   const session = await getServerSession(req, res, authOptions)
   if (!session) return res.status(401).end()
@@ -23,7 +36,7 @@ async function emailHandler(req: NextApiRequest, res: NextApiResponse) {
   await dbConnect()
   const result = await Promise.all([
     UserModel.findById(userId),
-    UserModel.find({ email: newEmail }),
+    UserModel.find({ email: newEmail, _id: { $ne: userId } }),
   ])
 
   const [user, otherUsers] = result
@@ -32,22 +45,20 @@ async function emailHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (otherUsers && otherUsers.length > 0) {
     return res.status(422).json({
+      status: ERROR,
       error: {
-        type: 'perField',
-        message: {
-          email: 'Этот адрес уже используется',
-        },
+        code: EEXISTS,
+        message: 'Email is already in use',
       },
     })
   }
 
   if (user.email === newEmail) {
     return res.status(422).json({
+      status: ERROR,
       error: {
-        type: 'perField',
-        message: {
-          email: 'Этот адрес уже установлен в качестве текущего',
-        },
+        code: ESAME_VALUE,
+        message: 'Email is the same as current',
       },
     })
   }

@@ -11,10 +11,11 @@ import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscriptio
 import DataLoadingError from '../uiParts/DataLoadingError'
 import { wasteAvailableSubscriptionSchema } from '../../lib/validation'
 import NotSubscribed from './NotSubscribed'
-import * as yup from 'yup'
 import Head from 'next/head'
 import { enqueueSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
+import { validateForm } from '../../lib/helpers/errorHelpers'
+import { InferType } from 'yup'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const api = '/api/my/subscriptions'
@@ -22,6 +23,10 @@ const createRoute = `${api}/waste-available`
 const updateRoute = (id: string) => `${api}/waste-available/${id}`
 const indexRoute = '/my/subscriptions/waste-available'
 const wasteTypesApi = '/api/waste-types'
+
+type WasteAvailableSubscription = InferType<
+  typeof wasteAvailableSubscriptionSchema
+>
 
 export default function CreateUpdateWasteAvailableSubscription(params: {
   action: 'create' | 'update'
@@ -38,6 +43,8 @@ export default function CreateUpdateWasteAvailableSubscription(params: {
   } as any)
   const { id = '' } = router.query
   const t = useTranslations('CreateUpdateWasteAvailableSubscription')
+  const tValidationMessages = useTranslations('ValidationMessages')
+
   const title = action === 'create' ? t('createTitle') : t('updateTitle')
 
   useEffect(() => {
@@ -104,11 +111,8 @@ export default function CreateUpdateWasteAvailableSubscription(params: {
   }, [id])
 
   const formHandler = async (
-    values: yup.InferType<typeof wasteAvailableSubscriptionSchema>,
-    {
-      setSubmitting,
-      setErrors,
-    }: FormikHelpers<yup.InferType<typeof wasteAvailableSubscriptionSchema>>,
+    values: WasteAvailableSubscription,
+    { setSubmitting }: FormikHelpers<WasteAvailableSubscription>,
   ) => {
     let method = ''
     let route = ''
@@ -161,15 +165,19 @@ export default function CreateUpdateWasteAvailableSubscription(params: {
         </Box>
 
         <Box sx={{ width: '100%' }}>
-          <Formik<yup.InferType<typeof wasteAvailableSubscriptionSchema>>
+          <Formik<WasteAvailableSubscription>
             enableReinitialize
             initialValues={initialValues}
-            validationSchema={wasteAvailableSubscriptionSchema}
+            validate={async (values) => {
+              return await validateForm({
+                values,
+                validationSchema: wasteAvailableSubscriptionSchema,
+                translations: tValidationMessages,
+              })
+            }}
             onSubmit={formHandler}
           >
-            {({ values }) => {
-              return <SubscriptionForm wasteTypes={wasteTypes} />
-            }}
+            <SubscriptionForm wasteTypes={wasteTypes} />
           </Formik>
         </Box>
       </>

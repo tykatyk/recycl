@@ -8,13 +8,17 @@ import PageLoadingCircle from '../PageLoadingCircle'
 import { enqueueSnackbar } from 'notistack'
 import { userName as userNameValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
+import { validateForm } from '../../../lib/helpers/errorHelpers'
+import { useTranslations } from 'next-intl'
 
-const errorMessage = 'Что то пошло не так'
 const api = '/api/my/account/user-name'
-export default function PhoneForm() {
+
+export default function ContactsForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const [userName, setUserName] = useState('')
+  const t = useTranslations('AccountSettings.ContactsForm')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const css = {
     width: '100%',
@@ -30,7 +34,7 @@ export default function PhoneForm() {
 
         const response = await fetch(api)
         if (response.status !== 200) {
-          throw new Error(errorMessage)
+          throw new Error(t('errorMessage'))
         }
 
         const data = await response.json()
@@ -64,7 +68,7 @@ export default function PhoneForm() {
           <ErrorOutlineIcon />
         </Avatar>
         <Typography variant="body2" color="error">
-          Ошибка при получении данных
+          {t('errorMessage')}
         </Typography>
       </Box>
     )
@@ -77,9 +81,15 @@ export default function PhoneForm() {
         initialValues={{
           username: userName,
         }}
-        validationSchema={yup.object({
-          username: userNameValidator,
-        })}
+        validate={async (values) => {
+          return await validateForm({
+            values,
+            validationSchema: yup.object({
+              username: userNameValidator,
+            }),
+            translations: tValidationMessages,
+          })
+        }}
         onSubmit={async (values) => {
           try {
             const response = await fetch(api, {
@@ -91,12 +101,12 @@ export default function PhoneForm() {
             })
 
             if (response.status !== 200) {
-              throw new Error(errorMessage)
+              throw new Error(t('errorMessage'))
             }
 
-            enqueueSnackbar('Данные успешно обновлены', { variant: 'success' })
+            enqueueSnackbar(t('successMessage'), { variant: 'success' })
           } catch (error) {
-            enqueueSnackbar('Возникла ошибка при сохранении данных', {
+            enqueueSnackbar(t('errorMessage'), {
               variant: 'error',
             })
           }
@@ -111,7 +121,7 @@ export default function PhoneForm() {
                   margin="normal"
                   fullWidth
                   id="username"
-                  label="Имя или название организации"
+                  label={t('userNameLabel')}
                   name="username"
                   component={TextFieldFormik}
                 />
@@ -124,7 +134,7 @@ export default function PhoneForm() {
                   disabled={isSubmitting}
                   style={{ width: 'auto' }}
                 >
-                  Сохранить
+                  {t('submit')}
                   {isSubmitting && <ButtonSubmittingCircle />}
                 </Button>
               </Box>

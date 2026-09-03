@@ -16,6 +16,7 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import LocaleSwitcher from '../../components/uiParts/LocaleSwitcher'
 import { useTranslations } from 'next-intl'
+import { validateForm } from '../../lib/helpers/errorHelpers'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const api = '/api/auth/signup/'
@@ -28,6 +29,7 @@ export default function RegisterPage() {
   const { locale } = router
   const { status } = useSession()
   const t = useTranslations('RegisterPage')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   if (status === 'authenticated') {
     router.push('/', undefined, { locale })
@@ -71,7 +73,13 @@ export default function RegisterPage() {
               name: '',
               email: '',
             }}
-            validationSchema={registerSchema}
+            validate={async (values) => {
+              return await validateForm({
+                values,
+                validationSchema: registerSchema,
+                translations: tValidationMessages,
+              })
+            }}
             onSubmit={async (values, { resetForm }) => {
               if (!showRecaptcha) {
                 setShowRecaptcha(true)

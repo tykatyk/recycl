@@ -1,4 +1,4 @@
-import { Box, Button, InputAdornment, Stack, Typography } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import Layout from '../../../../components/layouts/Layout'
 import { useFormik } from 'formik'
 import { wasteRemovalSubscriptionSchema } from '../../../../lib/validation'
@@ -15,41 +15,12 @@ import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 import NumberField from '../../../../components/uiParts/formInputs/NumberField'
 import { minRadius, maxRadius } from '@recycl/shared/dist/constants'
+import { validateForm } from '../../../../lib/helpers/errorHelpers'
 
 const api = '/api/my/subscriptions'
 const wasteRemovalApi = `${api}/waste-removal`
 const frontendUrl = '/my/subscriptions'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-
-const translateError = (error: yup.ValidationError) => {
-  console.log(error.params)
-  return error.message
-}
-
-const validate = async (values) => {
-  try {
-    await wasteRemovalSubscriptionSchema.validate(values, {
-      abortEarly: false,
-    })
-
-    return {}
-  } catch (error) {
-    if (!(error instanceof yup.ValidationError)) {
-      return {}
-    }
-
-    return error.inner.reduce<Record<string, string>>(
-      (errors, validationError) => {
-        if (validationError.path && !errors[validationError.path]) {
-          errors[validationError.path] = translateError(validationError)
-        }
-
-        return errors
-      },
-      {},
-    )
-  }
-}
 
 const Content = ({ formik, t }) => {
   return (
@@ -129,14 +100,21 @@ export default function WasteRemovalSubscription() {
   const [viewStatus, setViewStatus] = useState('')
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('WasteRemovalSubscriptionPage')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const formik = useFormik<
     yup.InferType<typeof wasteRemovalSubscriptionSchema>
   >({
     enableReinitialize: true,
     initialValues: initialValues as any,
-    // validationSchema: wasteRemovalSubscriptionSchema,
-    validate: validate,
+    validate: async (values) => {
+      return await validateForm({
+        values,
+        validationSchema: wasteRemovalSubscriptionSchema,
+        translations: tValidationMessages,
+      })
+    },
+
     onSubmit: (values) => {
       formHandler(values)
     },

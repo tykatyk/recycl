@@ -17,6 +17,7 @@ import { useSnackbar } from 'notistack'
 import { InferType } from 'yup'
 import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutocomplete'
 import { useTranslations } from 'use-intl'
+import { validateForm } from '../../lib/helpers/errorHelpers'
 
 export default function AdSidebarItemsList(props) {
   const { handleSubmit, initialFormValues, howSearchWorks = '' } = props
@@ -30,6 +31,7 @@ export default function AdSidebarItemsList(props) {
   const [modalOpen, setModalOpen] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('AdSidebarItemsList')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   type AdSearchForm = InferType<typeof adSearchFormSchema>
   const formik = useFormik<AdSearchForm>({
@@ -38,7 +40,13 @@ export default function AdSidebarItemsList(props) {
       wasteLocation,
       searchRadius,
     },
-    validationSchema: adSearchFormSchema,
+    validate: async (values) => {
+      return await validateForm({
+        values,
+        validationSchema: adSearchFormSchema,
+        translations: tValidationMessages,
+      })
+    },
     onSubmit: handleSubmit,
     enableReinitialize: true,
   })

@@ -3,14 +3,13 @@ import { useTranslations } from 'next-intl'
 import Link from './Link'
 import Cookies from 'js-cookie'
 import { Box } from '@mui/material'
+import { useEffect, useState } from 'react'
 
 export default function LocaleSwitcher() {
   const t = useTranslations('LocaleSwitcher')
 
-  const { locale, locales, pathname, query } = useRouter()
-  if (!locale || !locales) {
-    return null
-  }
+  const { locale, locales, asPath } = useRouter()
+  const [mounted, setMounted] = useState(false)
 
   const handleClick = (locale) => {
     Cookies.set('NEXT_LOCALE', locale, {
@@ -19,16 +18,21 @@ export default function LocaleSwitcher() {
     })
   }
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted || !locale || !locales) {
+    return null
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       {locales?.map((localeItem) => {
         return (
           <Box key={localeItem}>
             <Link
-              href={{
-                pathname,
-                query,
-              }}
+              href={asPath}
               locale={localeItem}
               onClick={() => handleClick(localeItem)}
               sx={{

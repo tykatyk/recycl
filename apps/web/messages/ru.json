@@ -32,7 +32,8 @@
     "form": {
       "yourName": "Имя или название организации",
       "yourEmail": "Электронная почта",
-      "submit": "Зарегистрироваться"
+      "submit": "Зарегистрироваться",
+      "logIn": "Вход"
     }
   },
   "LoginPage": {
@@ -370,6 +371,7 @@
       "quantityEndAdornment": "кг",
       "phone": "Контактный телефон",
       "phoneHelperText": "Обязательное поле",
+      "comment": "Комментарий",
       "submit": "Сохранить"
     }
   },
@@ -526,7 +528,15 @@
     "ChangeEmailForm": {
       "successMessage": "Письмо подтверждения отправлено на новый адрес",
       "errorMessage": "Что то пошло не так",
+      "emailInUse": "Этот адрес уже используется",
+      "emailTheSameAsCurrent": "Этот адрес уже установлен в качестве текущего",
       "label": "Новый email адрес",
+      "submit": "Сохранить"
+    },
+    "ContactsForm": {
+      "successMessage": "Данные успешно обновлены",
+      "errorMessage": "Что то пошло не так",
+      "userNameLabel": "Имя или название организации",
       "submit": "Сохранить"
     },
     "DeleteAccountComponent": {
@@ -593,5 +603,31 @@
     "view": "Показать",
     "description": "Опиcание",
     "complain": "Пожаловаться"
+  },
+  "ValidationMessages": {
+    "required": "Обязательное поле",
+    "positive": "Поле должно содержать число больше 0",
+    "onlyDigits": "Только цифры",
+    "onlyIntegers": "Только целые числа",
+    "email": "Недействительный email",
+    "phone": "Недействительный номер телефона",
+    "notOnlySpaces": "Строка не может состоять только из пробелов",
+    "wrongType": "Значение имеет не верный тип данных",
+    "dateIsSameOrAfter": "Дата/время меньше текущих",
+    "dateIsOneYearAfterNow": "Нелязя выбирать даты в далеком будущем",
+    "atLeastOne": "Выберите хотя бы 1 значение",
+    "maxLength": "Максимум {max, plural, one {# символ} few {# символа} other {# символов}}",
+    "minLength": "Минимум {min, plural, one {# символ} few {# символа} other {# символов}}",
+    "maxNumber": "Значение не должно быть больше {max}",
+    "minNumber": "Значение не должно быть меньше {min}"
+  },
+  "ComplaintDialog": {
+    "title": "Пожаловаться на контент",
+    "content": "Опишите причину жалобы",
+    "label": "Текст жалобы",
+    "cancel": "Отменить",
+    "submit": "Отправить",
+    "errorMessage": "Что то пошло не так",
+    "successMessage": "Сообщение успешно отправлено"
   }
 }

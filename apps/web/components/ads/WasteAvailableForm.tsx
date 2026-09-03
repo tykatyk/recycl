@@ -15,6 +15,8 @@ import {
   wasteTypeFetcher,
 } from '../../lib/helpers/dataFetcher'
 import { useTranslations } from 'next-intl'
+import { validateForm } from '../../lib/helpers/errorHelpers'
+import * as yup from 'yup'
 
 const api = '/api/my/ads'
 const myAds = '/my/ads'
@@ -23,12 +25,12 @@ const initVal = {
   title: '',
   wasteLocation: null as any,
   wasteType: '',
-  quantity: '',
+  quantity: '' as any,
   contactPhone: '',
   comment: '',
 }
 
-type FormValues = typeof initVal
+type FormValues = yup.InferType<typeof adSchema>
 
 export default function WasteAvailableForm(props) {
   const { h1 } = props
@@ -41,6 +43,7 @@ export default function WasteAvailableForm(props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const t = useTranslations('WasteAvailableForm')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const createHandler = async (values: FormValues, setSubmitting) => {
     try {
@@ -167,7 +170,13 @@ export default function WasteAvailableForm(props) {
       <Formik
         enableReinitialize
         initialValues={initialValues}
-        validationSchema={adSchema}
+        validate={async (values) => {
+          return await validateForm({
+            values,
+            validationSchema: adSchema,
+            translations: tValidationMessages,
+          })
+        }}
         onSubmit={async (values, { setSubmitting }) => {
           if (id) {
             await updateHandler(values, setSubmitting)
@@ -260,6 +269,19 @@ export default function WasteAvailableForm(props) {
                       name="contactPhone"
                       variant="outlined"
                       helperText={t('form.phoneHelperText')}
+                      disabled={shouldDisable}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Field
+                      component={TextFieldFormik}
+                      multiline
+                      rows={5}
+                      label={t('form.comment')}
+                      color="secondary"
+                      fullWidth
+                      name="comment"
+                      variant="outlined"
                       disabled={shouldDisable}
                     />
                   </Grid>

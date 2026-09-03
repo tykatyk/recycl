@@ -6,21 +6,35 @@ import { enqueueSnackbar } from 'notistack'
 import { email as emailValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
 import { useTranslations } from 'next-intl'
+import { ApiResponseStatus } from '../../../lib/helpers/responses'
+import {
+  responseStatuses,
+  validateForm,
+} from '../../../lib/helpers/errorHelpers'
 
+const { ERROR } = responseStatuses
 const api = '/api/my/account/email'
 
 export default function PhoneForm() {
   const t = useTranslations('AccountSettings.ChangeEmailForm')
+  const tValidationMessages = useTranslations('ValidationMessages')
+
   return (
     <Box>
       <Formik
         initialValues={{
           email: '',
         }}
-        validationSchema={yup.object({
-          email: emailValidator,
-        })}
-        onSubmit={async (values, { setErrors }) => {
+        validate={async (values) => {
+          return await validateForm({
+            values,
+            validationSchema: yup.object({
+              email: emailValidator,
+            }),
+            translations: tValidationMessages,
+          })
+        }}
+        onSubmit={async (values) => {
           try {
             const response = await fetch(api, {
               method: 'POST',
@@ -30,29 +44,34 @@ export default function PhoneForm() {
               },
             })
 
-            if (response.status === 200) {
+            if (response.ok) {
               enqueueSnackbar(t('successMessage'), {
                 variant: 'success',
               })
               return
             }
 
-            const data = await response.json()
+            const data: ApiResponseStatus = await response.json()
+            if (data.status !== ERROR) {
+              throw new Error(t('errorMessage'))
+            }
+
             const { error } = data
 
-            if (error.type === 'perField') {
-              //ToDo: what is returned from api
-              setErrors(error.message)
-              return
-            }
-            if (error.type === 'perForm') {
-              enqueueSnackbar(error.message, {
+            if (error.code === 'EEXISTS') {
+              enqueueSnackbar(t('emailInUse'), {
                 variant: 'error',
               })
               return
             }
-            throw new Error('Something went wrong')
-            return
+            if (error.code === 'ESAME_VALUE') {
+              enqueueSnackbar(t('emailTheSameAsCurrent'), {
+                variant: 'error',
+              })
+              return
+            }
+
+            throw new Error(t('errorMessage'))
           } catch (error) {
             enqueueSnackbar(t('errorMessage'), {
               variant: 'error',

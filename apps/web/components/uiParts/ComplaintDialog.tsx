@@ -15,9 +15,9 @@ import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import { Box } from '@mui/material'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { complaintContentVariants } from '@recycl/shared/dist/constants'
-
-const errorMessage = 'Что то пошло не так'
-const successMessage = 'Сообщение отправлено администратору'
+import { useTranslations } from 'next-intl'
+import { InferType } from 'yup'
+import { validateForm } from '../../lib/helpers/errorHelpers'
 
 type FormDialogProps = {
   open: boolean
@@ -25,12 +25,16 @@ type FormDialogProps = {
   contentType: (typeof complaintContentVariants)[number]
 }
 
+type ComplaintDialog = InferType<typeof complaintFormSchema>
+
 export default function ComplaintDialog(props: FormDialogProps) {
   const { open, setOpen, contentType } = props
   const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
   const [recaptchaToken, setRecaptchaToken] = useState('')
   const recaptchaRef = useRef<ReCAPTCHA>(null)
+  const t = useTranslations('ComplaintDialog')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   const handleClose = () => {
     setOpen(false)
@@ -41,13 +45,20 @@ export default function ComplaintDialog(props: FormDialogProps) {
     setRecaptchaToken(token)
   }
 
-  const formik = useFormik({
+  const formik = useFormik<ComplaintDialog>({
     enableReinitialize: true,
     initialValues: {
       complaint: '',
       complaintUrl: router.asPath,
     },
-    validationSchema: complaintFormSchema,
+    validate: async (values) => {
+      return await validateForm({
+        values,
+        validationSchema: complaintFormSchema,
+        translations: tValidationMessages,
+      })
+    },
+
     onSubmit: async (values) => {
       if (!recaptchaToken) return
 
@@ -61,12 +72,12 @@ export default function ComplaintDialog(props: FormDialogProps) {
         if (!response.ok) {
           throw new Error('Response is not OK')
         }
-        enqueueSnackbar(successMessage, {
+        enqueueSnackbar(t('successMessage'), {
           variant: 'success',
         })
         handleClose()
       } catch (error) {
-        enqueueSnackbar(errorMessage, {
+        enqueueSnackbar(t('errorMessage'), {
           variant: 'error',
         })
       } finally {
@@ -87,9 +98,9 @@ export default function ComplaintDialog(props: FormDialogProps) {
         }}
       >
         <form onSubmit={formik.handleSubmit}>
-          <DialogTitle>Пожаловаться на контент</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogContent>
-            <DialogContentText>Опишите причину жалобы</DialogContentText>
+            <DialogContentText>{t('content')}</DialogContentText>
             <Box mb={3}>
               <TextField
                 multiline
@@ -98,7 +109,7 @@ export default function ComplaintDialog(props: FormDialogProps) {
                 margin="dense"
                 id="complaint"
                 name="complaint"
-                label="Текст жалобы"
+                label={t('label')}
                 fullWidth
                 value={formik.values.complaint}
                 onChange={formik.handleChange}
@@ -119,7 +130,7 @@ export default function ComplaintDialog(props: FormDialogProps) {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} variant="contained" size="small">
-              Отменить
+              {t('cancel')}
             </Button>
             <Button
               type="submit"
@@ -127,7 +138,7 @@ export default function ComplaintDialog(props: FormDialogProps) {
               variant="contained"
               size="small"
             >
-              Отправить
+              {t('submit')}
               {formik.isSubmitting && <ButtonSubmittingCircle />}
             </Button>
           </DialogActions>

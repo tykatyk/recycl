@@ -17,6 +17,7 @@ import { enqueueSnackbar } from 'notistack'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 import LocaleSwitcher from '../../components/uiParts/LocaleSwitcher'
+import { validateForm } from '../../lib/helpers/errorHelpers'
 
 const registerUrl = '/auth/register'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
@@ -36,6 +37,7 @@ export default function LoginPage() {
 
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const t = useTranslations('LoginPage')
+  const tValidationMessages = useTranslations('ValidationMessages')
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -80,9 +82,15 @@ export default function LoginPage() {
             initialValues={{
               email: '',
             }}
-            validationSchema={yup.object({
-              email: emailValidator,
-            })}
+            validate={async (values) => {
+              return await validateForm({
+                values,
+                validationSchema: yup.object({
+                  email: emailValidator,
+                }),
+                translations: tValidationMessages,
+              })
+            }}
             onSubmit={async (values, { resetForm }) => {
               try {
                 if (!showRecaptcha) {

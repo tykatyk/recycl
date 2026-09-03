@@ -161,6 +161,7 @@ export function CommentField({ formik }) {
         id="comment"
         label={t('comment.label')}
         helperText={formik.touched.comment && formik.errors.comment}
+        error={formik.touched.comment && Boolean(formik.errors.comment)}
         value={formik.values.comment}
         disabled={formik.isSubmitting}
         onBlur={formik.handleBlur}
