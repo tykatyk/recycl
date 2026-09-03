@@ -80,4 +80,4 @@ async function mySubscriptions(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default apiHandler(mySubscriptions, true)
+export default apiHandler(mySubscriptions)

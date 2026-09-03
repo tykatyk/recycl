@@ -10,10 +10,9 @@ import {
   responseStatuses,
 } from '../../../../lib/helpers/errorHelpers'
 import { email as emailSchema } from '@recycl/shared/dist/validation'
-import { validationErrorResponse } from '../../../../lib/helpers/responses'
 import type { ApiResponseStatus } from '../../../../lib/helpers/responses'
 
-const { NOT_FOUND, EXPIRED } = responseErrrorCodes
+const { NOT_FOUND, EXPIRED, VALIDATION_ERROR } = responseErrrorCodes
 const { SUCCESS, ERROR } = responseStatuses
 
 const tokenNotFoundUnsubscribe = async (
@@ -25,7 +24,13 @@ const tokenNotFoundUnsubscribe = async (
     const validated = await emailSchema.validate(email)
     validatedEmail = validated
   } catch (error) {
-    return validationErrorResponse(error, res)
+    return res.status(400).json({
+      status: ERROR,
+      error: {
+        code: VALIDATION_ERROR,
+        message: VALIDATION_ERROR,
+      },
+    })
   }
 
   await dbConnect()

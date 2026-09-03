@@ -68,4 +68,4 @@ async function singleWasteAvailableSubscriptionApiHandler(
   }
 }
 
-export default apiHandler(singleWasteAvailableSubscriptionApiHandler, true)
+export default apiHandler(singleWasteAvailableSubscriptionApiHandler)

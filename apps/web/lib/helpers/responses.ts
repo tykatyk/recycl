@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ValidationError } from 'yup'
 import { responseErrrorCodes, responseStatuses } from './errorHelpers'
 
-const { VALIDATION_ERROR, CAPTCHA_FAILED } = responseErrrorCodes
+const { CAPTCHA_FAILED } = responseErrrorCodes
 const { SUCCESS, ERROR } = responseStatuses
 
 type ErrorResponse = {
@@ -18,20 +17,6 @@ type SuccessResponse = {
 }
 
 export type ApiResponseStatus = ErrorResponse | SuccessResponse
-
-export const validationErrorResponse = function (
-  error: ValidationError,
-  res: NextApiResponse<ErrorResponse>,
-  message?: string,
-) {
-  return res.status(422).json({
-    status: ERROR,
-    error: {
-      code: VALIDATION_ERROR,
-      message: message || VALIDATION_ERROR,
-    },
-  })
-}
 
 export const captchaNotPassedResponse = function (
   res: NextApiResponse<ErrorResponse>,
@@ -68,9 +53,6 @@ export const apiHandler =
         )
       }
 
-      if (e instanceof ValidationError && allowValidationErrorsOnFrontend) {
-        return validationErrorResponse(e, res)
-      }
       res.status(500).json({
         status: responseStatuses.ERROR,
         error: {

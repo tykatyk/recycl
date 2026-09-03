@@ -51,4 +51,4 @@ async function wasteRemovalSubscriptionApiHandler(
   }
 }
 
-export default apiHandler(wasteRemovalSubscriptionApiHandler, true)
+export default apiHandler(wasteRemovalSubscriptionApiHandler)

@@ -118,4 +118,4 @@ async function wasteAvailableSubscriptionApiHandler(
   }
 }
 
-export default apiHandler(wasteAvailableSubscriptionApiHandler, true)
+export default apiHandler(wasteAvailableSubscriptionApiHandler)

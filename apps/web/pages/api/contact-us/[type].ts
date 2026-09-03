@@ -7,7 +7,6 @@ import {
 import { checkCaptcha } from '../../../lib/helpers/checkCaptcha'
 import {} from '../../../lib/helpers/responses'
 import {
-  validationErrorResponse,
   captchaNotPassedResponse,
   apiHandler,
 } from '../../../lib/helpers/responses'
