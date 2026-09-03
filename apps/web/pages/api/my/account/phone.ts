@@ -1,11 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { responseErrorCodes } from '../../../../lib/helpers/responses'
+import {
+  responseErrorCodes,
+  responseStatuses,
+} from '../../../../lib/helpers/responses'
 import { dbConnect, UserModel } from '@recycl/shared/dist/server/db'
 import { apiHandler } from '../../../../lib/helpers/responses'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
 import { phone as phoneValidator } from '@recycl/shared/dist/validation'
 const { METHOD_NOT_ALLOWED } = responseErrorCodes
+const { ERROR } = responseStatuses
+const { EEXISTS } = responseErrorCodes
 
 async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -38,7 +43,7 @@ async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
 
       const result = await Promise.all([
         UserModel.findById(userId),
-        UserModel.find({ phone: newPhone }),
+        UserModel.find({ phone: newPhone, _id: { $ne: userId } }),
       ])
 
       const [user, otherUsers] = result
@@ -46,11 +51,10 @@ async function userPhoneHandler(req: NextApiRequest, res: NextApiResponse) {
       if (!user) return res.status(404)
       if (otherUsers && otherUsers.length > 0) {
         return res.status(422).json({
+          status: ERROR,
           error: {
-            type: 'perField',
-            message: {
-              phone: 'Этот номер уже используется',
-            },
+            code: EEXISTS,
+            message: 'This phone number is allready in use',
           },
         })
       }

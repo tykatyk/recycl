@@ -11,6 +11,10 @@ import { phone as phoneValidator } from '@recycl/shared/dist/validation'
 import * as yup from 'yup'
 import { useTranslations } from 'next-intl'
 import { validateForm } from '../../../lib/helpers/errorHelpers'
+import { ApiResponseStatus } from '../../../lib/helpers/responses'
+import { responseStatuses } from '../../../lib/helpers/responses'
+
+const { ERROR } = responseStatuses
 
 const api = '/api/my/account/phone'
 
@@ -82,7 +86,7 @@ export default function PhoneForm() {
             translations: tValidationMessages,
           })
         }}
-        onSubmit={async (values, { setErrors }) => {
+        onSubmit={async (values) => {
           try {
             const response = await fetch(api, {
               method: 'PATCH',
@@ -92,23 +96,22 @@ export default function PhoneForm() {
               },
             })
 
-            if (response.status === 200) {
+            if (response.ok) {
               enqueueSnackbar(t('successMessage'), {
                 variant: 'success',
               })
               return
             }
 
-            const data = await response.json()
+            const data: ApiResponseStatus = await response.json()
+            if (data.status !== ERROR) {
+              throw new Error(t('errorMessage'))
+            }
 
             const { error } = data
 
-            if (error.type === 'perField') {
-              setErrors(error.message)
-              return
-            }
-            if (error.type === 'perForm') {
-              enqueueSnackbar(error.message, {
+            if (error.code === 'EEXISTS') {
+              enqueueSnackbar(t('phoneInUse'), {
                 variant: 'error',
               })
               return
