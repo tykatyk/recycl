@@ -93,10 +93,6 @@ export default function LoginPage() {
             }}
             onSubmit={async (values, { resetForm }) => {
               try {
-                if (!showRecaptcha) {
-                  setShowRecaptcha(true)
-                  return
-                }
                 if (!recaptchaRef.current.getValue()) return
 
                 const result = await signIn('email', {

@@ -81,10 +81,6 @@ export default function RegisterPage() {
               })
             }}
             onSubmit={async (values, { resetForm }) => {
-              if (!showRecaptcha) {
-                setShowRecaptcha(true)
-                return
-              }
               if (!recaptchaRef.current.getValue()) return
 
               try {
@@ -114,7 +110,7 @@ export default function RegisterPage() {
               }
             }}
           >
-            {({ isSubmitting, submitForm }) => {
+            {({ isSubmitting, submitForm, validateForm, setTouched }) => {
               return (
                 <>
                   <Form noValidate autoComplete="off">
@@ -145,7 +141,25 @@ export default function RegisterPage() {
                     </Box>
                     <Box sx={{ mb: 2 }}>
                       <Button
-                        type="submit"
+                        onClick={async () => {
+                          const errors = await validateForm()
+
+                          if (Object.keys(errors).length > 0) {
+                            setTouched(
+                              Object.keys(errors).reduce(
+                                (acc, key) => ({ ...acc, [key]: true }),
+                                {},
+                              ),
+                            )
+                            return
+                          }
+
+                          if (!showRecaptcha) {
+                            setShowRecaptcha(true)
+                          } else {
+                            recaptchaRef.current?.reset()
+                          }
+                        }}
                         variant="contained"
                         disabled={isSubmitting}
                         fullWidth
@@ -166,18 +180,20 @@ export default function RegisterPage() {
                       {t('form.logIn')}
                     </Link>
                   </Box>
-                  <Box
-                    sx={{
-                      display: showRecaptcha ? 'flex' : 'none',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <ReCAPTCHA
-                      ref={recaptchaRef}
-                      sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                      onChange={() => submitForm()}
-                    />
-                  </Box>
+                  {showRecaptcha && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                        onChange={() => submitForm()}
+                      />
+                    </Box>
+                  )}
                 </>
               )
             }}
