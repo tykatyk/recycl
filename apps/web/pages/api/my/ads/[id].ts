@@ -63,29 +63,6 @@ async function adHandler(req: NextApiRequest, res: NextApiResponse) {
 
       res.status(200).json({ message: 'Документ обновлен' })
       break
-    case 'PATCH':
-      const { action } = req.body
-
-      if (action !== 'activate' && action !== 'deactivate') {
-        return res.status(400).end()
-      }
-
-      if (existing.status === 'blocked') {
-        return res.status(403).end()
-      }
-      const updated =
-        action === 'activate'
-          ? {
-              status: 'active',
-              expires: new Date(
-                Date.now() + AD_EXPIRATION_PERIOD * 24 * 60 * 60 * 1000,
-              ),
-            }
-          : { status: 'disabled' }
-
-      await AdModel.updateOne(existing, updated)
-      res.status(200).end()
-      break
     default:
       res.status(405).json({ error: METHOD_NOT_ALLOWED })
       break

@@ -188,6 +188,8 @@
     "editBtn": "Редагувати",
     "deactivateBtn": "Деактивувати",
     "activateBtn": "Активувати",
+    "deactivateSelected": "Деактивувати обрані",
+    "activateSelected": "Активувати обрані",
     "deleteBtn": "Видалити",
     "fetchDataError": "Не вдалося завантажити дані",
     "deletionError": "Помилка під час видалення оголошення",

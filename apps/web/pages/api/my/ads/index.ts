@@ -8,7 +8,10 @@ import {
   validSortOrder,
 } from '../../../../lib/helpers/eventHelpers' //ToDo: rename and refactor eventHelpers
 import { apiHandler } from '../../../../lib/helpers/responses'
-import { responseErrorCodes } from '../../../../lib/helpers/responses'
+import {
+  responseErrorCodes,
+  responseStatuses,
+} from '../../../../lib/helpers/responses'
 import { SortOrder, OrderBy } from '../../../../lib/types/pagination'
 import {
   paginationPageNumberSchema,
@@ -17,8 +20,14 @@ import {
 } from '../../../../lib/validation'
 import mongoose from 'mongoose'
 import getCoords from '../../../../lib/helpers/getCoords'
-import { documentActivityStatus } from '@recycl/shared/dist/constants'
-const { METHOD_NOT_ALLOWED } = responseErrorCodes
+import {
+  AD_EXPIRATION_PERIOD,
+  documentActivityStatus,
+} from '@recycl/shared/dist/constants'
+
+const { SUCCESS, ERROR } = responseStatuses
+const { METHOD_NOT_ALLOWED, VALIDATION_ERROR } = responseErrorCodes
+const { active, blocked } = documentActivityStatus
 
 const queryValidationSchema = yup.object({
   page: paginationPageNumberSchema,
@@ -171,6 +180,65 @@ async function adsHanlder(req: NextApiRequest, res: NextApiResponse) {
       res
         .status(200)
         .json({ message: `${deletedCount} ads successfully deleted` })
+      break
+    }
+
+    case 'PATCH': {
+      const {
+        action,
+        ids,
+      }: { action: 'activate' | 'deactivate'; ids: string[] } = req.body
+
+      if (action !== 'activate' && action !== 'deactivate') {
+        return res.status(400).json({
+          status: ERROR,
+          error: {
+            code: VALIDATION_ERROR,
+            message: 'Unknown action',
+          },
+        })
+      }
+
+      const allAreValid = ids.every((id) => mongoose.Types.ObjectId.isValid(id))
+
+      if (!allAreValid) {
+        return res.status(400).json({
+          status: ERROR,
+          error: {
+            code: VALIDATION_ERROR,
+            message: 'Some ids are invalid',
+          },
+        })
+      }
+
+      const updated =
+        action === 'activate'
+          ? {
+              status: active,
+              expires: new Date(
+                Date.now() + AD_EXPIRATION_PERIOD * 24 * 60 * 60 * 1000,
+              ),
+            }
+          : { status: 'disabled' }
+
+      await dbConnect()
+      const result = await AdModel.updateMany(
+        {
+          _id: { $in: ids },
+          user: new mongoose.Types.ObjectId(user),
+          status: { $ne: blocked },
+        },
+        {
+          $set: updated,
+        },
+      )
+
+      if (!result) return res.status(400).end()
+
+      res.status(200).json({
+        status: SUCCESS,
+        message: `Documents modified: ${result.modifiedCount}`,
+      })
       break
     }
 

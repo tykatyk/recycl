@@ -188,6 +188,8 @@
     "editBtn": "Редактировать",
     "deactivateBtn": "Деактивировать",
     "activateBtn": "Активировать",
+    "deactivateSelected": "Деактивировать выбранные",
+    "activateSelected": "Активировать выбранные",
     "deleteBtn": "Удалить",
     "fetchDataError": "Не удалось загрузить данные",
     "deletionError": "Ошибка при удалении объявления",

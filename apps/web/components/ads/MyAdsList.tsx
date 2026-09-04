@@ -102,12 +102,12 @@ export default function MyAdsList(props: MyAdsProps) {
     setStatus('')
   }
 
-  const handleActivation = async (id: string) => {
+  const handleActivation = async (ids: string[]) => {
     setStatus('actionPerforming')
     const action = variant === 'active' ? 'deactivate' : 'activate'
-    const response = await fetch(`${apiUrl}/${id}`, {
+    const response = await fetch(apiUrl, {
       method: 'PATCH',
-      body: JSON.stringify({ id, action }),
+      body: JSON.stringify({ ids, action }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -327,7 +327,25 @@ export default function MyAdsList(props: MyAdsProps) {
                 handleDeleteMany={deleteMany}
                 selectedCount={selected.length}
                 total={Math.min(data.pagination.pageSize, data.items.length)}
-              />
+              >
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', pr: 2, pl: 2 }}
+                >
+                  <Button
+                    size="small"
+                    variant="text"
+                    color="secondary"
+                    onClick={async (_) => {
+                      await handleActivation(selected)
+                    }}
+                    disabled={selected.length === 0}
+                  >
+                    {variant === 'active'
+                      ? t('deactivateSelected')
+                      : t('activateSelected')}
+                  </Button>
+                </Box>
+              </ActionsBar>
               <Stack spacing={2} sx={{ width: '100%' }}>
                 {data.items.map((item, idx: number) => {
                   return (
@@ -445,7 +463,7 @@ export default function MyAdsList(props: MyAdsProps) {
                                 color="secondary"
                                 startIcon={<ToggleOnIcon />}
                                 onClick={async (_) => {
-                                  await handleActivation(item._id)
+                                  await handleActivation([item._id])
                                 }}
                               >
                                 {variant === 'active'

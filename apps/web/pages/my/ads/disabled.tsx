@@ -13,7 +13,7 @@ export default function MyAdsDisabled() {
   return (
     <>
       <Head>
-        <title>{`t("title") | ${brand}`}</title>
+        <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
       </Head>
       <Layout>
