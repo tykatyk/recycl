@@ -3,6 +3,8 @@ import { Box, Button, Typography, Container } from '@mui/material'
 import LayoutWithoutHeader from './layouts/LayoutWithoutHeader'
 import Head from 'next/head'
 import { useTranslations } from 'use-intl'
+import { useRouter } from 'next/router'
+import CanonicalUrl from './uiParts/CanonicalUrl'
 
 const homeUrl = '/'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
@@ -14,12 +16,21 @@ type ErrorComponentProps = {
 }
 export default function ErrorComponent(props: ErrorComponentProps) {
   const { headerText, contentText, title } = props
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('ErrorComponent')
+
   return (
     <>
       <Head>
         <title>{`${title} | ${brand}`}</title>
         <meta name="robots" content="noindex"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <LayoutWithoutHeader>
         <Container maxWidth="sm" sx={{ p: 2 }}>

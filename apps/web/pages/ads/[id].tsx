@@ -10,20 +10,28 @@ import { isValidObjectId } from 'mongoose'
 import Head from 'next/head'
 import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 import { useTranslations } from 'next-intl'
-const { FORBIDDEN } = responseErrorCodes
+import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
 
+const { FORBIDDEN } = responseErrorCodes
 const { documentActivityStatus } = constants
 const { active } = documentActivityStatus
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 function ContentNotAvailable() {
   const router = useRouter()
+  const { asPath, locale, defaultLocale, locales } = router
   const t = useTranslations('SingleWasteAvailableAdPage.ContentNotAvailable')
 
   return (
     <>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box
@@ -76,7 +84,8 @@ type WasteAvailableAdProps = {
 export default function WasteAvailableAd(props: WasteAvailableAdProps) {
   const { data, error } = props
   const t = useTranslations('SingleWasteAvailableAdPage')
-
+  const router = useRouter()
+  const { asPath, locale, defaultLocale, locales } = router
   if (error) return <ContentNotAvailable />
 
   return (
@@ -86,6 +95,12 @@ export default function WasteAvailableAd(props: WasteAvailableAdProps) {
         <meta
           name="description"
           content={`${data.title}. ${data.comment?.slice(0, 150)}`}
+        />
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
         />
       </Head>
       <Layout>

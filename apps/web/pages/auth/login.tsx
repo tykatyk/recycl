@@ -18,6 +18,7 @@ import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 import LocaleSwitcher from '../../components/uiParts/LocaleSwitcher'
 import { validateForm } from '../../lib/helpers/errorHelpers'
+import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
 
 const registerUrl = '/auth/register'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
@@ -26,7 +27,7 @@ export default function LoginPage() {
   const theme = useTheme()
   const [showRecaptcha, setShowRecaptcha] = useState(false)
   const router = useRouter()
-  const { locale, query } = router
+  const { locale, locales, defaultLocale, asPath, query } = router
   const { from } = query
   const validFrom =
     typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
@@ -50,6 +51,12 @@ export default function LoginPage() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <LayoutWithoutHeader>
         <Box>

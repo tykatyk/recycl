@@ -21,6 +21,8 @@ import { AdMarkers } from '../uiParts/Marker'
 import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
+import CanonicalUrl from '../uiParts/CanonicalUrl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const listViewUrl = '/ads/list'
@@ -41,6 +43,8 @@ export default function AdsOnMap() {
   const [center, setCenter] = useState<MapCenter | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [selectedMarker, setSelectedMarker] = useState('')
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('AdsOnMap')
 
   const handleDrawerToggle = () => {
@@ -105,6 +109,12 @@ export default function AdsOnMap() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="description" content={t('metaDescription')} />
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Box
         sx={{

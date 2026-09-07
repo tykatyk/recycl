@@ -4,9 +4,13 @@ import Head from 'next/head'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../../../api/auth/[...nextauth]'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
+import CanonicalUrl from '../../../../../components/uiParts/CanonicalUrl'
 
 export default function EditMobileCollectionPoint() {
   const brand = process.env.NEXT_PUBLIC_BRAND || ''
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('EditMobileCollectionPointPage')
 
   return (
@@ -14,6 +18,12 @@ export default function EditMobileCollectionPoint() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <CollectionPointFormUpdate variant="mobile" h1={t('h1')} />

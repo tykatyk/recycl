@@ -5,16 +5,27 @@ import RedirectUnauthenticatedUser from '../../../components/uiParts/RedirectUna
 import MyAdsList from '../../../components/ads/MyAdsList'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import CanonicalUrl from '../../../components/uiParts/CanonicalUrl'
+import { useRouter } from 'next/router'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 export default function MyAds() {
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('MyAdsPage')
+
   return (
     <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box

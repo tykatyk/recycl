@@ -38,6 +38,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 import ActionsBar from '../../../../components/uiParts/ActionsBar'
+import CanonicalUrl from '../../../../components/uiParts/CanonicalUrl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const apiUrl = '/api/my/subscriptions/waste-available'
@@ -485,12 +486,20 @@ const SubscriptionList = () => {
 }
 
 export default function WasteAvailableSubscriptions() {
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('WasteAvailableSubscriptions')
   return (
     <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box

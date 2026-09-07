@@ -3,17 +3,28 @@ import { Avatar, Box, Button, Typography, Container } from '@mui/material'
 import LayoutWithoutHeader from '../../components/layouts/LayoutWithoutHeader'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
+import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
 
 const homeUrl = '/'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 export default function AuthErrorPage() {
   const t = useTranslations('AuthErrorPage')
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
+
   return (
     <>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <LayoutWithoutHeader>
         <Container component="div" maxWidth="sm" sx={{ p: 2 }}>

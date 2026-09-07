@@ -16,6 +16,8 @@ import { useTranslations } from 'next-intl'
 import NumberField from '../../../../components/uiParts/formInputs/NumberField'
 import { minRadius, maxRadius } from '@recycl/shared/dist/constants'
 import { validateForm } from '../../../../lib/helpers/errorHelpers'
+import CanonicalUrl from '../../../../components/uiParts/CanonicalUrl'
+import { useRouter } from 'next/router'
 
 const api = '/api/my/subscriptions'
 const wasteRemovalApi = `${api}/waste-removal`
@@ -99,6 +101,8 @@ export default function WasteRemovalSubscription() {
   const [initialValues, setInitialValues] = useState({ radius: '' } as any)
   const [viewStatus, setViewStatus] = useState('')
   const { enqueueSnackbar } = useSnackbar()
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('WasteRemovalSubscriptionPage')
   const tValidationMessages = useTranslations('ValidationMessages')
 
@@ -205,6 +209,12 @@ export default function WasteRemovalSubscription() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box

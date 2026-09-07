@@ -2,6 +2,8 @@ import { Typography, Box, Paper } from '@mui/material'
 import Layout from '../components/layouts/Layout'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import CanonicalUrl from '../components/uiParts/CanonicalUrl'
+import { useRouter } from 'next/router'
 
 const btcWallet = '16eboKokCzZaLgvA4WoVgV82pBG5jPNXbA'
 const ethWallet = '0xabba15ead95b371a3065b4194012ef345d294b35'
@@ -10,12 +12,21 @@ const usdtWallet = '0xabba15ead95b371a3065b4194012ef345d294b35' //(BNB Smart Cha
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 export default function SupportUsPage() {
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
+
   const t = useTranslations('SupportUsPage')
 
   return (
     <>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box

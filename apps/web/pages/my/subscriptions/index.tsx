@@ -21,6 +21,8 @@ import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../api/auth/[...nextauth]'
+import CanonicalUrl from '../../../components/uiParts/CanonicalUrl'
+import { useRouter } from 'next/router'
 
 const api = '/api/my/subscriptions'
 
@@ -34,6 +36,8 @@ export default function MySubscriptions() {
   >([])
   const [userSubs, setUserSubs] = useState<SubscriptionName>([])
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('MySubscriptionsPage')
   const tSubscriptionDetails = useTranslations('SubscriptionDetails')
 
@@ -170,6 +174,12 @@ export default function MySubscriptions() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box>

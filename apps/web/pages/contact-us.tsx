@@ -10,6 +10,8 @@ import { useSnackbar } from 'notistack'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 import { validateForm } from '../lib/helpers/errorHelpers'
+import { useRouter } from 'next/router'
+import CanonicalUrl from '../components/uiParts/CanonicalUrl'
 
 const apiRoute = 'api/contact-us/general'
 const limit = 1000
@@ -18,6 +20,8 @@ const brand = process.env.NEXT_PUBLIC_BRAND || ''
 export default function ContactUsPage() {
   const [recaptchaToken, setRecaptchaToken] = useState(null)
   const recaptchaRef = useRef<ReCAPTCHA>(null)
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('ContactUsPage')
   const tValidationMessages = useTranslations('ValidationMessages')
 
@@ -31,6 +35,12 @@ export default function ContactUsPage() {
     <>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Container maxWidth="md">

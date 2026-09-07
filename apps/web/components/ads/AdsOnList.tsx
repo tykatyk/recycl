@@ -27,6 +27,7 @@ import Head from 'next/head'
 import AdSidebarHeader from '../uiParts/AdSidebarHeader'
 import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 import { useTranslations } from 'next-intl'
+import CanonicalUrl from '../uiParts/CanonicalUrl'
 
 const listViewUrl = '/ads/list'
 const mapViewUrl = '/ads'
@@ -70,7 +71,7 @@ export default function AdsOnList(props: AdsOnListProps) {
     searchRadius: null,
   })
   const router = useRouter()
-  const { locale } = router
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('AdsOnListPage')
 
   const getHref = useCallback(
@@ -172,6 +173,12 @@ export default function AdsOnList(props: AdsOnListProps) {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="description" content={t('metaDescription')} />
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Box
         sx={{

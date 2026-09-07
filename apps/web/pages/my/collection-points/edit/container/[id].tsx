@@ -4,9 +4,13 @@ import Head from 'next/head'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../../../api/auth/[...nextauth]'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
+import CanonicalUrl from '../../../../../components/uiParts/CanonicalUrl'
 
 export default function EditContainerCollectionPoint() {
   const brand = process.env.NEXT_PUBLIC_BRAND || ''
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('EditContainerCollectionPointPage')
 
   return (
@@ -14,6 +18,12 @@ export default function EditContainerCollectionPoint() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <CollectionPointFormUpdate variant="container" h1={t('h1')} />

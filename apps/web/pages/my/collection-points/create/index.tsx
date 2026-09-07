@@ -14,13 +14,14 @@ import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import CanonicalUrl from '../../../../components/uiParts/CanonicalUrl'
 
 const baseUrl = '/my/collection-points/create'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 export default function CreateCollectionPoint() {
   const router = useRouter()
-  const { locale } = router
+  const { locale, locales, defaultLocale, asPath } = router
   const [selected, setSelected] = useState<string>('')
   const t = useTranslations('CreateCollectionPointPage')
   const tCollectionPointTypes = useTranslations('CollectionPointTypes')
@@ -30,6 +31,12 @@ export default function CreateCollectionPoint() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box>

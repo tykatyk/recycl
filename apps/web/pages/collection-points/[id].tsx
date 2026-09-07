@@ -10,6 +10,7 @@ import { isValidObjectId } from 'mongoose'
 import Head from 'next/head'
 import Link from '../../components/uiParts/Link'
 import { useTranslations } from 'use-intl'
+import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
 const { FORBIDDEN } = responseErrorCodes
 
 const { documentActivityStatus } = constants
@@ -69,6 +70,8 @@ function ContentNotAvailableView() {
 
 export default function CollectionPoint(props) {
   const { data, error } = props
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('CollectionPointPage')
 
   if (error) {
@@ -76,6 +79,12 @@ export default function CollectionPoint(props) {
       <>
         <Head>
           <title>{`${t('errorTitle')} | ${brand}`}</title>
+          <CanonicalUrl
+            asPath={asPath}
+            locale={locale}
+            defaultLocale={defaultLocale}
+            locales={locales}
+          />
         </Head>
         <Layout>
           <ContentNotAvailableView />

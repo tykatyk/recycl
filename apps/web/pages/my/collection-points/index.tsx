@@ -5,11 +5,16 @@ import RedirectUnauthenticatedUser from '../../../components/uiParts/RedirectUna
 import MyCollectionPointsList from '../../../components/collectionPoints/MyCollectionPointsList'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import CanonicalUrl from '../../../components/uiParts/CanonicalUrl'
+import { useRouter } from 'next/router'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 export default function MyCollectionPoints() {
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('MyCollectionPointsPage')
+
   return (
     <RedirectUnauthenticatedUser>
       <Head>
@@ -17,6 +22,12 @@ export default function MyCollectionPoints() {
           {t('title')} | {brand}
         </title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box

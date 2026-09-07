@@ -42,6 +42,7 @@ import NoRows from '../../components/uiParts/NoRows'
 import { HrefOptions } from '../../lib/types/pagination'
 import { useTranslations } from 'next-intl'
 import type { CollectionPoint } from '../../lib/types/collectionPoint'
+import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
 
 const { INTERNAL_SERVER_ERROR } = responseErrorCodes
 
@@ -105,7 +106,7 @@ export default function CollectionPointsListView(
   const t = useTranslations('CollectionPointsListViewPage')
   const tCollectionPointTypes = useTranslations('CollectionPointTypes')
   const router = useRouter()
-  const { locale } = router
+  const { locale, locales, defaultLocale, asPath } = router
 
   const getHref = useCallback(
     (options: HrefOptions) => {
@@ -201,6 +202,12 @@ export default function CollectionPointsListView(
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="description" content={t('metaDescription')} />
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Box
         sx={{

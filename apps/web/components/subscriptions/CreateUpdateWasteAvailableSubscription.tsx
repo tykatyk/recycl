@@ -16,6 +16,7 @@ import { enqueueSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
 import { validateForm } from '../../lib/helpers/errorHelpers'
 import { InferType } from 'yup'
+import CanonicalUrl from '../uiParts/CanonicalUrl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const api = '/api/my/subscriptions'
@@ -34,14 +35,15 @@ export default function CreateUpdateWasteAvailableSubscription(params: {
   const { action } = params
   const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
   const router = useRouter()
-  const { locale } = router
+  const { locale, locales, defaultLocale, asPath, query } = router
+  const { id = '' } = query
   const [viewStatus, setViewStatus] = useState('')
   const [initialValues, setInitialValues] = useState({
     location: null,
     wasteTypes: [],
     radius: '',
   } as any)
-  const { id = '' } = router.query
+
   const t = useTranslations('CreateUpdateWasteAvailableSubscription')
   const tValidationMessages = useTranslations('ValidationMessages')
 
@@ -204,6 +206,12 @@ export default function CreateUpdateWasteAvailableSubscription(params: {
       <Head>
         <title>{`${title} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box

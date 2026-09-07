@@ -11,10 +11,15 @@ import DeleteAccountComponent from '../../../components/uiParts/userSettings/Del
 import { useId } from 'react'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
+import CanonicalUrl from '../../../components/uiParts/CanonicalUrl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 
 export default function AccountSettings() {
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
+
   const t = useTranslations('AccountSettings')
   const id = useId()
 
@@ -23,6 +28,12 @@ export default function AccountSettings() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <Box sx={{ width: '100%' }}>

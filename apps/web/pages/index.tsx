@@ -21,6 +21,7 @@ import Link from '../components/uiParts/Link'
 import HowItWorks from '../components/home/HowItWorks'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/router'
+import CanonicalUrl from '../components/uiParts/CanonicalUrl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const PREFIX = 'Index'
@@ -142,8 +143,9 @@ export default function HomePage() {
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.down('md'))
   const [splashMinHeight, setSplashMinHeight] = useState(0)
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('HomePage')
-  const { locale } = useRouter()
 
   useEffect(() => {
     let isLoaded = true
@@ -167,6 +169,12 @@ export default function HomePage() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="description" content="" />
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Wrapper>
         <Box

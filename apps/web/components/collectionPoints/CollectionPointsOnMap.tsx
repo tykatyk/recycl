@@ -20,6 +20,8 @@ import { AdMarkers } from '../uiParts/Marker'
 import Head from 'next/head'
 import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/router'
+import CanonicalUrl from '../uiParts/CanonicalUrl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const baseUrl = '/collection-points/list'
@@ -40,6 +42,8 @@ export default function CollectionPointsOnMap() {
   const [center, setCenter] = useState<MapCenter | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [selectedMarker, setSelectedMarker] = useState('')
+  const router = useRouter()
+  const { locale, locales, defaultLocale, asPath } = router
 
   const t = useTranslations('CollectionPointsOnMap')
 
@@ -104,6 +108,12 @@ export default function CollectionPointsOnMap() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="description" content={t('title')} />
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Box
         sx={{

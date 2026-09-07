@@ -17,6 +17,7 @@ import Head from 'next/head'
 import LocaleSwitcher from '../../components/uiParts/LocaleSwitcher'
 import { useTranslations } from 'next-intl'
 import { validateForm } from '../../lib/helpers/errorHelpers'
+import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const api = '/api/auth/signup/'
@@ -26,7 +27,7 @@ export default function RegisterPage() {
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const [showRecaptcha, setShowRecaptcha] = useState(false)
   const router = useRouter()
-  const { locale } = router
+  const { locale, locales, defaultLocale, asPath } = router
   const { status } = useSession()
   const t = useTranslations('RegisterPage')
   const tValidationMessages = useTranslations('ValidationMessages')
@@ -40,6 +41,12 @@ export default function RegisterPage() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <LayoutWithoutHeader>
         <Box sx={{ minWidth: 470 }}>

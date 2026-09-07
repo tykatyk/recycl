@@ -4,6 +4,7 @@ import { Box, Alert, Button } from '@mui/material'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useTranslations } from 'next-intl'
+import CanonicalUrl from '../../../../components/uiParts/CanonicalUrl'
 
 type ChangeEmailProps = {
   urlIsValid: boolean
@@ -14,7 +15,7 @@ const brand = process.env.NEXT_PUBLIC_BRAND || ''
 export default function ChangeEmail(props: ChangeEmailProps) {
   const { urlIsValid } = props
   const router = useRouter()
-  const { locale } = router
+  const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('ChangeEmailPage')
 
   return (
@@ -22,6 +23,12 @@ export default function ChangeEmail(props: ChangeEmailProps) {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <LayoutWithoutHeader>
         <Box
