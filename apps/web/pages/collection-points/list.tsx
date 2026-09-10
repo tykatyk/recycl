@@ -8,7 +8,10 @@ import {
 import getCoords from '../../lib/helpers/getCoords'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
 import * as yup from 'yup'
-import { documentActivityStatus } from '@recycl/shared/dist/constants'
+import {
+  documentActivityStatus,
+  wasteTypeNames,
+} from '@recycl/shared/dist/constants'
 import Header from '../../components/uiParts/header/Header'
 import {
   Box,
@@ -104,6 +107,7 @@ export default function CollectionPointsListView(
     searchRadius: null,
   })
   const t = useTranslations('CollectionPointsListViewPage')
+  const tWasteTypes = useTranslations('WasteTypes')
   const tCollectionPointTypes = useTranslations('CollectionPointTypes')
   const router = useRouter()
   const { locale, locales, defaultLocale, asPath } = router
@@ -311,13 +315,20 @@ export default function CollectionPointsListView(
                                   {t('wasteTypes')}
                                 </Typography>
                                 <Stack spacing={2} direction={'row'}>
-                                  {item.wasteTypes.map((waste) => {
-                                    return (
-                                      <Chip
-                                        label={`${waste} ${t('quantityDimension')}`}
-                                      />
+                                  {item.wasteTypes
+                                    .sort((a, b) =>
+                                      tWasteTypes(a).localeCompare(
+                                        tWasteTypes(b),
+                                      ),
                                     )
-                                  })}
+                                    .map((waste) => {
+                                      return (
+                                        <Chip
+                                          key={waste}
+                                          label={`${tWasteTypes(waste)} ${t('quantityDimension')}`}
+                                        />
+                                      )
+                                    })}
                                 </Stack>
                               </Box>
 
@@ -495,11 +506,11 @@ export async function getServerSideProps({ query, locale }) {
     await dbConnect()
     const skip = Math.max(validPage - 1, 0) * validPageSize
     const collectionPoints = await CollectionPointModel.find(filter)
-      .skip(skip)
-      .limit(validPageSize)
-      .sort({ updatedAt: -1 })
-      .select('user location wasteTypes date variant')
-      .lean()
+          .skip(skip)
+          .limit(validPageSize)
+          .sort({ updatedAt: -1 })
+          .select('user location wasteTypes date variant')
+          .lean()
 
     return {
       props: {

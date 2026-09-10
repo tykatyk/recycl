@@ -1,6 +1,7 @@
 import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
 import { contactPhone, locationSchema } from '../dbModelCommons'
 import { documentActivityStatus } from '../../../constants'
+import { wasteTypeNames } from '../../../constants'
 
 const options = { discriminatorKey: 'variant' }
 
@@ -12,10 +13,17 @@ const collectionPointSchema = new Schema(
       required: true,
     },
     location: { type: locationSchema, required: true },
-    wasteTypes: {
-      type: [String],
-      required: true,
-    },
+    wasteTypes: [
+      {
+        type: String,
+        enum: wasteTypeNames,
+        validate: {
+          validator: (value: string[]) => value.length > 0,
+          message: 'wasteTypes must contain at least one item',
+        },
+      },
+    ],
+
     phone: { ...contactPhone, required: true },
     viewCount: {
       type: Number,

@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Grid, Typography, InputAdornment, Button, Box } from '@mui/material'
+import {
+  Grid,
+  Typography,
+  InputAdornment,
+  Button,
+  Box,
+  MenuItem,
+} from '@mui/material'
 import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
 import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
-import SelectFormik from '../uiParts/formInputs/SelectFormik'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
 import { Formik, Form, Field } from 'formik'
@@ -17,6 +23,7 @@ import {
 import { useTranslations } from 'next-intl'
 import { validateForm } from '../../lib/helpers/errorHelpers'
 import * as yup from 'yup'
+import type { Waste } from '../../lib/types/waste'
 
 const api = '/api/my/ads'
 const myAds = '/my/ads'
@@ -38,11 +45,12 @@ export default function WasteAvailableForm(props) {
   const { locale } = router
   const { enqueueSnackbar } = useSnackbar()
   const [initialValues, setInitialValues] = useState<FormValues>(initVal)
-  const [wasteTypesData, setWasteTypesData] = useState([])
+  const [wasteTypesData, setWasteTypesData] = useState<Waste[]>([])
   const { id } = router.query
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const t = useTranslations('WasteAvailableForm')
+  const tWasteTypes = useTranslations('WasteTypes')
   const tValidationMessages = useTranslations('ValidationMessages')
 
   const createHandler = async (values: FormValues, setSubmitting) => {
@@ -231,13 +239,37 @@ export default function WasteAvailableForm(props) {
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <SelectFormik
-                      data={wasteTypesData}
+                    <Field
+                      component={TextFieldFormik}
                       name={'wasteType'}
                       label={t('form.wasteType')}
                       helperText={t('form.wasteTypeHelperText')}
                       disabled={shouldDisable}
-                    />
+                      fullWidth
+                      select
+                      color="secondary"
+                      variant="outlined"
+                      SelectProps={{
+                        MenuProps: {
+                          anchorOrigin: {
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          },
+                          transformOrigin: {
+                            vertical: 'top',
+                            horizontal: 'left',
+                          },
+                        },
+                      }}
+                    >
+                      {wasteTypesData.map((item) => {
+                        return (
+                          <MenuItem key={item._id} value={item.name}>
+                            {tWasteTypes(item.name)}
+                          </MenuItem>
+                        )
+                      })}
+                    </Field>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Field

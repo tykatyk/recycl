@@ -1,5 +1,6 @@
 import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
 import { locationSchema } from '../dbModelCommons'
+import { wasteTypeNames } from '../../../constants'
 
 const wasteAvailableSubscriptionSchema = new Schema({
   user: {
@@ -12,7 +13,16 @@ const wasteAvailableSubscriptionSchema = new Schema({
     required: true,
   },
   location: { type: locationSchema, required: true },
-  wasteTypes: [String],
+  wasteTypes: [
+    {
+      type: String,
+      enum: wasteTypeNames,
+      validate: {
+        validator: (value: string[]) => value.length > 0,
+        message: 'wasteTypes must contain at least one item',
+      },
+    },
+  ],
 })
 
 export type WasteAvailableSubscription = InferSchemaType<

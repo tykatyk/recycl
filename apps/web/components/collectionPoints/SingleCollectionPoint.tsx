@@ -12,12 +12,12 @@ import dayjs from 'dayjs'
 import { useTranslations } from 'next-intl'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
-
 const api = '/api/collection-points/phone'
 
 export default function SingleCollectionPoint(props) {
   const t = useTranslations('SingleCollectionPoint')
   const tCollectionPointTypes = useTranslations('CollectionPointTypes')
+  const tWasteTypes = useTranslations('WasteTypes')
 
   const { data } = props
   const [showPhone, setShowPhone] = useState(false)
@@ -86,15 +86,18 @@ export default function SingleCollectionPoint(props) {
       >
         <Box>
           <Grid container spacing={2}>
-            <Chip
-              //ToDo
-              label={`${t('collectionPointType')}: ${tCollectionPointTypes(data.variant.toLowerCase())}`}
-              size="small"
-            />
-            <Chip
-              label={t('addedBy', { userName: data.user.name })}
-              size="small"
-            />
+            <Grid>
+              <Chip
+                label={`${t('collectionPointType')}: ${tCollectionPointTypes(data.variant.toLowerCase())}`}
+                size="small"
+              />
+            </Grid>
+            <Grid>
+              <Chip
+                label={t('addedBy', { userName: data.user.name })}
+                size="small"
+              />
+            </Grid>
           </Grid>
         </Box>
 
@@ -116,7 +119,11 @@ export default function SingleCollectionPoint(props) {
 
           <Grid container spacing={2}>
             {data.wasteTypes.map((item, idx) => {
-              return <Chip key={idx} label={item} size="small" />
+              return (
+                <Grid>
+                  <Chip key={idx} label={tWasteTypes(item)} size="small" />
+                </Grid>
+              )
             })}
           </Grid>
         </Box>
@@ -126,25 +133,31 @@ export default function SingleCollectionPoint(props) {
           </Typography>
           <Box>
             <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-              <Typography sx={{ color: (theme) => theme.palette.text.primary }}>
-                {showPhone ? (
-                  <Link href={`tel:${phone}`} sx={{ color: 'inherit' }}>
-                    {phone}
-                  </Link>
-                ) : (
-                  defaultPhone
-                )}
-              </Typography>
+              <Grid>
+                <Typography
+                  sx={{ color: (theme) => theme.palette.text.primary }}
+                >
+                  {showPhone ? (
+                    <Link href={`tel:${phone}`} sx={{ color: 'inherit' }}>
+                      {phone}
+                    </Link>
+                  ) : (
+                    defaultPhone
+                  )}
+                </Typography>
+              </Grid>
 
               {!showPhone && (
-                <Button
-                  size="small"
-                  onClick={() => buttonHandler()}
-                  color="secondary"
-                  loading={loading}
-                >
-                  {t('showPhoneBtn')}
-                </Button>
+                <Grid>
+                  <Button
+                    size="small"
+                    onClick={() => buttonHandler()}
+                    color="secondary"
+                    loading={loading}
+                  >
+                    {t('showPhoneBtn')}
+                  </Button>
+                </Grid>
               )}
             </Grid>
           </Box>

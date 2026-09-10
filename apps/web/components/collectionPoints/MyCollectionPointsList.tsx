@@ -11,6 +11,7 @@ import {
   PaginationItem,
   Checkbox,
   CircularProgress,
+  Grid,
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import router, { useRouter } from 'next/router'
@@ -83,6 +84,7 @@ export default function MyCollectionPointsList(
   const scrollPosRef = useRef<number>(0)
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('MyCollectionPointsList')
+  const tWasteTypes = useTranslations('WasteTypes')
   const tCollectionPointTypes = useTranslations('CollectionPointTypes')
 
   const handleDelete = async (documentIds: string[]) => {
@@ -381,15 +383,18 @@ export default function MyCollectionPointsList(
                             >
                               {`${t('data.wasteTypes')}:`}
                             </Typography>
-                            <Stack direction="row" spacing={1}>
-                              {item.wasteTypes.map(
-                                (wasteType: string, idx: number) => {
-                                  return (
-                                    <Chip label={`${wasteType}`} key={idx} />
-                                  )
-                                },
-                              )}
-                            </Stack>
+                            <Grid container spacing={1}>
+                              {item.wasteTypes.map((wasteType) => {
+                                return (
+                                  <Grid>
+                                    <Chip
+                                      label={tWasteTypes(wasteType)}
+                                      key={wasteType}
+                                    />
+                                  </Grid>
+                                )
+                              })}
+                            </Grid>
                           </Box>
                           <Box>
                             <Typography

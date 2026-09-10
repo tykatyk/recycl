@@ -81,6 +81,7 @@ export default function MyAdsList(props: MyAdsProps) {
   const firstItemRef = useRef<HTMLDivElement>(null)
   const scrollPosRef = useRef<number>(0)
   const t = useTranslations('MyAdsList')
+  const tWasteTypes = useTranslations('WasteTypes')
 
   const { enqueueSnackbar } = useSnackbar()
 
@@ -418,7 +419,7 @@ export default function MyAdsList(props: MyAdsProps) {
                               {`${t('data.wasteType')}: `}
                             </Typography>
                             <Typography component={'span'} variant="body2">
-                              {`${item.wasteType}`}
+                              {tWasteTypes(item.wasteType)}
                             </Typography>
                           </Box>
                           <Box>

@@ -7,27 +7,27 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-
-type WasteItem = {
-  _id: string
-  name: string
-}
+import { wasteTypeNames } from '@recycl/shared/dist/constants'
+import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
+import type { Waste } from '../../lib/types/waste'
 
 export default function AdSidebarItemsMap(props: {
   handleChange: (newValue: string) => void
   h1: string
 }) {
-  const [wasteTypes, setWasteTypes] = useState<WasteItem[]>([])
+  const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
   const { handleChange, h1 } = props
   const t = useTranslations('AdSidebarItemsMap')
+  const tWasteTypes = useTranslations('WasteTypes')
 
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const response = await fetch('/api/waste-types')
-        const data = await response.json()
-
-        setWasteTypes(data)
+        const data: Waste[] = await wasteTypeFetcher()
+        const sorted = data.sort((a, b) =>
+          tWasteTypes(a.name).localeCompare(tWasteTypes(b.name)),
+        )
+        setWasteTypes(sorted)
       } catch (error) {
         console.log(error)
       }
@@ -59,19 +59,18 @@ export default function AdSidebarItemsMap(props: {
         </Box>
         <Box sx={{ width: '100%' }}>
           <Box>
-            <Autocomplete
+            <Autocomplete<Waste>
               disablePortal
               options={wasteTypes}
               sx={{ width: '100%' }}
               onChange={(event, newValue) => {
                 handleChange(newValue ? newValue.name : '')
               }}
-              getOptionLabel={(option) => {
-                if (option) {
-                  return option.name
-                }
-                return ''
-              }}
+              getOptionLabel={(option) =>
+                wasteTypeNames.includes(option.name)
+                  ? tWasteTypes(option.name)
+                  : ''
+              }
               renderInput={(params) => (
                 <TextField
                   {...params}

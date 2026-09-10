@@ -1,6 +1,10 @@
+import type { Waste } from '../../types/waste'
+
 export const wasteTypeFetcher = async () => {
   const result = await fetch(`/api/waste-types`)
-  return await result.json()
+
+  const data: Waste[] = await result.json()
+  return data
 }
 
 export const userPhoneFetcher = async () => {

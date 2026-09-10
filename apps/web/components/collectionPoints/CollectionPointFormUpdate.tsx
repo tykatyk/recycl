@@ -20,6 +20,7 @@ import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
 import { useTranslations } from 'next-intl'
 import { validateForm } from '../../lib/helpers/errorHelpers'
 import { InferType } from 'yup'
+import type { Waste } from '../../lib/types/waste'
 
 const api = '/api/my/collection-points'
 
@@ -37,11 +38,12 @@ export default function CollectionPointFormUpdate(
   const { locale } = router
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [wasteTypes, setWasteTypes] = useState<any>([]) //ToDo: add type
+  const [wasteTypes, setWasteTypes] = useState<Waste[]>([])
   const { id } = router.query
 
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('CollectionPointFormUpdate')
+  const tWasteTypes = useTranslations('WasteTypes')
   const tValidationMessages = useTranslations('ValidationMessages')
 
   const [initialValues, setInitialValues] = useState<CollectionPoint>(() => {
@@ -96,7 +98,10 @@ export default function CollectionPointFormUpdate(
           wasteTypeFetcher(),
           collectionPointFetcher(),
         ])
-        setWasteTypes(wasteTypeData)
+        const sorted = wasteTypeData.sort((a, b) =>
+          tWasteTypes(a.name).localeCompare(tWasteTypes(b.name)),
+        )
+        setWasteTypes(sorted)
       } catch (error) {
         enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       } finally {

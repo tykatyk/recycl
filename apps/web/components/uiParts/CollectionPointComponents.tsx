@@ -15,8 +15,14 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import ButtonSubmittingCircle from './ButtonSubmittingCircle'
 import PlacesAutocompleteNew from './formInputs/PlacesAutocompleteNew'
 import { useTranslations } from 'next-intl'
+import type { Waste } from '../../lib/types/waste'
+import { useFormik } from 'formik'
 
-export function DateField({ formik }) {
+export function DateField({
+  formik,
+}: {
+  formik: ReturnType<typeof useFormik>
+}) {
   const t = useTranslations('CollectionPointFormUpdate.form')
   return (
     <Grid size={{ xs: 12 }}>
@@ -30,8 +36,9 @@ export function DateField({ formik }) {
               fullWidth: true,
               error: formik.touched.date && Boolean(formik.errors.date),
               helperText:
-                (formik.touched.date && formik.errors.date) ||
-                `*${t('date.helperText')}`,
+                formik.touched.date && typeof formik.errors.date === 'string'
+                  ? formik.errors.date
+                  : `*${t('date.helperText')}`,
               onBlur: () => formik.setFieldTouched('date', true),
             },
           }}
@@ -104,8 +111,15 @@ export function PlaceAutocompleteField({ collectionPointType, formik }) {
   )
 }
 
-export function WasteTypeField({ wasteTypes, formik }) {
+export function WasteTypeField({
+  wasteTypes,
+  formik,
+}: {
+  wasteTypes: Waste[]
+  formik: ReturnType<typeof useFormik>
+}) {
   const t = useTranslations('CollectionPointFormUpdate.form')
+  const tWasteTypes = useTranslations('WasteTypes')
 
   return (
     <Grid size={{ xs: 12 }}>
@@ -133,15 +147,21 @@ export function WasteTypeField({ wasteTypes, formik }) {
           }}
           label={t('wasteType.label')}
         >
-          {wasteTypes.map((item, index: number) => (
-            <MenuItem key={index} value={item.name}>
-              {item.name}
-            </MenuItem>
-          ))}
+          {wasteTypes
+            .sort((a, b) =>
+              tWasteTypes(a.name).localeCompare(tWasteTypes(b.name)),
+            )
+            .map((item, index: number) => (
+              <MenuItem key={index} value={item.name}>
+                {tWasteTypes(item.name)}
+              </MenuItem>
+            ))}
         </Select>
         <FormHelperText>
-          {(formik.touched.wasteTypes && formik.errors.wasteTypes) ||
-            ` *${t('wasteType.helperText')}`}
+          {formik.touched.wasteTypes &&
+          typeof formik.errors.wasteTypes === 'string'
+            ? formik.errors.wasteTypes
+            : ` *${t('wasteType.helperText')}`}
         </FormHelperText>
       </FormControl>
     </Grid>

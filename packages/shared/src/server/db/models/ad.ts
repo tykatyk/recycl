@@ -4,6 +4,7 @@ import {
   documentActivityStatus,
   AD_EXPIRATION_PERIOD,
 } from '../../../constants'
+import { wasteTypeNames } from '../../../constants'
 
 const adSchema = new Schema(
   {
@@ -23,6 +24,7 @@ const adSchema = new Schema(
     },
     wasteType: {
       type: String,
+      enum: wasteTypeNames,
       required: true,
     },
     wasteCreatedRegularly: {

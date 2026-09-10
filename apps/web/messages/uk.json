@@ -223,7 +223,7 @@
   },
   "CollectionPointTypes": {
     "stationery": "Стаціонарний",
-    "mobile": "Пересуввний",
+    "mobile": "Пересувний",
     "container": "Сортувальний контейнер"
   },
   "CollectionPointsOnMap": {
@@ -633,5 +633,28 @@
     "submit": "Надіслати",
     "errorMessage": "Щось пішло не так",
     "successMessage": "Повідомлення успішно надіслано"
+  },
+  "WasteTypes": {
+    "aluminumCans": "Алюмінієві банки",
+    "dangerousWaste": "Небезпечні відходи",
+    "electronicWaste": "Електронні відходи",
+    "largeHouseholdAppliances": "Великогабаритна побутова техніка",
+    "tetraPack": "Тетрапак",
+    "wood": "Відходи деревини",
+    "textile": "Текстиль",
+    "paper": "Папір",
+    "metal": "Метал",
+    "batteries": "Батарейки та акумулятори",
+    "organicAnimalWaste": "Органіка",
+    "tiers": "Шини",
+    "rubberOther": "Гума (інше)",
+    "glassBottles": "Скляні пляшки з-під напоїв",
+    "glassPerfumeBottles": "Скляні флакони з-під парфумів",
+    "glassOther": "Скло (інше)",
+    "plasticLids": "Пластикові кришки",
+    "plasticBags": "Пластикові пакети",
+    "plasticBottles": "Пластикові пляшки",
+    "plasticOther": "Пластик (інше)",
+    "otherWaste": "Інше"
   }
 }

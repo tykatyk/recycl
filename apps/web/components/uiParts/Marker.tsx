@@ -90,9 +90,22 @@ export const AggregatedAdContent = ({ data }) => {
   )
 }
 
-export const IndividualCollectionPointContent = ({ data }) => {
+type IndividualCollectionPointContentProps = {
+  data: {
+    adId: string
+    placeDescription: string
+    wasteTypes: (typeof wasteTypeNames)[number][]
+    phone: string
+    variant: CollectionPointVariant
+    date: string
+  }
+}
+export const IndividualCollectionPointContent = ({
+  data,
+}: IndividualCollectionPointContentProps) => {
   const { adId, placeDescription, wasteTypes, phone, variant, date } = data
   const t = useTranslations('Marker.IndividualCollectionPointContent')
+  const tWasteTypes = useTranslations('WasteTypes')
   const tCollectionPointTypes = useTranslations('CollectionPointTypes')
 
   return (
@@ -136,12 +149,14 @@ export const IndividualCollectionPointContent = ({ data }) => {
         </Typography>
         <Box sx={{ mb: 1 }}>
           <Grid spacing={1}>
-            {wasteTypes.map((wasteType: string, idx: number) => {
+            {wasteTypes
+              .sort((a, b) => tWasteTypes(a).localeCompare(tWasteTypes(b)))
+              .map((wasteType) => {
               return (
                 <Chip
                   variant="filled"
-                  label={`${wasteType}`}
-                  key={idx}
+                    label={tWasteTypes(wasteType)}
+                    key={wasteType}
                   sx={(theme) => ({
                     m: 0.5,
                     color: '#fff',

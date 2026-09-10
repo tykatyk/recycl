@@ -22,3 +22,26 @@ export const CHANGE_EMAIL_EXPIRATION_PERIOD = 10
 export const minRadius = 1
 export const maxRadius = 200
 
+export const wasteTypeNames = [
+  'aluminumCans',
+  'dangerousWaste',
+  'electronicWaste',
+  'largeHouseholdAppliances',
+  'tetraPack',
+  'wood',
+  'textile',
+  'paper',
+  'metal',
+  'batteries',
+  'organicAnimalWaste',
+  'tiers',
+  'rubberOther',
+  'glassBottles',
+  'glassPerfumeBottles',
+  'glassOther',
+  'plasticLids',
+  'plasticBags',
+  'plasticBottles',
+  'plasticOther',
+  'otherWaste',
+] as const

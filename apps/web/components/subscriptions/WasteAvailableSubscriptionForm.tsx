@@ -24,6 +24,7 @@ export default function WasteAvailableSubscriptionForm(props: {
   const { wasteTypes } = props
   const { isSubmitting } = useFormikContext<CollectionPoint>()
   const t = useTranslations('CreateUpdateWasteAvailableSubscription.form')
+  const tWasteTypes = useTranslations('WasteTypes')
 
   return (
     <Form>
@@ -104,21 +105,25 @@ export default function WasteAvailableSubscriptionForm(props: {
               },
             }}
           >
-            {wasteTypes.map((item) => {
-              return (
-                <MenuItem
-                  sx={{
-                    '&.Mui-selected': {
-                      background: '#2e3638',
-                    },
-                  }}
-                  key={item['_id']}
-                  value={/*item['_id']*/ item['name']}
-                >
-                  {item['name']}
-                </MenuItem>
+            {wasteTypes
+              .sort((a, b) =>
+                tWasteTypes(a.name).localeCompare(tWasteTypes(b.name)),
               )
-            })}
+              .map((item) => {
+                return (
+                  <MenuItem
+                    sx={{
+                      '&.Mui-selected': {
+                        background: '#2e3638',
+                      },
+                    }}
+                    key={item._id}
+                    value={item.name}
+                  >
+                    {tWasteTypes(item.name)}
+                  </MenuItem>
+                )
+              })}
           </Field>
         </Box>
         <Box>

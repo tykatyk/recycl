@@ -12,12 +12,17 @@ import PlacesAutocompleteNew from './formInputs/PlacesAutocompleteNew'
 import { useFormik } from 'formik'
 import NumberField from './formInputs/NumberField'
 import { adSearchFormSchema } from '../../lib/validation/adSearchForm'
-import { minRadius, maxRadius } from '@recycl/shared/dist/constants'
+import {
+  minRadius,
+  maxRadius,
+  wasteTypeNames,
+} from '@recycl/shared/dist/constants'
 import { useSnackbar } from 'notistack'
 import { InferType } from 'yup'
 import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutocomplete'
 import { useTranslations } from 'use-intl'
 import { validateForm } from '../../lib/helpers/errorHelpers'
+import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
 
 export default function AdSidebarItemsList(props) {
   const { handleSubmit, initialFormValues, howSearchWorks = '' } = props
@@ -27,11 +32,14 @@ export default function AdSidebarItemsList(props) {
     wasteLocation = null,
   } = initialFormValues
 
-  const [wasteTypes, setWasteTypes] = useState<string[]>([])
+  const [wasteTypes, setWasteTypes] = useState<
+    (typeof wasteTypeNames)[number][]
+  >([])
   const [modalOpen, setModalOpen] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('AdSidebarItemsList')
   const tValidationMessages = useTranslations('ValidationMessages')
+  const tWasteTypes = useTranslations('WasteTypes')
 
   type AdSearchForm = InferType<typeof adSearchFormSchema>
   const formik = useFormik<AdSearchForm>({
@@ -67,10 +75,13 @@ export default function AdSidebarItemsList(props) {
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const response = await fetch('/api/waste-types')
-        const data = await response.json()
-        const mapped = data.map((item) => item.name)
-        setWasteTypes(mapped)
+        const data = await wasteTypeFetcher()
+        const sorted = data
+          .sort((a, b) =>
+            tWasteTypes(a.name).localeCompare(tWasteTypes(b.name)),
+          )
+          .map((item) => item.name)
+        setWasteTypes(sorted)
       } catch (error) {
         enqueueSnackbar(t('errorMessage'), { variant: 'error' })
       }
@@ -91,14 +102,17 @@ export default function AdSidebarItemsList(props) {
           <Box sx={{ width: '100%', p: 1 }}>
             <form onSubmit={formik.handleSubmit} style={{ width: '100%' }}>
               <Box sx={{ mb: 2 }}>
-                <Autocomplete
+                <Autocomplete<(typeof wasteTypeNames)[number]>
                   disablePortal
                   options={wasteTypes}
                   sx={{ width: '100%' }}
-                  value={formik.values.wasteType}
+                  value={formik.values.wasteType as any}
                   onChange={(event, newValue) => {
                     formik.setFieldValue('wasteType', newValue)
                   }}
+                  getOptionLabel={(option) =>
+                    wasteTypeNames.includes(option) ? tWasteTypes(option) : ''
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}

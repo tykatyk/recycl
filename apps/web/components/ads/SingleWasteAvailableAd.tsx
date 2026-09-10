@@ -9,18 +9,23 @@ import { useSnackbar } from 'notistack'
 import LocationPinIcon from '@mui/icons-material/LocationPin'
 import ComplaintDialog from '../uiParts/ComplaintDialog'
 import { useTranslations } from 'use-intl'
+import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 
 const defaultPhone = '(xxx)-xxx-xx-xx'
 const api = '/api/ads/phone'
 
-export default function SingleWasteAvailableAd(props) {
-  const { data } = props
+export default function SingleWasteAvailableAd({
+  data,
+}: {
+  data: Omit<Ad, 'user'> & { _id: string; user: { name: string } }
+}) {
   const [showPhone, setShowPhone] = useState(false)
   const [phone, setPhone] = useState(defaultPhone)
   const [loading, setLoading] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const [complaintDialogOpen, setComplaintDialogOpen] = useState(false)
   const t = useTranslations('SingleWasteAvailableAd')
+  const tWasteTypes = useTranslations('WasteTypes')
 
   const creationDate = new Date(data.createdAt)
   const formattedDate = new Intl.DateTimeFormat('ru-RU', {
@@ -90,7 +95,10 @@ export default function SingleWasteAvailableAd(props) {
       >
         <Box>
           <Grid container spacing={2}>
-            <Chip label={`${t('wasteType')}: ${data.wasteType}`} size="small" />
+            <Chip
+              label={`${t('wasteType')}: ${tWasteTypes(data.wasteType)}`}
+              size="small"
+            />
             <Chip label={`${t('adCreated')}: ${formattedDate}`} size="small" />
             <Chip label={`${t('addedUser')}: ${data.user.name}`} size="small" />
           </Grid>
