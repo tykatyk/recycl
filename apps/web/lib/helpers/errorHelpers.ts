@@ -53,31 +53,3 @@ export async function validateForm<T extends FormikValues>(
     )
   }
 }
-
-type Callback<P extends { [key: string]: any }> = (
-  context: GetServerSidePropsContext,
-) => ReturnType<GetServerSideProps<P>>
-
-export function getServerSidePropsHandler<P extends { [key: string]: any }>(
-  callback: Callback<P>,
-  redirectOnError?: string,
-): GetServerSideProps<P> {
-  return async (context: GetServerSidePropsContext) => {
-    try {
-      return await callback(context)
-    } catch (e) {
-      if (redirectOnError) {
-        return {
-          redirect: {
-            destination: redirectOnError,
-            permanent: false,
-          },
-        }
-      }
-
-      return {
-        props: {} as P,
-      }
-    }
-  }
-}
