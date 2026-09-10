@@ -11,6 +11,7 @@ import Head from 'next/head'
 import Link from '../../components/uiParts/Link'
 import { useTranslations } from 'use-intl'
 import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
+import { InferGetServerSidePropsType } from 'next'
 const { FORBIDDEN } = responseErrorCodes
 
 const { documentActivityStatus } = constants
@@ -68,7 +69,9 @@ function ContentNotAvailableView() {
   )
 }
 
-export default function CollectionPoint(props) {
+export default function CollectionPoint(
+  props: InferGetServerSidePropsType<typeof getServerSideProps>,
+) {
   const { data, error } = props
   const router = useRouter()
   const { locale, locales, defaultLocale, asPath } = router
@@ -98,6 +101,12 @@ export default function CollectionPoint(props) {
       <Head>
         <title>{`${t('successTitle', { description: data.location.description })} | ${brand}`}</title>
         <meta name="description" content={t('successTitle')} />
+        <CanonicalUrl
+          asPath={asPath}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          locales={locales}
+        />
       </Head>
       <Layout>
         <SingleCollectionPoint data={data} />
