@@ -17,6 +17,7 @@ import { useTranslations } from 'next-intl'
 import { validateForm } from '../../lib/helpers/errorHelpers'
 import { InferType } from 'yup'
 import CanonicalUrl from '../uiParts/CanonicalUrl'
+import { wasteTypeFetcher } from '../../lib/helpers/dataFetcher'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const api = '/api/my/subscriptions'
@@ -60,16 +61,6 @@ export default function CreateUpdateWasteAvailableSubscription(params: {
       return (await response.json()) as (keyof typeof subscriptionVariantNames)[]
     }
 
-    const getWasteTypes = async () => {
-      const response = await fetch(wasteTypesApi)
-
-      if (!response.ok) {
-        throw new Error('Response is not OK')
-      }
-
-      return (await response.json()) as Waste[]
-    }
-
     const loadData = async () => {
       try {
         setViewStatus('loading')
@@ -82,7 +73,7 @@ export default function CreateUpdateWasteAvailableSubscription(params: {
           return
         }
 
-        const wasteTypes = await getWasteTypes()
+        const wasteTypes = await wasteTypeFetcher()
 
         setWasteTypes(wasteTypes)
         setViewStatus('ok')
