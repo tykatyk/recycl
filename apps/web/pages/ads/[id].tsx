@@ -78,7 +78,7 @@ function ContentNotAvailable() {
   )
 }
 type WasteAvailableAdProps = {
-  data: Ad & { _id: string }
+  data: Omit<Ad, 'user'> & { _id: string; user: { name: string } }
   error: any
 }
 export default function WasteAvailableAd(props: WasteAvailableAdProps) {
