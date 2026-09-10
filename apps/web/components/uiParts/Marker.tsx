@@ -15,6 +15,10 @@ import { Dispatch, SetStateAction } from 'react'
 import Supercluster, { ClusterProperties } from 'supercluster'
 import dayjs from 'dayjs'
 import { useTranslations } from 'use-intl'
+import type {
+  CollectionPointVariant,
+  wasteTypeNames,
+} from '@recycl/shared/dist/constants'
 
 const aggregatedMarkerStyles = {
   '&:link': { color: 'blue', textDecoration: 'none' },
@@ -77,7 +81,14 @@ export const AggregatedAdContent = ({ data }) => {
       <Box>
         <Typography variant="body2" sx={{ color: 'blue' }}>
           <Link
-            href={`/ads/list?wasteType=${wasteType}&locationDescription=${placeDescription}&locationId=${placeId}`}
+            href={{
+              pathname: '/ads/list',
+              query: {
+                wasteType,
+                locationDescription: placeDescription,
+                locationId: placeId,
+              },
+            }}
             target="_blank"
             rel="noopener noreferrer"
             sx={aggregatedMarkerStyles}
@@ -152,19 +163,19 @@ export const IndividualCollectionPointContent = ({
             {wasteTypes
               .sort((a, b) => tWasteTypes(a).localeCompare(tWasteTypes(b)))
               .map((wasteType) => {
-              return (
-                <Chip
-                  variant="filled"
+                return (
+                  <Chip
+                    variant="filled"
                     label={tWasteTypes(wasteType)}
                     key={wasteType}
-                  sx={(theme) => ({
-                    m: 0.5,
-                    color: '#fff',
-                    background: theme.palette.grey[600],
-                  })}
-                />
-              )
-            })}
+                    sx={(theme) => ({
+                      m: 0.5,
+                      color: '#fff',
+                      background: theme.palette.grey[600],
+                    })}
+                  />
+                )
+              })}
           </Grid>
         </Box>
       </Box>
@@ -213,7 +224,14 @@ export const AggregatedCollectionPointContent = ({ data }) => {
       <Box>
         <Typography variant="body2" sx={{ color: 'blue' }}>
           <Link
-            href={`/collection-points/list?wasteType=${wasteType}&locationDescription=${placeDescription}&locationId=${placeId}`}
+            href={{
+              pathname: '/collection-points/list',
+              query: {
+                wasteType,
+                locationDescription: placeDescription,
+                locationId: placeId,
+              },
+            }}
             target="_blank"
             rel="noopener noreferrer"
             sx={aggregatedMarkerStyles}
