@@ -469,7 +469,7 @@ export async function getServerSideProps({ query, locale }) {
       status: documentActivityStatus.active,
     }
 
-    if (wasteType) {
+    if (wasteType && wasteTypeNames.includes(wasteType)) {
       filter.wasteTypes = wasteType
     }
 
@@ -505,7 +505,13 @@ export async function getServerSideProps({ query, locale }) {
 
     await dbConnect()
     const skip = Math.max(validPage - 1, 0) * validPageSize
-    const collectionPoints = await CollectionPointModel.find(filter)
+    const collectionPoints = searchRadius
+      ? await CollectionPointModel.find(filter)
+          .skip(skip)
+          .limit(validPageSize)
+          .select('user location wasteTypes date variant')
+          .lean()
+      : await CollectionPointModel.find(filter)
           .skip(skip)
           .limit(validPageSize)
           .sort({ updatedAt: -1 })
@@ -517,7 +523,7 @@ export async function getServerSideProps({ query, locale }) {
         status: 'success',
         data: {
           ads: JSON.parse(JSON.stringify(collectionPoints)),
-          wasteType,
+          wasteType: wasteTypeNames.includes(wasteType) ? wasteType : '',
           wasteLocation:
             locationDescription && locationId
               ? {

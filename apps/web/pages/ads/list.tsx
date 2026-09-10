@@ -9,6 +9,7 @@ import {
 import getCoords from '../../lib/helpers/getCoords'
 import { rowsPerPageOptions } from '../../lib/helpers/eventHelpers'
 import * as yup from 'yup'
+import { wasteTypeNames } from '@recycl/shared/dist/constants'
 const { INTERNAL_SERVER_ERROR } = responseErrorCodes
 
 async function getPlaceCoordinates(placeId: string) {
@@ -69,8 +70,8 @@ export async function getServerSideProps({ locale, query }) {
       status: 'active',
     }
 
-    if (wasteType) {
-      filter.wasteType = wasteType
+    if (wasteType && wasteTypeNames.includes(wasteType)) {
+      filter.wasteTypes = wasteType
     }
 
     const wasteLocation =
@@ -105,19 +106,25 @@ export async function getServerSideProps({ locale, query }) {
 
     await dbConnect()
     const skip = Math.max(validPage - 1, 0) * validPageSize
-    const ads = await AdModel.find(filter)
-      .skip(skip)
-      .limit(validPageSize)
-      .sort({ updatedAt: -1 })
-      .select('title user wasteLocation wasteType quantity updatedAt')
-      .lean()
+    const ads = searchRadius
+      ? await AdModel.find(filter)
+          .skip(skip)
+          .limit(validPageSize)
+          .select('title user wasteLocation wasteType quantity updatedAt')
+          .lean()
+      : await AdModel.find(filter)
+          .skip(skip)
+          .limit(validPageSize)
+          .sort({ updatedAt: -1 })
+          .select('title user wasteLocation wasteType quantity updatedAt')
+          .lean()
 
     return {
       props: {
         status: 'success',
         data: {
           ads: JSON.parse(JSON.stringify(ads)),
-          wasteType,
+          wasteType: wasteTypeNames.includes(wasteType) ? wasteType : '',
           wasteLocation:
             locationDescription && locationId
               ? {
