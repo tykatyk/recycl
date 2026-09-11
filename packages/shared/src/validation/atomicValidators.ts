@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 import { phoneRegex, whitespaceRegex } from './regularExpressions'
 import { validationMessages } from './messages'
-import { minRadius, maxRadius } from '../constants'
+import { minRadius, maxRadius, wasteTypeNames } from '../constants'
 
 const {
   required,
@@ -71,10 +71,21 @@ const location = yup
 
 // const location = yup.object().nullable().required(required)
 
-const waste = yup.string().required(required).typeError(wrongType)
+const waste = yup
+  .mixed<(typeof wasteTypeNames)[number]>()
+  .oneOf(wasteTypeNames)
+  .required(required)
+  .typeError(wrongType)
+
 const wasteArray = yup
   .array()
-  .of(yup.string().required(required))
+  .of(
+    yup
+      .mixed<(typeof wasteTypeNames)[number]>()
+      .oneOf(wasteTypeNames)
+      .required(required)
+      .typeError(wrongType),
+  )
   .min(1, atLeastOne)
   .required(required)
   .typeError(wrongType)

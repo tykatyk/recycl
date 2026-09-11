@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react'
 import Autocomplete from '@mui/material/Autocomplete'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
-import { Box, Typography, TextField, Chip, ListItem } from '@mui/material'
+import { Box, Typography, TextField, ListItem } from '@mui/material'
 import throttle from 'lodash/throttle'
 import parse from 'autosuggest-highlight/parse'
 import Listbox from './Listbox'

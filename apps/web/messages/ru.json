@@ -368,7 +368,7 @@
       "wasteLocationHelperText": "Обязательное поле",
       "wasteType": "Тип вторсырья",
       "wasteTypeHelperText": "Обязательное поле",
-      "quantity": "Количество",
+      "quantity": "Количество, кг",
       "quantityHelperText": "Обязательное поле",
       "quantityEndAdornment": "кг",
       "phone": "Контактный телефон",

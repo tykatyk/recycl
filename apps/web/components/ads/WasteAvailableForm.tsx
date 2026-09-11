@@ -2,16 +2,17 @@ import { useEffect, useState } from 'react'
 import {
   Grid,
   Typography,
-  InputAdornment,
   Button,
   Box,
   MenuItem,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  FormHelperText,
 } from '@mui/material'
-import PlacesAutocomplete from '../uiParts/formInputs/PlacesAutocomplete'
-import TextFieldFormik from '../uiParts/formInputs/TextFieldFormik'
 import PageLoadingCircle from '../uiParts/PageLoadingCircle'
 import ButtonSubmittingCircle from '../uiParts/ButtonSubmittingCircle'
-import { Formik, Form, Field } from 'formik'
 import { useRouter } from 'next/router'
 import { getNormalizedValues } from './removalFormConfig'
 import { adSchema } from '../../lib/validation'
@@ -24,6 +25,9 @@ import { useTranslations } from 'next-intl'
 import { validateForm } from '../../lib/helpers/errorHelpers'
 import * as yup from 'yup'
 import type { Waste } from '../../lib/types/waste'
+import { useFormik } from 'formik'
+import PlacesAutocompleteNew from '../uiParts/formInputs/PlacesAutocompleteNew'
+import NumberField from '../uiParts/formInputs/NumberField'
 
 const api = '/api/my/ads'
 const myAds = '/my/ads'
@@ -31,8 +35,8 @@ const myAds = '/my/ads'
 const initVal = {
   title: '',
   wasteLocation: null as any,
-  wasteType: '',
-  quantity: '' as any,
+  wasteType: '' as any,
+  quantity: null as any,
   contactPhone: '',
   comment: '',
 }
@@ -52,6 +56,28 @@ export default function WasteAvailableForm(props) {
   const t = useTranslations('WasteAvailableForm')
   const tWasteTypes = useTranslations('WasteTypes')
   const tValidationMessages = useTranslations('ValidationMessages')
+
+  const formik = useFormik({
+    initialValues,
+
+    validate: async (values) => {
+      return await validateForm({
+        values,
+        validationSchema: adSchema,
+        translations: tValidationMessages,
+      })
+    },
+
+    onSubmit: async (values, { setSubmitting }) => {
+      if (id) {
+        await updateHandler(values, setSubmitting)
+      } else {
+        await createHandler(values, setSubmitting)
+      }
+    },
+    enableReinitialize: true,
+  })
+  const shouldDisable = loading || formik.isSubmitting
 
   const createHandler = async (values: FormValues, setSubmitting) => {
     try {
@@ -175,165 +201,178 @@ export default function WasteAvailableForm(props) {
 
   return (
     <Box>
-      <Formik
-        enableReinitialize
-        initialValues={initialValues}
-        validate={async (values) => {
-          return await validateForm({
-            values,
-            validationSchema: adSchema,
-            translations: tValidationMessages,
-          })
-        }}
-        onSubmit={async (values, { setSubmitting }) => {
-          if (id) {
-            await updateHandler(values, setSubmitting)
-          } else {
-            await createHandler(values, setSubmitting)
-          }
-        }}
-      >
-        {({ isSubmitting }) => {
-          const shouldDisable = loading || isSubmitting
+      <Box sx={{ mt: 2, mb: 3 }}>
+        <Typography component="h1" variant="h4">
+          {h1}
+        </Typography>
+      </Box>
 
-          return (
-            <Box>
-              <Box sx={{ mt: 2, mb: 3 }}>
-                <Typography component="h1" variant="h4">
-                  {h1}
-                </Typography>
-              </Box>
+      <form onSubmit={formik.handleSubmit}>
+        <Grid
+          container
+          maxWidth={'md'}
+          sx={{
+            '& > *': {
+              mb: 3,
+            },
+          }}
+        >
+          <Grid size={{ xs: 12 }}>
+            <TextField
+              id="title"
+              name="title"
+              variant="outlined"
+              fullWidth
+              label={t('form.adTitle')}
+              helperText={
+                (formik.touched.title && formik.errors.title) ||
+                `*${t('form.adTitleHelperText')}`
+              }
+              disabled={shouldDisable}
+              error={formik.touched.title && Boolean(formik.errors.title)}
+              value={formik.values.title}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+            />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <PlacesAutocompleteNew
+              id="wasteLocation"
+              name="wasteLocation"
+              variant="outlined"
+              fullWidth
+              label={t('form.wasteLocation')}
+              value={formik.values.wasteLocation}
+              onChange={(event, newValue) => {
+                formik.setFieldValue('wasteLocation', newValue)
+              }}
+              onBlur={() => formik.setFieldTouched('wasteLocation', true)}
+              error={
+                formik.touched.wasteLocation &&
+                Boolean(formik.errors.wasteLocation)
+              }
+              helperText={
+                (formik.touched.wasteLocation && formik.errors.wasteLocation) ||
+                `*${t('form.wasteLocationHelperText')}`
+              }
+              disabled={shouldDisable}
+            />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <FormControl
+              fullWidth
+              error={
+                formik.touched.wasteType && Boolean(formik.errors.wasteType)
+              }
+            >
+              <InputLabel id="wasteType-label">
+                {t('form.wasteType')}
+              </InputLabel>
+              <Select
+                id={'wasteType'}
+                name={'wasteType'}
+                color="secondary"
+                variant="outlined"
+                disabled={shouldDisable}
+                value={formik.values.wasteType}
+                onChange={(event) => {
+                  const value = event.target.value
+                  formik.setFieldValue('wasteType', value)
+                }}
+                onBlur={(event) => {
+                  formik.setFieldTouched('wasteType', true)
+                }}
+                label={t('form.wasteType')}
+                labelId="wasteType-label"
+              >
+                {wasteTypesData.map((item) => {
+                  return (
+                    <MenuItem key={item._id} value={item.name}>
+                      {tWasteTypes(item.name)}
+                    </MenuItem>
+                  )
+                })}
+              </Select>
+              <FormHelperText>
+                {formik.touched.wasteType &&
+                typeof formik.errors.wasteType === 'string'
+                  ? formik.errors.wasteType
+                  : ` *${t('form.wasteTypeHelperText')}`}
+              </FormHelperText>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <NumberField
+              disabled={shouldDisable}
+              label={t('form.quantity')}
+              id="quantity"
+              name="quantity"
+              value={formik.values.quantity}
+              onValueChange={(value) => {
+                formik.setFieldValue('quantity', value)
 
-              <Form>
-                <Grid
-                  container
-                  maxWidth={'md'}
-                  sx={{
-                    '& > *': {
-                      mb: 3,
-                    },
-                  }}
-                >
-                  <Grid size={{ xs: 12 }}>
-                    <Field
-                      id="title"
-                      name="title"
-                      variant="outlined"
-                      fullWidth
-                      component={TextFieldFormik}
-                      label={t('form.adTitle')}
-                      helperText={t('form.adTitleHelperText')}
-                      disabled={shouldDisable}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Field
-                      id="wasteLocation"
-                      name="wasteLocation"
-                      variant="outlined"
-                      fullWidth
-                      component={PlacesAutocomplete}
-                      label={t('form.wasteLocation')}
-                      helperText={t('form.wasteLocationHelperText')}
-                      disabled={shouldDisable}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Field
-                      component={TextFieldFormik}
-                      name={'wasteType'}
-                      label={t('form.wasteType')}
-                      helperText={t('form.wasteTypeHelperText')}
-                      disabled={shouldDisable}
-                      fullWidth
-                      select
-                      color="secondary"
-                      variant="outlined"
-                      SelectProps={{
-                        MenuProps: {
-                          anchorOrigin: {
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          },
-                          transformOrigin: {
-                            vertical: 'top',
-                            horizontal: 'left',
-                          },
-                        },
-                      }}
-                    >
-                      {wasteTypesData.map((item) => {
-                        return (
-                          <MenuItem key={item._id} value={item.name}>
-                            {tWasteTypes(item.name)}
-                          </MenuItem>
-                        )
-                      })}
-                    </Field>
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Field
-                      component={TextFieldFormik}
-                      label={t('form.quantity')}
-                      color="secondary"
-                      type="number"
-                      fullWidth
-                      name="quantity"
-                      variant="outlined"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {t('form.quantityEndAdornment')}
-                          </InputAdornment>
-                        ),
-                      }}
-                      helperText={t('form.quantityHelperText')}
-                      disabled={shouldDisable}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Field
-                      component={TextFieldFormik}
-                      label={t('form.phone')}
-                      color="secondary"
-                      type="tel"
-                      fullWidth
-                      name="contactPhone"
-                      variant="outlined"
-                      helperText={t('form.phoneHelperText')}
-                      disabled={shouldDisable}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Field
-                      component={TextFieldFormik}
-                      multiline
-                      rows={5}
-                      label={t('form.comment')}
-                      color="secondary"
-                      fullWidth
-                      name="comment"
-                      variant="outlined"
-                      disabled={shouldDisable}
-                    />
-                  </Grid>
-                </Grid>
+                if (!formik.touched.quantity) {
+                  formik.setFieldTouched('quantity', true, false)
+                }
+              }}
+              error={formik.touched.quantity && Boolean(formik.errors.quantity)}
+              helperText={
+                (formik.touched.quantity && formik.errors.quantity) ||
+                `*${t('form.quantityHelperText')}`
+              }
+            />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <TextField
+              type="tel"
+              id="contactPhone"
+              name="contactPhone"
+              variant="outlined"
+              fullWidth
+              label={t('form.phone')}
+              helperText={
+                (formik.touched.contactPhone && formik.errors.contactPhone) ||
+                `*${t('form.phoneHelperText')}`
+              }
+              disabled={shouldDisable}
+              error={
+                formik.touched.contactPhone &&
+                Boolean(formik.errors.contactPhone)
+              }
+              value={formik.values.contactPhone}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+            />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <TextField
+              multiline
+              rows={5}
+              label={t('form.comment')}
+              fullWidth
+              name="comment"
+              id="comment"
+              variant="outlined"
+              disabled={shouldDisable}
+              helperText={
+                (formik.touched.comment && formik.errors.comment) ||
+                `*${t('form.comment')}`
+              }
+              error={formik.touched.comment && Boolean(formik.errors.comment)}
+              value={formik.values.comment}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+            />
+          </Grid>
+        </Grid>
 
-                <Grid size={{ xs: 12 }}>
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    disabled={shouldDisable}
-                  >
-                    {t('form.submit')}
-                    {isSubmitting && <ButtonSubmittingCircle />}
-                  </Button>
-                </Grid>
-              </Form>
-            </Box>
-          )
-        }}
-      </Formik>
+        <Grid size={{ xs: 12 }}>
+          <Button variant="contained" type="submit" disabled={shouldDisable}>
+            {t('form.submit')}
+            {formik.isSubmitting && <ButtonSubmittingCircle />}
+          </Button>
+        </Grid>
+      </form>
     </Box>
   )
 }

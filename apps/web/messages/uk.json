@@ -369,7 +369,7 @@
       "wasteLocationHelperText": "Обов’язкове поле",
       "wasteType": "Тип вторсировини",
       "wasteTypeHelperText": "Обов’язкове поле",
-      "quantity": "Кількість",
+      "quantity": "Кількість, кг",
       "quantityHelperText": "Обов’язкове поле",
       "quantityEndAdornment": "кг",
       "phone": "Контактний телефон",
