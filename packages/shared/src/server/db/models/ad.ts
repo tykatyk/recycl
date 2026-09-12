@@ -50,12 +50,8 @@ const adSchema = new Schema(
     expires: {
       type: Date,
       required: true,
-      default: () => {
-        const date = new Date()
-        return date.setDate(
-          date.getDate() + AD_EXPIRATION_PERIOD * 24 * 60 * 60 * 1000,
-        )
-      },
+      default: () =>
+        new Date(Date.now() + AD_EXPIRATION_PERIOD * 24 * 60 * 60 * 1000),
     },
   },
   { timestamps: true },

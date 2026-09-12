@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 export default {
   reactStrictMode: true,
+  output: 'standalone',
   modularizeImports: {
     '@mui/material': {
       transform: '@mui/material/{{member}}',

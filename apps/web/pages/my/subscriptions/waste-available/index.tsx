@@ -11,6 +11,7 @@ import {
   PaginationItem,
   Checkbox,
   CircularProgress,
+  Grid,
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import { useRouter } from 'next/router'
@@ -138,6 +139,7 @@ const SubscriptionList = () => {
   const scrollPosRef = useRef<number>(0)
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('SubscriptionList')
+  const tWasteTypes = useTranslations('WasteTypes')
   const tNoData = useTranslations('NoData')
 
   const handleDelete = async (documentIds: string[]) => {
@@ -400,13 +402,15 @@ const SubscriptionList = () => {
                           >
                             {`${t('whatToSearch')}:`}
                           </Typography>
-                          <Stack direction="row" spacing={1}>
-                            {item.wasteTypes.map(
-                              (wasteType: string, idx: number) => {
-                                return <Chip label={`${wasteType}`} key={idx} />
-                              },
-                            )}
-                          </Stack>
+                          <Grid container spacing={1}>
+                            {item.wasteTypes.map((wasteType) => {
+                              return (
+                                <Grid key={wasteType}>
+                                  <Chip label={tWasteTypes(wasteType)} />
+                                </Grid>
+                              )
+                            })}
+                          </Grid>
                         </Box>
                         <Box sx={{ pb: 2, borderBottom: '1px solid #5a5a5a' }}>
                           <Typography
