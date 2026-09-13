@@ -48,34 +48,34 @@ const StyledMain = styled('main')(({ theme }) => ({
 
     // background image for landscape orientation
     [`@media screen`]: {
-      backgroundImage: `url(${images.mediumLandscape})`,
+      backgroundImage: `url(/${images.mediumLandscape})`,
     },
 
     [theme.breakpoints.up('sm')]: {
-      backgroundImage: `url(${images.xLargeLandscape})`,
+      backgroundImage: `url(/${images.xLargeLandscape})`,
     },
 
     // background image for portrait orientation
     [`@media screen and (orientation: portrait)`]: {
-      backgroundImage: `url(${images.smallPortrait})`, // 600px
+      backgroundImage: `url(/${images.smallPortrait})`, // 600px
     },
     [`${theme.breakpoints.up('sm')} and (orientation: portrait)`]: {
-      backgroundImage: `url(${images.mediumPortrait})`, // 960px
+      backgroundImage: `url(/${images.mediumPortrait})`, // 960px
     },
     [`${theme.breakpoints.up('md')} and (orientation: portrait)`]: {
-      backgroundImage: `url(${images.largePortrait})`, // 1280px
+      backgroundImage: `url(/${images.largePortrait})`, // 1280px
     },
     [`${theme.breakpoints.up(
       'xs',
     )} and (min-resolution: 2dppx) and (orientation: portrait)`]: {
-      backgroundImage: `url(${images.smallRetinaPortrait})`, // 1200px
+      backgroundImage: `url(/${images.smallRetinaPortrait})`, // 1200px
     },
     [`${theme.breakpoints.up(
       'sm',
     )} and (min-resolution: 2dppx) and (orientation: portrait), ${theme.breakpoints
       .up('lg')
       .replace('@media ', '')} and (orientation: portrait)`]: {
-      backgroundImage: `url(${images.mediumRetinaPortrait})`, // 1920px
+      backgroundImage: `url(/${images.mediumRetinaPortrait})`, // 1920px
     },
 
     color: '#fff',
