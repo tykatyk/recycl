@@ -16,8 +16,8 @@ export const delimiter = `
   `
 
 export const getFullHtml = (data: FullHtmlData) => {
-  const logoPath = '../public/images/logo.png'
-  const brandName = process.env.BRAND || '' //ToDo: refactor
+  const logoPath = `${getHost()}/images/logo.png`
+  const brandName = process.env.BRAND || ''
   const unsubscribeText =
     'Если вы не хотите получать подобные уведомления, нажмите'
   const unsubscribe = 'Oтписаться'

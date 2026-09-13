@@ -11,9 +11,9 @@ import { default as theme } from '../../../lib/helpers/themeStub'
  * @note We don't add the email address to avoid needing to escape it, if you do, remember to sanitize it!
  */
 
-const wrongLetterText =
+const wrongAddressee =
   'Если запрос на вход отправлялся не вами, просто проигнорируйте данное письмо.'
-const signInText = 'Войти'
+const signIn = 'Войти'
 
 export function getLoginEmailContent(url: string) {
   return `
@@ -36,7 +36,7 @@ export function getLoginEmailContent(url: string) {
             font-weight: bold;
           "
         >
-          ${signInText}
+          ${signIn}
         </a>
       </td>
     </tr>
@@ -45,7 +45,7 @@ export function getLoginEmailContent(url: string) {
         align="center"
         style="padding: 0px 0px 10px 0px; color: ${theme.palette.text.primary}"
       >
-        ${wrongLetterText}
+        ${wrongAddressee}
       </td>
     </tr>
   `
