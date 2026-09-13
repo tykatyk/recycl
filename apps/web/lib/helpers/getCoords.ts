@@ -3,7 +3,6 @@ import { Client } from '@googlemaps/google-maps-services-js'
 export default async function getCoords(placeId: string) {
   if (!placeId || typeof placeId !== 'string') return null
 
-  let coords: number[] = []
   const client = new Client({})
 
   return client

@@ -410,26 +410,31 @@ export default function MyCollectionPointsList(
                           </Box>
 
                           <Box>
-                            <Stack direction="row" spacing={2}>
-                              <Button
-                                href={`${baseUrl}/edit/${item.variant}/${item._id}`}
-                                size="small"
-                                color="secondary"
-                                startIcon={<EditIcon />}
-                              >
-                                {t('editBtn')}
-                              </Button>
-                              <Button
-                                size="small"
-                                color="secondary"
-                                startIcon={<DeleteIcon />}
-                                onClick={async (_) => {
-                                  await handleDelete([item._id])
-                                }}
-                              >
-                                {t('deleteBtn')}
-                              </Button>
-                            </Stack>
+                            <Grid container spacing={2}>
+                              <Grid>
+                                {' '}
+                                <Button
+                                  href={`${baseUrl}/edit/${item.variant}/${item._id}`}
+                                  size="small"
+                                  color="secondary"
+                                  startIcon={<EditIcon />}
+                                >
+                                  {t('editBtn')}
+                                </Button>
+                              </Grid>
+                              <Grid>
+                                <Button
+                                  size="small"
+                                  color="secondary"
+                                  startIcon={<DeleteIcon />}
+                                  onClick={async (_) => {
+                                    await handleDelete([item._id])
+                                  }}
+                                >
+                                  {t('deleteBtn')}
+                                </Button>
+                              </Grid>
+                            </Grid>
                           </Box>
                         </Box>
                       </Paper>
