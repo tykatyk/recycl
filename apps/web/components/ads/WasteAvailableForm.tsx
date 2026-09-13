@@ -285,13 +285,17 @@ export default function WasteAvailableForm(props) {
                 label={t('form.wasteType')}
                 labelId="wasteType-label"
               >
-                {wasteTypesData.map((item) => {
-                  return (
-                    <MenuItem key={item._id} value={item.name}>
-                      {tWasteTypes(item.name)}
-                    </MenuItem>
+                {wasteTypesData
+                  .sort((a, b) =>
+                    tWasteTypes(a.name).localeCompare(tWasteTypes(b.name)),
                   )
-                })}
+                  .map((item) => {
+                    return (
+                      <MenuItem key={item._id} value={item.name}>
+                        {tWasteTypes(item.name)}
+                      </MenuItem>
+                    )
+                  })}
               </Select>
               <FormHelperText>
                 {formik.touched.wasteType &&
