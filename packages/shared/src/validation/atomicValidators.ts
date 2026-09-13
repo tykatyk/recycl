@@ -16,6 +16,7 @@ const {
   minLength,
   maxNumber,
   minNumber,
+  oneOf,
 } = validationMessages
 
 const email = yup.string().required(required).email(emailMsg)
@@ -73,7 +74,7 @@ const location = yup
 
 const waste = yup
   .mixed<(typeof wasteTypeNames)[number]>()
-  .oneOf(wasteTypeNames)
+  .oneOf(wasteTypeNames, oneOf)
   .required(required)
   .typeError(wrongType)
 
@@ -82,7 +83,7 @@ const wasteArray = yup
   .of(
     yup
       .mixed<(typeof wasteTypeNames)[number]>()
-      .oneOf(wasteTypeNames)
+      .oneOf(wasteTypeNames, oneOf)
       .required(required)
       .typeError(wrongType),
   )

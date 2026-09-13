@@ -625,7 +625,8 @@
     "maxLength": "Максимум {max, plural, one {# символ} few {# символа} other {# символов}}",
     "minLength": "Минимум {min, plural, one {# символ} few {# символа} other {# символов}}",
     "maxNumber": "Значение не должно быть больше {max}",
-    "minNumber": "Значение не должно быть меньше {min}"
+    "minNumber": "Значение не должно быть меньше {min}",
+    "oneOf": "Выберите один из вариантов"
   },
   "ComplaintDialog": {
     "title": "Пожаловаться на контент",

@@ -14,4 +14,5 @@ export const validationMessages = {
   minLength: 'minLength',
   maxNumber: 'maxNumber',
   minNumber: 'minNumber',
+  oneOf: 'oneOf',
 } as const
