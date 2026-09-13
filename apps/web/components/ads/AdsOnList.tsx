@@ -73,6 +73,7 @@ export default function AdsOnList(props: AdsOnListProps) {
   const router = useRouter()
   const { locale, locales, defaultLocale, asPath } = router
   const t = useTranslations('AdsOnListPage')
+  const tWasteTypes = useTranslations('WasteTypes')
 
   const getHref = useCallback(
     (options: HrefOptions) => {
@@ -291,7 +292,7 @@ export default function AdsOnList(props: AdsOnListProps) {
                                   />
                                   <Chip
                                     size="small"
-                                    label={`${item.wasteType}`}
+                                    label={tWasteTypes(item.wasteType)}
                                   />
                                 </Stack>
                               </Box>
