@@ -71,7 +71,7 @@ export async function getServerSideProps({ locale, query }) {
     }
 
     if (wasteType && wasteTypeNames.includes(wasteType)) {
-      filter.wasteTypes = wasteType
+      filter.wasteType = wasteType
     }
 
     const wasteLocation =
