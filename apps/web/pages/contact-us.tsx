@@ -43,7 +43,7 @@ export default function ContactUsPage() {
         />
       </Head>
       <Layout>
-        <Container maxWidth="md">
+        <Box>
           <Typography
             component="h1"
             variant="h4"
@@ -198,7 +198,7 @@ export default function ContactUsPage() {
               )
             }}
           </Formik>
-        </Container>
+        </Box>
       </Layout>
     </>
   )

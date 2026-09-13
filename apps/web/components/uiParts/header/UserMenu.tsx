@@ -25,7 +25,7 @@ const authenticated = 'authenticated'
 const LogIn = () => {
   const router = useRouter()
   const from = router.asPath === '/' ? '' : `?from=${router.asPath}`
-  console.log(router.asPath)
+
   const t = useTranslations('Header.userMenu')
   return (
     <MenuItem component={Link} href={`/auth/login${from}`}>

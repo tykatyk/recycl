@@ -69,10 +69,13 @@ export default function SupportUsPage() {
                   USDT
                 </Typography>
                 <Typography align="center">
-                  <span>{usdtWallet}</span>
-                  <Box component="span" sx={{ color: 'grey.500' }}>
+                  <span style={{ display: 'block' }}>{usdtWallet}</span>
+                  <Typography
+                    component="span"
+                    sx={{ display: 'block', color: 'grey.500' }}
+                  >
                     {'(BNB Smart Chain (BEP20))'}
-                  </Box>
+                  </Typography>
                 </Typography>
               </Box>
             </Box>

@@ -49,7 +49,7 @@ export default function RegisterPage() {
         />
       </Head>
       <LayoutWithoutHeader>
-        <Box sx={{ minWidth: 470 }}>
+        <Box sx={{ width: '100%', maxWidth: 470 }}>
           <Box sx={{ display: 'flex', justifyContent: 'end' }}>
             <LocaleSwitcher />
           </Box>

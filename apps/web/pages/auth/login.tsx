@@ -59,7 +59,7 @@ export default function LoginPage() {
         />
       </Head>
       <LayoutWithoutHeader>
-        <Box>
+        <Box sx={{ width: '100%', maxWidth: 470 }}>
           <Box sx={{ display: 'flex', justifyContent: 'end' }}>
             <LocaleSwitcher />
           </Box>
@@ -130,7 +130,7 @@ export default function LoginPage() {
             {({ isSubmitting, submitForm, validateForm, setTouched }) => {
               return (
                 <>
-                  <Box sx={{ mb: 2, minWidth: 470 }}>
+                  <Box sx={{ mb: 2 }}>
                     <Form noValidate autoComplete="off">
                       <Box sx={{ mb: 2 }}>
                         <Field
