@@ -84,13 +84,15 @@ export default function AdSidebarItemsCommon() {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
+            width: 'calc(100% - 32px)',
             maxWidth: 600,
+            maxHeight: 'calc(100vh - 32px)',
             bgcolor: 'background.paper',
             border: '2px solid #000',
             boxShadow: 24,
-            p: 4,
-            maxHeight: '100vh',
+            p: { xs: 2, sm: 4 },
             overflowY: 'auto',
+            boxSizing: 'border-box',
           }}
         >
           <ProposeWasteType setOpen={setModalOpen} />
