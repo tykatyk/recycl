@@ -31,7 +31,7 @@ export default function Header(props) {
 
   const {
     currentDialogId,
-    desktopBreakpoints = { xs: 'none', md: 'flex' },
+    desktopBreakpoints = { xs: 'none', lg: 'flex' },
     mobileViewport,
     ...rest
   } = props
@@ -81,14 +81,16 @@ export default function Header(props) {
           <Box
             sx={{ display: 'flex', alignItems: 'center', ml: 'auto', pl: 1 }}
           >
-            <HeaderActions />
+            <Box>
+              <LocaleSwitcher />
+            </Box>
+            <Box sx={{ pl: 2 }}>
+              <HeaderActions />
+            </Box>
 
             {/* <UnreadDialogsCounter currentDialogId={currentDialogId} /> */}
-            <Box sx={{ pl: 2 }}>
-              <UserAvatar handleMenu={handleMenu} />
-            </Box>
             <Box sx={{ pl: 1 }}>
-              <LocaleSwitcher />
+              <UserAvatar handleMenu={handleMenu} />
             </Box>
           </Box>
           <UserMenu
