@@ -33,6 +33,7 @@ export default function SupportUsPage() {
           sx={{
             display: 'flex',
             flexDirection: 'column',
+            minWidth: 0,
           }}
         >
           <Typography
@@ -56,23 +57,45 @@ export default function SupportUsPage() {
                 <Typography variant="h6" align="center">
                   Bitcoin
                 </Typography>
-                <Typography align="center">{btcWallet}</Typography>
+                <Typography
+                  align="center"
+                  sx={{
+                    overflowWrap: 'anywhere',
+                  }}
+                >
+                  {btcWallet}
+                </Typography>
               </Box>
               <Box>
                 <Typography align="center" variant="h6">
                   Etherum
                 </Typography>
-                <Typography align="center">{ethWallet}</Typography>
+                <Typography
+                  align="center"
+                  sx={{
+                    overflowWrap: 'anywhere',
+                  }}
+                >
+                  {ethWallet}
+                </Typography>
               </Box>
               <Box>
                 <Typography align="center" variant="h6">
                   USDT
                 </Typography>
-                <Typography align="center">
+                <Typography
+                  align="center"
+                  sx={{
+                    overflowWrap: 'anywhere',
+                  }}
+                >
                   <span style={{ display: 'block' }}>{usdtWallet}</span>
                   <Typography
                     component="span"
-                    sx={{ display: 'block', color: 'grey.500' }}
+                    sx={{
+                      display: 'block',
+                      color: 'grey.500',
+                    }}
                   >
                     {'(BNB Smart Chain (BEP20))'}
                   </Typography>
