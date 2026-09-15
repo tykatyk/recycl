@@ -35,22 +35,22 @@ export default function App(props: AppProps) {
         <CssBaseline />
         <GlobalCss />
         <SessionProvider session={session}>
-          <SnackbarProvider
-            maxSnack={3}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
+          <NextIntlClientProvider
+            locale={router.locale}
+            messages={pageProps.messages}
+            timeZone="Europe/Kiev"
           >
-            <NextIntlClientProvider
-              locale={router.locale}
-              messages={pageProps.messages}
-              timeZone="Europe/Kiev"
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
             >
               <Component {...pageProps} />
-            </NextIntlClientProvider>
-          </SnackbarProvider>
-          <CookieConsentPopup />
+            </SnackbarProvider>
+            <CookieConsentPopup />
+          </NextIntlClientProvider>
         </SessionProvider>
       </ThemeProvider>
     </>

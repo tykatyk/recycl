@@ -659,5 +659,9 @@
     "plasticBottles": "Пластикові пляшки",
     "plasticOther": "Пластик (інше)",
     "otherWaste": "Інше"
+  },
+  "CookieConsent": {
+    "weUseCookies": "Ми використовуємо файли cookie для покращення якості роботи сайту",
+    "ok": "ok"
   }
 }

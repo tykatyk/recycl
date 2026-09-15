@@ -659,5 +659,9 @@
     "plasticBottles": "Пластиковые бутылки",
     "plasticOther": "Пластик (прочее)",
     "otherWaste": "Прочее"
+  },
+  "CookieConsent": {
+    "weUseCookies": "Мы используем файлы cookie для улучшения качества работы сайта",
+    "ok": "ok"
   }
 }

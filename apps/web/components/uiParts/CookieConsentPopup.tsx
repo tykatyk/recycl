@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { styled } from '@mui/material/styles'
-import { Typography, Button, Grow } from '@mui/material'
-import Link from './Link'
+import { Typography, Button } from '@mui/material'
 import Cookies from 'js-cookie'
+import { colors } from '../../lib/helpers/themeStub'
+import { useTranslations } from 'next-intl'
 
 const PREFIX = 'CookieConsentPopup'
 
@@ -22,15 +23,14 @@ const Root = styled('div')(({ theme }) => ({
 
   [`&.${classes.termsPopup}`]: {
     padding: theme.spacing(4),
-    background: '#6f0595;',
+    background: colors.darkBlueGreen,
     position: 'fixed',
     bottom: 0,
     left: 0,
     right: 0,
     width: '100%',
     display: 'flex',
-    zIndex: '999',
-    display: 'flex',
+    zIndex: '1200',
     justifyContent: 'center',
     alignItems: 'center',
     [theme.breakpoints.down('md')]: {
@@ -45,6 +45,7 @@ const Root = styled('div')(({ theme }) => ({
 
 export default function CookieConsentPopup() {
   const [showCookieConsent, setShowCookieConsent] = useState(false)
+  const t = useTranslations('CookieConsent')
   const handleClick = () => {
     Cookies.set('cookieConsent', 'agreed', { expires: 31, sameSite: 'Lax' })
     setShowCookieConsent(false)
@@ -58,28 +59,14 @@ export default function CookieConsentPopup() {
     return (
       <Root className={classes.termsPopup}>
         <div>
-          <Typography>
-            Мы используем файлы cookie для улучшения качества работы.
-          </Typography>
-          <Typography>
-            Пользуясь сайтом, вы соглашаетесь с{' '}
-            <Link
-              href="/privacy-policy"
-              className={classes.link}
-              style={{ color: '#0feb5b' }}
-            >
-              Политикой приватности
-            </Link>
-            .
-          </Typography>
+          <Typography>{t('weUseCookies')}</Typography>
         </div>
         <Button
           variant="contained"
-          color="secondary"
           className={classes.termsButton}
           onClick={() => handleClick()}
         >
-          OK
+          {t('ok').toUpperCase()}
         </Button>
       </Root>
     )
