@@ -7,17 +7,20 @@ export const setSplashMinHeight = (isLoaded, options, stateHandler) => {
   const windowHeight = window.innerHeight
   let minHeight = windowHeight - headerHeight
 
-  if (isMobile()) {
-    const portraitMode = window.innerHeight > window.innerWidth
+  // if (isMobile()) {
+  //   const portraitMode = window.innerHeight > window.innerWidth
 
-    if (options.minHeight === 0 || options.portraitMode != portraitMode) {
-      options.minHeight = minHeight
-      options.portraitMode = portraitMode
-      stateHandler(minHeight)
-    }
-  } else {
-    stateHandler(minHeight)
-  }
+  //   if (
+  //     options.minHeight !== minHeight ||
+  //     options.portraitMode != portraitMode
+  //   ) {
+  //     options.minHeight = minHeight
+  //     options.portraitMode = portraitMode
+  //     stateHandler(minHeight)
+  //   }
+  // } else {
+  stateHandler(minHeight)
+  // }
 }
 
 let timeout
