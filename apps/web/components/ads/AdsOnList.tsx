@@ -8,6 +8,7 @@ import {
   SelectChangeEvent,
   Stack,
   Typography,
+  useMediaQuery,
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import AdSidebarItemsList from '../uiParts/AdSidebarItemsList'
@@ -28,6 +29,7 @@ import AdSidebarHeader from '../uiParts/AdSidebarHeader'
 import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 import { useTranslations } from 'next-intl'
 import CanonicalUrl from '../uiParts/CanonicalUrl'
+import { useTheme } from '@mui/material/styles'
 
 const listViewUrl = '/ads/list'
 const mapViewUrl = '/ads'
@@ -57,7 +59,9 @@ export type AdsOnListProps =
     }
 export default function AdsOnList(props: AdsOnListProps) {
   const { enqueueSnackbar } = useSnackbar()
-  const [drawerOpen, setDrawerOpen] = useState(true)
+  const theme = useTheme()
+  const initialDrawerOpen = useMediaQuery(theme.breakpoints.up('sm'))
+  const [drawerOpen, setDrawerOpen] = useState(initialDrawerOpen)
   const [initialFormValues, setInitialFormValues] = useState<{
     wasteType: string | null
     wasteLocation: {
@@ -121,6 +125,10 @@ export default function AdsOnList(props: AdsOnListProps) {
   }
 
   const { data } = props
+
+  useEffect(() => {
+    setDrawerOpen(initialDrawerOpen)
+  }, [initialDrawerOpen])
 
   useEffect(() => {
     if (!data) {

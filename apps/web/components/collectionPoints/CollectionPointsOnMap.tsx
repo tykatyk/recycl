@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Map from '../uiParts/Map'
-import { Box } from '@mui/material'
+import { Box, useMediaQuery } from '@mui/material'
 import getUserLocation from '../../lib/helpers/getUserLocation'
 import { useSnackbar } from 'notistack'
 import UserLocation from '../uiParts/UserLocation'
@@ -22,6 +22,7 @@ import AdSidebarChangeView from '../uiParts/AdSidebarChangeView'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/router'
 import CanonicalUrl from '../uiParts/CanonicalUrl'
+import { useTheme } from '@mui/material/styles'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const baseUrl = '/collection-points/list'
@@ -40,7 +41,9 @@ export default function CollectionPointsOnMap() {
   const [zoom, setZoom] = useState(11)
   const [locationError, setLocationError] = useState(false)
   const [center, setCenter] = useState<MapCenter | null>(null)
-  const [drawerOpen, setDrawerOpen] = useState(true)
+  const theme = useTheme()
+  const initialDrawerOpen = useMediaQuery(theme.breakpoints.up('sm'))
+  const [drawerOpen, setDrawerOpen] = useState(initialDrawerOpen)
   const [selectedMarker, setSelectedMarker] = useState('')
   const router = useRouter()
   const { locale, locales, defaultLocale, asPath } = router
@@ -50,6 +53,10 @@ export default function CollectionPointsOnMap() {
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen)
   }
+
+  useEffect(() => {
+    setDrawerOpen(initialDrawerOpen)
+  }, [initialDrawerOpen])
 
   useEffect(() => {
     getUserLocation().then((coordinates) => {

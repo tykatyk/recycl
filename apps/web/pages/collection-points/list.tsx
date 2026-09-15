@@ -23,6 +23,7 @@ import {
   Chip,
   SelectChangeEvent,
   PaginationItem,
+  useMediaQuery,
 } from '@mui/material'
 import Cookies from 'js-cookie'
 import Head from 'next/head'
@@ -46,6 +47,7 @@ import { HrefOptions } from '../../lib/types/pagination'
 import { useTranslations } from 'next-intl'
 import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
+import { useTheme } from '@mui/material/styles'
 
 const { INTERNAL_SERVER_ERROR } = responseErrorCodes
 
@@ -93,7 +95,9 @@ export default function CollectionPointsListView(
   props: CollectionPointsOnListProps,
 ) {
   const { enqueueSnackbar } = useSnackbar()
-  const [drawerOpen, setDrawerOpen] = useState(true)
+  const theme = useTheme()
+  const initialDrawerOpen = useMediaQuery(theme.breakpoints.up('sm'))
+  const [drawerOpen, setDrawerOpen] = useState(initialDrawerOpen)
   const [initialFormValues, setInitialFormValues] = useState<{
     wasteType: string | null
     wasteLocation: {
@@ -155,6 +159,10 @@ export default function CollectionPointsListView(
   }
 
   const { data } = props
+
+  useEffect(() => {
+    setDrawerOpen(initialDrawerOpen)
+  }, [initialDrawerOpen])
 
   useEffect(() => {
     if (!data) {
