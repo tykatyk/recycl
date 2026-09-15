@@ -20,7 +20,7 @@ export default function Logo() {
       <Box
         component="span"
         sx={{
-          display: 'inline',
+          display: { xs: 'none', sm: 'inline' },
           fontSize: '1.5rem',
           fontFamily: 'inherit',
           fontWeight: 'bold',

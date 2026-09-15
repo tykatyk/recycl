@@ -37,7 +37,10 @@ export default function LocaleSwitcher() {
               onClick={() => handleClick(localeItem)}
               sx={{
                 color: '#fff',
-                fontSize: 12,
+                fontSize: {
+                  xs: 10,
+                  sm: 12,
+                },
                 textDecoration: localeItem === locale ? 'underline' : 'none',
 
                 '&:hover': {
