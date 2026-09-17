@@ -13,7 +13,6 @@ async function wasteRemovalSubscriptionApiHandler(
   res: NextApiResponse,
 ) {
   const session = await getServerSession(req, res, authOptions)
-
   if (!session?.id) return res.status(401).end()
 
   await dbConnect()

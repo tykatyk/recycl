@@ -119,8 +119,8 @@ export default function WasteRemovalSubscription() {
       })
     },
 
-    onSubmit: (values) => {
-      formHandler(values)
+    onSubmit: async (values) => {
+      await formHandler(values)
     },
   })
 
@@ -171,7 +171,7 @@ export default function WasteRemovalSubscription() {
   }, [])
 
   const formHandler = async (values) => {
-    const response = await fetch(`${api}`, {
+    const response = await fetch(`${wasteRemovalApi}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ radius: values.radius }),
