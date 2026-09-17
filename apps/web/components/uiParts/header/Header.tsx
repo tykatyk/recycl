@@ -65,6 +65,14 @@ export default function Header(props) {
           disableGutters
           sx={{ display: 'flex', justifyContent: 'space-between', padding: 0 }}
         >
+          <Box id="mobile-anchor" sx={{ mr: 1 }}>
+            <MobileNavigation
+              links={links}
+              isMobile={isMobile}
+              mobileViewport={mobileViewport}
+            />
+          </Box>
+
           <Box
             sx={{
               display: 'flex',
@@ -99,13 +107,6 @@ export default function Header(props) {
             handleClose={handleClose}
             handleListKeyDown={handleListKeyDown}
           />
-          <Box id="mobile-anchor">
-            <MobileNavigation
-              links={links}
-              isMobile={isMobile}
-              mobileViewport={mobileViewport}
-            />
-          </Box>
         </Toolbar>
       </Container>
     </AppBar>

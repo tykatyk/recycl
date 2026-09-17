@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { IconButton, Menu, Box, MenuItem, useMediaQuery } from '@mui/material'
+import {
+  IconButton,
+  Menu,
+  Box,
+  MenuItem,
+  useMediaQuery,
+  Typography,
+} from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import theme from '../../../lib/helpers/themeStub'
 import { useRouter } from 'next/router'
@@ -83,6 +90,9 @@ export default function MobileNavigation({
               sx={{
                 display: 'block',
                 width: '100%',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
               }}
             >
               {link.text}
