@@ -17,39 +17,44 @@ export const ensureUsersSubscribedWorker =
     QUEUE_ENSURE_USERS_SUBSCRIBED,
     async (job: Job<EnsureUsersSubscribedJobData>) => {
       if (job.name !== JOB_ENSURE_USERS_SUBSCRIBED) return
-      const { offset, limit } = job.data
+      try {
+        const { offset, limit } = job.data
 
-      const users = await getUnsubscribedUsersFromProvider(limit, offset)
+        const users = await getUnsubscribedUsersFromProvider(limit, offset)
 
-      if (users.length === 0) {
-        return {
-          done: true,
-          nextOffset: null,
-          processed: 0,
+        if (users.length === 0) {
+          return {
+            done: true,
+            nextOffset: null,
+            processed: 0,
+          }
         }
-      }
 
-      const unsubscribedEmails = users.map((user) => user.email)
-      await setSubscriptionsUsubscribed(unsubscribedEmails)
+        const unsubscribedEmails = users.map((user) => user.email)
+        await setSubscriptionsUsubscribed(unsubscribedEmails)
 
-      const hasMore = users.length === limit
-      const nextOffset = hasMore ? offset + limit : null
+        const hasMore = users.length === limit
+        const nextOffset = hasMore ? offset + limit : null
 
-      if (hasMore && nextOffset) {
-        await ensureUserSubscribedQueue.add(
-          getJobName({ offset: nextOffset, limit }),
-          {
-            offset: nextOffset,
-            limit,
-          },
-          //ToDo: maybe add jobId: runId for better status monitoring
-        )
-      }
+        if (hasMore && nextOffset) {
+          await ensureUserSubscribedQueue.add(
+            getJobName({ offset: nextOffset, limit }),
+            {
+              offset: nextOffset,
+              limit,
+            },
+            //ToDo: maybe add jobId: runId for better status monitoring
+          )
+        }
 
-      return {
-        done: !hasMore,
-        nextOffset,
-        processed: users.length,
+        return {
+          done: !hasMore,
+          nextOffset,
+          processed: users.length,
+        }
+      } catch (err) {
+        console.log(err)
+        throw new Error('Cannot filter unsubscribed users')
       }
     },
     {

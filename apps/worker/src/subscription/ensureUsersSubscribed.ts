@@ -10,7 +10,7 @@ export const getUnsubscribedUsersFromProvider = async (
 ) => {
   const unsubscribedUsers = await sendPulseFetcher(
     `${sendPulsePath}?limit=${limit}&offset=${offset}`,
-    { signal: AbortSignal.timeout(5000) },
+    {},
   )
 
   if (!Array.isArray(unsubscribedUsers)) {
