@@ -23,6 +23,10 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/router'
 import CanonicalUrl from '../uiParts/CanonicalUrl'
 import { useTheme } from '@mui/material/styles'
+import {
+  getDesktopBreakpoints,
+  getMobileViewport,
+} from '../../lib/helpers/headerBreakpoints'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
 const baseUrl = '/collection-points/list'
@@ -131,7 +135,10 @@ export default function CollectionPointsOnMap() {
       >
         {locationError ? (
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Header />
+            <Header
+              desktopBreakpoints={getDesktopBreakpoints(drawerOpen)}
+              mobileViewport={getMobileViewport(drawerOpen)}
+            />
             <Box
               component="main"
               sx={{

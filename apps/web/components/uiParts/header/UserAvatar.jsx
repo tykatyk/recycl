@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { styled } from '@mui/material/styles'
 import { Avatar, IconButton } from '@mui/material'
 import AccountCircle from '@mui/icons-material/AccountCircle'
@@ -12,8 +12,8 @@ const classes = {
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   [`& .${classes.small}`]: {
-    width: theme.spacing(3),
-    height: theme.spacing(3),
+    width: theme.breakpoints.down('sm') ? 20 : theme.spacing(3),
+    height: theme.breakpoints.down('sm') ? 20 : theme.spacing(3),
   },
 }))
 

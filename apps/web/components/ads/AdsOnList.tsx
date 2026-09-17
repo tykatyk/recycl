@@ -30,6 +30,10 @@ import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
 import { useTranslations } from 'next-intl'
 import CanonicalUrl from '../uiParts/CanonicalUrl'
 import { useTheme } from '@mui/material/styles'
+import {
+  getDesktopBreakpoints,
+  getMobileViewport,
+} from '../../lib/helpers/headerBreakpoints'
 
 const listViewUrl = '/ads/list'
 const mapViewUrl = '/ads'
@@ -226,8 +230,8 @@ export default function AdsOnList(props: AdsOnListProps) {
             }}
           >
             <Header
-              desktopBreakpoints={{ xs: 'none', lg: 'flex' }}
-              mobileViewport={{ show: 'xs', hide: 'lg' }}
+              desktopBreakpoints={getDesktopBreakpoints(drawerOpen)}
+              mobileViewport={getMobileViewport(drawerOpen)}
             />
 
             <Box

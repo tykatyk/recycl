@@ -22,6 +22,7 @@ export default function MobileNavigation({
   const router = useRouter()
   const { locale } = router
   const { show, hide } = mobileViewport
+  const isDense = useMediaQuery(theme.breakpoints.down('sm'))
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     // setAnchorNavMenu(event.currentTarget)
@@ -50,7 +51,7 @@ export default function MobileNavigation({
         aria-haspopup="true"
         onClick={handleOpenNavMenu}
         color="inherit"
-        size="large"
+        size={isDense ? 'small' : 'large'}
       >
         <MenuIcon />
       </IconButton>
@@ -72,7 +73,7 @@ export default function MobileNavigation({
         sx={{ display: { [show]: 'block', [hide]: 'none' } }}
       >
         {links.map((link, index: number) => (
-          <MenuItem key={index} onClick={handleCloseNavMenu}>
+          <MenuItem dense={isDense} key={index} onClick={handleCloseNavMenu}>
             <Link
               href={link.href}
               locale={locale}

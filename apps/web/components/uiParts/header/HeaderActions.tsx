@@ -4,9 +4,10 @@ import {
   Button,
   IconButton,
   ListItemIcon,
-  ListItemText,
   Menu,
   MenuItem,
+  Typography,
+  useMediaQuery,
 } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
@@ -15,6 +16,7 @@ import PlaceIcon from '@mui/icons-material/Place'
 import Link from '../Link'
 import { useRouter } from 'next/router'
 import { useTranslations } from 'next-intl'
+import { useTheme } from '@mui/material/styles'
 
 export default function HeaderActions() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -22,6 +24,8 @@ export default function HeaderActions() {
   const router = useRouter()
   const { locale } = router
   const t = useTranslations('Header.actions')
+  const theme = useTheme()
+  const isDense = useMediaQuery(theme.breakpoints.down('sm'))
 
   const menuItems = [
     {
@@ -69,7 +73,7 @@ export default function HeaderActions() {
         <IconButton
           aria-label="создать объявление"
           color="inherit"
-          size="large"
+          size={isDense ? 'small' : 'large'}
           onClick={handleClick}
         >
           <AddCircleIcon />
@@ -94,9 +98,21 @@ export default function HeaderActions() {
               component={Link}
               href={item.href}
               locale={locale}
+              dense={isDense}
             >
-              <ListItemIcon>{Icon ? <Icon /> : null}</ListItemIcon>
-              <ListItemText>{item.text}</ListItemText>
+              <ListItemIcon
+                sx={{
+                  display: {
+                    xs: 'none',
+                    sm: 'flex',
+                  },
+                }}
+              >
+                {Icon ? <Icon /> : null}
+              </ListItemIcon>
+              <Typography variant="inherit" noWrap>
+                {item.text}
+              </Typography>
             </MenuItem>
           )
         })}

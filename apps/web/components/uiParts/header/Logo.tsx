@@ -20,7 +20,7 @@ export default function Logo() {
       <Box
         component="span"
         sx={{
-          display: { xs: 'none', sm: 'inline' },
+          display: { xs: 'none', md: 'inline' },
           fontSize: '1.5rem',
           fontFamily: 'inherit',
           fontWeight: 'bold',
@@ -28,7 +28,7 @@ export default function Logo() {
           letterSpacing: 0,
         }}
       >
-        Recycl
+        {process.env.NEXT_PUBLIC_BRAND || ''}
       </Box>
     </Link>
   )

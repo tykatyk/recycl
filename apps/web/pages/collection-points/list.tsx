@@ -48,6 +48,10 @@ import { useTranslations } from 'next-intl'
 import type { CollectionPoint } from '../../lib/types/collectionPoint'
 import CanonicalUrl from '../../components/uiParts/CanonicalUrl'
 import { useTheme } from '@mui/material/styles'
+import {
+  getDesktopBreakpoints,
+  getMobileViewport,
+} from '../../lib/helpers/headerBreakpoints'
 
 const { INTERNAL_SERVER_ERROR } = responseErrorCodes
 
@@ -257,8 +261,8 @@ export default function CollectionPointsListView(
             }}
           >
             <Header
-              desktopBreakpoints={{ xs: 'none', lg: 'flex' }}
-              mobileViewport={{ show: 'xs', hide: 'lg' }}
+              desktopBreakpoints={getDesktopBreakpoints(drawerOpen)}
+              mobileViewport={getMobileViewport(drawerOpen)}
             />
 
             <Box
