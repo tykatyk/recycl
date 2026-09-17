@@ -21,10 +21,9 @@ export default function Logo() {
         component="span"
         sx={{
           display: { xs: 'none', md: 'inline' },
-          fontSize: '1.5rem',
+          fontSize: '1.2rem',
           fontFamily: 'inherit',
           fontWeight: 'bold',
-          lineHeight: '1.334',
           letterSpacing: 0,
         }}
       >
