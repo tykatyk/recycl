@@ -1,7 +1,9 @@
-import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
-import { wasteTypeNames } from '../../../constants'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { wasteTypeNames } from '../../../constants.js'
 
-const wasteTypeSchema = new Schema(
+const { models, model } = mongoose
+
+const wasteTypeSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -16,10 +18,10 @@ const wasteTypeSchema = new Schema(
 
 export type WasteType = InferSchemaType<typeof wasteTypeSchema>
 
-type WasteTypeModel = Model<WasteType>
+type WasteTypeModel = mongoose.Model<WasteType>
 
 const WasteTypeModel =
-  (models.WasteType as Model<WasteType>) ||
+  (models.WasteType as mongoose.Model<WasteType>) ||
   model<WasteType, WasteTypeModel>('WasteType', wasteTypeSchema)
 
 export default WasteTypeModel

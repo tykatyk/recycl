@@ -1,5 +1,5 @@
-import type { Email, EmailData } from './types'
-import { getBrandName, getEmailFrom } from '@recycl/shared/dist/email'
+import type { Email, EmailData } from './types.js'
+import { getBrandName, getEmailFrom } from '@recycl/shared/dist/email/index.js'
 
 export const emailsPerHour = 50
 

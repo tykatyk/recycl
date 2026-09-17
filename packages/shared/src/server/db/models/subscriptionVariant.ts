@@ -1,7 +1,9 @@
-import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
-import { subscriptionVariantNames } from '../../subscription/subscriptionVariantNames'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { subscriptionVariantNames } from '../../subscription/index.js'
 
-const subscriptionVariantSchema = new Schema({
+const { models, model } = mongoose
+
+const subscriptionVariantSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -14,7 +16,7 @@ export type SubscriptionVariant = InferSchemaType<
   typeof subscriptionVariantSchema
 >
 
-type SubscriptionVariantModel = Model<SubscriptionVariant>
+type SubscriptionVariantModel = mongoose.Model<SubscriptionVariant>
 
 const SubscriptionVariantModel =
   (models.SubscriptionVariant as SubscriptionVariantModel) ||

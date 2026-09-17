@@ -1,6 +1,8 @@
-import { sendPulseFetcher } from '../email/sendPulseFetcher'
-import { dbConnect } from '@recycl/shared/dist/server/db'
-import { SubscriptionModel } from '@recycl/shared/dist/server/db'
+import { sendPulseFetcher } from '../email/sendPulseFetcher.js'
+import {
+  dbConnect,
+  SubscriptionModel,
+} from '@recycl/shared/dist/server/db/index.js'
 
 const sendPulsePath = '/smtp/unsubscribe'
 

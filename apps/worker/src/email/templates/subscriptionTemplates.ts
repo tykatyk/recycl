@@ -1,9 +1,13 @@
 import type {
   WasteLocationCounter,
   SubscriptionVariantName,
-} from '../..//subscription/types'
-import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
-import { getHost, getFullHtml, delimiter } from '@recycl/shared/dist/email'
+} from '../..//subscription/types.js'
+import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription/index.js'
+import {
+  getHost,
+  getFullHtml,
+  delimiter,
+} from '@recycl/shared/dist/email/index.js'
 
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 

@@ -1,4 +1,4 @@
-import type { SendPulseError } from './types'
+import type { SendPulseError } from './types.js'
 
 export const createSendPulseError = (params: SendPulseError) => {
   const { error_code, message } = params

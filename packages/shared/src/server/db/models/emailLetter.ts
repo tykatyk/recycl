@@ -1,12 +1,7 @@
-import {
-  Schema,
-  model,
-  models,
-  InferSchemaType,
-  Model,
-  ValidatorProps,
-} from 'mongoose'
-import { checkEmail } from '../dbModelCommons'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { checkEmail } from '../dbModelCommons.js'
+
+const { model, models } = mongoose
 
 const emailLetterVariants = [
   'proposeWasteType',
@@ -16,7 +11,7 @@ const emailLetterVariants = [
 ] as const
 export type EmailLetterVariant = (typeof emailLetterVariants)[number]
 
-const emailLetterSchema = new Schema(
+const emailLetterSchema = new mongoose.Schema(
   {
     message: {
       type: String,
@@ -33,7 +28,7 @@ const emailLetterSchema = new Schema(
       required: true,
       validate: {
         validator: checkEmail,
-        message: (props: ValidatorProps) =>
+        message: (props: mongoose.ValidatorProps) =>
           `${props.value} invalidEmailAddress`,
       },
       lowercase: true,
@@ -45,7 +40,7 @@ const emailLetterSchema = new Schema(
       required: true,
       validate: {
         validator: checkEmail,
-        message: (props: ValidatorProps) =>
+        message: (props: mongoose.ValidatorProps) =>
           `${props.value} invalidEmailAddress`,
       },
       lowercase: true,
@@ -82,7 +77,7 @@ const emailLetterSchema = new Schema(
 
 export type EmailLetter = InferSchemaType<typeof emailLetterSchema>
 
-type EmailLetterModel = Model<EmailLetter>
+type EmailLetterModel = mongoose.Model<EmailLetter>
 
 const EmailLetterModel =
   (models.EmailLetter as EmailLetterModel) ||

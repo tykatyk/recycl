@@ -1,10 +1,12 @@
-import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
-import { locationSchema } from '../dbModelCommons'
-import { wasteTypeNames } from '../../../constants'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { locationSchema } from '../dbModelCommons.js'
+import { wasteTypeNames } from '../../../constants.js'
 
-const wasteAvailableSubscriptionSchema = new Schema({
+const { models, model } = mongoose
+
+const wasteAvailableSubscriptionSchema = new mongoose.Schema({
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
@@ -29,7 +31,8 @@ export type WasteAvailableSubscription = InferSchemaType<
   typeof wasteAvailableSubscriptionSchema
 >
 
-type WasteAvailableSubscriptionModel = Model<WasteAvailableSubscription>
+type WasteAvailableSubscriptionModel =
+  mongoose.Model<WasteAvailableSubscription>
 
 const WasteAvailableSubscriptionModel =
   (models.WasteAvailableSubscription as WasteAvailableSubscriptionModel) ||

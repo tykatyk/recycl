@@ -2,7 +2,7 @@ import { Schema, Types, ValidatorProps } from 'mongoose'
 import {
   phone as phoneValidator,
   email as emailValidator,
-} from '../../validation/atomicValidators'
+} from '../../validation/atomicValidators.js'
 
 export const contactPhone = {
   type: String,

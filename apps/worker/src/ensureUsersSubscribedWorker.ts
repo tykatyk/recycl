@@ -2,15 +2,15 @@ import { Worker, Job } from 'bullmq'
 import {
   getUnsubscribedUsersFromProvider,
   setSubscriptionsUsubscribed,
-} from './subscription/ensureUsersSubscribed'
-import { ensureUserSubscribedQueue, getJobName } from './queue'
-import type { EnsureUsersSubscribedJobData } from './subscription/types'
-import { requestsPerMinute } from './email/sendPulseApiRequestLimiter'
-import { redisConnection } from '@recycl/shared/dist/server/redis'
+} from './subscription/ensureUsersSubscribed.js'
+import { ensureUserSubscribedQueue, getJobName } from './queue/index.js'
+import type { EnsureUsersSubscribedJobData } from './subscription/types.js'
+import { requestsPerMinute } from './email/sendPulseApiRequestLimiter.js'
+import { redisConnection } from '@recycl/shared/dist/server/redis/index.js'
 import {
   JOB_ENSURE_USERS_SUBSCRIBED,
   QUEUE_ENSURE_USERS_SUBSCRIBED,
-} from '@recycl/shared/dist/server/worker'
+} from '@recycl/shared/dist/server/worker/index.js'
 
 export const ensureUsersSubscribedWorker =
   new Worker<EnsureUsersSubscribedJobData>(

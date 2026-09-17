@@ -1,1 +1,1 @@
-export * from './subscriptionVariantNames'
+export * from './subscriptionVariantNames.js'

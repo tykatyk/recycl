@@ -1,5 +1,5 @@
 export {
   getUnsubscribedUsersFromProvider,
   setSubscriptionsUsubscribed,
-} from './ensureUsersSubscribed'
-export { getSubscriptionEmail } from './subscriptionEmailBuilder'
+} from './ensureUsersSubscribed.js'
+export { getSubscriptionEmail } from './subscriptionEmailBuilder.js'

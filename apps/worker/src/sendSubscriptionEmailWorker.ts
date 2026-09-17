@@ -1,21 +1,21 @@
 import { Worker, Job } from 'bullmq'
-import { SendSubscriptionEmailJobData } from './subscription/types'
-import { redisConnection as redis } from '@recycl/shared/dist/server/redis'
-import { sendPulseFetcher } from './email/sendPulseFetcher'
+import { SendSubscriptionEmailJobData } from './subscription/types.js'
+import { redisConnection as redis } from '@recycl/shared/dist/server/redis/index.js'
+import { sendPulseFetcher } from './email/sendPulseFetcher.js'
 import {
   SubscriptionEmailDeliveryModel,
   SubscriptionRunModel,
   SubscriptionBatchModel,
   UserModel,
-} from '@recycl/shared/dist/server/db'
+} from '@recycl/shared/dist/server/db/index.js'
 import {
   getSubscriptionData,
   getSubscriptionEmail,
-} from './subscription/subscriptionEmailBuilder'
-import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
-import { QUEUE_SUBSCRIPTION_RUN } from '@recycl/shared/dist/server/worker'
-import { createSendPulseError } from './email/sendPulseError'
-import type { SendPulseSMPTResponse, SendPulseError } from './email/types'
+} from './subscription/subscriptionEmailBuilder.js'
+import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription/index.js'
+import { QUEUE_SUBSCRIPTION_RUN } from '@recycl/shared/dist/server/worker/index.js'
+import { createSendPulseError } from './email/sendPulseError.js'
+import type { SendPulseSMPTResponse, SendPulseError } from './email/types.js'
 import dayjs from 'dayjs'
 
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames

@@ -2,15 +2,15 @@ import {
   CollectionPointModel,
   AdModel,
   WasteRemovalSubscriptionModel,
-} from '@recycl/shared/dist/server/db'
-import { constants } from '@recycl/shared/dist'
+} from '@recycl/shared/dist/server/db/index.js'
+import { constants } from '@recycl/shared/dist/index.js'
 import type {
   AggregatedSubscriptionData,
   WasteLocationCounter,
   WasteTypeCounter,
-} from './types'
+} from './types.js'
 import mongoose from 'mongoose'
-import { EARTH_RADIUS } from './constants'
+import { EARTH_RADIUS } from './constants.js'
 
 const { documentActivityStatus } = constants
 

@@ -1,17 +1,17 @@
 import { Queue } from 'bullmq'
-import { redisConnection } from '@recycl/shared/dist/server/redis'
+import { redisConnection } from '@recycl/shared/dist/server/redis/index.js'
 import {
   JOB_ENSURE_USERS_SUBSCRIBED,
   QUEUE_SUBSCRIPTION_RUN,
   QUEUE_PREPARE_SUBSCRIPTION_RUN,
   QUEUE_ENSURE_USERS_SUBSCRIBED,
   QUEUE_REBUILD_SUPERCLUSTER_INDEX,
-} from '@recycl/shared/dist/server/worker'
+} from '@recycl/shared/dist/server/worker/index.js'
 import type {
   PrepareSubscriptionRunJobData,
   SendSubscriptionEmailJobData,
   EnsureUsersSubscribedJobData,
-} from '../subscription/types'
+} from '../subscription/types.js'
 
 export const getJobName = (options: { offset: number; limit: number }) => {
   const { offset = 0, limit = 1 } = options

@@ -4,18 +4,21 @@ import {
   SubscriptionBatchModel,
   SubscriptionModel,
   SubscriptionRunModel,
-} from '@recycl/shared/dist/server/db'
-import { Subscription } from '@recycl/shared/dist/server/db/models/subscription'
+} from '@recycl/shared/dist/server/db/index.js'
+import { Subscription } from '@recycl/shared/dist/server/db/models/subscription.js'
 import type { FilterQuery, Types } from 'mongoose'
-import type { PrepareSubscriptionRunJobData } from './subscription/types'
-import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
-import { redisConnection as redis } from '@recycl/shared/dist/server/redis'
+import type { PrepareSubscriptionRunJobData } from './subscription/types.js'
+import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription/index.js'
+import { redisConnection as redis } from '@recycl/shared/dist/server/redis/index.js'
 import {
   QUEUE_PREPARE_SUBSCRIPTION_RUN,
   JOB_PREPARE_SUBSCRIPTION_RUN,
   JOB_SEND_SUBSCRIPTION_BATCH,
-} from '@recycl/shared/dist/server/worker'
-import { subscriptionRunQueue, prepareSubsctionRunQueue } from './queue'
+} from '@recycl/shared/dist/server/worker/index.js'
+import {
+  subscriptionRunQueue,
+  prepareSubsctionRunQueue,
+} from './queue/index.js'
 
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 const batchLimit = 100

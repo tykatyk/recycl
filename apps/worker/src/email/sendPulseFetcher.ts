@@ -1,5 +1,5 @@
-import { getAccessToken } from './sendPulseTokenManager'
-import { incrementRequestCount } from './sendPulseApiRequestLimiter'
+import { getAccessToken } from './sendPulseTokenManager.js'
+import { incrementRequestCount } from './sendPulseApiRequestLimiter.js'
 
 const BASE_URL = 'https://api.sendpulse.com'
 const MAX_REQUEST_TIME_MS = 5000

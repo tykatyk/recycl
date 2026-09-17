@@ -1,8 +1,10 @@
-import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
+import mongoose, { type InferSchemaType } from 'mongoose'
 
-const wasteRemovalSubscriptionSchema = new Schema({
+const { models, model } = mongoose
+
+const wasteRemovalSubscriptionSchema = new mongoose.Schema({
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
@@ -16,7 +18,7 @@ export type WasteRemovalSubscription = InferSchemaType<
   typeof wasteRemovalSubscriptionSchema
 >
 
-type WasteRemovalSubscriptionModel = Model<WasteRemovalSubscription>
+type WasteRemovalSubscriptionModel = mongoose.Model<WasteRemovalSubscription>
 
 const WasteRemovalSubscriptionModel =
   (models.WasteRemovalSubscription as WasteRemovalSubscriptionModel) ||

@@ -1,7 +1,8 @@
-import { Schema, model, models, InferSchemaType, Model } from 'mongoose'
-import { subscriptionVariantNames } from '../../subscription/subscriptionVariantNames'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { subscriptionVariantNames } from '../../subscription/index.js'
 
-const subscriptionJobRunSchema = new Schema(
+const { models, model } = mongoose
+const subscriptionJobRunSchema = new mongoose.Schema(
   {
     subscriptionVariantName: {
       type: String,
@@ -74,7 +75,7 @@ const subscriptionJobRunSchema = new Schema(
 
 export type SubscriptionRun = InferSchemaType<typeof subscriptionJobRunSchema>
 
-type SubscriptionRunModel = Model<SubscriptionRun>
+type SubscriptionRunModel = mongoose.Model<SubscriptionRun>
 
 const SubscriptionRunModel =
   (models.SubscriptionRun as SubscriptionRunModel) ||

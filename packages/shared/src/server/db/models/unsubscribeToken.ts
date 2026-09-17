@@ -1,8 +1,10 @@
-import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
-const unsubscribeTokenSchema = new Schema(
+import mongoose, { type InferSchemaType } from 'mongoose'
+const { models, model } = mongoose
+
+const unsubscribeTokenSchema = new mongoose.Schema(
   {
     subscription: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Subscription',
       required: true,
     },
@@ -16,5 +18,5 @@ const unsubscribeTokenSchema = new Schema(
 
 export type UnsubscribeToken = InferSchemaType<typeof unsubscribeTokenSchema>
 
-export default (models.UnsubscribeToken as Model<UnsubscribeToken>) ||
+export default (models.UnsubscribeToken as mongoose.Model<UnsubscribeToken>) ||
   model<UnsubscribeToken>('UnsubscribeToken', unsubscribeTokenSchema)

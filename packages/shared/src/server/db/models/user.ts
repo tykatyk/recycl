@@ -1,11 +1,14 @@
-import { Schema, models, model, InferSchemaType, Model } from 'mongoose'
-import type { ValidatorProps } from 'mongoose'
+import mongoose, { type InferSchemaType, type ValidatorProps } from 'mongoose'
 import cryptoRandomString from 'crypto-random-string'
-import { checkEmail, contactPhone } from '../dbModelCommons'
-import { documentActivityStatus } from '../../../constants'
-import { validationMessages } from '../../../validation'
-import { CHANGE_EMAIL_EXPIRATION_PERIOD } from '../../../constants'
-import { userRoles } from '../../../constants'
+import { checkEmail, contactPhone } from '../dbModelCommons.js'
+import {
+  userRoles,
+  CHANGE_EMAIL_EXPIRATION_PERIOD,
+  documentActivityStatus,
+} from '../../../constants.js'
+import { validationMessages } from '../../../validation/index.js'
+
+const { models, model } = mongoose
 
 const { email: invalidEmailAddress } = validationMessages
 
@@ -24,7 +27,7 @@ const methods = {
   },
 } satisfies UserMethods
 
-const locationSchema = new Schema({
+const locationSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true,
@@ -35,7 +38,7 @@ const locationSchema = new Schema({
   },
 })
 
-const userSchema = new Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -119,7 +122,7 @@ userSchema.index({
 
 export type User = InferSchemaType<typeof userSchema>
 
-type UserModel = Model<User, {}, UserMethods>
+type UserModel = mongoose.Model<User, {}, UserMethods>
 const UserModel =
   (models.User as UserModel) || model<User, UserModel>('User', userSchema)
 

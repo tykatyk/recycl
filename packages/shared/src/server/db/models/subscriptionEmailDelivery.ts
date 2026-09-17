@@ -1,10 +1,12 @@
-import { Schema, model, models, InferSchemaType, Model } from 'mongoose'
-import { subscriptionVariantNames } from '../../subscription/subscriptionVariantNames'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { subscriptionVariantNames } from '../../subscription/index.js'
 
-const emailDeliverySchema = new Schema(
+const { model, models } = mongoose
+
+const emailDeliverySchema = new mongoose.Schema(
   {
     runId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'SubscriptionEmailRun',
       required: true,
       index: true,
@@ -54,7 +56,7 @@ const emailDeliverySchema = new Schema(
 
 export type EmailDelivery = InferSchemaType<typeof emailDeliverySchema>
 
-type EmailDeliveryModel = Model<EmailDelivery>
+type EmailDeliveryModel = mongoose.Model<EmailDelivery>
 
 const EmailDeliveryModel =
   (models.EmailDelivery as EmailDeliveryModel) ||

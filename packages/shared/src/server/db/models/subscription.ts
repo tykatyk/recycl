@@ -1,10 +1,12 @@
-import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
-import { subscriptionVariantNames } from '../../subscription'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { subscriptionVariantNames } from '../../subscription/index.js'
 
-const subscriptionSchema = new Schema(
+const { models, model } = mongoose
+
+const subscriptionSchema = new mongoose.Schema(
   {
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
@@ -28,7 +30,7 @@ subscriptionSchema.index({
 
 export type Subscription = InferSchemaType<typeof subscriptionSchema>
 
-type SubscriptionModel = Model<Subscription>
+type SubscriptionModel = mongoose.Model<Subscription>
 
 const SubscriptionModel =
   (models.Subscription as SubscriptionModel) ||

@@ -1,9 +1,10 @@
-import { Schema, model, models, InferSchemaType, Model } from 'mongoose'
+import mongoose, { type InferSchemaType } from 'mongoose'
+const { model, models } = mongoose
 
-const subscriptionEmailBatchSchema = new Schema(
+const subscriptionEmailBatchSchema = new mongoose.Schema(
   {
     runId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: 'SubscriptionEmailRun',
       required: true,
       index: true,
@@ -59,7 +60,7 @@ export type SubscriptionEmailBatch = InferSchemaType<
   typeof subscriptionEmailBatchSchema
 >
 
-type SubscriptionEmailBatchModel = Model<SubscriptionEmailBatch>
+type SubscriptionEmailBatchModel = mongoose.Model<SubscriptionEmailBatch>
 
 const SubscriptionEmailBatchModel =
   (models.SubscriptionEmailBatch as SubscriptionEmailBatchModel) ||

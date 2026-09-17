@@ -1,2 +1,2 @@
-export * from './jobNames'
-export * from './queueNames'
+export * from './jobNames.js'
+export * from './queueNames.js'

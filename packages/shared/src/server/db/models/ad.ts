@@ -1,12 +1,14 @@
-import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
-import { contactPhone, locationSchema } from '../dbModelCommons'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { contactPhone, locationSchema } from '../dbModelCommons.js'
 import {
   documentActivityStatus,
   AD_EXPIRATION_PERIOD,
-} from '../../../constants'
-import { wasteTypeNames } from '../../../constants'
+  wasteTypeNames,
+} from '../../../constants.js'
 
-const adSchema = new Schema(
+const { models, model } = mongoose
+
+const adSchema = new mongoose.Schema(
   {
     //ToDo: refactor user schema. Use one from dbModelCommons
     title: {
@@ -14,7 +16,7 @@ const adSchema = new Schema(
       required: true,
     },
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
@@ -78,7 +80,7 @@ adSchema.index({
 
 export type Ad = InferSchemaType<typeof adSchema>
 
-type AdModel = Model<Ad>
+type AdModel = mongoose.Model<Ad>
 
 const AdModel = (models.Ad as AdModel) || model<Ad, AdModel>('Ad', adSchema)
 

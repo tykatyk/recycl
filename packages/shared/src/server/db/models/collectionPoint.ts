@@ -1,14 +1,15 @@
-import { Model, Schema, models, model, InferSchemaType } from 'mongoose'
-import { contactPhone, locationSchema } from '../dbModelCommons'
-import { documentActivityStatus } from '../../../constants'
-import { wasteTypeNames } from '../../../constants'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { contactPhone, locationSchema } from '../dbModelCommons.js'
+import { documentActivityStatus, wasteTypeNames } from '../../../constants.js'
+
+const { models, model } = mongoose
 
 const options = { discriminatorKey: 'variant' }
 
-const collectionPointSchema = new Schema(
+const collectionPointSchema = new mongoose.Schema(
   {
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
@@ -67,7 +68,7 @@ collectionPointSchema.index({
 
 export type CollectionPoint = InferSchemaType<typeof collectionPointSchema>
 
-type CollectionPointModel = Model<CollectionPoint>
+type CollectionPointModel = mongoose.Model<CollectionPoint>
 
 const CollectionPointModel =
   (models.CollectionPoint as CollectionPointModel) ||
@@ -76,9 +77,9 @@ const CollectionPointModel =
     collectionPointSchema,
   )
 
-const collectionPointContainerSchema = new Schema({}, options)
+const collectionPointContainerSchema = new mongoose.Schema({}, options)
 
-const collectionPointStationerySchema = new Schema(
+const collectionPointStationerySchema = new mongoose.Schema(
   {
     receiveParcels: {
       type: Boolean,
@@ -89,7 +90,7 @@ const collectionPointStationerySchema = new Schema(
   options,
 )
 
-const collectionPointMobileSchema = new Schema(
+const collectionPointMobileSchema = new mongoose.Schema(
   {
     date: {
       type: Date,
@@ -120,9 +121,9 @@ export type CollectionPointStationery = CollectionPoint &
 export type CollectionPointMobile = CollectionPoint &
   CollectionPointMobileFields
 
-type CollectionPointContainerModel = Model<CollectionPointContainer>
-type CollectionPointStationeryModel = Model<CollectionPointStationery>
-type CollectionPointMobileModel = Model<CollectionPointMobile>
+type CollectionPointContainerModel = mongoose.Model<CollectionPointContainer>
+type CollectionPointStationeryModel = mongoose.Model<CollectionPointStationery>
+type CollectionPointMobileModel = mongoose.Model<CollectionPointMobile>
 
 export const CollectionPointContainerModel =
   (CollectionPointModel.discriminators?.container as

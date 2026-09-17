@@ -1,7 +1,7 @@
 import * as yup from 'yup'
-import { phoneRegex, whitespaceRegex } from './regularExpressions'
-import { validationMessages } from './messages'
-import { minRadius, maxRadius, wasteTypeNames } from '../constants'
+import { phoneRegex, whitespaceRegex } from './regularExpressions.js'
+import { validationMessages } from './messages.js'
+import { minRadius, maxRadius, wasteTypeNames } from '../constants.js'
 
 const {
   required,

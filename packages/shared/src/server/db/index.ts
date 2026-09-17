@@ -1,2 +1,2 @@
-export * from './models'
-export { default as dbConnect } from './connection'
+export * from './models/index.js'
+export { default as dbConnect } from './connection.js'

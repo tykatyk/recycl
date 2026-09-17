@@ -1,3 +1,3 @@
-export * as validation from './validation'
-export * as constants from './constants'
-export * as email from './email'
+export * as validation from './validation/index.js'
+export * as constants from './constants.js'
+export * as email from './email/index.js'

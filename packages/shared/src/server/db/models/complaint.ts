@@ -1,9 +1,11 @@
-import { Schema, Model, models, model, InferSchemaType } from 'mongoose'
-import { checkEmail } from '../dbModelCommons'
-import { complaintContentVariants } from '../../../constants'
+import mongoose, { type InferSchemaType } from 'mongoose'
+import { checkEmail } from '../dbModelCommons.js'
+import { complaintContentVariants } from '../../../constants.js'
 import type { ValidatorProps } from 'mongoose'
 
-const complaintSchema = new Schema(
+const { models, model } = mongoose
+
+const complaintSchema = new mongoose.Schema(
   {
     complaint: {
       type: String,
@@ -18,7 +20,7 @@ const complaintSchema = new Schema(
       Enum: complaintContentVariants,
     },
     userId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       index: true,
     },
@@ -45,7 +47,7 @@ const complaintSchema = new Schema(
 )
 export type Complaint = InferSchemaType<typeof complaintSchema>
 
-type ComplaintModel = Model<Complaint>
+type ComplaintModel = mongoose.Model<Complaint>
 
 const ComplaintModel =
   (models.Complaint as ComplaintModel) ||

@@ -1,23 +1,23 @@
-import Message from './message'
-import AdModel from './ad'
+import Message from './message.js'
+import AdModel from './ad.js'
 // import Account from './account'
-import WasteType from './wasteType'
+import WasteType from './wasteType.js'
 import CollectionPointModel, {
   CollectionPointContainerModel,
   CollectionPointStationeryModel,
   CollectionPointMobileModel,
-} from './collectionPoint'
-import SubscriptionModel from './subscription'
-import SubscriptionEmailDeliveryModel from './subscriptionEmailDelivery'
-import WasteAvailableSubscriptionModel from './wasteAvailableSubsciption'
-import WasteRemovalSubscriptionModel from './wasteRemovalSubsciption'
-import SubscriptionVariantModel from './subscriptionVariant'
-import UnsubscribeToken from './unsubscribeToken'
-import UserModel from './user'
-import SubscriptionRunModel from './subscriptionRun'
-import SubscriptionBatchModel from './subscriptionBatch'
-import EmailLetterModel from './emailLetter'
-import ComplaintModel from './complaint'
+} from './collectionPoint.js'
+import SubscriptionModel from './subscription.js'
+import SubscriptionEmailDeliveryModel from './subscriptionEmailDelivery.js'
+import WasteAvailableSubscriptionModel from './wasteAvailableSubsciption.js'
+import WasteRemovalSubscriptionModel from './wasteRemovalSubsciption.js'
+import SubscriptionVariantModel from './subscriptionVariant.js'
+import UnsubscribeToken from './unsubscribeToken.js'
+import UserModel from './user.js'
+import SubscriptionRunModel from './subscriptionRun.js'
+import SubscriptionBatchModel from './subscriptionBatch.js'
+import EmailLetterModel from './emailLetter.js'
+import ComplaintModel from './complaint.js'
 
 export {
   Message,

@@ -1,12 +1,15 @@
-import type { PrepareSubscriptionData, SubscriptionVariantName } from './types'
-import { buildEncodedEmail } from '../email'
+import type {
+  PrepareSubscriptionData,
+  SubscriptionVariantName,
+} from './types.js'
+import { buildEncodedEmail } from '../email/index.js'
 import {
   getSubscriptionHtml,
   getSubscriptionTitleAndHeader,
-} from '../email/templates/subscriptionTemplates'
-import { getWasteAvailableData } from './wasteAvailableSubscription'
-import { getWasteRemovalData } from './wasteRemovalSubscription'
-import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription'
+} from '../email/templates/subscriptionTemplates.js'
+import { getWasteAvailableData } from './wasteAvailableSubscription.js'
+import { getWasteRemovalData } from './wasteRemovalSubscription.js'
+import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription/index.js'
 
 export const getSubscriptionData = async (params: {
   userId: string

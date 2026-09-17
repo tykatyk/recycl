@@ -5,11 +5,11 @@ import {
   dbConnect,
   AdModel,
   WasteType as WasteTypeModel,
-} from '@recycl/shared/dist/server/db'
-import { redisConnection as redis } from '@recycl/shared/dist/server/redis'
-import { QUEUE_REBUILD_SUPERCLUSTER_INDEX } from '@recycl/shared/dist/server/worker'
-import type { AdFeature } from '@recycl/shared/dist/server/types'
-import type { Ad } from '@recycl/shared/dist/server/db/models/ad'
+} from '@recycl/shared/dist/server/db/index.js'
+import { redisConnection as redis } from '@recycl/shared/dist/server/redis/index.js'
+import { QUEUE_REBUILD_SUPERCLUSTER_INDEX } from '@recycl/shared/dist/server/worker/index.js'
+import type { AdFeature } from '@recycl/shared/dist/server/types.js'
+import type { Ad } from '@recycl/shared/dist/server/db/models/ad.js'
 
 type RebuildSuperclusterJobData = {
   indexMap: Map<string, Supercluster<AdFeature>>

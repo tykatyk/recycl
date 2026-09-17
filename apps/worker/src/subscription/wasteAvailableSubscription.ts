@@ -2,14 +2,14 @@ import type {
   WasteTypeCounter,
   WasteLocationCounter,
   AggregatedSubscriptionData,
-} from './types'
+} from './types.js'
 import {
   WasteAvailableSubscriptionModel,
   AdModel,
-} from '@recycl/shared/dist/server/db'
+} from '@recycl/shared/dist/server/db/index.js'
 import { Types } from 'mongoose'
-import { EARTH_RADIUS } from './constants'
-import { documentActivityStatus } from '@recycl/shared/dist/constants'
+import { EARTH_RADIUS } from './constants.js'
+import { documentActivityStatus } from '@recycl/shared/dist/constants.js'
 
 export const getWasteAvailableData = async (params: {
   userId: string
