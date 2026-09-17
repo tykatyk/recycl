@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer'
 import { EmailLetterModel } from '@recycl/shared/dist/server/db'
 import type { EmailLetterVariant } from '@recycl/shared/dist/server/db/models/emailLetter'
+import { getBrandName, getEmailFrom } from '@recycl/shared/dist/email'
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -28,7 +29,7 @@ export async function sendEmail({
   text: string
 }) {
   return transporter.sendMail({
-    from: process.env.EMAIL_FROM,
+    from: { name: getBrandName(), address: getEmailFrom() },
     to,
     subject,
     html,

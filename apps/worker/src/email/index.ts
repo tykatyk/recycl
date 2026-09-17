@@ -1,21 +1,7 @@
 import type { Email, EmailData } from './types'
+import { getBrandName, getEmailFrom } from '@recycl/shared/dist/email'
 
 export const emailsPerHour = 50
-const emailsPerMonth = 12000
-
-const getBrandName = () => {
-  if (!process.env.BRAND) {
-    throw new Error('process.env.BRAND is not defined')
-  }
-  return process.env.BRAND
-}
-
-const getEmailFrom = () => {
-  if (!process.env.EMAIL_FROM) {
-    throw new Error('process.env.EMAIL_FROM is not defined')
-  }
-  return process.env.EMAIL_FROM
-}
 
 export function prepareEmailObj(params: EmailData) {
   const { userName, userEmail, subject, html } = params
