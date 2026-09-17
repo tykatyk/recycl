@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { styled, useTheme } from '@mui/material/styles'
 import {
   Grid,
   Card,
@@ -10,6 +9,7 @@ import {
   Box,
   Container,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import cardsContent from '../components/home/cardsContent'
 import { handleResize } from '../components/home/resizeHandlers'
 import images from '../components/home/backgroundImages'
@@ -24,114 +24,6 @@ import { useRouter } from 'next/router'
 import CanonicalUrl from '../components/uiParts/CanonicalUrl'
 
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
-const PREFIX = 'Index'
-
-const classes = {
-  splash: `${PREFIX}-splash`,
-  splashHeader: `${PREFIX}-splashHeader`,
-  cardContainer: `${PREFIX}-cardContainer`,
-  card: `${PREFIX}-card`,
-  cardHeader: `${PREFIX}-cardHeader`,
-  cardContent: `${PREFIX}-cardContent`,
-}
-
-const StyledMain = styled('main')(({ theme }) => ({
-  [`& .${classes.splash}`]: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    margin: '0 auto',
-    minWidth: '100%',
-    maxWidth: '1920px',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-
-    // background image for landscape orientation
-    [`@media screen`]: {
-      backgroundImage: `url(/${images.mediumLandscape})`,
-    },
-
-    [theme.breakpoints.up('sm')]: {
-      backgroundImage: `url(/${images.xLargeLandscape})`,
-    },
-
-    // background image for portrait orientation
-    [`@media screen and (orientation: portrait)`]: {
-      backgroundImage: `url(/${images.smallPortrait})`, // 600px
-    },
-    [`${theme.breakpoints.up('sm')} and (orientation: portrait)`]: {
-      backgroundImage: `url(/${images.mediumPortrait})`, // 960px
-    },
-    [`${theme.breakpoints.up('md')} and (orientation: portrait)`]: {
-      backgroundImage: `url(/${images.largePortrait})`, // 1280px
-    },
-    [`${theme.breakpoints.up(
-      'xs',
-    )} and (min-resolution: 2dppx) and (orientation: portrait)`]: {
-      backgroundImage: `url(/${images.smallRetinaPortrait})`, // 1200px
-    },
-    [`${theme.breakpoints.up(
-      'sm',
-    )} and (min-resolution: 2dppx) and (orientation: portrait), ${theme.breakpoints
-      .up('lg')
-      .replace('@media ', '')} and (orientation: portrait)`]: {
-      backgroundImage: `url(/${images.mediumRetinaPortrait})`, // 1920px
-    },
-
-    color: '#fff',
-    textAlign: 'center',
-  },
-
-  [`& .${classes.splashHeader}`]: {
-    margin: '0 auto',
-    padding: '0 24px',
-    maxWidth: 900,
-    boxSizing: 'border-box',
-    fontWeight: 'bold',
-    textShadow: '2px 1px #152229',
-    overflowWrap: 'break-word',
-  },
-
-  [`& .${classes.cardContainer}`]: {
-    maxWidth: `${theme.breakpoints.values.lg}px`,
-    padding: '40px 16px',
-    margin: '0 auto',
-  },
-
-  [`& .${classes.card}`]: {
-    minHeight: '25em',
-    backgroundColor: `${theme.palette.background.paper}`,
-    color: '#fff',
-  },
-
-  [`& .${classes.cardHeader}`]: {
-    backgroundColor: `${theme.palette.primary.dark}`,
-    borderBottom: '6px solid #fff',
-  },
-
-  [`& .${classes.cardContent}`]: {
-    paddingTop: theme.spacing(3),
-    '& li': {
-      position: 'relative',
-      paddingLeft: theme.spacing(3),
-      paddingBottom: theme.spacing(3),
-      '&::lastChild': {
-        paddingBottom: 0,
-      },
-      '&:before': {
-        content: '"»"',
-        color: `${theme.palette.secondary.main}`,
-        fontSize: '2em',
-        fontWeight: 'bold',
-        display: 'inline-block',
-        marginRight: theme.spacing(1),
-        position: 'absolute',
-        top: '-0.5em',
-        left: '0',
-      },
-    },
-  },
-}))
 
 const options = {
   portraitMode: true,
@@ -139,28 +31,34 @@ const options = {
   portraitHeight: 0,
   minHeight: 0,
 }
+
 export default function HomePage() {
   const theme = useTheme()
-  const matches = useMediaQuery(theme.breakpoints.down('md'))
+
+  const isSm = useMediaQuery(theme.breakpoints.between('sm', 'md'))
+
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'))
+
   const [splashMinHeight, setSplashMinHeight] = useState(0)
+
   const router = useRouter()
   const { locale, locales, defaultLocale, asPath } = router
+
   const t = useTranslations('HomePage')
 
   useEffect(() => {
     let isLoaded = true
 
-    handleResize(isLoaded, options, setSplashMinHeight)
+    const onResize = () => {
+      handleResize(isLoaded, options, setSplashMinHeight)
+    }
 
-    window.addEventListener('resize', () =>
-      handleResize(isLoaded, options, setSplashMinHeight),
-    )
+    onResize()
+    window.addEventListener('resize', onResize)
 
     return () => {
       isLoaded = false
-      window.removeEventListener('resize', () =>
-        handleResize(isLoaded, options, setSplashMinHeight),
-      )
+      window.removeEventListener('resize', onResize)
     }
   }, [])
 
@@ -169,6 +67,7 @@ export default function HomePage() {
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="description" content="" />
+
         <CanonicalUrl
           asPath={asPath}
           locale={locale}
@@ -176,44 +75,159 @@ export default function HomePage() {
           locales={locales}
         />
       </Head>
+
       <Wrapper>
         <Box
           className="container"
-          sx={{ width: '100%', ml: 'auto', mr: 'auto', maxWidth: 1920 }}
+          sx={{
+            width: '100%',
+            mx: 'auto',
+            maxWidth: 1920,
+          }}
         >
           <Header />
-          <StyledMain sx={{ width: '100%' }}>
-            <section
-              className={classes.splash}
-              style={{ minHeight: `${splashMinHeight}px` }}
+
+          <Box
+            component="main"
+            sx={{
+              width: '100%',
+            }}
+          >
+            {/* Splash */}
+            <Box
+              component="section"
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                mx: 'auto',
+                minWidth: '100%',
+                maxWidth: 1920,
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundImage: `url(/${images.mediumLandscape})`,
+                color: '#fff',
+                textAlign: 'center',
+                minHeight: splashMinHeight,
+
+                [theme.breakpoints.up('sm')]: {
+                  backgroundImage: `url(/${images.xLargeLandscape})`,
+                },
+
+                '@media screen and (orientation: portrait)': {
+                  backgroundImage: `url(/${images.smallPortrait})`,
+                },
+
+                [`${theme.breakpoints.up('sm')} and (orientation: portrait)`]: {
+                  backgroundImage: `url(/${images.mediumPortrait})`,
+                },
+
+                [`${theme.breakpoints.up('md')} and (orientation: portrait)`]: {
+                  backgroundImage: `url(/${images.largePortrait})`,
+                },
+
+                [`${theme.breakpoints.up(
+                  'xs',
+                )} and (min-resolution: 2dppx) and (orientation: portrait)`]: {
+                  backgroundImage: `url(/${images.smallRetinaPortrait})`,
+                },
+
+                [`${theme.breakpoints.up(
+                  'sm',
+                )} and (min-resolution: 2dppx) and (orientation: portrait), ${theme.breakpoints
+                  .up('lg')
+                  .replace('@media ', '')} and (orientation: portrait)`]: {
+                  backgroundImage: `url(/${images.mediumRetinaPortrait})`,
+                },
+              }}
             >
               <Typography
                 component="h1"
-                variant={matches ? 'h3' : 'h2'}
-                className={classes.splashHeader}
+                variant={isSm ? 'h3' : isXs ? 'h4' : 'h2'}
+                sx={{
+                  mx: 'auto',
+                  px: 3,
+                  maxWidth: 900,
+                  boxSizing: 'border-box',
+                  fontWeight: 'bold',
+                  textShadow: '2px 1px #152229',
+                  overflowWrap: 'break-word',
+                }}
               >
                 {t('h1')}
               </Typography>
-            </section>
-            <section className={classes.cardContainer}>
+            </Box>
+
+            {/* What we propose */}
+            <Box
+              component="section"
+              sx={{
+                maxWidth: `${theme.breakpoints.values.lg}px`,
+                px: 2,
+                py: 5,
+                mx: 'auto',
+              }}
+            >
               <Typography
-                component={'h2'}
-                variant={matches ? 'h4' : 'h3'}
+                component="h2"
+                variant={isSm ? 'h3' : isXs ? 'h4' : 'h2'}
                 align="center"
-                sx={{ mt: 1, mb: 6 }}
+                sx={{
+                  mt: 1,
+                  mb: 6,
+                }}
               >
                 {t('whatWePropose.h2')}
               </Typography>
+
               <Grid container spacing={5}>
                 {cardsContent.map((card, idx) => (
                   <Grid key={idx} size={{ xs: 12, sm: 6 }}>
-                    <Card className={classes.card}>
+                    <Card
+                      sx={{
+                        minHeight: '25em',
+                        backgroundColor: 'background.paper',
+                        color: '#fff',
+                      }}
+                    >
                       <CardHeader
                         title={t(`whatWePropose.${card.id}.title`)}
-                        titleTypographyProps={{ align: 'center' }}
-                        className={classes.cardHeader}
+                        titleTypographyProps={{
+                          align: 'center',
+                        }}
+                        sx={{
+                          backgroundColor: 'primary.dark',
+                          borderBottom: '6px solid #fff',
+                        }}
                       />
-                      <CardContent className={classes.cardContent}>
+
+                      <CardContent
+                        sx={{
+                          pt: 3,
+
+                          '& li': {
+                            position: 'relative',
+                            pl: 3,
+                            pb: 3,
+
+                            '&:last-child': {
+                              pb: 0,
+                            },
+
+                            '&::before': {
+                              content: '"»"',
+                              color: 'secondary.main',
+                              fontSize: '2em',
+                              fontWeight: 'bold',
+                              display: 'inline-block',
+                              mr: 1,
+                              position: 'absolute',
+                              top: '-0.5em',
+                              left: 0,
+                            },
+                          },
+                        }}
+                      >
                         <ul>
                           {card.description.map((item, index) => (
                             <Typography component="li" key={index}>
@@ -223,12 +237,13 @@ export default function HomePage() {
                                 sx={{
                                   color: '#fff',
                                   textDecoration: 'none',
+
                                   '&:hover': {
                                     textDecoration: 'underline',
                                   },
                                 }}
                               >
-                                {/* //ToDo: add types */}
+                                {/* ToDo: add types */}
                                 {t(
                                   `whatWePropose.${card.id}.${item.id}` as any,
                                 )}
@@ -241,19 +256,24 @@ export default function HomePage() {
                   </Grid>
                 ))}
               </Grid>
-            </section>
-            <section
-              style={{
-                backgroundColor: '#21275c',
+            </Box>
+
+            {/* How it works */}
+            <Box
+              component="section"
+              sx={{
                 width: '100%',
-                padding: '40px 16px',
+                px: 2,
+                py: 5,
+                backgroundColor: '#21275c',
               }}
             >
               <Container maxWidth="md">
-                <HowItWorks matches={matches} />
+                <HowItWorks variant={isSm ? 'h3' : isXs ? 'h4' : 'h2'} />
               </Container>
-            </section>
-          </StyledMain>
+            </Box>
+          </Box>
+
           <Footer />
         </Box>
       </Wrapper>

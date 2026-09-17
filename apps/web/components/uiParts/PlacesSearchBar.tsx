@@ -1,4 +1,11 @@
-import { Autocomplete, Box, Chip, TextField, Typography } from '@mui/material'
+import {
+  Autocomplete,
+  Box,
+  Chip,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from '@mui/material'
 import { useEffect, useMemo } from 'react'
 import { colors } from '../../lib/helpers/themeStub'
 const { darkBlueGreen } = colors
@@ -8,7 +15,8 @@ import Listbox from '../uiParts/formInputs/Listbox'
 import React from 'react'
 import throttle from 'lodash/throttle'
 import type { PlaceTypeWithMatchedSubstrings } from '../../lib/types/placeAutocomplete'
-import { APIProvider, useMap, useMapsLibrary } from '@vis.gl/react-google-maps'
+import { useMap, useMapsLibrary } from '@vis.gl/react-google-maps'
+import { useTheme } from '@mui/material/styles'
 
 export default function PlacesSearchBar() {
   const [inputValue, setInputValue] = React.useState('')
@@ -20,6 +28,8 @@ export default function PlacesSearchBar() {
   const placesLib = useMapsLibrary('places')
   const [sessionToken, setSessionToken] = React.useState<any>(null)
   const map = useMap()
+  const theme = useTheme()
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'))
 
   const autocompleteService = useMemo(() => {
     if (!placesLib) return null
@@ -112,11 +122,12 @@ export default function PlacesSearchBar() {
   return (
     <Box
       sx={{
-        width: 300,
+        width: isXs ? 230 : 300,
         borderRadius: '8px',
         background: '#fff',
         p: '8px 4px 4px 4px',
         mt: '4px',
+        ml: isXs ? 1 : 0,
         boxShadow: '1px 1px 4px #6e6d6d',
       }}
     >

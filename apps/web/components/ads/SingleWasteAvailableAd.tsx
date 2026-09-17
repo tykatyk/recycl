@@ -59,7 +59,7 @@ export default function SingleWasteAvailableAd({
   }, [phone, data])
 
   return (
-    <Box>
+    <Box sx={{ width: '100%' }}>
       <Box sx={{ mb: 3 }}>
         <Box sx={{ mb: 1 }}>
           <Typography component="h1" variant="h4">

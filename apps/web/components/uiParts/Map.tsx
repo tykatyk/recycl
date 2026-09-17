@@ -15,6 +15,8 @@ import {
 } from 'react'
 import type { BBox, MapCenter } from '@recycl/shared/dist/server/types'
 import PlacesSearchBar from './PlacesSearchBar'
+import { useMediaQuery } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 
 const googleMapId = 'd80f8976374eb93b825a20cf'
 export const initialZoom = 11
@@ -33,6 +35,8 @@ export default function MapComponent(props: MapComponentProps) {
   const isResizing = useRef(false)
   const resizeTimeout = useRef<NodeJS.Timeout | null>(null)
   const { setVisibleRect, setZoom, center, children, setSelectedMarker } = props
+  const theme = useTheme()
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'))
 
   const updateMapState = useCallback((map: google.maps.Map) => {
     const bounds = map.getBounds()
@@ -109,7 +113,11 @@ export default function MapComponent(props: MapComponentProps) {
         }}
         onClick={() => setSelectedMarker('')}
       >
-        <MapControl position={ControlPosition.TOP_CENTER}>
+        <MapControl
+          position={
+            isXs ? ControlPosition.TOP_LEFT : ControlPosition.TOP_CENTER
+          }
+        >
           <PlacesSearchBar />
         </MapControl>
         {children}

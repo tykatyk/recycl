@@ -7,14 +7,18 @@ import TimelineDot from '@mui/lab/TimelineDot'
 import { useTranslations } from 'next-intl'
 import { Typography } from '@mui/material'
 
-export default function HowItWorks({ matches }: { matches: boolean }) {
+export default function HowItWorks({
+  variant,
+}: {
+  variant: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+}) {
   const t = useTranslations('HomePage.howItWorks')
 
   return (
     <>
       <Typography
         component={'h2'}
-        variant={matches ? 'h4' : 'h3'}
+        variant={variant}
         align="center"
         sx={{ mt: 1, mb: 6 }}
       >

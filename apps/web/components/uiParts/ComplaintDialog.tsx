@@ -88,15 +88,7 @@ export default function ComplaintDialog(props: FormDialogProps) {
 
   return (
     <React.Fragment>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        PaperProps={{
-          sx: {
-            minWidth: '450px',
-          },
-        }}
-      >
+      <Dialog open={open} onClose={handleClose}>
         <form onSubmit={formik.handleSubmit}>
           <DialogTitle>{t('title')}</DialogTitle>
           <DialogContent>
