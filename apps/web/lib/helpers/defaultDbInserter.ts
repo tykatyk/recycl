@@ -28,7 +28,7 @@ const mapper = (items) => {
 const wasteTypes = mapper(wasteTypeNames)
 const subscriptionVariants = mapper(['wasteAvailable', 'wasteRemoval'])
 
-const databaseUrl = 'mongodb://127.0.0.1:27017/recycldb2'
+const databaseUrl = 'mongodb://127.0.0.1:27017/recycldb'
 
 async function insertWasteTypes() {
   console.log('Start inserting waste types')
