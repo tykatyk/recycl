@@ -24,6 +24,7 @@ import {
   SelectChangeEvent,
   PaginationItem,
   useMediaQuery,
+  Grid,
 } from '@mui/material'
 import Cookies from 'js-cookie'
 import Head from 'next/head'
@@ -326,7 +327,7 @@ export default function CollectionPointsListView(
                                 >
                                   {t('wasteTypes')}
                                 </Typography>
-                                <Stack spacing={2} direction={'row'}>
+                                <Grid container spacing={2}>
                                   {item.wasteTypes
                                     .sort((a, b) =>
                                       tWasteTypes(a).localeCompare(
@@ -335,13 +336,12 @@ export default function CollectionPointsListView(
                                     )
                                     .map((waste) => {
                                       return (
-                                        <Chip
-                                          key={waste}
-                                          label={`${tWasteTypes(waste)} ${t('quantityDimension')}`}
-                                        />
+                                        <Grid key={waste}>
+                                          <Chip label={tWasteTypes(waste)} />
+                                        </Grid>
                                       )
                                     })}
-                                </Stack>
+                                </Grid>
                               </Box>
 
                               <Box sx={{ mb: 2 }}>
