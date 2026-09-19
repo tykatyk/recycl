@@ -21,9 +21,9 @@ async function requestHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const auth = req.headers['authorization']
-  // if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
-  //   return res.status(401).end()
-  // }
+  if (auth !== `Bearer ${process.env.SEND_SUBSCRIPTION_EMAILS_TOKEN}`) {
+    return res.status(401).end()
+  }
 
   const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
