@@ -42,7 +42,7 @@ const getLastRunDate = async (
   runId: string,
 ) => {
   const previousRun = await SubscriptionRunModel.findOne({
-    id: {
+    _id: {
       $lt: runId,
     },
     subscriptionVariantName,
