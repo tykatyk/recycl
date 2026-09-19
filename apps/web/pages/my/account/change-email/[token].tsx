@@ -106,7 +106,7 @@ export async function getServerSideProps({ query, locale }) {
   return {
     props: {
       urlIsValid: true,
-      messages: (await import(`../../../../messages/${locale}.json`)).default,
+      messages: (await import(`../../../../messages/${locale}`)).default,
     },
   }
 }

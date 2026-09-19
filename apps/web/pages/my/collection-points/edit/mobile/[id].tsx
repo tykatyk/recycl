@@ -47,8 +47,7 @@ export async function getServerSideProps({ req, res, locale, resolvedUrl }) {
 
   return {
     props: {
-      messages: (await import(`../../../../../messages/${locale}.json`))
-        .default,
+      messages: (await import(`../../../../../messages/${locale}`)).default,
     },
   }
 }

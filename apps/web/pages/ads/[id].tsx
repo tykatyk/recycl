@@ -133,7 +133,7 @@ export async function getServerSideProps({ res, query, locale }) {
       notFound: true,
     }
   }
-  const messages = (await import(`../../messages/${locale}.json`)).default
+  const messages = (await import(`../../messages/${locale}`)).default
   if (data.status !== active) {
     res.statusCode = 403
     return {

@@ -31,7 +31,7 @@ export default function AdsListView(props: AdsOnListProps) {
 
 export async function getServerSideProps({ locale, query }) {
   const messages = {
-    messages: (await import(`../../messages/${locale}.json`)).default,
+    messages: (await import(`../../messages/${locale}`)).default,
   }
 
   try {

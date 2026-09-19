@@ -112,7 +112,7 @@ export default function SupportUsPage() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      messages: (await import(`../messages/${locale}.json`)).default,
+      messages: (await import(`../messages/${locale}`)).default,
     },
   }
 }

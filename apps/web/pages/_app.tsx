@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { SessionProvider } from 'next-auth/react'

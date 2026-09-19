@@ -1,8 +1,10 @@
+import { wasteTypeNames } from '@recycl/shared/dist/constants.js'
+
 type AggregatedSubscriptionData = {
   locationId: string
   locationName: string
   coordinates: number[]
-  wasteTypes: string[]
+  wasteTypes: (typeof wasteTypeNames)[number][]
 }
 
 type SubscriptionVariantName = 'wasteAvailable' | 'wasteRemoval'
@@ -25,7 +27,10 @@ type EnsureUsersSubscribedJobData = {
   limit: number
 }
 
-type WasteTypeCounter = { wasteName: string; newAdsCount: number }
+type WasteTypeCounter = {
+  wasteName: (typeof wasteTypeNames)[number]
+  newAdsCount: number
+}
 
 type WasteLocationCounter = {
   locationName: string

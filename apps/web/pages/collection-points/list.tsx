@@ -444,7 +444,7 @@ export default function CollectionPointsListView(
 
 export async function getServerSideProps({ query, locale }) {
   //ToDo: add verification that locationDescription really belongs to locationId
-  const messages = (await import(`../../messages/${locale}.json`)).default
+  const messages = (await import(`../../messages/${locale}`)).default
 
   try {
     const {

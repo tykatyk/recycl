@@ -1,13 +1,16 @@
 import type {
   WasteLocationCounter,
   SubscriptionVariantName,
-} from '../..//subscription/types.js'
+} from '../../subscription/types.js'
 import { subscriptionVariantNames } from '@recycl/shared/dist/server/subscription/index.js'
 import {
   getHost,
   getFullHtml,
   delimiter,
 } from '@recycl/shared/dist/email/index.js'
+import { ru } from '@recycl/shared/dist/i18n/index.js'
+
+const { WasteTypes } = ru
 
 const { wasteAvailable, wasteRemoval } = subscriptionVariantNames
 
@@ -86,7 +89,7 @@ export const getSubscriptionHtml = (params: {
           const { wasteName, newAdsCount } = wasteType
           return `<tr>
                     <td style="padding:0 0 4px 8px">
-                      Тип отходов: ${wasteName}
+                      Тип отходов: ${WasteTypes[wasteName]}
                     </td>
                   </tr>
                   <tr>

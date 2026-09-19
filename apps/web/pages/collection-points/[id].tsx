@@ -160,7 +160,7 @@ export async function getServerSideProps({ res, locale, query }) {
         },
         createdAt: data.createdAt.toDateString(),
       },
-      messages: (await import(`../../messages/${locale}.json`)).default,
+      messages: (await import(`../../messages/${locale}`)).default,
     },
   }
 }
