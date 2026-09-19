@@ -54,7 +54,7 @@ const LogIn = () => {
   )
 }
 
-const LogOut = ({ status }) => {
+const LogOut = () => {
   const t = useTranslations('Header.userMenu')
   const theme = useTheme()
   const isDense = useMediaQuery(theme.breakpoints.down('sm'))
@@ -63,11 +63,9 @@ const LogOut = ({ status }) => {
     <MenuItem
       dense={isDense}
       onClick={() => {
-        if (status === 'authenticated') {
-          signOut({
-            callbackUrl: '/',
-          })
-        }
+        signOut({
+          callbackUrl: '/',
+        })
       }}
       sx={{ px: { xs: 1, sm: 2 }, py: 1 }}
     >
@@ -183,34 +181,28 @@ export default function UserMenu(props) {
         },
       }}
     >
-      {status === authenticated ? (
-        <>
-          <MenuItem dense={isDense} divider>
-            <ListItemText
-              style={{
-                textAlign: 'center',
-                color: theme.palette.secondary.main,
-              }}
-              secondary={session ? session.user?.name : ''}
-            />
-          </MenuItem>
-          <MenuItem dense={isDense}>
-            <ListItemText
-              style={{
-                color: theme.palette.secondary.main,
-                textTransform: 'uppercase',
-              }}
-              secondary={t('header')}
-            />
-          </MenuItem>
-          {menuItems.map((item, index) => {
-            return showSubmenu(item, index)
-          })}
-          <LogOut status={status} />
-        </>
-      ) : (
-        <LogIn />
-      )}
+      <MenuItem dense={isDense} divider>
+        <ListItemText
+          style={{
+            textAlign: 'center',
+            color: theme.palette.secondary.main,
+          }}
+          secondary={session ? session.user?.name : ''}
+        />
+      </MenuItem>
+      <MenuItem dense={isDense}>
+        <ListItemText
+          style={{
+            color: theme.palette.secondary.main,
+            textTransform: 'uppercase',
+          }}
+          secondary={t('header')}
+        />
+      </MenuItem>
+      {menuItems.map((item, index) => {
+        return showSubmenu(item, index)
+      })}
+      {status === 'authenticated' ? <LogOut /> : <LogIn />}
     </Menu>
   )
 }
