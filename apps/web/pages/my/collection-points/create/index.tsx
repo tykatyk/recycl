@@ -15,6 +15,7 @@ import { collectionPointTypes } from '@recycl/shared/dist/constants'
 import Head from 'next/head'
 import { useTranslations } from 'next-intl'
 import CanonicalUrl from '../../../../components/uiParts/CanonicalUrl'
+import RedirectUnauthenticatedUser from '../../../../components/uiParts/RedirectUnauthenticatedUser'
 
 const baseUrl = '/my/collection-points/create'
 const brand = process.env.NEXT_PUBLIC_BRAND || ''
@@ -27,7 +28,7 @@ export default function CreateCollectionPoint() {
   const tCollectionPointTypes = useTranslations('CollectionPointTypes')
 
   return (
-    <>
+    <RedirectUnauthenticatedUser>
       <Head>
         <title>{`${t('title')} | ${brand}`}</title>
         <meta name="robots" content="noindex, nofollow"></meta>
@@ -99,7 +100,7 @@ export default function CreateCollectionPoint() {
           </Grid>
         </Box>
       </Layout>
-    </>
+    </RedirectUnauthenticatedUser>
   )
 }
 
